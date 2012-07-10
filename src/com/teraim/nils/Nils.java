@@ -26,8 +26,21 @@ public class Nils extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_nils);
 		db.copyDBIfNeeded();
+		db.open();
+		Cursor c = db.getAllParams();
+		if (c.moveToFirst())
+		{
+			Log.d("NILS","Move to first ok");
+			do {
+				createInput(c);
+			} while (c.moveToNext());
+		}	
+		db.close();
+	}
 
-
+	private void createButtons(Cursor c) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
@@ -52,7 +65,7 @@ public class Nils extends Activity {
 			} while (c.moveToNext());
 		}
 		db.close();}
-	
+		
 	
 	
 	

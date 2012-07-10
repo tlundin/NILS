@@ -14,6 +14,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import android.widget.Adapter;
 public class Dbhelper {
 	static final String KEY_ROWID="ID";
 	static final String KEY_NAME="NAME";
@@ -94,6 +95,16 @@ public class Dbhelper {
 	//	return db.query(DATABASE_TABLE, null, null, null, null, null, null, null);
 	//	return db.query(DATABASE_TABLE, new String[] {KEY_NAME}, null, null, null, null, null);
 	}
+	
+	public Adapter getAdapter() {
+		return new SimpleCursorAdapter(
+                this, 
+                R.layout.pepak_list_item, 
+                getAllParams(), 
+                new String[] {"postOne", "postTwo", "picture"}, 
+                new int[] {R.id.postOne, R.id.postTwo, R.id.picture});
+	}
+	
 	//---retrieves a particular contact---
 	public Cursor getContact(long rowId) throws SQLException
 	{
