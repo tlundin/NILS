@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceCategory android:title="Category 1">
+<CheckBoxPreference
+android:title="Device Type"
+android:defaultValue="false"
+android:summary="This device is Red"
+android:key="checkboxPref" />
+</PreferenceCategory>
+<PreferenceCategory android:title="Category 2">    
+
+</PreferenceCategory>
+
+</PreferenceScreen>
