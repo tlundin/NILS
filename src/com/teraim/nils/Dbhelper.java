@@ -13,21 +13,16 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.widget.Adapter;
 public class Dbhelper {
-	static final String KEY_ROWID="ID";
-	static final String KEY_NAME="NAME";
-	static final String KEY_VALUE="VALUE";
 	static final String TAG = "DBAdapter";
 	static final String DATABASE_TABLE = "params";
-	static final String DATABASE_NAME = "nilso";
+	static final String DATABASE_NAME = "nilsdb";
+	static final String ASSET_DATABASE_NAME = "sqlver";
+
 	static final int DATABASE_VERSION = 1;
-	static final String DATABASE_CREATE =
-			"create table params (ID integer primary key autoincrement, "
-					+ "NAME text, VALUE text);";
-	private static final String ASSET_DATABASE_NAME = "devnilsdb";
-	
 	final Context context;
 	DatabaseHelper DBHelper;
 	SQLiteDatabase db;
@@ -43,31 +38,23 @@ public class Dbhelper {
 			super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		}
 		@Override
-		public void onCreate(SQLiteDatabase db)
-		{
-			try {
-				db.execSQL(DATABASE_CREATE);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
 		{
 			Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
-					+ newVersion + ", which will destroy all old data");
-			db.execSQL("DROP TABLE IF EXISTS params");
+					+ newVersion + ", which is not implemented yet");
+			//db.execSQL("DROP TABLE IF EXISTS params");
 			onCreate(db);
+		}
+		@Override
+		public void onCreate(SQLiteDatabase arg0) {
+			Log.e(TAG, "database is missing");
 		}
 	}
 	//---opens the database---
 	public Dbhelper open() throws SQLException
 	{
 		db = DBHelper.getWritableDatabase();//DBHelper.getWritableDatabase();	
-		Log.d("NILS","Name of db: "+DBHelper.getDatabaseName());
-		if (db!=null)
-			Log.d("NILS","DB is not null");
-			
+		Log.d("NILS","Name of db: "+DBHelper.getDatabaseName());		
 		return this;
 	}
 	//---closes the database---
@@ -76,37 +63,45 @@ public class Dbhelper {
 		DBHelper.close();
 	}
 	//---insert a contact into the database---
-	public long insertValue(String name, String VALUE)
-	{
+	public long insertPicture(int direction) {
+	
 		ContentValues initialValues = new ContentValues();
-		initialValues.put(KEY_NAME, name);
-		initialValues.put(KEY_VALUE, VALUE);
+//		initialValues.put(KEY_NAME, name);
+//		initialValues.put(KEY_VALUE, VALUE);
 		return db.insert(DATABASE_TABLE, null, initialValues);
 	}
 	//---deletes a particular contact---
 	public boolean deleteValue(long rowId)
 	{
-		return db.delete(DATABASE_TABLE, KEY_ROWID + "=" + rowId, null) > 0;
+		return true;
+				//db.delete(DATABASE_TABLE, KEY_ROWID + "=" + rowId, null) > 0;
 	}
 	//---retrieves all the params---
 	public Cursor getAllParams()
 	{
-	return db.rawQuery("select * from params",null);
+	return db.rawQuery("select rowid _id, * from params",null);
 	//	return db.query(DATABASE_TABLE, null, null, null, null, null, null, null);
-	//	return db.query(DATABASE_TABLE, new String[] {KEY_NAME}, null, null, null, null, null);
+	//	return db.query(DATABASE_TABLE, new String[] {KEY_NAME, KEY_VALUE}, null, null, null, null, null);
 	}
 	
-	public Adapter getAdapter() {
+	
+	
+
+   
+	@SuppressWarnings("deprecation")
+	public SimpleCursorAdapter getAdapter() {
+		Cursor c = getAllParams();
+		
 		return new SimpleCursorAdapter(
-                this, 
-                R.layout.pepak_list_item, 
-                getAllParams(), 
-                new String[] {"postOne", "postTwo", "picture"}, 
-                new int[] {R.id.postOne, R.id.postTwo, R.id.picture});
+                context, 
+                android.R.layout.two_line_list_item, 
+                c, 
+                new String[] {"NAME", "VALUE"},
+                new int[] {android.R.id.text1, android.R.id.text2});
 	}
 	
 	//---retrieves a particular contact---
-	public Cursor getContact(long rowId) throws SQLException
+	/*public Cursor getContact(long rowId) throws SQLException
 	{
 
 		Cursor mCursor =
@@ -118,7 +113,9 @@ public class Dbhelper {
 		}
 		return mCursor;
 	}
+	*/
 	//---updates a contact---
+	/*
 	public boolean updateContact(long rowId, String name, String VALUE)
 	{
 		ContentValues args = new ContentValues();
@@ -126,6 +123,7 @@ public class Dbhelper {
 		args.put(KEY_VALUE, VALUE);
 		return db.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
 	}
+	*/
 	public void copyDBIfNeeded() {
 		try {
 		String destPath = "/data/data/" + context.getPackageName() +

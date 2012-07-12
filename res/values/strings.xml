@@ -4,5 +4,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
     <string name="title_activity_nils">Nils</string>
+    <string name="takepicnorth">North Picture</string>
+    <string name="title_take_picture">Take Picture</string>
 
 </resources>

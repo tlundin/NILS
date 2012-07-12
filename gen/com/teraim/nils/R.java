@@ -14,16 +14,29 @@ public final class R {
         public static final int padding_large=0x7f050002;
         public static final int padding_medium=0x7f050001;
         public static final int padding_small=0x7f050000;
+        public static final int ui_elem_margin_bottom=0x7f050004;
+        public static final int ui_elem_margin_left=0x7f050005;
+        public static final int ui_elem_margin_right=0x7f050006;
+        public static final int ui_elem_margin_top=0x7f050003;
     }
     public static final class drawable {
         public static final int ic_action_search=0x7f020000;
         public static final int ic_launcher=0x7f020001;
     }
     public static final class id {
-        public static final int menu_settings=0x7f090000;
+        public static final int azimuth=0x7f090004;
+        public static final int east=0x7f090003;
+        public static final int menu_settings=0x7f090008;
+        public static final int mycompass=0x7f090007;
+        public static final int north=0x7f090000;
+        public static final int pitch=0x7f090005;
+        public static final int roll=0x7f090006;
+        public static final int south=0x7f090002;
+        public static final int west=0x7f090001;
     }
     public static final class layout {
         public static final int activity_nils=0x7f030000;
+        public static final int takepicture=0x7f030001;
     }
     public static final class menu {
         public static final int activity_nils=0x7f080000;
@@ -32,7 +45,9 @@ public final class R {
         public static final int app_name=0x7f060000;
         public static final int hello_world=0x7f060001;
         public static final int menu_settings=0x7f060002;
+        public static final int takepicnorth=0x7f060004;
         public static final int title_activity_nils=0x7f060003;
+        public static final int title_take_picture=0x7f060005;
     }
     public static final class style {
         public static final int AppTheme=0x7f070000;

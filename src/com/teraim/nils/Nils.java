@@ -1,47 +1,54 @@
 package com.teraim.nils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import android.app.Activity;
+import android.app.ListActivity;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.widget.ListView;
 import android.widget.Toast;
 
 
 
-public class Nils extends Activity {
+public class Nils extends ListActivity {
 
 	String tag = "Lifecycle";
-	Dbhelper db = new Dbhelper(this);
+	//Dbhelper db = new Dbhelper(this);
+	
+	ListView treeList = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_nils);
-		db.copyDBIfNeeded();
-		db.open();
-		Cursor c = db.getAllParams();
-		if (c.moveToFirst())
-		{
-			Log.d("NILS","Move to first ok");
-			do {
-				createInput(c);
-			} while (c.moveToNext());
-		}	
-		db.close();
+		
+		//setContentView(R.layout.activity_nils);
+		//treeList = (ListView) findViewById(R.id.treelist);
+		///db.copyDBIfNeeded();
+		//db.open();
+		//Log.d("NILS","gets!");
+		//SimpleCursorAdapter mAdapter = db.getAdapter();
+		//Log.d("NILS","nogets!");
+		//setListAdapter(mAdapter);
+		//treeList.setAdapter(mAdapter);
+		//treeList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+  
+        // capture touches on the listview
+		/*
+		treeList.setOnItemClickListener(new OnItemClickListener() {
+        	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        		// store the selected contact for later
+        		TextView textView = (TextView) view;
+//        		contactToDelete = textView.getText().toString();
+        	}
+        });
+        */
+
+		//db.close();
+		Intent myIntent = new Intent(getBaseContext(),TakePictureActivity.class);
+		startActivity(myIntent);
 	}
 
-	private void createButtons(Cursor c) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -53,6 +60,7 @@ public class Nils extends Activity {
 	{
 		super.onStart();
 		Log.d(tag, "In the onStart() event");
+		/*
 		//---get all params---
 		db.open();
 		Log.d("NILS","db opened!");
@@ -64,8 +72,11 @@ public class Nils extends Activity {
 				displayParams(c);
 			} while (c.moveToNext());
 		}
-		db.close();}
+		db.close();
 		
+		}
+		*/
+	}
 	
 	
 	
