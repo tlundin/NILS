@@ -6,7 +6,8 @@
     <uses-sdk
         android:minSdkVersion="14"
         android:targetSdkVersion="15" />
-
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <application
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -16,6 +17,7 @@
             android:label="@string/title_activity_nils" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -25,16 +27,37 @@
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="com.teraim.nils.AppPreferenceActivity" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
                 <activity
-                    android:exported="false"
+            android:name=".FindAreaActivity"
+            android:exported="false"
+            android:label="@string/title_find_area" >
+            <intent-filter>
+                <action android:name="com.teraim.nils.FindAreaActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".TakePictureActivity"
+            android:exported="false"
             android:label="@string/title_take_picture" >
-            
             <intent-filter>
                 <action android:name="com.teraim.nils.TakePicture" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ShowPic"
+            android:exported="false"
+            android:label="Show a Picturos" >
+            <intent-filter>
+                <action android:name="com.teraim.nils.ShowPic" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

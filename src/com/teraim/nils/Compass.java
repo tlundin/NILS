@@ -11,9 +11,9 @@ import android.view.View;
 
 public class Compass extends View {
 	 
-	 
 	 private float direction;
 	 private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
 	 public Compass(Context context) {
 	  super(context);
 	 }
@@ -61,10 +61,14 @@ public class Compass extends View {
 	    (float)(h/2 - r * android.util.FloatMath.cos(-direction)),
 	    paint);
 	 
+	  
 	 }
+	 
 	  
 	 public void update(float dir){
-	  direction = dir;
+		 
+		 direction = dir;
+
 	  invalidate();
 	 }
 	  
