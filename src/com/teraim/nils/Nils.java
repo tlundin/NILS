@@ -1,5 +1,11 @@
 package com.teraim.nils;
 
+import java.io.InputStreamReader;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
@@ -12,9 +18,11 @@ import android.widget.Toast;
 
 
 
+
 public class Nils extends ListActivity {
 
 	String tag = "Lifecycle";
+
 	//Dbhelper db = new Dbhelper(this);
 	
 	ListView treeList = null;
@@ -22,6 +30,38 @@ public class Nils extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		//Layer between db & other persistent storage.
+		CommonVars.startPersistenceManager(this);
+	String jsonStr = null;
+		InputStreamReader is = new InputStreamReader(getResources().openRawResource(R.raw.nils_json));
+		try {
+	       jsonStr = new java.util.Scanner(is).useDelimiter("\\A").next();
+	    } catch (java.util.NoSuchElementException e) {
+	        jsonStr = "";
+	    }
+		
+		JSONObject json=null;
+		JSONArray jsa = null;
+		try {
+			String tst = jsonStr.substring(70800,70908);
+			
+			json = new JSONObject(jsonStr);
+			//jsa = new JSONArray(buffer.toString());
+			//if (jsa != null)
+			//	json = jsa.getJSONObject(0);
+
+	
+		if (json!=null) {
+			String name = (String)json.get("name");
+			System.out.println(name);
+		}
+		
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+		
 		
 		//setContentView(R.layout.activity_nils);
 		//treeList = (ListView) findViewById(R.id.treelist);
@@ -44,7 +84,7 @@ public class Nils extends ListActivity {
         	}
         });
         */
-
+		
 		//db.close();
 		Intent myIntent = new Intent(getBaseContext(),FindAreaActivity.class);
 		startActivity(myIntent);

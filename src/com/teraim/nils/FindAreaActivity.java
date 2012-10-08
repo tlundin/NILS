@@ -16,6 +16,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -42,33 +43,35 @@ import android.widget.Toast;
  */
 public class FindAreaActivity extends Activity implements LocationListener, SensorEventListener {
 
+	private static final String MITTPUNKT_KEY = "mittpunkt";
 	LocationManager lm;
-	TextView ll = null,dt=null;
+	TextView lat,longh, dt=null;
 	Location destination = null;
 	int provyteID = -1;
 	SensorManager sensorManager;
 	private Sensor sensorAccelerometer;
 	private Sensor sensorMagneticField;
 	private ImageView arrow;	
-	private TextView fieldBearing;
-	//private Compass myCompass;
-	private float deg = -1; //the current bearing towards target in degrees east.
+	private TextView fieldBearing,mittPunktView;
+	
 	private Location currentLocation=null;
 
-	Integer[] imageIDs = {
-			R.drawable.delyta,
-			R.drawable.ost,
-			R.drawable.vast,
-			R.drawable.norr,
-			R.drawable.syd,
+	String[] imageNames = {
+			"delyta",
+			"ost",
+			"vast",
+			"norr",
+			"syd"
 	};
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.findarea);
-		ll = (TextView)findViewById(R.id.latlong);
+		lat = (TextView)findViewById(R.id.lat);
+		longh = (TextView)findViewById(R.id.longh);
 		dt = (TextView)findViewById(R.id.distance);
 		arrow = (ImageView)findViewById(R.id.arrow);
 
@@ -98,56 +101,29 @@ public class FindAreaActivity extends Activity implements LocationListener, Sens
 			}
 		});
 
-		/*		
-		Bitmap delytaB = BitmapFactory.decodeFile("mnt/sdcard/nils/provytor/"+provyteID+"/old/delytaB.jpg");			
-		Bitmap eastB = BitmapFactory.decodeFile("mnt/sdcard/nils/provytor/"+provyteID+"/old/east.jpg");		
-		Bitmap westB = BitmapFactory.decodeFile("mnt/sdcard/nils/provytor/"+provyteID+"/old/west.jpg");		
-		Bitmap northB = BitmapFactory.decodeFile("mnt/sdcard/nils/provytor/"+provyteID+"/old/north.jpg");		
-		Bitmap southB = BitmapFactory.decodeFile("mnt/sdcard/nils/provytor/"+provyteID+"/old/south.jpg");		
-
-
-		ImageView iv;
-
-		iv = (ImageView)findViewById(R.id.delprovyta);
-		if (delytaB==null)
-			iv.setImageResource(R.drawable.delyta);
-		else
-			iv.setImageBitmap(delytaB);
-
-		iv = (ImageView)findViewById(R.id.east);
-		if (eastB==null)
-			iv.setImageResource(R.drawable.ost);
-		else
-			iv.setImageBitmap(eastB);
-
-		iv = (ImageView)findViewById(R.id.west);
-		if (westB==null)
-			iv.setImageResource(R.drawable.vast);
-		else
-			iv.setImageBitmap(westB);
-
-		iv = (ImageView)findViewById(R.id.north);
-		if (northB==null)
-			iv.setImageResource(R.drawable.norr);
-		else
-			iv.setImageBitmap(northB);
-
-		iv = (ImageView)findViewById(R.id.south);
-		if (southB==null)
-			iv.setImageResource(R.drawable.syd);
-		else
-			iv.setImageBitmap(southB);
-
-		 */
-
-		//Compass related..
-		//myCompass = (Compass)findViewById(R.id.mycompass);
 
 		sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
 		sensorAccelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		sensorMagneticField = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
+		mittPunktView = (TextView)findViewById(R.id.txt_mittpunkt);
+		String mp = CommonVars.pm.get(MITTPUNKT_KEY);
+		if (mp!=null)
+			mittPunktView.setText(mp);
+		
+	}
 
+	public void registerCenter(View view) {
+		String txt ="Det finns ingen uppmätt koordinat ännu!";
+		if (currentLocation != null) {
+			txt = "Ytans mittpunkt kalibrerad till (Latitud) "+
+					currentLocation.getLatitude()+" (Longitud) "+currentLocation.getLongitude();
+			mittPunktView.setText(txt);
+			//Persist the value
+			CommonVars.pm.persist(MITTPUNKT_KEY,txt);
+		}
+		
+		Toast.makeText(getBaseContext(),txt,Toast.LENGTH_SHORT).show();
 	}
 
 
@@ -160,7 +136,7 @@ public class FindAreaActivity extends Activity implements LocationListener, Sens
 		}
 		//---returns the number of images---
 		public int getCount() {
-			return imageIDs.length;
+			return imageNames.length;
 		}
 		//---returns the item---
 		public Object getItem(int position) {
@@ -181,11 +157,18 @@ public class FindAreaActivity extends Activity implements LocationListener, Sens
 						GridView.LayoutParams(195, 195));
 				imageView.setScaleType(
 						ImageView.ScaleType.CENTER_CROP);
-				imageView.setPadding(5, 5, 5, 5);
+				imageView.setPadding(10, 5, 5, 5);
 			} else {
 				imageView = (ImageView) convertView;
 			}
-			imageView.setImageResource(imageIDs[position]);
+			String picPath = Environment.getExternalStorageDirectory()+
+					CommonVars.NILS_BASE_DIR+"/delyta/"+
+					CommonVars.getCurrentYtID()+"/bilder";
+			
+			Bitmap bm = BitmapFactory.decodeFile(picPath+"/gamla/"+
+					CommonVars.compassToString(position)+".png");
+
+			imageView.setImageBitmap(bm);
 			//imageView.setImageBitmap(bm[position]);
 			return imageView;
 		}
@@ -232,7 +215,8 @@ public class FindAreaActivity extends Activity implements LocationListener, Sens
 
 	public void onLocationChanged(Location loc) {
 		if (loc!=null) {
-			ll.setText(loc.getLatitude()+","+loc.getLongitude());
+			lat.setText(loc.getLatitude()+"");
+			longh.setText(loc.getLongitude()+"");
 
 			dt.setText(Math.round(loc.distanceTo(destination))+" meter(s)");
 			currentLocation = loc;

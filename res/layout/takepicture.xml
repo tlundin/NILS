@@ -6,64 +6,94 @@
     android:orientation="vertical"
     tools:context=".takePicture" >
 
+    <TextView
+        android:id="@+id/riktningstxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textStyle="bold"
+        android:textSize="30sp" />
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-         >
-        
-        <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_weight=".3" >
-
-        <ImageView
-            android:id="@+id/oldPic"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-        <ImageView
-            android:id="@+id/newPic"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-        
-        <Button
-            android:id="@+id/takePic"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:onClick="takePhoto"
-            android:text="Ta ny bild" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight=".3"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:text="Det här är arkiv-bilden:"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <ImageView
+                android:id="@+id/oldPic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="picZoom" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Det här är nya bilden:"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <ImageView
+                android:id="@+id/newPic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="takePhoto" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_weight=".7" >
+            android:layout_weight=".7"
+            android:orientation="vertical" >
 
             <TextView
                 android:id="@+id/azimuth"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp" />
 
             <TextView
                 android:id="@+id/pitch"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/roll"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <view
                 android:id="@+id/mycompass"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 class="com.teraim.nils.Compass" />
+
+            <Button
+                android:id="@+id/takepic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="takePhoto"
+                android:text="Ta en ny bild"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
         </LinearLayout>
     </LinearLayout>
+     />
 
 </LinearLayout>

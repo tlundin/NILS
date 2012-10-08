@@ -1,0 +1,3454 @@
+{
+	"name":"nils basschema",
+	"properties":{
+		"lagid":{
+			"type":"integer",
+			"title":"inventeringslag, id",
+			"required":true,
+			"minimum":0,
+			"description":""
+		},
+		"dator":{
+			"type":"string",
+			"title":"handdator, id",
+			"required":true,
+			"description":"Använd handdatorns MAC-adress"
+		},
+		"operator":{
+			"type":"string",
+			"title":"namn på inmatare",
+			"required":true,
+			"description":"Borde kanske vara ett id-nummer"
+		},
+		"inventeringsdatum":{
+			"type":"string",
+			"format":"date",
+			"title":"datum och tid för inventeringstart av denna provyta",
+			"required":true,
+			"description":""
+		},
+		"provyteid":{
+			"type":"integer",
+			"title":"provyteid",
+			"required":true,
+			"minimum":0,
+			"description":""
+		},
+		
+		"delyteantal":{
+			"type":"integer",
+			"title":"antal delytor",
+			"required":true,
+			"minimum":1
+		},
+		"delytor":{
+			"type":"array",
+			"items":{
+				"delyteid":{
+					"type":"integer",
+					"description":"vilken delyta",
+					"required":true,
+					"minimum":1
+				}
+			}
+		},
+
+
+		"ProvytaData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"Provyta":{
+					"type":["integer","null"],
+					"title":"Provyta nr",
+					"required":true,
+					"enum":[01-12, 50-99, 200-400, 800-999],
+					"description":""
+				},
+				"Objekt":{
+					"type":["integer","null"],
+					"title":"ÄBO nr",
+					"required":true,
+					"minimum":000,
+					"maximum":999,
+					"description":""
+				},
+				"InvTypP":{
+					"type":["integer","null"],
+					"title":"Invent-typ",
+					"required":true,
+					"enum":[1, 2],
+					"description":""
+				},
+				"DosFarg":{
+					"type":["integer","null"],
+					"title":"DosFarg",
+					"required":true,
+					"enum":[0,1],
+					"description":""
+				},
+				"HjDelat":{
+					"type":["integer","null"],
+					"title":"HjDelat",
+					"required":true,
+					"enum":[],
+					"description":""
+				},
+				"HjAntal":{
+					"type":["integer","null"],
+					"title":"HjAntal",
+					"required":true,
+					"enum":[],
+					"description":""
+				},
+				"HjNyUt":{
+					"type":["integer","null"],
+					"title":"HjNyUt",
+					"required":true,
+					"enum":[],
+					"description":""
+				},
+				"CenGPSNr":{
+					"type":["integer","null"],
+					"title":"GPS nr",
+					"required":true,
+					"minimum":000,
+					"maximum":999,
+					"description":""
+				},
+				"CenGPSNo":{
+					"type":["integer","null"],
+					"title":"GPS nord X [m]",
+					"required":true,
+					"minimum":0000,
+					"maximum":9999,
+					"description":""
+				},
+				"CenGPSOs":{
+					"type":["integer","null"],
+					"title":"GPS ost Y [m]",
+					"required":true,
+					"minimum":0000,
+					"maximum":9999,
+					"description":""
+				},
+				"Markering":{
+					"type":["integer","null"],
+					"title":"Markering ",
+					"required":true,
+					"enum":[1, 2, 3],
+					"description":""
+				},
+				"ProGPSNr":{
+					"type":["integer","null"],
+					"title":"Profil nr 000-999",
+					"required":true,
+					"minimum":000,
+					"maximum":999,
+					"description":""
+				},
+				"ProGPSNo":{
+					"type":["integer","null"],
+					"title":"Profil nord X",
+					"required":true,
+					"minimum":0000,
+					"maximum":9999,
+					"description":""
+				},
+				"ProGPSOs":{
+					"type":["integer","null"],
+					"title":"Profil ost Y",
+					"required":true,
+					"minimum":0000,
+					"maximum":9999,
+					"description":""
+				},
+				"MarAvst":{
+					"type":["integer","null"],
+					"title":"Avst från prof [dm]",
+					"required":true,
+					"minimum":000,
+					"maximum":999,
+					"description":""
+				},
+				"MarRikt":{
+					"type":["integer","null"],
+					"title":"Rikt från prof [grader]",
+					"required":true,
+					"minimum":000,
+					"maximum":360,
+					"description":""
+				},
+				"Delat":{
+					"type":["integer","null"],
+					"title":"Dela?",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"AntDelyt":{
+					"type":["integer","null"],
+					"title":"Antal",
+					"required":true,
+					"enum":[2, 3, 4, 5],
+					"description":""
+				},
+				"DelDosa":{
+					"type":["integer","null"],
+					"title":"DelaDosa",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"NyUtlagg":{
+					"type":["integer","null"],
+					"title":"Nytt utlägg?",
+					"required":true,
+					"enum":[],
+					"description":""
+				}
+			}
+		},
+
+
+		"ASmaProdata":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"ASmaProdata/ASmaPro":{
+					"type":["integer","null"],
+					"title":"Ytnummer",
+					"required":true,
+					"enum":[1-9],
+					"description":""
+				},
+				"ASmaProdata/Lage":{
+					"type":["integer","null"],
+					"title":"Delyta nr",
+					"required":true,
+					"enum":[],
+					"description":""
+				},
+				"ASmaProdata/SmInv":{
+					"type":["integer","null"],
+					"title":"Inventeras?",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"ASmaProdata/SmOrsak":{
+					"type":["integer","null"],
+					"title":"Orsak",
+					"required":true,
+					"enum":[01, 02, 03, 04, 05, 06, 07, 08, 09, 10],
+					"description":""
+				},
+				"ASmaProdata/LovBusk":{
+					"type":["integer","null"],
+					"title":"Lövbuskar [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"ASmaProdata/LovTrad":{
+					"type":["integer","null"],
+					"title":"Lövträd [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"ASmaProdata/BarrTrad":{
+					"type":["integer","null"],
+					"title":"Barrtr-en [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"ASmaProdata/TotTackF":{
+					"type":["integer","null"],
+					"title":"Fältskikt tot [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"ASmaProdata/GramForna":{
+					"type":["integer","null"],
+					"title":"Gramförna [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				}
+			}
+		},
+
+
+		"AtgardData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"Markav":{
+					"type":["integer","null"],
+					"title":"Avvattning",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4],
+					"description":""
+				},
+				"DikTid":{
+					"type":["integer","null"],
+					"title":"Avvattning tid",
+					"required":true,
+					"enum":[00, 01, 02, 05, 10],
+					"description":""
+				},
+				"MarkStor":{
+					"type":["integer","null"],
+					"title":"Störning",
+					"required":true,
+					"enum":[00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13, 14],
+					"description":""
+				},
+				"StorTid":{
+					"type":["integer","null"],
+					"title":"Störning tid",
+					"required":true,
+					"enum":[00, 01, 02, 05],
+					"description":""
+				},
+				"StorTack":{
+					"type":["integer","null"],
+					"title":"Störning [%]",
+					"required":true,
+					"minimum":000,
+					"maximum":100,
+					"description":""
+				},
+				"Brand":{
+					"type":["integer","null"],
+					"title":"Bränning",
+					"required":true,
+					"enum":[0, 1, 2, 3],
+					"description":""
+				},
+				"BrTid":{
+					"type":["integer","null"],
+					"title":"Bränn tid",
+					"required":true,
+					"enum":[00, 01, 02, 05],
+					"description":""
+				},
+				"BrTack":{
+					"type":["integer","null"],
+					"title":"Bränn %  [%]",
+					"required":true,
+					"minimum":000,
+					"maximum":100,
+					"description":""
+				},
+				"Planter":{
+					"type":["integer","null"],
+					"title":"Plantering",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4],
+					"description":""
+				},
+				"PlaTrArt":{
+					"type":["integer","null"],
+					"title":"Plant träd",
+					"required":true,
+					"enum":[11-97],
+					"description":""
+				},
+				"PlaTrTid":{
+					"type":["integer","null"],
+					"title":"Pl träd tid",
+					"required":true,
+					"enum":[00, 01, 02, 05],
+					"description":""
+				},
+				"PlaBuArt":{
+					"type":["integer","null"],
+					"title":"Plant busk",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"PlaBuTid":{
+					"type":["integer","null"],
+					"title":"Pl busk tid",
+					"required":true,
+					"enum":[00, 01, 02, 05],
+					"description":""
+				},
+				"Avverk":{
+					"type":["integer","null"],
+					"title":"Avverkning",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4, 5, 6, 7, 8],
+					"description":""
+				},
+				"AvTid":{
+					"type":["integer","null"],
+					"title":"Avverk tid",
+					"required":true,
+					"enum":[00, 01, 02, 05],
+					"description":""
+				},
+				"NaturHugg":{
+					"type":["integer","null"],
+					"title":"Naturhugg",
+					"required":true,
+					"enum":[0, 1, 2],
+					"description":""
+				},
+				"DepAck":{
+					"type":["integer","null"],
+					"title":"Deponering",
+					"required":true,
+					"enum":[00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11],
+					"description":""
+				},
+				"DepTid":{
+					"type":["integer","null"],
+					"title":"Deponer tid",
+					"required":true,
+					"enum":[00, 01, 02, 05],
+					"description":""
+				},
+				"DepTack":{
+					"type":["integer","null"],
+					"title":"Deponer [%]",
+					"required":true,
+					"enum":[001-100],
+					"description":""
+				}
+			}
+		},
+
+
+		"AvstandData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"Avstand":{
+					"type":["integer","null"],
+					"title":"Avstånd [m]",
+					"required":true,
+					"minimum":000,
+					"maximum":200,
+					"description":""
+				}
+			}
+		},
+
+
+		"BuskarData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"KodNr":{
+					"type":["integer","null"],
+					"title":"KodNr",
+					"required":true,
+					"enum":[],
+					"description":""
+				},
+				"TackDiff":{
+					"type":["integer","null"],
+					"title":"TackDiff [%]",
+					"required":true,
+					"minimum":0,
+					"maximum":100,
+					"description":""
+				},
+				"Tathet":{
+					"type":["integer","null"],
+					"title":"Tathet",
+					"required":true,
+					"minimum":0,
+					"maximum":1,
+					"description":""
+				},
+				"Hojd":{
+					"type":["integer","null"],
+					"title":"Hojd [dm]",
+					"required":true,
+					"minimum":000,
+					"maximum":150,
+					"description":""
+				}
+			}
+		},
+
+
+		"DelningData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"Avst1":{
+					"type":["integer","null"],
+					"title":"Avstånd1 [dm]",
+					"required":true,
+					"enum":[000-100 ],
+					"description":""
+				},
+				"Rikt1":{
+					"type":["integer","null"],
+					"title":"Riktn1 [grader]",
+					"required":true,
+					"minimum":000,
+					"maximum":360,
+					"description":""
+				},
+				"Avst2":{
+					"type":["integer","null"],
+					"title":"Avstånd2 [dm]",
+					"required":true,
+					"enum":[000-100 ],
+					"description":""
+				},
+				"Rikt2":{
+					"type":["integer","null"],
+					"title":"Riktn2 [grader]",
+					"required":true,
+					"minimum":000,
+					"maximum":360,
+					"description":""
+				},
+				"Avst3":{
+					"type":["integer","null"],
+					"title":"Avstånd3 [dm]",
+					"required":true,
+					"enum":[000-100 ],
+					"description":""
+				},
+				"Rikt3":{
+					"type":["integer","null"],
+					"title":"Riktn3 [grader]",
+					"required":true,
+					"minimum":000,
+					"maximum":360,
+					"description":""
+				},
+				"Avst4":{
+					"type":["integer","null"],
+					"title":"Avstånd4 [dm]",
+					"required":true,
+					"enum":[000-100 ],
+					"description":""
+				},
+				"Rikt4":{
+					"type":["integer","null"],
+					"title":"Riktn4 [grader]",
+					"required":true,
+					"minimum":000,
+					"maximum":360,
+					"description":""
+				},
+				"Avst5":{
+					"type":["integer","null"],
+					"title":"Avstånd5 [dm]",
+					"required":true,
+					"enum":[000-100 ],
+					"description":""
+				},
+				"Rikt5":{
+					"type":["integer","null"],
+					"title":"Riktn5 [grader]",
+					"required":true,
+					"minimum":000,
+					"maximum":360,
+					"description":""
+				},
+				"Avst6":{
+					"type":["integer","null"],
+					"title":"Avstånd6 [dm]",
+					"required":true,
+					"enum":[000-100 ],
+					"description":""
+				},
+				"Rikt6":{
+					"type":["integer","null"],
+					"title":"Riktn6 [grader]",
+					"required":true,
+					"minimum":000,
+					"maximum":360,
+					"description":""
+				},
+				"Avst7":{
+					"type":["integer","null"],
+					"title":"Avstånd7 [dm]",
+					"required":true,
+					"enum":[000-100 ],
+					"description":""
+				},
+				"Rikt7":{
+					"type":["integer","null"],
+					"title":"Riktn7 [grader]",
+					"required":true,
+					"minimum":000,
+					"maximum":360,
+					"description":""
+				},
+				"Avst8":{
+					"type":["integer","null"],
+					"title":"Avstånd8 [dm]",
+					"required":true,
+					"enum":[000-100 ],
+					"description":""
+				},
+				"Rikt8":{
+					"type":["integer","null"],
+					"title":"Riktn8 [grader]",
+					"required":true,
+					"minimum":000,
+					"maximum":360,
+					"description":""
+				}
+			}
+		},
+
+
+		"DelytaData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"Delyta":{
+					"type":["integer","null"],
+					"title":"Delyta",
+					"required":true,
+					"enum":[1-5],
+					"description":""
+				},
+				"RegTLav":{
+					"type":["integer","null"],
+					"title":"Lavar på löv?",
+					"required":true,
+					"enum":[0, 1, 2, 3],
+					"description":""
+				}
+			}
+		},
+
+
+		"DetaljData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"TradReg":{
+					"type":["integer","null"],
+					"title":"Träddata?",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"Orsak":{
+					"type":["integer","null"],
+					"title":"Orsak",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"SmaDim":{
+					"type":["integer","null"],
+					"title":"Smådim?",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				}
+			}
+		},
+
+
+		"DiVadata":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"TypDiVa":{
+					"type":["integer","null"],
+					"title":"Typ",
+					"required":true,
+					"enum":[1, 2, 3],
+					"description":""
+				},
+				"StrandMyr":{
+					"type":["integer","null"],
+					"title":"Mot myr?",
+					"required":true,
+					"enum":[0, 1, 2],
+					"description":""
+				},
+				"StrandVass":{
+					"type":["integer","null"],
+					"title":"Vasstrand?",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"StrandTyp":{
+					"type":["integer","null"],
+					"title":"Bottentyp",
+					"required":true,
+					"enum":[1, 2, 3, 4, 5, 6, 7],
+					"description":""
+				},
+				"TypDike":{
+					"type":["integer","null"],
+					"title":"Typ",
+					"required":true,
+					"enum":[1, 2, 3],
+					"description":""
+				},
+				"DVKoppl":{
+					"type":["integer","null"],
+					"title":"Koppling",
+					"required":true,
+					"enum":[0, 1, 2],
+					"description":""
+				},
+				"DikDjup":{
+					"type":["integer","null"],
+					"title":"Totalt dikesdjup [dm]",
+					"required":true,
+					"enum":[01-50],
+					"description":""
+				},
+				"DikBredd":{
+					"type":["integer","null"],
+					"title":"Total dikesbredd [dm]",
+					"required":true,
+					"enum":[01-99],
+					"description":""
+				},
+				"DodVedIV":{
+					"type":["integer","null"],
+					"title":"Ved i vatten [antal]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"DodVedOV":{
+					"type":["integer","null"],
+					"title":"Ved över vatten [antal]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"VaFaBredd":{
+					"type":["integer","null"],
+					"title":"V-fåran Bredd [dm]",
+					"required":true,
+					"minimum":00,
+					"maximum":60,
+					"description":""
+				},
+				"VaytaBre":{
+					"type":["integer","null"],
+					"title":"V-ytan bredd [dm]",
+					"required":true,
+					"minimum":00,
+					"maximum":60,
+					"description":""
+				},
+				"VaytaLage":{
+					"type":["integer","null"],
+					"title":"V-ytan läge [dm]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"VaStand":{
+					"type":["integer","null"],
+					"title":"Vattenstånd",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4],
+					"description":""
+				},
+				"VaDjup":{
+					"type":["integer","null"],
+					"title":"Vattendjup [dm]",
+					"required":true,
+					"enum":[00-20, 21],
+					"description":""
+				},
+				"StroHast":{
+					"type":["integer","null"],
+					"title":"Strömhast",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4],
+					"description":""
+				},
+				"TypBed":{
+					"type":["integer","null"],
+					"title":"Typ av bedömning",
+					"required":true,
+					"enum":[1, 2, 3, 4],
+					"description":""
+				},
+				"StrBredd":{
+					"type":["integer","null"],
+					"title":"Strandbredd  [dm]",
+					"required":true,
+					"minimum":00,
+					"maximum":30,
+					"description":""
+				},
+				"Orsak":{
+					"type":["integer","null"],
+					"title":"Orsak",
+					"required":true,
+					"enum":[1, 2],
+					"description":""
+				},
+				"OrtTack":{
+					"type":["integer","null"],
+					"title":"Örter [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"GramTack":{
+					"type":["integer","null"],
+					"title":"Graminider [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"GraFoTack":{
+					"type":["integer","null"],
+					"title":"Gramförna [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"BuTack":{
+					"type":["integer","null"],
+					"title":"Buskar [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"TrTack":{
+					"type":["integer","null"],
+					"title":"Träd [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"SolExp":{
+					"type":["integer","null"],
+					"title":"Solexponering",
+					"required":true,
+					"enum":[0, 1, 2, 3],
+					"description":""
+				},
+				"Avveinom":{
+					"type":["integer","null"],
+					"title":"Kalavverkning",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"StrAvv":{
+					"type":["integer","null"],
+					"title":"Avstånd kalav [m]",
+					"required":true,
+					"enum":[00–40],
+					"description":""
+				},
+				"Atgard":{
+					"type":["integer","null"],
+					"title":"Åtgärder",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"StrHavd":{
+					"type":["integer","null"],
+					"title":"Hävd",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4, 5],
+					"description":""
+				},
+				"AvvRoj":{
+					"type":["integer","null"],
+					"title":"Röjning",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4, 5, 6],
+					"description":""
+				},
+				"AvvTid":{
+					"type":["integer","null"],
+					"title":"Röjning tid",
+					"required":true,
+					"enum":[00, 01, 02, 05],
+					"description":""
+				},
+				"StrStorn":{
+					"type":["integer","null"],
+					"title":"Störning",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+					"description":""
+				},
+				"StrSTid":{
+					"type":["integer","null"],
+					"title":"Störning tid",
+					"required":true,
+					"enum":[00, 01, 02, 05],
+					"description":""
+				},
+				"StrStoTack":{
+					"type":["integer","null"],
+					"title":"Störning [%]",
+					"required":true,
+					"minimum":000,
+					"maximum":100,
+					"description":""
+				},
+				"StrDep":{
+					"type":["integer","null"],
+					"title":"Deponering",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4, 5, 6, 7],
+					"description":""
+				},
+				"StrDTid":{
+					"type":["integer","null"],
+					"title":"Deponer tid",
+					"required":true,
+					"enum":[00, 01, 02, 05],
+					"description":""
+				},
+				"StrDTack":{
+					"type":["integer","null"],
+					"title":"Deponer [%]",
+					"required":true,
+					"minimum":000,
+					"maximum":100,
+					"description":""
+				},
+				"Stratum":{
+					"type":["integer","null"],
+					"title":"Stratum",
+					"required":true,
+					"enum":[1-10],
+					"description":""
+				},
+				"AlpVatten":{
+					"type":["integer","null"],
+					"title":"Alp vatten?",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"Objekt":{
+					"type":["integer","null"],
+					"title":"Kontrollfråga",
+					"required":true,
+					"enum":[1, 2, 3],
+					"description":""
+				},
+				"NyttAvst":{
+					"type":["integer","null"],
+					"title":"Nytt avstånd [m]",
+					"required":true,
+					"minimum":000,
+					"maximum":200,
+					"description":""
+				}
+			}
+		},
+
+
+		"FotoData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"FotoDat":{
+					"type":["integer","null"],
+					"title":"Fotodatum [månad, dag]",
+					"required":true,
+					"enum":[01-12, 01-31],
+					"description":""
+				},
+				"FotoNorr":{
+					"type":["integer","null"],
+					"title":"Foto norr  [bildnummer]",
+					"required":true,
+					"enum":[0001-9999],
+					"description":""
+				},
+				"FotoOst":{
+					"type":["integer","null"],
+					"title":"Foto ost [bildnummer]",
+					"required":true,
+					"enum":[0001-9999],
+					"description":""
+				},
+				"FotoSyd":{
+					"type":["integer","null"],
+					"title":"Foto syd [bildnummer]",
+					"required":true,
+					"enum":[0001-9999],
+					"description":""
+				},
+				"FotoVast":{
+					"type":["integer","null"],
+					"title":"Foto väst [bildnummer]",
+					"required":true,
+					"enum":[0001-9999],
+					"description":""
+				},
+				"SmaPro1":{
+					"type":["integer","null"],
+					"title":"Småprovyta [bildnummer]",
+					"required":true,
+					"enum":[0001-9999],
+					"description":""
+				}
+			}
+		},
+
+
+		"HabitatData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"Skogstyp":{
+					"type":["integer","null"],
+					"title":"Skogstyp",
+					"required":true,
+					"minimum":00,
+					"maximum":16,
+					"description":""
+				},
+				"HabDom":{
+					"type":["integer","null"],
+					"title":"HabDom",
+					"required":true,
+					"enum":[1001-9999],
+					"description":""
+				},
+				"Hab2":{
+					"type":["integer","null"],
+					"title":"Ytterligare Hab?",
+					"required":true,
+					"enum":[1001-9999],
+					"description":""
+				},
+				"Areal2":{
+					"type":["integer","null"],
+					"title":"Areal",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"Hab3":{
+					"type":["integer","null"],
+					"title":"Ytterligare Hab?",
+					"required":true,
+					"enum":[1001-9999],
+					"description":""
+				},
+				"Areal3":{
+					"type":["integer","null"],
+					"title":"Areal",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"Hab4":{
+					"type":["integer","null"],
+					"title":"Ytterligare Hab?",
+					"required":true,
+					"enum":[1001-9999],
+					"description":""
+				},
+				"Areal4":{
+					"type":["integer","null"],
+					"title":"Areal",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"Hab5":{
+					"type":["integer","null"],
+					"title":"Ytterligare Hab?",
+					"required":true,
+					"enum":[1001-9999],
+					"description":""
+				},
+				"Areal5":{
+					"type":["integer","null"],
+					"title":"Areal",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				}
+			}
+		},
+
+
+		"HagnData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"Hojd":{
+					"type":["integer","null"],
+					"title":"Höjd [dm]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"TypHagn":{
+					"type":["integer","null"],
+					"title":"Typ",
+					"required":true,
+					"enum":[1, 2, 3, 4, 5, 6, 7, 8, 9],
+					"description":""
+				},
+				"RutStor":{
+					"type":["integer","null"],
+					"title":"Rutstorlek [cm]",
+					"required":true,
+					"enum":[01-99],
+					"description":""
+				},
+				"Bredd":{
+					"type":["integer","null"],
+					"title":"Bredd [dm]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"StenForm":{
+					"type":["integer","null"],
+					"title":"Stenform",
+					"required":true,
+					"enum":[1, 2, 3],
+					"description":""
+				},
+				"FaltTack":{
+					"type":["integer","null"],
+					"title":"Fältsk. Tot [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"MossTack":{
+					"type":["integer","null"],
+					"title":"Mossor [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"LavTack":{
+					"type":["integer","null"],
+					"title":"Lavar [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"BuTack":{
+					"type":["integer","null"],
+					"title":"Buskar [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"TraTack":{
+					"type":["integer","null"],
+					"title":"Träd [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"SolExp":{
+					"type":["integer","null"],
+					"title":"Solexponering",
+					"required":true,
+					"enum":[1, 2, 3],
+					"description":""
+				},
+				"Atgard":{
+					"type":["integer","null"],
+					"title":"Åtgärder",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"AvvRoj":{
+					"type":["integer","null"],
+					"title":"Röjning",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4, 5, 6],
+					"description":""
+				},
+				"AvvTid":{
+					"type":["integer","null"],
+					"title":"Röjning tid",
+					"required":true,
+					"enum":[00, 01, 02, 05],
+					"description":""
+				},
+				"DepAck":{
+					"type":["integer","null"],
+					"title":"Deponering",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4, 5, 6, 7],
+					"description":""
+				},
+				"DepATid":{
+					"type":["integer","null"],
+					"title":"Deponer tid",
+					"required":true,
+					"enum":[00, 01, 02, 05],
+					"description":""
+				},
+				"DepATack":{
+					"type":["integer","null"],
+					"title":"Deponer [%]",
+					"required":true,
+					"minimum":000,
+					"maximum":100,
+					"description":""
+				},
+				"Skick":{
+					"type":["integer","null"],
+					"title":"Skick",
+					"required":true,
+					"enum":[1, 2, 3],
+					"description":""
+				},
+				"Funktion":{
+					"type":["integer","null"],
+					"title":"Funktion",
+					"required":true,
+					"enum":[1, 2, 3, 4, 5, 6, 7],
+					"description":""
+				},
+				"Objekt":{
+					"type":["integer","null"],
+					"title":"Kontrollfråga",
+					"required":true,
+					"enum":[1, 2, 3],
+					"description":""
+				},
+				"NyttAvst":{
+					"type":["integer","null"],
+					"title":"Nytt avstånd [m]",
+					"required":true,
+					"minimum":000,
+					"maximum":200,
+					"description":""
+				}
+			}
+		},
+
+
+		"InvAvstData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"InvAvst":{
+					"type":["integer","null"],
+					"title":"Invgr avstånd [m]",
+					"required":true,
+					"minimum":000,
+					"maximum":200,
+					"description":""
+				},
+				"InvGrTyp":{
+					"type":["integer","null"],
+					"title":"Invgräns typ ",
+					"required":true,
+					"enum":[1, 2, 3],
+					"description":""
+				},
+				"KartInv":{
+					"type":["integer","null"],
+					"title":"Kartinv typ",
+					"required":true,
+					"enum":[01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13],
+					"description":""
+				},
+				"InvGrGPSNr":{
+					"type":["integer","null"],
+					"title":"Invgr GPS nr",
+					"required":true,
+					"minimum":000,
+					"maximum":999,
+					"description":""
+				},
+				"InvGrGPSNo":{
+					"type":["integer","null"],
+					"title":"Invgr nord X [m]",
+					"required":true,
+					"minimum":000,
+					"maximum":999,
+					"description":""
+				},
+				"InvGrGPSOs":{
+					"type":["integer","null"],
+					"title":"Invgr ost Y [m]",
+					"required":true,
+					"minimum":000,
+					"maximum":999,
+					"description":""
+				},
+				"Objekt":{
+					"type":["integer","null"],
+					"title":"Kontrollfråga",
+					"required":true,
+					"enum":[1, 2, 3],
+					"description":""
+				},
+				"NyttAvst":{
+					"type":["integer","null"],
+					"title":"Nytt avstånd [m]",
+					"required":true,
+					"minimum":000,
+					"maximum":200,
+					"description":""
+				}
+			}
+		},
+
+
+		"KlavNrData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"LopNr":{
+					"type":["integer","null"],
+					"title":"Träd nummer",
+					"required":true,
+					"enum":[],
+					"description":""
+				},
+				"KlaTrSl":{
+					"type":["integer","null"],
+					"title":"Trädslag",
+					"required":true,
+					"enum":[11-97, 00, 06, 05, 04, 03, 02, 01],
+					"description":""
+				},
+				"DodArt":{
+					"type":["integer","null"],
+					"title":"Trädsl dött",
+					"required":true,
+					"enum":[11-97],
+					"description":""
+				},
+				"KlaDim":{
+					"type":["integer","null"],
+					"title":"Diameter [mm]",
+					"required":true,
+					"enum":[0040-9999],
+					"description":""
+				},
+				"BukTrSl":{
+					"type":["integer","null"],
+					"title":"Buk trädslag",
+					"required":true,
+					"enum":[11-97],
+					"description":""
+				},
+				"BukDim1":{
+					"type":["integer","null"],
+					"title":"Buk grövsta [mm]",
+					"required":true,
+					"enum":[0001-9999],
+					"description":""
+				},
+				"BukDim2":{
+					"type":["integer","null"],
+					"title":"Buk näst gr [mm]",
+					"required":true,
+					"enum":[0001-9999],
+					"description":""
+				},
+				"BukDim3":{
+					"type":["integer","null"],
+					"title":"Buk tredje gr [mm]",
+					"required":true,
+					"enum":[0001-9999, 0000],
+					"description":""
+				},
+				"BukAnt":{
+					"type":["integer","null"],
+					"title":"Buk antal [antal]",
+					"required":true,
+					"enum":[01-99],
+					"description":""
+				}
+			}
+		},
+
+
+		"LinjeData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"Linje":{
+					"type":["integer","null"],
+					"title":"Linjenummer",
+					"required":true,
+					"enum":[1-12],
+					"description":""
+				},
+				"StartAvst":{
+					"type":["integer","null"],
+					"title":"Startavstånd [m]",
+					"required":true,
+					"minimum":0,
+					"maximum":200,
+					"description":""
+				},
+				"GangRikt":{
+					"type":["integer","null"],
+					"title":"Gångriktning",
+					"required":true,
+					"enum":[1, 2, 3, 4],
+					"description":""
+				},
+				"LinjeStar":{
+					"type":["integer","null"],
+					"title":"Invent-typ",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"KartInv":{
+					"type":["integer","null"],
+					"title":"Orsak",
+					"required":true,
+					"enum":[01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13],
+					"description":""
+				},
+				"LinStaGPSNr":{
+					"type":["integer","null"],
+					"title":"Start GPS nr",
+					"required":true,
+					"minimum":000,
+					"maximum":999,
+					"description":""
+				},
+				"LinStaGPSX":{
+					"type":["integer","null"],
+					"title":"Start GPS X [m]",
+					"required":true,
+					"minimum":000,
+					"maximum":999,
+					"description":""
+				},
+				"LinStaGPSY":{
+					"type":["integer","null"],
+					"title":"Start GPS Y [m]",
+					"required":true,
+					"minimum":000,
+					"maximum":999,
+					"description":""
+				},
+				"LinjeSlut":{
+					"type":["integer","null"],
+					"title":"Linjeslut",
+					"required":true,
+					"enum":[1, 2],
+					"description":""
+				},
+				"LinSluGPSNr":{
+					"type":["integer","null"],
+					"title":"Slut GPS nr",
+					"required":true,
+					"minimum":000,
+					"maximum":999,
+					"description":""
+				},
+				"LinSluGPSX":{
+					"type":["integer","null"],
+					"title":"Slut GPS X [m]",
+					"required":true,
+					"minimum":000,
+					"maximum":999,
+					"description":""
+				},
+				"LinSluGPSY":{
+					"type":["integer","null"],
+					"title":"Slut GPS Y [m]",
+					"required":true,
+					"minimum":000,
+					"maximum":999,
+					"description":""
+				}
+			}
+		},
+
+
+		"MarkAnvData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"MarkTyp":{
+					"type":["integer","null"],
+					"title":"Marktyp",
+					"required":true,
+					"enum":[1, 2, 3, 4, 5],
+					"description":""
+				},
+				"ManvAker":{
+					"type":["integer","null"],
+					"title":"Åkermark ",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4, 5, 6],
+					"description":""
+				},
+				"MAnvAnlag":{
+					"type":["integer","null"],
+					"title":"Anlagd mark",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4, 5, 6, 7, 8],
+					"description":""
+				},
+				"ManvSkog":{
+					"type":["integer","null"],
+					"title":"Skogsmark",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4, 5, 6, 7, 8],
+					"description":""
+				},
+				"ManvOvr":{
+					"type":["integer","null"],
+					"title":"Övrig mark",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4, 5, 6],
+					"description":""
+				},
+				"Djur":{
+					"type":["integer","null"],
+					"title":"Djurslag",
+					"required":true,
+					"enum":[1, 2, 3, 4, 5, 6, 7, 8],
+					"description":""
+				},
+				"BetTack1":{
+					"type":["integer","null"],
+					"title":"Veg <5 cm [%]",
+					"required":true,
+					"minimum":000,
+					"maximum":100,
+					"description":""
+				},
+				"BetTack2":{
+					"type":["integer","null"],
+					"title":"Veg 5-15 cm [%]",
+					"required":true,
+					"minimum":000,
+					"maximum":100,
+					"description":""
+				},
+				"BetTack3":{
+					"type":["integer","null"],
+					"title":"Veg >15 cm [%]",
+					"required":true,
+					"minimum":000,
+					"maximum":100,
+					"description":""
+				},
+				"BetTack4":{
+					"type":["integer","null"],
+					"title":"Veg tuvor [%]",
+					"required":true,
+					"minimum":000,
+					"maximum":100,
+					"description":""
+				},
+				"TypRek":{
+					"type":["integer","null"],
+					"title":"Rekreation",
+					"required":true,
+					"enum":[1, 2, 3, 4, 5, 6, 7],
+					"description":""
+				},
+				"TypTakt":{
+					"type":["integer","null"],
+					"title":"Täkt",
+					"required":true,
+					"enum":[1, 2, 3, 4, 5],
+					"description":""
+				},
+				"TypTransp":{
+					"type":["integer","null"],
+					"title":"Transp-yta",
+					"required":true,
+					"enum":[1, 2, 3, 4, 5],
+					"description":""
+				},
+				"NyUtlagg":{
+					"type":["integer","null"],
+					"title":"Nytt utl./ÄBO?",
+					"required":true,
+					"enum":[],
+					"description":""
+				},
+				"Hist / TidigAnv":{
+					"type":["integer","null"],
+					"title":"Historisk / Tidigare anv.",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4, 5, 6, 7],
+					"description":""
+				},
+				"SpBetVeg":{
+					"type":["integer","null"],
+					"title":"Bete veg",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"SpBetSta":{
+					"type":["integer","null"],
+					"title":"B stängsel",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"SpBetTrBu":{
+					"type":["integer","null"],
+					"title":"B träd busk",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"SpBetSpi":{
+					"type":["integer","null"],
+					"title":"B spillning",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"SpSlaVeg":{
+					"type":["integer","null"],
+					"title":"Slåtter veg",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"SpSlaHas":{
+					"type":["integer","null"],
+					"title":"S hässja",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"SpSlaLad":{
+					"type":["integer","null"],
+					"title":"S lada ",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"SpSlaSild":{
+					"type":["integer","null"],
+					"title":"S sildike",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"TidHist":{
+					"type":["integer","null"],
+					"title":"Tidpunkt",
+					"required":true,
+					"enum":[00, 01, 02, 05, 10, 25, 50, 99],
+					"description":""
+				}
+			}
+		},
+
+
+		"MarkBeskData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"NyUtlagg":{
+					"type":["integer","null"],
+					"title":"Nytt utlägg/ÄBO?",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"Fukt":{
+					"type":["integer","null"],
+					"title":"Markfukt",
+					"required":true,
+					"enum":[1, 2, 3, 4, 5],
+					"description":""
+				},
+				"RorlVatt":{
+					"type":["integer","null"],
+					"title":"Rörligt vatt",
+					"required":true,
+					"enum":[0, 1, 2],
+					"description":""
+				},
+				"VattPav":{
+					"type":["integer","null"],
+					"title":"Vattenpåv",
+					"required":true,
+					"enum":[0, 1, 2, 3],
+					"description":""
+				},
+				"MarkLut":{
+					"type":["integer","null"],
+					"title":"Lutning [grader]",
+					"required":true,
+					"minimum":00,
+					"maximum":90,
+					"description":""
+				},
+				"LutRiktning":{
+					"type":["integer","null"],
+					"title":"Riktning [grader]",
+					"required":true,
+					"enum":[000-360, 999],
+					"description":""
+				},
+				"Jordman":{
+					"type":["integer","null"],
+					"title":"Jordmån",
+					"required":true,
+					"enum":[1, 2, 3, 4],
+					"description":""
+				},
+				"Markslag":{
+					"type":["integer","null"],
+					"title":"Markslag ",
+					"required":true,
+					"enum":[1, 2, 3],
+					"description":""
+				},
+				"HumusDjup":{
+					"type":["integer","null"],
+					"title":"Humusdjup [cm]",
+					"required":true,
+					"minimum":00,
+					"maximum":30,
+					"description":""
+				},
+				"Jordart":{
+					"type":["integer","null"],
+					"title":"Jordart",
+					"required":true,
+					"enum":[1, 2, 3],
+					"description":""
+				},
+				"Textur":{
+					"type":["integer","null"],
+					"title":"Textur",
+					"required":true,
+					"enum":[1, 2, 3, 4, 5, 6, 7, 8],
+					"description":""
+				},
+				"Jorddjup":{
+					"type":["integer","null"],
+					"title":"Jorddjup",
+					"required":true,
+					"enum":[1, 2, 3, 4],
+					"description":""
+				},
+				"MarkBlock":{
+					"type":["integer","null"],
+					"title":"Blockighet",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4],
+					"description":""
+				},
+				"Myrveg":{
+					"type":["integer","null"],
+					"title":"Myrvegetation?",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"FastMaTa":{
+					"type":["integer","null"],
+					"title":"Fastmatta [%]",
+					"required":true,
+					"minimum":000,
+					"maximum":100,
+					"description":""
+				},
+				"FastMaRis":{
+					"type":["integer","null"],
+					"title":"Risinslag [%]",
+					"required":true,
+					"minimum":000,
+					"maximum":100,
+					"description":""
+				},
+				"FastMaTyp":{
+					"type":["integer","null"],
+					"title":"Fastm typ",
+					"required":true,
+					"enum":[1, 2, 3],
+					"description":""
+				},
+				"MjuTa":{
+					"type":["integer","null"],
+					"title":"Mjukmatta [%]",
+					"required":true,
+					"minimum":000,
+					"maximum":100,
+					"description":""
+				},
+				"MjuTyp":{
+					"type":["integer","null"],
+					"title":"Mjukm typ",
+					"required":true,
+					"enum":[1, 2, 3],
+					"description":""
+				},
+				"LosBoTa":{
+					"type":["integer","null"],
+					"title":"Lösbotten [%]",
+					"required":true,
+					"minimum":000,
+					"maximum":100,
+					"description":""
+				},
+				"SumpKarr":{
+					"type":["integer","null"],
+					"title":"Sumpkärr [%]",
+					"required":true,
+					"minimum":000,
+					"maximum":100,
+					"description":""
+				},
+				"AnTorvma":{
+					"type":["integer","null"],
+					"title":"Övrig torv [%]",
+					"required":true,
+					"minimum":000,
+					"maximum":100,
+					"description":""
+				}
+			}
+		},
+
+
+		"MarkTackeData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"HuTyp":{
+					"type":["integer","null"],
+					"title":"Huvudtyp",
+					"required":true,
+					"enum":[1, 2, 3, 4, 5],
+					"description":""
+				},
+				"Invent":{
+					"type":["integer","null"],
+					"title":"Inventeras?",
+					"required":true,
+					"enum":[01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13, 14, 15, 16],
+					"description":""
+				},
+				"VaStand":{
+					"type":["integer","null"],
+					"title":"Vattenstånd",
+					"required":true,
+					"enum":[1, 2, 3, 4],
+					"description":""
+				},
+				"VaStTillf":{
+					"type":["integer","null"],
+					"title":"V-stånd tillf",
+					"required":true,
+					"enum":[1, 2, 3, 4],
+					"description":""
+				},
+				"FaltTack":{
+					"type":["integer","null"],
+					"title":"Fält total [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"GramForna":{
+					"type":["integer","null"],
+					"title":"Gramförna [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"BuskTot":{
+					"type":["integer","null"],
+					"title":"Busk total [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				}
+			}
+		},
+
+
+		"NaturTypData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"FjallTyp":{
+					"type":["integer","null"],
+					"title":"Fjälltyp",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4],
+					"description":""
+				},
+				"Nat2000":{
+					"type":["integer","null"],
+					"title":"Natura 2000",
+					"required":true,
+					"enum":[00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12],
+					"description":""
+				},
+				"HedTyp":{
+					"type":["integer","null"],
+					"title":"Hedtyp",
+					"required":true,
+					"enum":[1, 2],
+					"description":""
+				}
+			}
+		},
+
+
+		"RutaData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"Ruta":{
+					"type":["integer","null"],
+					"title":"Rutanummer",
+					"required":true,
+					"enum":[1-631],
+					"description":""
+				},
+				"TypRuta":{
+					"type":["integer","null"],
+					"title":"Invent-typ",
+					"required":true,
+					"enum":[1, 2, 3],
+					"description":""
+				},
+				"Stratum":{
+					"type":["integer","null"],
+					"title":"Stratum",
+					"required":true,
+					"enum":[01, 02, 03, 04, 05, 06, 07, 08, 09, 10],
+					"description":""
+				},
+				"Lag":{
+					"type":["integer","null"],
+					"title":"Lag",
+					"required":true,
+					"enum":[01-99],
+					"description":""
+				},
+				"StartDat":{
+					"type":["integer","null"],
+					"title":"Startdatum [Månad Dag]",
+					"required":true,
+					"enum":[01-12,01-31],
+					"description":""
+				},
+				"StartTid":{
+					"type":["integer","null"],
+					"title":"Starttid [Tim min]",
+					"required":true,
+					"enum":[00-23,00-59],
+					"description":""
+				},
+				"SlutDat":{
+					"type":["integer","null"],
+					"title":"Slutdatum [Månad Dag]",
+					"required":true,
+					"enum":[01-12,01-31],
+					"description":""
+				},
+				"SlutTid":{
+					"type":["integer","null"],
+					"title":"Sluttid [Tim min]",
+					"required":true,
+					"enum":[00-23,00-59],
+					"description":""
+				}
+			}
+		},
+
+
+		"SDimTRSData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"LopNr":{
+					"type":["integer","null"],
+					"title":"Smådim nr",
+					"required":true,
+					"enum":[],
+					"description":""
+				},
+				"SmaDimTRS":{
+					"type":["integer","null"],
+					"title":"Små trädslag",
+					"required":true,
+					"enum":[11-97],
+					"description":""
+				},
+				"SmaHo5dm":{
+					"type":["integer","null"],
+					"title":"Antal [antal]",
+					"required":true,
+					"minimum":000,
+					"maximum":999,
+					"description":""
+				},
+				"SmaDi19mm":{
+					"type":["integer","null"],
+					"title":"Antal 1-19 mm [antal]",
+					"required":true,
+					"minimum":000,
+					"maximum":999,
+					"description":""
+				},
+				"SmaDi39mm":{
+					"type":["integer","null"],
+					"title":"Antal 20-39 [antal]",
+					"required":true,
+					"minimum":000,
+					"maximum":999,
+					"description":""
+				},
+				"BukAnt19":{
+					"type":["integer","null"],
+					"title":"Bukant 1-19 mm [antal]",
+					"required":true,
+					"minimum":000,
+					"maximum":999,
+					"description":""
+				},
+				"BukAnt39":{
+					"type":["integer","null"],
+					"title":"Bukant 20-39 mm [antal]",
+					"required":true,
+					"minimum":000,
+					"maximum":999,
+					"description":""
+				}
+			}
+		},
+
+
+		"SkogsHonsData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"Art":{
+					"type":["integer","null"],
+					"title":"Art",
+					"required":true,
+					"enum":[0, 1, 2, 4, 5, 6],
+					"description":""
+				},
+				"Kon":{
+					"type":["integer","null"],
+					"title":"Kön",
+					"required":true,
+					"enum":[0, 1, 2],
+					"description":""
+				},
+				"Kull":{
+					"type":["integer","null"],
+					"title":"Kull",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"Antal":{
+					"type":["integer","null"],
+					"title":"Antal [antal]",
+					"required":true,
+					"enum":[01-15],
+					"description":""
+				},
+				"AvstFraLinje":{
+					"type":["integer","null"],
+					"title":"Avstånd [m]",
+					"required":true,
+					"minimum":00,
+					"maximum":50,
+					"description":""
+				},
+				"RiktFraLin":{
+					"type":["integer","null"],
+					"title":"Riktning",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"Objekt":{
+					"type":["integer","null"],
+					"title":"Kontrollfråga",
+					"required":true,
+					"enum":[1, 2, 3],
+					"description":""
+				},
+				"NyttAvst":{
+					"type":["integer","null"],
+					"title":"Nytt avstånd [m]",
+					"required":true,
+					"minimum":000,
+					"maximum":200,
+					"description":""
+				}
+			}
+		},
+
+
+		"SkogskantData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"OppMark":{
+					"type":["integer","null"],
+					"title":"Öppen mark",
+					"required":true,
+					"enum":[01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13, 14, 15, 16],
+					"description":""
+				},
+				"KantAld":{
+					"type":["integer","null"],
+					"title":"Kantålder",
+					"required":true,
+					"enum":[00, 02, 05, 10, 25, 50, 99],
+					"description":""
+				},
+				"AvgrLin":{
+					"type":["integer","null"],
+					"title":"Avgränsad",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4, 5, 6, 7, 8],
+					"description":""
+				},
+				"TrArt":{
+					"type":["integer","null"],
+					"title":"Skogstyp",
+					"required":true,
+					"enum":[01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11],
+					"description":""
+				},
+				"TrTackIn":{
+					"type":["integer","null"],
+					"title":"Träd skog [%]",
+					"required":true,
+					"enum":[30-99],
+					"description":""
+				},
+				"Hojd":{
+					"type":["integer","null"],
+					"title":"Medelhöjd S [dm]",
+					"required":true,
+					"enum":[050-500],
+					"description":""
+				},
+				"TrBuTaOp":{
+					"type":["integer","null"],
+					"title":"Träd/busk Ö %",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"OppHojd":{
+					"type":["integer","null"],
+					"title":"Medelhöjd Ö [dm]",
+					"required":true,
+					"minimum":00,
+					"maximum":50,
+					"description":""
+				},
+				"OppBredd":{
+					"type":["integer","null"],
+					"title":"Bredd Ö [m]",
+					"required":true,
+					"enum":[020-999],
+					"description":""
+				},
+				"BrynRIkt":{
+					"type":["integer","null"],
+					"title":"Brynriktning [grader]",
+					"required":true,
+					"minimum":000,
+					"maximum":360,
+					"description":""
+				},
+				"BrynProf":{
+					"type":["integer","null"],
+					"title":"Brynprofil",
+					"required":true,
+					"enum":[1, 2, 3, 4, 5, 6, 7, 8, 9],
+					"description":""
+				},
+				"KantForm":{
+					"type":["integer","null"],
+					"title":"Kantform",
+					"required":true,
+					"enum":[1, 2, 3, 4, 5],
+					"description":""
+				},
+				"Objekt":{
+					"type":["integer","null"],
+					"title":"Kontrollfråga",
+					"required":true,
+					"enum":[1, 2, 3],
+					"description":""
+				},
+				"NyttAvst":{
+					"type":["integer","null"],
+					"title":"Nytt avstånd [m]",
+					"required":true,
+					"minimum":000,
+					"maximum":200,
+					"description":""
+				}
+			}
+		},
+
+
+		"SmaProData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"SmaPro":{
+					"type":["integer","null"],
+					"title":"Ytnummer",
+					"required":true,
+					"enum":[1-9],
+					"description":""
+				},
+				"Lage":{
+					"type":["integer","null"],
+					"title":"Delyta nr",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4, 5],
+					"description":""
+				},
+				"SmInv":{
+					"type":["integer","null"],
+					"title":"Inventeras?",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"SmOrsak":{
+					"type":["integer","null"],
+					"title":"Orsak",
+					"required":true,
+					"enum":[01, 02, 03, 04, 05, 06, 07, 08, 09, 10],
+					"description":""
+				},
+				"LovBusk":{
+					"type":["integer","null"],
+					"title":"Lövbuskar [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"LovTrad":{
+					"type":["integer","null"],
+					"title":"Lövträd [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"BarrTrad":{
+					"type":["integer","null"],
+					"title":"Barrtr-en [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"TotTackF":{
+					"type":["integer","null"],
+					"title":"Fältskikt tot [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"GramForna":{
+					"type":["integer","null"],
+					"title":"Gramförna [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"Stratum":{
+					"type":["integer","null"],
+					"title":"Stratum",
+					"required":true,
+					"enum":[01-09, 10],
+					"description":""
+				},
+				"Renlavar":{
+					"type":["integer","null"],
+					"title":"Renlavar [%]",
+					"required":true,
+					"minimum":000,
+					"maximum":100,
+					"description":""
+				},
+				"RenlFukt":{
+					"type":["integer","null"],
+					"title":"RenlFukt",
+					"required":true,
+					"enum":[1, 2, 3],
+					"description":""
+				},
+				"HojdPos1":{
+					"type":["integer","null"],
+					"title":"HojdPos1 [mm]",
+					"required":true,
+					"minimum":000,
+					"maximum":500,
+					"description":""
+				},
+				"HojdPos2":{
+					"type":["integer","null"],
+					"title":"HojdPos2 [mm]",
+					"required":true,
+					"minimum":000,
+					"maximum":500,
+					"description":""
+				},
+				"HojdPos3":{
+					"type":["integer","null"],
+					"title":"HojdPos3 [mm]",
+					"required":true,
+					"minimum":000,
+					"maximum":500,
+					"description":""
+				},
+				"HojdPos4":{
+					"type":["integer","null"],
+					"title":"HojdPos4 [mm]",
+					"required":true,
+					"minimum":000,
+					"maximum":500,
+					"description":""
+				}
+			}
+		},
+
+
+		"StrandData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"VaStra":{
+					"type":["integer","null"],
+					"title":"Typ",
+					"required":true,
+					"enum":[1, 2, 3, 4],
+					"description":""
+				},
+				"StrandMyr":{
+					"type":["integer","null"],
+					"title":"Mot myr?",
+					"required":true,
+					"enum":[0, 1, 2],
+					"description":""
+				},
+				"StrandVass":{
+					"type":["integer","null"],
+					"title":"Vasstrand?",
+					"required":true,
+					"enum":[0, 3],
+					"description":""
+				},
+				"StrandTyp":{
+					"type":["integer","null"],
+					"title":"Bottentyp",
+					"required":true,
+					"enum":[1, 2, 3, 4, 5, 6, 7],
+					"description":""
+				},
+				"VaytaLage":{
+					"type":["integer","null"],
+					"title":"V-ytan läge [dm]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"VaStand":{
+					"type":["integer","null"],
+					"title":"Vattenstånd",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4],
+					"description":""
+				},
+				"VaDjup":{
+					"type":["integer","null"],
+					"title":"Vattendjup",
+					"required":true,
+					"enum":[00-20, 21],
+					"description":""
+				},
+				"StroHast":{
+					"type":["integer","null"],
+					"title":"Strömhast ",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4],
+					"description":""
+				},
+				"TypBed":{
+					"type":["integer","null"],
+					"title":"Typ av bedöm",
+					"required":true,
+					"enum":[1, 2, 3, 4],
+					"description":""
+				},
+				"StrBredd":{
+					"type":["integer","null"],
+					"title":"Strandbredd [dm]",
+					"required":true,
+					"minimum":000,
+					"maximum":999,
+					"description":""
+				},
+				"Orsak":{
+					"type":["integer","null"],
+					"title":"Orsak",
+					"required":true,
+					"enum":[1, 2],
+					"description":""
+				},
+				"OrtTack":{
+					"type":["integer","null"],
+					"title":"Örter [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"GramTack":{
+					"type":["integer","null"],
+					"title":"Graminider [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"GraFoTack":{
+					"type":["integer","null"],
+					"title":"Gramförna [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"GrBuTrad":{
+					"type":["integer","null"],
+					"title":"Yttre gräns [dm]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"BuTack":{
+					"type":["integer","null"],
+					"title":"Buskar [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"TrTack":{
+					"type":["integer","null"],
+					"title":"Träd [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"SolExp":{
+					"type":["integer","null"],
+					"title":"Solexponering",
+					"required":true,
+					"enum":[0, 1, 2, 3 ],
+					"description":""
+				},
+				"Avveinom":{
+					"type":["integer","null"],
+					"title":"Kalavverkning",
+					"required":true,
+					"enum":[0, 2, 3],
+					"description":""
+				},
+				"StrAvv":{
+					"type":["integer","null"],
+					"title":"Avstånd kalav [m]",
+					"required":true,
+					"minimum":00,
+					"maximum":40,
+					"description":""
+				},
+				"Atgard":{
+					"type":["integer","null"],
+					"title":"Åtgärder",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"StrHavd":{
+					"type":["integer","null"],
+					"title":"Hävd",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4, 5],
+					"description":""
+				},
+				"AvvRoj":{
+					"type":["integer","null"],
+					"title":"Röjning ",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4, 5, 6],
+					"description":""
+				},
+				"AvvTid":{
+					"type":["integer","null"],
+					"title":"Röjning tid",
+					"required":true,
+					"enum":[00, 01, 02, 05],
+					"description":""
+				},
+				"StrStorn":{
+					"type":["integer","null"],
+					"title":"Störning",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+					"description":""
+				},
+				"StrSTid":{
+					"type":["integer","null"],
+					"title":"Störning tid",
+					"required":true,
+					"enum":[00, 01, 02, 05],
+					"description":""
+				},
+				"StrStoTack":{
+					"type":["integer","null"],
+					"title":"Störning [%]",
+					"required":true,
+					"minimum":000,
+					"maximum":100,
+					"description":""
+				},
+				"StrDep":{
+					"type":["integer","null"],
+					"title":"Deponering",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4, 5, 6, 7],
+					"description":""
+				},
+				"StrDTid":{
+					"type":["integer","null"],
+					"title":"Deponer tid",
+					"required":true,
+					"enum":[00, 01, 02, 05],
+					"description":""
+				},
+				"StrDTack":{
+					"type":["integer","null"],
+					"title":"Deponer [%]",
+					"required":true,
+					"minimum":000,
+					"maximum":100,
+					"description":""
+				},
+				"DodVedIV":{
+					"type":["integer","null"],
+					"title":"Ved i vatten [antal]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"DodVedOV":{
+					"type":["integer","null"],
+					"title":"Ved över vatten [antal]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"AlpVatten":{
+					"type":["integer","null"],
+					"title":"Alp vatten?",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"Objekt":{
+					"type":["integer","null"],
+					"title":"Kontrollfråga",
+					"required":true,
+					"enum":[1, 2, 3],
+					"description":""
+				},
+				"NyttAvst":{
+					"type":["integer","null"],
+					"title":"Nytt avstånd [m]",
+					"required":true,
+					"minimum":000,
+					"maximum":200,
+					"description":""
+				}
+			}
+		},
+
+
+		"TradData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"TotTrad":{
+					"type":["integer","null"],
+					"title":"Träd tot [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"TradFor":{
+					"type":["integer","null"],
+					"title":"Trädförekomst",
+					"required":true,
+					"enum":[0, 1, 2, 3],
+					"description":""
+				},
+				"MedHojd":{
+					"type":["integer","null"],
+					"title":"Medelhöjd [dm]",
+					"required":true,
+					"enum":[005-500],
+					"description":""
+				},
+				"GrYtaDod":{
+					"type":["integer","null"],
+					"title":"G-yta döda [m2/ha]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"GrYtaLev":{
+					"type":["integer","null"],
+					"title":"G-yta levande [m2/ha]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"StamDod":{
+					"type":["integer","null"],
+					"title":"Stam död [antal/ha]",
+					"required":true,
+					"minimum":0000,
+					"maximum":9999,
+					"description":""
+				},
+				"HojdPlaSk":{
+					"type":["integer","null"],
+					"title":"Planthöjd [dm]",
+					"required":true,
+					"enum":[05-13],
+					"description":""
+				},
+				"StamLev":{
+					"type":["integer","null"],
+					"title":"Stam lev [antal/ha]",
+					"required":true,
+					"minimum":0000,
+					"maximum":9999,
+					"description":""
+				},
+				"MeAlder":{
+					"type":["integer","null"],
+					"title":"Medelålder [år]",
+					"required":true,
+					"enum":[001-999],
+					"description":""
+				},
+				"AntSkikt":{
+					"type":["integer","null"],
+					"title":"Skiktning",
+					"required":true,
+					"enum":[1, 2, 3, 4],
+					"description":""
+				},
+				"SkogSvensk":{
+					"type":["integer","null"],
+					"title":"Skog svensk",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"SkogFAO":{
+					"type":["integer","null"],
+					"title":"Skog FAO",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"TradBuskFAO":{
+					"type":["integer","null"],
+					"title":"TrädBusk FAO",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				}
+			}
+		},
+
+
+		"TradLavData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"LopNr":{
+					"type":["integer","null"],
+					"title":"Träd nummer",
+					"required":true,
+					"enum":[],
+					"description":""
+				},
+				"TrArt":{
+					"type":["integer","null"],
+					"title":"Trädslag",
+					"required":true,
+					"enum":[30-97, 01, 03],
+					"description":""
+				},
+				"DodArt":{
+					"type":["integer","null"],
+					"title":"Trädsl dött",
+					"required":true,
+					"enum":[30-97],
+					"description":""
+				},
+				"Diam":{
+					"type":["integer","null"],
+					"title":"Diameter [m]",
+					"required":true,
+					"enum":[0100-9999],
+					"description":""
+				},
+				"LungTack":{
+					"type":["integer","null"],
+					"title":"Lung 0-1,8 [dm2]",
+					"required":true,
+					"minimum":000,
+					"maximum":999,
+					"description":""
+				},
+				"LungTack4":{
+					"type":["integer","null"],
+					"title":"Lung 1,8-4 [dm2]",
+					"required":true,
+					"minimum":000,
+					"maximum":999,
+					"description":""
+				},
+				"LungFrukt":{
+					"type":["integer","null"],
+					"title":"Antal fruktkr [antal]",
+					"required":true,
+					"minimum":000,
+					"maximum":999,
+					"description":""
+				},
+				"SkrovTack":{
+					"type":["integer","null"],
+					"title":"Skrov 0-1,8 [dm2]",
+					"required":true,
+					"minimum":000,
+					"maximum":999,
+					"description":""
+				},
+				"SkrovTack4":{
+					"type":["integer","null"],
+					"title":"Skrov 1,8-4 [dm2]",
+					"required":true,
+					"minimum":000,
+					"maximum":999,
+					"description":""
+				}
+			}
+		},
+
+
+		"TrspLedData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"TypLed":{
+					"type":["integer","null"],
+					"title":"Ledtyp",
+					"required":true,
+					"enum":[1, 2, 3, 4, 5, 6, 7, 8],
+					"description":""
+				},
+				"TypStig":{
+					"type":["integer","null"],
+					"title":"Stigtyp",
+					"required":true,
+					"enum":[1, 2, 3, 4, 5, 6, 7, 8],
+					"description":""
+				},
+				"Fordon":{
+					"type":["integer","null"],
+					"title":"Fordonstyp",
+					"required":true,
+					"enum":[1, 2, 3, 4],
+					"description":""
+				},
+				"SpDjup":{
+					"type":["integer","null"],
+					"title":"Spårdjup [cm]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"Stigbredd":{
+					"type":["integer","null"],
+					"title":"Stigbredd [dm]",
+					"required":true,
+					"enum":[02-99],
+					"description":""
+				},
+				"Vagbabre":{
+					"type":["integer","null"],
+					"title":"Vägbredd [dm]",
+					"required":true,
+					"enum":[001-999],
+					"description":""
+				},
+				"BreddOmr":{
+					"type":["integer","null"],
+					"title":"Områd-bredd [dm]",
+					"required":true,
+					"enum":[001-999],
+					"description":""
+				},
+				"Belagg":{
+					"type":["integer","null"],
+					"title":"Beläggning",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4, 5, 6],
+					"description":""
+				},
+				"MittBredd":{
+					"type":["integer","null"],
+					"title":"Mittremsa [dm]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"StorTack":{
+					"type":["integer","null"],
+					"title":"Störning [%]",
+					"required":true,
+					"minimum":000,
+					"maximum":100,
+					"description":""
+				},
+				"SteBloHa":{
+					"type":["integer","null"],
+					"title":"Sten [%]",
+					"required":true,
+					"minimum":000,
+					"maximum":100,
+					"description":""
+				},
+				"MinGrus":{
+					"type":["integer","null"],
+					"title":"Mjord/Grus [%]",
+					"required":true,
+					"minimum":000,
+					"maximum":100,
+					"description":""
+				},
+				"HumTorv":{
+					"type":["integer","null"],
+					"title":"Humus [%]",
+					"required":true,
+					"minimum":000,
+					"maximum":100,
+					"description":""
+				},
+				"BroAld":{
+					"type":["integer","null"],
+					"title":"Ålder",
+					"required":true,
+					"enum":[1, 2, 3],
+					"description":""
+				},
+				"Objekt":{
+					"type":["integer","null"],
+					"title":"Kontrollfråga",
+					"required":true,
+					"enum":[1, 2, 3],
+					"description":""
+				},
+				"NyttAvst":{
+					"type":["integer","null"],
+					"title":"Nytt avstånd [m]",
+					"required":true,
+					"minimum":000,
+					"maximum":200,
+					"description":""
+				}
+			}
+		},
+
+
+		"VaxterASmaproData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"Artkod":{
+					"type":["integer","null"],
+					"title":"Artkod",
+					"required":true,
+					"enum":["beror på meny"],
+					"description":""
+				},
+				"Tackning":{
+					"type":["integer","null"],
+					"title":"Fältskikt tot [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				}
+			}
+		},
+
+
+		"VaxterDiVaData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"Artkod":{
+					"type":["integer","null"],
+					"title":"Artkod",
+					"required":true,
+					"enum":["beror på meny"],
+					"description":""
+				},
+				"Tackning":{
+					"type":["integer","null"],
+					"title":"Tackning [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				}
+			}
+		},
+
+
+		"VaxterHabitatData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"Artkod":{
+					"type":["integer","null"],
+					"title":"Artkod",
+					"required":true,
+					"enum":["beror på meny"],
+					"description":""
+				},
+				"Tackning":{
+					"type":["integer","null"],
+					"title":"Tackning [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				}
+			}
+		},
+
+
+		"VaxterlinjeData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"Artkod":{
+					"type":["integer","null"],
+					"title":"Artkod",
+					"required":true,
+					"enum":["beror på meny"],
+					"description":""
+				},
+				"Tackning":{
+					"type":["integer","null"],
+					"title":"Fältskikt tot [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				}
+			}
+		},
+
+
+		"VaxterProvytaData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"Artkod":{
+					"type":["integer","null"],
+					"title":"Artkod",
+					"required":true,
+					"enum":["beror på meny"],
+					"description":""
+				},
+				"Tackning":{
+					"type":["integer","null"],
+					"title":"Fältskikt tot [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				}
+			}
+		},
+
+
+		"VaxterProvytaSpillData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"Artkod":{
+					"type":["integer","null"],
+					"title":"Artkod",
+					"required":true,
+					"enum":[1, 2, 3, 4, 5],
+					"description":""
+				},
+				"Tackning":{
+					"type":["integer","null"],
+					"title":"Tackning [förekomst]",
+					"required":true,
+					"enum":[1],
+					"description":""
+				}
+			}
+		},
+
+
+		"VaxterSmaproData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"Artkod":{
+					"type":["integer","null"],
+					"title":"Artkod",
+					"required":true,
+					"enum":["beror på meny"],
+					"description":""
+				},
+				"Tackning":{
+					"type":["integer","null"],
+					"title":"Fältskikt tot [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				}
+			}
+		},
+
+
+		"VaxterStrandData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"Artkod":{
+					"type":["integer","null"],
+					"title":"Artkod",
+					"required":true,
+					"enum":["beror på meny"],
+					"description":""
+				},
+				"Tackning":{
+					"type":["integer","null"],
+					"title":"Tackning [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				}
+			}
+		},
+
+
+		"VegRemsaData":{
+			"type":"array",
+			"title":"",
+			"required":true,
+			"minItems":0,
+			"description":"",
+			"items":{
+				"Vagslant":{
+					"type":["integer","null"],
+					"title":"Vägslänt?",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"Dikesren":{
+					"type":["integer","null"],
+					"title":"Dikesren?",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"OvrRemsa":{
+					"type":["integer","null"],
+					"title":"Övrig remsa",
+					"required":true,
+					"enum":[1, 2, 3, 4],
+					"description":""
+				},
+				"ZonBredd":{
+					"type":["integer","null"],
+					"title":"Zonbredd [dm]",
+					"required":true,
+					"minimum":000,
+					"maximum":200,
+					"description":""
+				},
+				"ZonTack":{
+					"type":["integer","null"],
+					"title":"Z fältskikt",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"Bredd":{
+					"type":["integer","null"],
+					"title":"Remsa-bredd [dm]",
+					"required":true,
+					"enum":[010-100],
+					"description":""
+				},
+				"OrtTack":{
+					"type":["integer","null"],
+					"title":"Örter [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"RisTack":{
+					"type":["integer","null"],
+					"title":"Ris [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"GramTack":{
+					"type":["integer","null"],
+					"title":"Graminider [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"GraFoTa":{
+					"type":["integer","null"],
+					"title":"Gramförna [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"MossTack":{
+					"type":["integer","null"],
+					"title":"Mossor [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"LavTack":{
+					"type":["integer","null"],
+					"title":"Lavar [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"BuTack":{
+					"type":["integer","null"],
+					"title":"Buskar [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"TrTack":{
+					"type":["integer","null"],
+					"title":"Träd [%]",
+					"required":true,
+					"minimum":00,
+					"maximum":99,
+					"description":""
+				},
+				"Atgard":{
+					"type":["integer","null"],
+					"title":"Åtgärder",
+					"required":true,
+					"enum":[0, 1],
+					"description":""
+				},
+				"Havd":{
+					"type":["integer","null"],
+					"title":"Hävd",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4, 5],
+					"description":""
+				},
+				"AvvRoj":{
+					"type":["integer","null"],
+					"title":"Röjning",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4, 5, 6],
+					"description":""
+				},
+				"AvvTid":{
+					"type":["integer","null"],
+					"title":"Röjning tid",
+					"required":true,
+					"enum":[00, 01, 02, 05],
+					"description":""
+				},
+				"MarkStor":{
+					"type":["integer","null"],
+					"title":"Störning",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+					"description":""
+				},
+				"StorTid":{
+					"type":["integer","null"],
+					"title":"Störning tid",
+					"required":true,
+					"enum":[00, 01, 02, 05],
+					"description":""
+				},
+				"StorTack":{
+					"type":["integer","null"],
+					"title":"Störning [%]",
+					"required":true,
+					"minimum":000,
+					"maximum":100,
+					"description":""
+				},
+				"VegDep":{
+					"type":["integer","null"],
+					"title":"Deponering",
+					"required":true,
+					"enum":[0, 1, 2, 3, 4, 5, 6, 7],
+					"description":""
+				},
+				"VegDTid":{
+					"type":["integer","null"],
+					"title":"Deponer tid",
+					"required":true,
+					"enum":[00, 01, 02, 05],
+					"description":""
+				},
+				"VegDTack":{
+					"type":["integer","null"],
+					"title":"Deponer [%]",
+					"required":true,
+					"minimum":000,
+					"maximum":100,
+					"description":""
+				},
+				"Objekt":{
+					"type":["integer","null"],
+					"title":"Kontrollfråga",
+					"required":true,
+					"enum":[1, 2, 3],
+					"description":""
+				},
+				"NyttAvst":{
+					"type":["integer","null"],
+					"title":"Nytt avstånd [m]",
+					"required":true,
+					"minimum":000,
+					"maximum":200,
+					"description":""
+				}
+			}
+		}
+	}
+}

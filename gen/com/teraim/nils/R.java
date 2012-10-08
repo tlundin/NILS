@@ -11,13 +11,13 @@ public final class R {
     public static final class attr {
     }
     public static final class dimen {
-        public static final int padding_large=0x7f050002;
-        public static final int padding_medium=0x7f050001;
-        public static final int padding_small=0x7f050000;
-        public static final int ui_elem_margin_bottom=0x7f050004;
-        public static final int ui_elem_margin_left=0x7f050005;
-        public static final int ui_elem_margin_right=0x7f050006;
-        public static final int ui_elem_margin_top=0x7f050003;
+        public static final int padding_large=0x7f060002;
+        public static final int padding_medium=0x7f060001;
+        public static final int padding_small=0x7f060000;
+        public static final int ui_elem_margin_bottom=0x7f060004;
+        public static final int ui_elem_margin_left=0x7f060005;
+        public static final int ui_elem_margin_right=0x7f060006;
+        public static final int ui_elem_margin_top=0x7f060003;
     }
     public static final class drawable {
         public static final int arrow=0x7f020000;
@@ -30,24 +30,28 @@ public final class R {
         public static final int vast=0x7f020007;
     }
     public static final class id {
-        public static final int arrow=0x7f090007;
-        public static final int azimuth=0x7f09000d;
-        public static final int button1=0x7f090000;
-        public static final int distance=0x7f090002;
-        public static final int fieldBearing=0x7f090006;
-        public static final int gridview=0x7f090009;
-        public static final int latlong=0x7f090004;
-        public static final int menu_settings=0x7f090011;
-        public static final int mycompass=0x7f090010;
-        public static final int newPic=0x7f09000b;
-        public static final int oldPic=0x7f09000a;
-        public static final int oldpichead=0x7f090008;
-        public static final int pitch=0x7f09000e;
-        public static final int roll=0x7f09000f;
-        public static final int takePic=0x7f09000c;
-        public static final int textView1=0x7f090001;
-        public static final int textView2=0x7f090003;
-        public static final int watevar=0x7f090005;
+        public static final int arrow=0x7f0a0008;
+        public static final int azimuth=0x7f0a0010;
+        public static final int button1=0x7f0a000b;
+        public static final int distance=0x7f0a0001;
+        public static final int fieldBearing=0x7f0a0007;
+        public static final int gridview=0x7f0a000a;
+        public static final int lat=0x7f0a0003;
+        public static final int latlong=0x7f0a0006;
+        public static final int longh=0x7f0a0004;
+        public static final int menu_settings=0x7f0a0015;
+        public static final int mycompass=0x7f0a0013;
+        public static final int newPic=0x7f0a000f;
+        public static final int oldPic=0x7f0a000e;
+        public static final int oldpichead=0x7f0a0009;
+        public static final int pitch=0x7f0a0011;
+        public static final int riktningstxt=0x7f0a000d;
+        public static final int roll=0x7f0a0012;
+        public static final int takepic=0x7f0a0014;
+        public static final int textView1=0x7f0a0000;
+        public static final int textView2=0x7f0a0002;
+        public static final int txt_mittpunkt=0x7f0a000c;
+        public static final int watevar=0x7f0a0005;
     }
     public static final class layout {
         public static final int activity_nils=0x7f030000;
@@ -55,19 +59,22 @@ public final class R {
         public static final int takepicture=0x7f030002;
     }
     public static final class menu {
-        public static final int activity_nils=0x7f080000;
+        public static final int activity_nils=0x7f090000;
+    }
+    public static final class raw {
+        public static final int nils_json=0x7f050000;
     }
     public static final class string {
-        public static final int app_name=0x7f060000;
-        public static final int hello_world=0x7f060001;
-        public static final int menu_settings=0x7f060002;
-        public static final int takepicnorth=0x7f060004;
-        public static final int title_activity_nils=0x7f060003;
-        public static final int title_find_area=0x7f060006;
-        public static final int title_take_picture=0x7f060005;
+        public static final int app_name=0x7f070000;
+        public static final int hello_world=0x7f070001;
+        public static final int menu_settings=0x7f070002;
+        public static final int takepicnorth=0x7f070004;
+        public static final int title_activity_nils=0x7f070003;
+        public static final int title_find_area=0x7f070006;
+        public static final int title_take_picture=0x7f070005;
     }
     public static final class style {
-        public static final int AppTheme=0x7f070000;
+        public static final int AppTheme=0x7f080000;
     }
     public static final class xml {
         public static final int myprefs=0x7f040000;

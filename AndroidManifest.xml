@@ -21,6 +21,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+         <activity
+            android:name="PictureZoom"
+            android:exported="false"
+            android:theme="@android:style/Theme.Dialog"
+            android:label="ZOOM" >
+            <intent-filter>
+                <action android:name="com.teraim.nils.PictureZoom" />
+
+                <category android:name="android.intent.category." />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".AppPreferenceActivity"
             android:exported="false"

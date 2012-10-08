@@ -20,9 +20,10 @@ import android.util.Log;
 import android.widget.ImageView;
 public class Dbhelper {
 	static final String TAG = "DBAdapter";
-	static final String DATABASE_TABLE = "params";
 	static final String DATABASE_NAME = "nilsdb";
 	static final String ASSET_DATABASE_NAME = "sqlver";
+	static final String VAULEPAIR_TABLE = "params";
+
 
 	static final int DATABASE_VERSION = 1;
 	private static final String PIC_TABLE = "PICTURES";
@@ -198,4 +199,5 @@ public class Dbhelper {
 		inputStream.close();
 		outputStream.close();
 	}
+	
 }

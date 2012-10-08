@@ -8,7 +8,6 @@ import java.io.OutputStream;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
@@ -39,6 +38,7 @@ public class TakePictureActivity extends Activity implements SensorEventListener
 	private float[] matrixI;
 	private float[] matrixValues;
 	private ImageView oldPictureImageView,newPictureImageView; 
+	private String arkivBildUrl = null;
 
 	TextView readingAzimuth, readingPitch, readingRoll;
 	Compass myCompass;
@@ -51,6 +51,8 @@ public class TakePictureActivity extends Activity implements SensorEventListener
 			"syd"
 	};
 	String picPath = null;
+	TextView riktningstxt;
+	int compass;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -60,24 +62,27 @@ public class TakePictureActivity extends Activity implements SensorEventListener
 
 		oldPictureImageView = (ImageView)findViewById(R.id.oldPic);
 		newPictureImageView = (ImageView)findViewById(R.id.newPic);
-		
+		riktningstxt = 			(TextView)findViewById(R.id.riktningstxt);
 		
 		//get the selected picture
-		int compass = this.getIntent().getIntExtra("selectedpic", 0);
+		compass = this.getIntent().getIntExtra("selectedpic", 0);
 		//translate number into string
-		dir = (compass==0?"delyta":(compass==1?"ost":(compass==2?"vast":(compass==3?"norr":(compass==4?"syd":null)))));
+		
+		dir = CommonVars.compassToString(compass);
 		picPath = Environment.getExternalStorageDirectory()+
 				CommonVars.NILS_BASE_DIR+"/delyta/"+
 				CommonVars.getCurrentYtID()+"/bilder";
 		//Check if there is an existing picture.
+		arkivBildUrl = picPath+"/gamla/"+dir+".png";
+		String nyBildUrl = picPath+"/nya/"+dir+".png";
 		Log.d("NILS",picPath);
 		Bitmap oldPic = 
-			BitmapFactory.decodeFile(picPath+"/gamla/"+dir+".png");
+			BitmapFactory.decodeFile(arkivBildUrl);
 		
 		Bitmap newPic = 
-				BitmapFactory.decodeFile(picPath+"/nya/"+dir+".png");
+				BitmapFactory.decodeFile(nyBildUrl);
 		
-
+		riktningstxt.setText("Yta: "+CommonVars.getCurrentYtID()+" Riktning: "+dir);
 		oldPictureImageView.setImageBitmap(oldPic);
 
 		//oldPictureImageView.setBackgroundResource(1);
@@ -86,7 +91,6 @@ public class TakePictureActivity extends Activity implements SensorEventListener
 		readingAzimuth = (TextView)findViewById(R.id.azimuth);
 		readingPitch = (TextView)findViewById(R.id.pitch);
 		readingRoll = (TextView)findViewById(R.id.roll);
-
 		myCompass = (Compass)findViewById(R.id.mycompass);
 
 		sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
@@ -158,6 +162,14 @@ public class TakePictureActivity extends Activity implements SensorEventListener
 		intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
 		startActivityForResult(intent, TAKE_PICTURE);
 
+	}
+	
+	public void picZoom(View v) {
+		Intent myIntent = new Intent(getBaseContext(),PictureZoom.class);
+		if (arkivBildUrl != null)
+			myIntent.putExtra("picpath", arkivBildUrl);
+		startActivity(myIntent);
+		
 	}
 
 	protected void onResume() {
