@@ -1,5 +1,4 @@
 <resources>
-
     <string name="app_name">NILS</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
@@ -7,5 +6,6 @@
     <string name="takepicnorth">North Picture</string>
     <string name="title_take_picture">Take Picture</string>
     <string name="title_find_area">Hitta Provyta</string>
-
+    <string name="title_select_ruta">Välj Ruta</string>
+	<string name="title_select_yta">Välj Yta</string>
 </resources>

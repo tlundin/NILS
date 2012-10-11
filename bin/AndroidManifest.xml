@@ -13,7 +13,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".Nils"
+            android:name=".Main"
             android:label="@string/title_activity_nils" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,6 +21,27 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+            
+            <activity
+            android:name=".SelectRuta"
+            android:exported="false"
+            android:label="@string/title_select_ruta" >
+            <intent-filter>
+                <action android:name="com.teraim.nils.SelectRuta" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        
+                        <activity
+            android:name=".SelectYta"
+            android:exported="false"
+            android:label="@string/title_select_yta" >
+            <intent-filter>
+                <action android:name="com.teraim.nils.SelectYta" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        
          <activity
             android:name="PictureZoom"
             android:exported="false"
@@ -28,8 +49,7 @@
             android:label="ZOOM" >
             <intent-filter>
                 <action android:name="com.teraim.nils.PictureZoom" />
-
-                <category android:name="android.intent.category." />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity

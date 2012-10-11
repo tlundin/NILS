@@ -6,7 +6,7 @@ public class CommonVars {
 
 	
 	
-	//The current provyta (testfield)
+	//The current test surface
 	static int ytID=1;
 	static PersistenceManager pm = null;
 	//Constants
@@ -24,6 +24,7 @@ public class CommonVars {
 		return (compass==0?"delyta":(compass==1?"ost":(compass==2?"vast":(compass==3?"norr":(compass==4?"syd":null)))));
 	}
 
+	//A singleton pointing to the persistencemanager. The PM will allow saving and retrieving parameters from the SD card.
 	public static void startPersistenceManager(final Context ctx) {
 		pm = PersistenceManager.getSingleton(ctx);
 	}
