@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
 xmlns:android="http://schemas.android.com/apk/res/android">
-<PreferenceCategory android:title="Category 1">
+<PreferenceCategory android:title="Device Settings">
 <CheckBoxPreference
 android:title="Device Type"
-android:defaultValue="false"
+android:defaultValue="true"
 android:summary="This device is Red"
-android:key="checkboxPref" />
+android:key="dosColor" />
+
+<EditTextPreference
+            android:key="lagNr"
+            android:title="Lag" 
+            android:summary="Lagets benämning"
+            android:dialogTitle="Lag"
+            android:dialogMessage="Lagets benämning"    
+            android:defaultValue="Lag 1" /> 
 </PreferenceCategory>
-<PreferenceCategory android:title="Category 2">    
+<PreferenceCategory android:title="Map Settings">    
 
 </PreferenceCategory>
 

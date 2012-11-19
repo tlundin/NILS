@@ -6,6 +6,7 @@ package com.teraim.nils;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,7 +32,7 @@ public class SelectYta extends Activity {
 	Rutdata rd=null;
 	
 	  public void onCreate(Bundle savedInstanceState) {
-		boolean widthShorter = false;
+		  
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.selectyta);
 		rd = new Rutdata(getResources().openRawResource(R.raw.rutdata));
@@ -46,9 +47,7 @@ public class SelectYta extends Activity {
 		double width = size.x;
 		double height = size.y;
 		
-		//is the screen vertical or horizontal?
-		if (height>width)
-			widthShorter = true;
+
 		
 		Log.d("NILS","Device screen in pixel: "+width+", "+height);
 		
@@ -164,8 +163,8 @@ public class SelectYta extends Activity {
 		Toast.LENGTH_LONG).show();
 		return true;
 		case 4:
-		Toast.makeText(this, "You clicked on Item 5",
-		Toast.LENGTH_LONG).show();
+		Intent intent = new Intent(getBaseContext(),ConfigMenu.class);
+		startActivity(intent);
 		return true;
 		}
 		return false;
