@@ -11,6 +11,7 @@ public class PersistenceManager {
 	private PersistenceManager(Context ctx) {
 		myDb = new Dbhelper(ctx);
 		tDb = ctx.getSharedPreferences("NILS_prefs", 0);
+		
 	}
 	public static PersistenceManager getSingleton(Context ctx) {
 		return new PersistenceManager(ctx);

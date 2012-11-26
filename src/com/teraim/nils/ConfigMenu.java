@@ -1,6 +1,7 @@
 package com.teraim.nils;
 
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
@@ -9,7 +10,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
-public class ConfigMenu extends PreferenceActivity {
+public class ConfigMenu extends PreferenceActivity implements OnSharedPreferenceChangeListener {
 
 	 public void onCreate(Bundle savedInstanceState) {			
 			super.onCreate(savedInstanceState);
@@ -18,20 +19,29 @@ public class ConfigMenu extends PreferenceActivity {
 	        getFragmentManager().beginTransaction()
 	                .replace(android.R.id.content, new SettingsFragment())
 	                .commit();
+	        
 	 }
 	 
 	 
-	 public static class SettingsFragment extends PreferenceFragment {
+	 public static class SettingsFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener {
 		    @Override
 		    public void onCreate(Bundle savedInstanceState) {
 		        super.onCreate(savedInstanceState);
 
 		        // Load the preferences from an XML resource
 		        addPreferencesFromResource(R.xml.myprefs);
-		        PreferenceManager.setDefaultValues(getActivity(),
-	                    R.xml.myprefs, false);
+		        //Set default values for the prefs.
+		        getPreferenceScreen().getSharedPreferences()
+	            .registerOnSharedPreferenceChangeListener(this);
+
 		        
 		    }
+
+			public void onSharedPreferenceChanged(
+					SharedPreferences sharedPreferences, String key) {
+				 Toast.makeText(this.getActivity().getApplicationContext(), "sdfdsfprefchange", Toast.LENGTH_SHORT).show();
+
+			}
 	    
 		}
 	 

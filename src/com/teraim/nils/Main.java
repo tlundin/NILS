@@ -1,15 +1,14 @@
 package com.teraim.nils;
 
-import java.io.InputStreamReader;
-
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 public class Main extends Activity {
@@ -26,7 +25,15 @@ public class Main extends Activity {
 		//The persistent storage used is Shared Preferences
 		//http://developer.android.com/guide/topics/data/data-storage.html#pref
 		CommonVars.startPersistenceManager(this);
-		
+        PreferenceManager.setDefaultValues(this,
+                R.xml.myprefs, false);
+        SharedPreferences myPreference=PreferenceManager.getDefaultSharedPreferences(this);
+        if(myPreference.getBoolean("dosColor", false)) {
+            //blue!
+			 Toast.makeText(this.getApplicationContext(), "Den här dosan är röd", Toast.LENGTH_SHORT).show();
+
+        }
+        
 		//Load JSON configuration 
 		/*
 		String jsonStr = null;

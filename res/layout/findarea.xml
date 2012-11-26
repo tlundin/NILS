@@ -67,7 +67,7 @@
         android:id="@+id/watevar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/latlong"
+        android:layout_below="@+id/longh"
         android:layout_centerHorizontal="true"
         android:text="Vektor mot målet (ungefärlig)"
         android:textAppearance="?android:attr/textAppearanceLarge" />
@@ -99,7 +99,8 @@
         android:layout_centerHorizontal="true"
         android:text="Arkivbilder (öst,väst,nord,syd)"
         android:textAppearance="?android:attr/textAppearanceMedium" />
-    
+    
+
     <GridView
         android:id="@+id/gridview"
         android:layout_width="wrap_content"

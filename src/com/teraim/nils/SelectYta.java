@@ -6,6 +6,8 @@ package com.teraim.nils;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
@@ -15,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -112,7 +115,7 @@ public class SelectYta extends Activity {
 			b.setLayoutParams(layoutParams);b.setLayoutParams(layoutParams);
 			  b.setOnClickListener(new View.OnClickListener() {
 		             public void onClick(View v) {
-		                Log.d("NILS","clicked button with id "+yta.id);
+		                provytaDialog(((Button)v).getText());
 		             }
 		         });
 			main.addView(b);  
@@ -121,7 +124,34 @@ public class SelectYta extends Activity {
 	  
 	  
 	  
-	  @Override
+	  protected void provytaDialog(CharSequence ytID) {
+		  Log.d("NILS","clicked button with id "+ytID);
+          AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+          alert.setTitle("Provyta "+ytID);
+          alert.setMessage("Ska ytan inventeras?");
+
+          
+          alert.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface dialog, int whichButton) {
+      		final Intent myIntent = new Intent(getBaseContext(),HittaYta.class);
+      		startActivity(myIntent);
+            }
+          });
+
+          alert.setNegativeButton("Nej", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+              // Canceled.
+            }
+          });
+
+          alert.show();
+		
+	}
+
+
+
+	@Override
 		public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
 		CreateMenu(menu);

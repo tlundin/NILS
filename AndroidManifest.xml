@@ -60,16 +60,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".AppPreferenceActivity"
-            android:exported="false"
-            android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="com.teraim.nils.AppPreferenceActivity" />
 
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
                 <activity
             android:name=".FindAreaActivity"
             android:exported="false"
@@ -80,7 +71,17 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity
+                <activity
+            android:name=".HittaYta"
+            android:exported="false"
+            android:label="@string/title_find_area" >
+            <intent-filter>
+                <action android:name="com.teraim.nils.HittaYta" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+                <activity
             android:name=".TakePictureActivity"
             android:exported="false"
             android:label="@string/title_take_picture" >
