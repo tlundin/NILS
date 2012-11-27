@@ -38,8 +38,8 @@ public class SelectYta extends Activity {
 		  
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.selectyta);
-		rd = new Rutdata(getResources().openRawResource(R.raw.rutdata));
-		rd.scan();
+		rd = Rutdata.getSingleton(this);
+		
 		FrameLayout main = (FrameLayout) findViewById(R.id.ytselect);
 		
 		//Calculate size of display
@@ -58,8 +58,10 @@ public class SelectYta extends Activity {
 		//Ruta is 2125 meters from provyta 1.
 	
 		//First get the Ruta data.
-		Bundle bu = getIntent().getExtras();
-		String rutaId = bu.getString("ruta");
+		//Bundle bu = getIntent().getExtras();
+		//String rutaId = bu.getString("ruta");
+		String rutaId = CommonVars.getRutaId();
+		if (rutaId !=null) {
 		Ruta ruta = rd.findRuta(rutaId);
 		
 		//Yta yta1 = ruta.findYta("1");
@@ -120,14 +122,17 @@ public class SelectYta extends Activity {
 		         });
 			main.addView(b);  
 		}
+		}
 	  }
 	  
 	  
 	  
 	  protected void provytaDialog(CharSequence ytID) {
 		  Log.d("NILS","clicked button with id "+ytID);
+		  if (ytID!=null)
+			  CommonVars.setProvytaId(ytID.toString());
           AlertDialog.Builder alert = new AlertDialog.Builder(this);
-
+          
           alert.setTitle("Provyta "+ytID);
           alert.setMessage("Ska ytan inventeras?");
 
@@ -135,6 +140,7 @@ public class SelectYta extends Activity {
           alert.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
           public void onClick(DialogInterface dialog, int whichButton) {
       		final Intent myIntent = new Intent(getBaseContext(),HittaYta.class);
+      		
       		startActivity(myIntent);
             }
           });

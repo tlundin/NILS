@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-import android.graphics.Point;
+import android.content.Context;
 import android.util.Log;
 
 
@@ -18,11 +18,22 @@ import android.util.Log;
  */
 public class Rutdata  {
 
+	static Rutdata singleton;
+	public static Rutdata getSingleton(Context c) {
+		if (singleton == null) {
+			singleton = new Rutdata(c.getResources().openRawResource(R.raw.rutdata));
+			singleton.scan();
+		}
+		return singleton;
+	}
+	
 	protected class Yta {
 		String id;
 		double x;
 		double y;
 	}
+	
+	
 	protected class Ruta {
 		String id;
 		ArrayList<Yta> ytor = new ArrayList<Yta>();
@@ -77,7 +88,7 @@ public class Rutdata  {
 	
 	InputStream csvFile;
 	ArrayList<Ruta> rutor = new ArrayList<Ruta>();
-	public Rutdata(InputStream inputStream) {
+	private Rutdata(InputStream inputStream) {
 		csvFile = inputStream;
 
 	}
@@ -103,7 +114,7 @@ public class Rutdata  {
 		return null;
 	}
 	//scan csv file for Rutor. Create if needed.
-	public void scan() {
+	private void scan() {
 		InputStreamReader is = new InputStreamReader(csvFile);
 		BufferedReader br = new BufferedReader(is);
 		String header="boo";

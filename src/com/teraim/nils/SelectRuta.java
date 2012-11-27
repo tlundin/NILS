@@ -21,9 +21,7 @@ public class SelectRuta extends ListActivity {
 	
 	  public void onCreate(Bundle savedInstanceState) {
 		    super.onCreate(savedInstanceState);
-		    rd = new Rutdata(getResources().openRawResource(R.raw.rutdata));
-		   
-		    rd.scan();
+		    rd = Rutdata.getSingleton(this);	   
 		    values = rd.getRutIds();
 		    if (values == null) {
 		    	values = new String[1];
@@ -38,9 +36,11 @@ public class SelectRuta extends ListActivity {
 	  protected void onListItemClick (ListView l, View v, int position, long id) {
 		  Log.d("NILS", "I was clicked "+position+" should be "+values[position]);
 			final Intent intent = new Intent(getBaseContext(),SelectYta.class);
-			Bundle b = new Bundle();
+			/*Bundle b = new Bundle();
 			b.putString("ruta", values[position]);
 			intent.putExtras(b);
+			*/
+			CommonVars.setRutaId(values[position]);
 			startActivity(intent);
 	  }
 	  

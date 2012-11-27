@@ -7,17 +7,35 @@ public class CommonVars {
 	
 	
 	//The current test surface
-	static int ytID=1;
+	//TODO: REMOVE
+	private static int ytID=1;
+	
+	//The current "ruta"
+	private static String rutaId=null;
 	static PersistenceManager pm = null;
 	//Constants
 	
 	public static String NILS_BASE_DIR = "/nils";
+
+	private static String provytaId;
 
 	public static int getCurrentYtID() {
 		return ytID;
 	}
 	
 	
+
+	public static String getRutaId() {
+		return rutaId;
+	}
+
+
+
+	public static void setRutaId(String rutaId) {
+		CommonVars.rutaId = rutaId;
+	}
+
+
 
 	public static void setCurrentYtID(int ytID) {
 		CommonVars.ytID = ytID;
@@ -30,5 +48,16 @@ public class CommonVars {
 	public static void startPersistenceManager(final Context ctx) {
 		pm = PersistenceManager.getSingleton(ctx);
 	}
+
+
+
+	public static void setProvytaId(String ytID) {
+		provytaId = ytID;
+	}
+	public static String getProvytaId() {
+		return provytaId;
+	}
+	
+	
 
 }
