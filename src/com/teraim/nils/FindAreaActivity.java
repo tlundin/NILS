@@ -107,7 +107,7 @@ public class FindAreaActivity extends Activity implements LocationListener, Sens
 		sensorMagneticField = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
 		mittPunktView = (TextView)findViewById(R.id.txt_mittpunkt);
-		String mp = CommonVars.pm.get(MITTPUNKT_KEY);
+		String mp = CommonVars.cv().get(MITTPUNKT_KEY);
 		if (mp!=null)
 			mittPunktView.setText(mp);
 		
@@ -120,7 +120,7 @@ public class FindAreaActivity extends Activity implements LocationListener, Sens
 					currentLocation.getLatitude()+" (Longitud) "+currentLocation.getLongitude();
 			mittPunktView.setText(txt);
 			//Persist the value
-			CommonVars.pm.persist(MITTPUNKT_KEY,txt);
+			CommonVars.cv().put(MITTPUNKT_KEY,txt);
 		}
 		
 		Toast.makeText(getBaseContext(),txt,Toast.LENGTH_SHORT).show();
@@ -161,12 +161,13 @@ public class FindAreaActivity extends Activity implements LocationListener, Sens
 			} else {
 				imageView = (ImageView) convertView;
 			}
+			//TODO: Get rid of 1 below!!
 			String picPath = Environment.getExternalStorageDirectory()+
 					CommonVars.NILS_BASE_DIR+"/delyta/"+
-					CommonVars.getCurrentYtID()+"/bilder";
+					"1"+"/bilder";
 			
 			Bitmap bm = BitmapFactory.decodeFile(picPath+"/gamla/"+
-					CommonVars.compassToString(position)+".png");
+					CommonVars.compassToPicName(position)+".png");
 
 			imageView.setImageBitmap(bm);
 			//imageView.setImageBitmap(bm[position]);

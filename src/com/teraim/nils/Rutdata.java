@@ -88,6 +88,7 @@ public class Rutdata  {
 	
 	InputStream csvFile;
 	ArrayList<Ruta> rutor = new ArrayList<Ruta>();
+	
 	private Rutdata(InputStream inputStream) {
 		csvFile = inputStream;
 

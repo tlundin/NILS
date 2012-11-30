@@ -8,72 +8,81 @@
 package com.teraim.nils;
 
 public final class R {
+    public static final class array {
+        public static final int deviceColors=0x7f060000;
+    }
     public static final class attr {
     }
     public static final class dimen {
-        public static final int padding_large=0x7f060002;
-        public static final int padding_medium=0x7f060001;
-        public static final int padding_small=0x7f060000;
-        public static final int ui_elem_margin_bottom=0x7f060004;
-        public static final int ui_elem_margin_left=0x7f060005;
-        public static final int ui_elem_margin_right=0x7f060006;
-        public static final int ui_elem_margin_top=0x7f060003;
+        public static final int padding_large=0x7f070002;
+        public static final int padding_medium=0x7f070001;
+        public static final int padding_small=0x7f070000;
+        public static final int ui_elem_margin_bottom=0x7f070004;
+        public static final int ui_elem_margin_left=0x7f070005;
+        public static final int ui_elem_margin_right=0x7f070006;
+        public static final int ui_elem_margin_top=0x7f070003;
     }
     public static final class drawable {
         public static final int arrow=0x7f020000;
         public static final int delyta=0x7f020001;
-        public static final int ic_action_search=0x7f020002;
-        public static final int ic_launcher=0x7f020003;
-        public static final int life=0x7f020004;
-        public static final int norr=0x7f020005;
-        public static final int ost=0x7f020006;
-        public static final int roundshape=0x7f020007;
-        public static final int syd=0x7f020008;
-        public static final int threelines=0x7f020009;
-        public static final int vast=0x7f02000a;
+        public static final int empty_east=0x7f020002;
+        public static final int empty_north=0x7f020003;
+        public static final int empty_south=0x7f020004;
+        public static final int empty_west=0x7f020005;
+        public static final int ic_action_search=0x7f020006;
+        public static final int ic_launcher=0x7f020007;
+        public static final int ic_menu_preferences=0x7f020008;
+        public static final int life=0x7f020009;
+        public static final int roundshape=0x7f02000a;
+        public static final int threelines=0x7f02000b;
     }
     public static final class id {
-        public static final int arrow=0x7f0a0009;
-        public static final int azimuth=0x7f0a0016;
-        public static final int button1=0x7f0a000c;
-        public static final int distance=0x7f0a0003;
-        public static final int fieldBearing=0x7f0a0008;
-        public static final int gridview=0x7f0a000b;
-        public static final int imageView1=0x7f0a0011;
-        public static final int lat=0x7f0a0005;
-        public static final int longh=0x7f0a0006;
-        public static final int menu_settings=0x7f0a001b;
-        public static final int mycompass=0x7f0a0019;
-        public static final int newPic=0x7f0a0015;
-        public static final int oldPic=0x7f0a0014;
-        public static final int oldpichead=0x7f0a000a;
-        public static final int picgridview=0x7f0a0010;
-        public static final int pitch=0x7f0a0017;
-        public static final int provyta=0x7f0a000e;
-        public static final int radioButton1=0x7f0a0001;
-        public static final int radioButton2=0x7f0a0002;
-        public static final int riktningstxt=0x7f0a0013;
-        public static final int roll=0x7f0a0018;
-        public static final int tagtabell=0x7f0a000f;
-        public static final int takepic=0x7f0a001a;
-        public static final int textView1=0x7f0a0000;
-        public static final int textView2=0x7f0a0004;
-        public static final int txt_mittpunkt=0x7f0a000d;
-        public static final int watevar=0x7f0a0007;
-        public static final int ytselect=0x7f0a0012;
+        public static final int arrow=0x7f0b0007;
+        public static final int azimuth=0x7f0b0019;
+        public static final int button1=0x7f0b000a;
+        public static final int distance=0x7f0b0001;
+        public static final int fieldBearing=0x7f0b0006;
+        public static final int gamlabilder=0x7f0b0014;
+        public static final int gridview=0x7f0b0009;
+        public static final int gridview_new=0x7f0b0013;
+        public static final int gridview_old=0x7f0b0015;
+        public static final int imageView1=0x7f0b000f;
+        public static final int lat=0x7f0b0003;
+        public static final int longh=0x7f0b0004;
+        public static final int menu_settings=0x7f0b001e;
+        public static final int mycompass=0x7f0b001c;
+        public static final int newPic=0x7f0b0018;
+        public static final int nyabilder=0x7f0b0012;
+        public static final int oldPic=0x7f0b0017;
+        public static final int oldpichead=0x7f0b0008;
+        public static final int picgridview=0x7f0b000e;
+        public static final int pitch=0x7f0b001a;
+        public static final int provyta=0x7f0b000c;
+        public static final int riktningstxt=0x7f0b0016;
+        public static final int roll=0x7f0b001b;
+        public static final int separator=0x7f0b0010;
+        public static final int tagtabell=0x7f0b000d;
+        public static final int takepic=0x7f0b001d;
+        public static final int textView1=0x7f0b0000;
+        public static final int textView2=0x7f0b0002;
+        public static final int txt_mittpunkt=0x7f0b000b;
+        public static final int watevar=0x7f0b0005;
+        public static final int ytselect=0x7f0b0011;
     }
     public static final class layout {
-        public static final int configmenu=0x7f030000;
-        public static final int findarea=0x7f030001;
-        public static final int hittayta=0x7f030002;
-        public static final int loadscreen=0x7f030003;
-        public static final int ruta_list_layout=0x7f030004;
-        public static final int selectruta=0x7f030005;
-        public static final int selectyta=0x7f030006;
-        public static final int takepicture=0x7f030007;
+        public static final int findarea=0x7f030000;
+        public static final int hittayta=0x7f030001;
+        public static final int loadscreen=0x7f030002;
+        public static final int mypreflayout=0x7f030003;
+        public static final int mypreflayout2=0x7f030004;
+        public static final int ruta_list_layout=0x7f030005;
+        public static final int selectruta=0x7f030006;
+        public static final int selectyta=0x7f030007;
+        public static final int takepicture=0x7f030008;
+        public static final int takepicture_singular=0x7f030009;
     }
     public static final class menu {
-        public static final int activity_nils=0x7f090000;
+        public static final int activity_nils=0x7f0a0000;
     }
     public static final class raw {
         public static final int delningsdata=0x7f050000;
@@ -81,18 +90,17 @@ public final class R {
         public static final int rutdata=0x7f050002;
     }
     public static final class string {
-        public static final int app_name=0x7f070000;
-        public static final int hello_world=0x7f070001;
-        public static final int menu_settings=0x7f070002;
-        public static final int takepicnorth=0x7f070004;
-        public static final int title_activity_nils=0x7f070003;
-        public static final int title_find_area=0x7f070006;
-        public static final int title_select_ruta=0x7f070007;
-        public static final int title_select_yta=0x7f070008;
-        public static final int title_take_picture=0x7f070005;
+        public static final int app_name=0x7f080000;
+        public static final int menu_settings=0x7f080001;
+        public static final int title_activity_nils=0x7f080002;
+        public static final int title_find_area=0x7f080004;
+        public static final int title_select_color=0x7f080007;
+        public static final int title_select_ruta=0x7f080005;
+        public static final int title_select_yta=0x7f080006;
+        public static final int title_take_picture=0x7f080003;
     }
     public static final class style {
-        public static final int AppTheme=0x7f080000;
+        public static final int AppTheme=0x7f090000;
     }
     public static final class xml {
         public static final int myprefs=0x7f040000;

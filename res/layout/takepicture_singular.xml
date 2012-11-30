@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".takePicture" >
+
+    <TextView
+        android:id="@+id/riktningstxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text=""
+        android:textSize="30sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:text="Det här är gamla bilden:"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <ImageView
+        android:id="@+id/oldPic"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:onClick="picZoom" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Det här är nya bilden. Klicka för att ta ny."
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+		
+    <ImageView
+        android:id="@+id/newPic"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:onClick="takePhoto" />
+
+    <TextView
+        android:id="@+id/azimuth"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp" />
+
+    <TextView
+        android:id="@+id/pitch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/roll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <view
+        android:id="@+id/mycompass"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        class="com.teraim.nils.Compass" />
+
+    <Button
+        android:id="@+id/takepic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="takePhoto"
+        android:text="Ta ny bild"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+</LinearLayout>

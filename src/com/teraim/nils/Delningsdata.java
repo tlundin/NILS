@@ -22,9 +22,71 @@ public class Delningsdata {
 		return singleton;
 	}
 
+	//Train class stores the "TÅG" in swedish, i.e. the dividing lines crossing the Provyta (TestArea).
+	//Train defined by points in a circle. Each point is described as an angle (rikt) and a distance (dist).
+	//There can be up to 8 points per Train but there must be an equal number of Avst/Rikt, so
+	//setAvst and setRikt needs be called equal number of times. 
+	
+	
+	public class Train  {
+		static final int Max_Points = 10;
+		final int[] avst;
+		final int[] rikt;
+		private int current;
+		
+		boolean nick;
+		boolean carter;
+		
+		public Train() {
+			nick = carter = false;
+			avst=new int[Max_Points];
+			rikt=new int[Max_Points];
+			current=0;
+		}
+		public void setAvst(int avs) throws IllegalCallException {
+			if(!nick) {
+				avst[current]=avs;
+			
+				nick = true;
+				checkIfNext();
+			} else
+				throw new IllegalCallException();
+			
+		}
+		public void setRikt(int rik) throws IllegalCallException {
+			if(!carter) {
+			rikt[current]=rik;
+			carter = true;
+			checkIfNext();
+			} else
+				throw new IllegalCallException();
+
+		}
+		private void checkIfNext() {
+			if (nick&carter) {
+				current++;
+				nick = carter = false;
+			}
+		}
+		
+		public int getSize() {
+			return current;
+		}
+		
+		public int[][] getTag() {
+			if (current==0)
+				return null;
+			int ret[][]= new int[current][2];
+			for(int i=0;i<current;i++) {
+				ret[i][0]=avst[i];
+				ret[i][1]=rikt[i];
+			}
+			return ret;
+		}
+	}
 	public class Delyta {
 		final int Max_Points = 10;
-		private int[][] ar=new int[Max_Points][2];
+		private Train tr = new Train();
 		private final String myId;
 
 		public Delyta(String id, String[] raw) {
@@ -34,14 +96,6 @@ public class Delningsdata {
 			boolean avst = true;
 			myId = id;
 			//Put -999 to signal null value.
-			for (int j =0;j<Max_Points;j++) {
-				ar[j][0]=-999;
-			}
-			String deb="";
-			for (String s:raw) {
-				deb+=s+" ";
-			}
-			//Log.d("NILS","Raw: "+deb);
 			
 			for (String s:raw) {
 				
@@ -56,13 +110,24 @@ public class Delningsdata {
 				if (val<0) {
 					break;
 				}
+				
 				//If avst is true, the AVSTÅND will be set and the arraypointer moved forward.
 				if (avst) {
+					
 					avst = false;
-					i++;
-					ar[i][0]=val;
+					try {
+						tr.setAvst(val);
+					} catch (IllegalCallException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				} else {
-					ar[i][1]=val;
+					try {
+						tr.setRikt(val);
+					} catch (IllegalCallException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					avst = true;
 				}
 				
@@ -70,7 +135,7 @@ public class Delningsdata {
 			//Log.d("NILS","Tåg skapat med "+i+" element");
 		}
 		public int[][] getPoints() {
-			return ar;
+			return tr.getTag();
 		}
 		public String getId() {
 			return myId;
@@ -120,13 +185,7 @@ public class Delningsdata {
 		}
 
 		private void addProvYta(String provYteId,String delyteId,String[] raw) {
-			if(this.getId().equals("416")&&provYteId.equals("9")) {
-				Log.e("NILS", "NINE GETTING ADDEEEEDDD");
-				String dd="";
-				for(String s:raw)
-					dd+=s;
-				Log.e("NILS","DD "+dd);
-			}
+
 			if (provYteId != null) {
 			ProvYta _py = getProvYta(provYteId);
 			if (_py==null) {
@@ -205,6 +264,13 @@ public class Delningsdata {
 		//Calculate the distance between smallest and biggest x,y values
 		//This is done to be able to calculate the grid position.
 
+	}
+	
+	public void calcStuff() {
+		
+		
+		
+		
 	}
 }
 

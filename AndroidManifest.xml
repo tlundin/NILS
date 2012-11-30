@@ -31,7 +31,17 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        
+            
+            <activity
+            android:name=".SelectColor"
+            android:exported="false"
+            android:label="@string/title_select_color" >
+            <intent-filter>
+                <action android:name="com.teraim.nils.SelectColor" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+            
         <activity
             android:name=".SelectYta"
             android:exported="false"
@@ -82,11 +92,21 @@
             </intent-filter>
         </activity>
                 <activity
-            android:name=".TakePictureActivity"
+            android:name=".TakePicture"
             android:exported="false"
             android:label="@string/title_take_picture" >
             <intent-filter>
                 <action android:name="com.teraim.nils.TakePicture" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+                      <activity
+            android:name=".TakePictureActivity"
+            android:exported="false"
+            android:label="@string/title_take_picture" >
+            <intent-filter>
+                <action android:name="com.teraim.nils.TakePictureActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>

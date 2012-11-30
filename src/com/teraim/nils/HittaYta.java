@@ -43,10 +43,10 @@ public class HittaYta extends Activity {
 	    title.setTypeface(Typeface.SERIF, Typeface.BOLD);  
 	    TableRow.LayoutParams params = new TableRow.LayoutParams();  
 	    Delningsdata dd = Delningsdata.getSingleton(this);
-	    ArrayList<Delyta> dy = dd.getDelytor(CommonVars.getRutaId(), CommonVars.getProvytaId());
+	    ArrayList<Delyta> dy = dd.getDelytor(CommonVars.cv().getRutaId(), CommonVars.cv().getProvytaId());
 	    provyta.setDelytor(dy);
 	    
-	    Log.d("NILS","ruta: "+CommonVars.getRutaId()+" provyta: "+CommonVars.getProvytaId());
+	    Log.d("NILS","ruta: "+CommonVars.cv().getRutaId()+" provyta: "+CommonVars.cv().getProvytaId());
 	    
 	    provyta.invalidate();	    
 	    params.span = 6;  
@@ -97,12 +97,13 @@ public class HittaYta extends Activity {
 			} else {
 				imageView = (ImageView) convertView;
 			}
+			//TODO:Replace with RutaId!
 			String picPath = Environment.getExternalStorageDirectory()+
 					CommonVars.NILS_BASE_DIR+"/delyta/"+
-					CommonVars.getCurrentYtID()+"/bilder";
+					"1"+"/bilder";
 			
 			Bitmap bm = BitmapFactory.decodeFile(picPath+"/gamla/"+
-					CommonVars.compassToString(position)+".png");
+					CommonVars.compassToPicName(position)+".png");
 
 			imageView.setImageBitmap(bm);
 			//imageView.setImageBitmap(bm[position]);

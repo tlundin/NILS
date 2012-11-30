@@ -14,6 +14,7 @@ public class PictureZoom extends Activity {
 		ImageView tmp = new ImageView(this);
 		Bitmap pic = 
 				BitmapFactory.decodeFile(this.getIntent().getStringExtra("picpath"));
+
 		tmp.setImageBitmap(pic);
 		setContentView(tmp);
 		}

@@ -60,7 +60,7 @@ public class SelectYta extends Activity {
 		//First get the Ruta data.
 		//Bundle bu = getIntent().getExtras();
 		//String rutaId = bu.getString("ruta");
-		String rutaId = CommonVars.getRutaId();
+		String rutaId = CommonVars.cv().getRutaId();
 		if (rutaId !=null) {
 		Ruta ruta = rd.findRuta(rutaId);
 		
@@ -130,7 +130,7 @@ public class SelectYta extends Activity {
 	  protected void provytaDialog(CharSequence ytID) {
 		  Log.d("NILS","clicked button with id "+ytID);
 		  if (ytID!=null)
-			  CommonVars.setProvytaId(ytID.toString());
+			  CommonVars.cv().setProvytaId(ytID.toString());
           AlertDialog.Builder alert = new AlertDialog.Builder(this);
           
           alert.setTitle("Provyta "+ytID);

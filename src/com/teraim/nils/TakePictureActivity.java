@@ -58,7 +58,7 @@ public class TakePictureActivity extends Activity implements SensorEventListener
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.takepicture);
+		setContentView(R.layout.takepicture_singular);
 
 		oldPictureImageView = (ImageView)findViewById(R.id.oldPic);
 		newPictureImageView = (ImageView)findViewById(R.id.newPic);
@@ -68,10 +68,9 @@ public class TakePictureActivity extends Activity implements SensorEventListener
 		compass = this.getIntent().getIntExtra("selectedpic", 0);
 		//translate number into string
 		
-		dir = CommonVars.compassToString(compass);
-		picPath = Environment.getExternalStorageDirectory()+
-				CommonVars.NILS_BASE_DIR+"/delyta/"+
-				CommonVars.getCurrentYtID()+"/bilder";
+		dir = CommonVars.compassToPicName(compass);
+		//TODO: Replace with getRutaId when more pics.
+		picPath = CommonVars.cv().getCurrentPictureBasePath();
 		//Check if there is an existing picture.
 		arkivBildUrl = picPath+"/gamla/"+dir+".png";
 		String nyBildUrl = picPath+"/nya/"+dir+".png";
@@ -81,8 +80,8 @@ public class TakePictureActivity extends Activity implements SensorEventListener
 		
 		Bitmap newPic = 
 				BitmapFactory.decodeFile(nyBildUrl);
-		
-		riktningstxt.setText("Yta: "+CommonVars.getCurrentYtID()+" Riktning: "+dir);
+		//TODO: Replace with getrutaID when more pics.
+		riktningstxt.setText("Ruta: "+CommonVars.cv().getRutaId()+" Provyta: "+CommonVars.cv().getProvytaId()+" Riktning: "+dir);
 		oldPictureImageView.setImageBitmap(oldPic);
 
 		//oldPictureImageView.setBackgroundResource(1);

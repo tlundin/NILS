@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 public class Main extends Activity {
@@ -20,22 +20,110 @@ public class Main extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		//Layer between application and persistent storage.
 		//The persistent storage used is Shared Preferences
 		//http://developer.android.com/guide/topics/data/data-storage.html#pref
-		CommonVars.startPersistenceManager(this);
-        PreferenceManager.setDefaultValues(this,
-                R.xml.myprefs, false);
-        SharedPreferences myPreference=PreferenceManager.getDefaultSharedPreferences(this);
-        if(myPreference.getBoolean("dosColor", false)) {
-            //blue!
-			 Toast.makeText(this.getApplicationContext(), "Den här dosan är röd", Toast.LENGTH_SHORT).show();
+		PreferenceManager.setDefaultValues(this,
+				R.xml.myprefs, false);
+		//Initialize common vars.
+		CommonVars.init(this);
+		//Get the instance.
+		CommonVars cv = CommonVars.cv();
+		//Check the color. If no color, require it.
+		String deviceColor = cv.getDeviceColor();
+		Toast.makeText(this.getApplicationContext(), "Den här dosan är "+deviceColor, Toast.LENGTH_SHORT).show();
 
-        }
-        
-		//Load JSON configuration 
-		/*
+
+		setContentView(R.layout.loadscreen);
+
+		Handler mHandler = new Handler();
+		final String devCol = deviceColor;
+		mHandler.postDelayed(new Runnable() {
+			public void run() {
+				checkConditions();
+			}
+		}, INITIAL_DELAY);
+
+
+	}
+
+	// askForColor,askForRuta;
+	final static int ASK_RUTA_RC = 1; 
+	final static int ASK_COLOR_RC = 2; 
+	private void checkConditions() {
+		final Intent selectRutaIntent = new Intent(getBaseContext(),SelectRuta.class);
+		final Intent selectColorIntent = new Intent(getBaseContext(),SelectColor.class);
+		final Intent selectYtaIntent = new Intent(getBaseContext(),SelectYta.class);
+		final Intent takePictureIntent = new Intent(getBaseContext(),TakePicture.class);
+
+		//If Color not set, check.
+		String deviceColor = CommonVars.cv().getDeviceColor();		
+		boolean askForColor = (deviceColor.equals(CommonVars.UNDEFINED));
+		if (askForColor) {
+			startActivityForResult(selectColorIntent,ASK_COLOR_RC);	
+		}
+		else {
+			//if Ruta is not known, check.
+			String currentRuta = CommonVars.cv().getRutaId();
+			boolean askForRuta = (currentRuta.equals(CommonVars.UNDEFINED));
+			if (askForRuta) {
+				startActivityForResult(selectRutaIntent,ASK_RUTA_RC);
+			}
+			else {
+
+				if(deviceColor.equals(CommonVars.blue())) {
+					Log.d("NILS","dosa blå!"+CommonVars.blue());				
+					startActivity(takePictureIntent);
+				}
+				else
+					startActivity(selectYtaIntent);            			
+				finish();		
+
+			}
+		}
+
+	}
+
+
+
+
+
+
+
+
+
+@Override
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	super.onActivityResult(requestCode, resultCode, data);
+
+	if (requestCode == ASK_COLOR_RC) //check if the request code is the one you've sent
+	{
+		if (resultCode == Activity.RESULT_OK) 
+		{
+			Log.d("NILS","Color is now set");
+		} else 
+			Log.e("NILS","Color dialog was not executed properly.");
+	}
+	else if (requestCode == ASK_RUTA_RC) //check if the request code is the one you've sent
+	{
+		if (resultCode == Activity.RESULT_OK) 
+		{
+			Log.d("NILS","Ruta is now set");
+			
+			}
+		}else {
+			Log.e("NILS","Ruta dialog was not executed properly.");
+		}
+	
+	checkConditions();
+
+
+}
+
+
+//Load JSON configuration 
+/*
 		String jsonStr = null;
 		InputStreamReader is = new InputStreamReader(getResources().openRawResource(R.raw.nils_json));
 		try {
@@ -43,42 +131,41 @@ public class Main extends Activity {
 	    } catch (java.util.NoSuchElementException e) {
 	        jsonStr = "";
 	    }
-		
+
 		JSONObject json=null;
 		JSONArray jsa = null;
 		try {
 			String tst = jsonStr.substring(70800,70908);
-			
+
 			json = new JSONObject(jsonStr);
 			//jsa = new JSONArray(buffer.toString());
 			//if (jsa != null)
 			//	json = jsa.getJSONObject(0);
 
-	
+
 		if (json!=null) {
 			String name = (String)json.get("name");
 			System.out.println(name);
 		}
-		
+
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}		
-		
-		*/
-		setContentView(R.layout.loadscreen);
-		//treeList = (ListView) findViewById(R.id.treelist);
-		///db.copyDBIfNeeded();
-		//db.open();
-		//Log.d("NILS","gets!");
-		//SimpleCursorAdapter mAdapter = db.getAdapter();
-		//Log.d("NILS","nogets!");
-		//setListAdapter(mAdapter);
-		//treeList.setAdapter(mAdapter);
-		//treeList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-  
-        // capture touches on the listview
-		/*
+
+ */
+//treeList = (ListView) findViewById(R.id.treelist);
+///db.copyDBIfNeeded();
+//db.open();
+//Log.d("NILS","gets!");
+//SimpleCursorAdapter mAdapter = db.getAdapter();
+//Log.d("NILS","nogets!");
+//setListAdapter(mAdapter);
+//treeList.setAdapter(mAdapter);
+//treeList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
+// capture touches on the listview
+/*
 		treeList.setOnItemClickListener(new OnItemClickListener() {
         	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         		// store the selected contact for later
@@ -86,40 +173,33 @@ public class Main extends Activity {
 //        		contactToDelete = textView.getText().toString();
         	}
         });
-        */
-		
-		//db.close();
-		
-		
-		//Show start screen
-		//
-		//XmlPullParser parser = Xml.newPullParser();
-	
-		
-		final Intent myIntent = new Intent(getBaseContext(),SelectRuta.class);
-		Handler mHandler = new Handler();
-		mHandler.postDelayed(new Runnable() {
-            public void run() {
-            	startActivity(myIntent);
-            	finish();
-            }
-        }, INITIAL_DELAY);
-    }
-		
-	
+ */
 
-	
-	/*@Override
+//db.close();
+
+
+//Show start screen
+//
+//XmlPullParser parser = Xml.newPullParser();
+
+
+
+
+
+
+
+
+/*@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.activity_nils, menu);
 		return true;
 	}
-    */
-	public void onStart()
-	{
-		super.onStart();
-		Log.d(tag, "In the onStart() event");
-		/*
+ */
+public void onStart()
+{
+	super.onStart();
+	Log.d(tag, "In the onStart() event");
+	/*
 		//---get all params---
 		db.open();
 		Log.d("NILS","db opened!");
@@ -132,48 +212,48 @@ public class Main extends Activity {
 			} while (c.moveToNext());
 		}
 		db.close();
-		
-		}
-		*/
-	}
-	
-	
-	
-	public void onRestart() {
-		super.onRestart();
-		Log.d(tag, "In the onRestart() event");
-	}
-	
-	public void onResume()
-	{
-		super.onResume();
-		Log.d(tag, "In the onResume() event");
-	}
-	public void onPause()
-	{
-		super.onPause();
-		Log.d(tag, "In the onPause() event");
-	}
-	public void onStop()
-	{
-		super.onStop();
-		Log.d(tag, "In the onStop() event");
-	}
-	public void onDestroy()
-	{
-		super.onDestroy();
-		Log.d(tag, "In the onDestroy() event");
-	}
 
-	public void displayParams(Cursor c)
-	{
-		Toast.makeText(this,
-				"id: " + c.getString(1) + "\n" +
-						"Name: " + c.getString(0) + "\n" +
-						"Value: " + c.getString(2),
-						Toast.LENGTH_LONG).show();
-	}
-	/*
+		}
+	 */
+}
+
+
+
+public void onRestart() {
+	super.onRestart();
+	Log.d(tag, "In the onRestart() event");
+}
+
+public void onResume()
+{
+	super.onResume();
+	Log.d(tag, "In the onResume() event");
+}
+public void onPause()
+{
+	super.onPause();
+	Log.d(tag, "In the onPause() event");
+}
+public void onStop()
+{
+	super.onStop();
+	Log.d(tag, "In the onStop() event");
+}
+public void onDestroy()
+{
+	super.onDestroy();
+	Log.d(tag, "In the onDestroy() event");
+}
+
+public void displayParams(Cursor c)
+{
+	Toast.makeText(this,
+			"id: " + c.getString(1) + "\n" +
+					"Name: " + c.getString(0) + "\n" +
+					"Value: " + c.getString(2),
+					Toast.LENGTH_LONG).show();
+}
+/*
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 	super.onCreateOptionsMenu(menu);
@@ -185,7 +265,7 @@ public class Main extends Activity {
 	{
 	return MenuChoice(item);
 	}
-	
+
 	private void CreateMenu(Menu menu)
 	{
 	MenuItem mnu1 = menu.add(0, 0, 0, "Item 1");
@@ -238,6 +318,6 @@ public class Main extends Activity {
 	}
 	return false;
 	}
-	*/
+ */
 
 }

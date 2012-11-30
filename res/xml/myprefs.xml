@@ -1,22 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
-xmlns:android="http://schemas.android.com/apk/res/android">
-<PreferenceCategory android:title="Device Settings">
-<CheckBoxPreference
-android:title="Device Type"
-android:defaultValue="true"
-android:summary="This device is Red"
-android:key="dosColor" />
-
+xmlns:android="http://schemas.android.com/apk/res/android" >
+<PreferenceCategory
+    android:title="Allmänt" 
+    android:layout="@layout/mypreflayout2">
+ <ListPreference 
+     android:key="deviceColor"
+     android:entryValues="@array/deviceColors" android:title="Dosans färg" android:entries="@array/deviceColors" android:layout="@layout/mypreflayout"/>
+    
 <EditTextPreference
             android:key="lagNr"
             android:title="Lag" 
             android:summary="Lagets benämning"
             android:dialogTitle="Lag"
             android:dialogMessage="Lagets benämning"    
-            android:defaultValue="Lag 1" /> 
-</PreferenceCategory>
-<PreferenceCategory android:title="Map Settings">    
+            android:defaultValue="Lag 1" 
+			android:layout="@layout/mypreflayout" />
+<EditTextPreference 
+    android:dialogTitle="Ange namn" 
+    android:title="Användarens namn" 
+    android:dialogMessage="Skriv in ditt namn här!" 
+    android:negativeButtonText="Cancel" 
+    android:positiveButtonText="Ok" 
+    android:key="username" 
+    android:layout="@layout/mypreflayout"
+    android:defaultValue="okänt"/> 
+ </PreferenceCategory>
+
+<PreferenceCategory android:title="Annat" android:layout="@layout/mypreflayout2">    
 
 </PreferenceCategory>
 
