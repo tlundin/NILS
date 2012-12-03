@@ -24,7 +24,7 @@ xmlns:android="http://schemas.android.com/apk/res/android" >
     android:positiveButtonText="Ok" 
     android:key="username" 
     android:layout="@layout/mypreflayout"
-    android:defaultValue="okänt"/> 
+    /> 
  </PreferenceCategory>
 
 <PreferenceCategory android:title="Annat" android:layout="@layout/mypreflayout2">    

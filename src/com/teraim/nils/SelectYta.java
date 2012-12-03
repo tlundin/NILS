@@ -30,7 +30,6 @@ import com.teraim.nils.Rutdata.Yta;
  * Activity for selecting an sub-area (del-yta).
  */
 public class SelectYta extends Activity {
-	private static final double DistanceToOrigo = 2125;
 	private static final double ZoomFactor = 250;
 	Rutdata rd=null;
 	
@@ -96,8 +95,8 @@ public class SelectYta extends Activity {
 			
 			//subtract min value from the coordinate to get normalized values
 			//add half the zoom factor to center..
-			double normx = (yta.x-minmax[0]);
-			double normy = (yta.y-minmax[1]);
+			double normx = (yta.sweLong-minmax[0]);
+			double normy = (yta.sweLat-minmax[1]);
 			//double normx = (yta.x-rutaX0);
 			//double normy = (yta.y-rutaY0);
 			Log.d("NILS","normxy "+normx+" "+normy);
@@ -139,9 +138,9 @@ public class SelectYta extends Activity {
           
           alert.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
           public void onClick(DialogInterface dialog, int whichButton) {
-      		final Intent myIntent = new Intent(getBaseContext(),HittaYta.class);
-      		
-      		startActivity(myIntent);
+        	Intent intent = getIntent();
+  			setResult(Activity.RESULT_OK, intent);
+  			finish();
             }
           });
 

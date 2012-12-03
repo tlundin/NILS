@@ -7,5 +7,6 @@
     <string name="title_select_ruta">Välj Ruta</string>
 	<string name="title_select_yta">Välj Yta</string>
     <string name="title_select_color">Välj dosans färg</string>
-		
+	<color name="white">#FFFFFF</color>	
+	<color name="black">#000000</color>	
 </resources>

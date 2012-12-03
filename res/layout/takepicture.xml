@@ -42,4 +42,37 @@
         android:stretchMode="columnWidth"
         android:verticalSpacing="10dp" />
    
+   <com.teraim.nils.ProvytaView 
+      android:id="@+id/provytaF" 
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_weight="2" />
+   
+   <LinearLayout
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:orientation="horizontal" >
+
+       <Button
+           android:id="@+id/mittpunktB" 
+           android:text="Sätt mittpunkt"
+           android:enabled="false"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:onClick="setMittpunkt" />
+
+       <Button
+            android:id="@+id/riktpunktB" 
+           android:text="Sätt riktpunkter"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:onClick="setRiktpunkter" />
+	<TextView 
+	 	   android:id="@+id/mittText" 
+	       android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           
+	    />
+   </LinearLayout>
+
 </LinearLayout>

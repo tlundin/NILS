@@ -36,14 +36,14 @@ public class Compass extends View {
 	 
 	 @Override
 	 protected void onDraw(Canvas canvas) {
-	   
+	  final int margin = 5;
 	  int w = getMeasuredWidth();
 	  int h = getMeasuredHeight();
 	  int r;
 	  if(w > h){
-	   r = h/2;
+	   r = h/2-margin;
 	  }else{
-	   r = w/2;
+	   r = w/2-margin;
 	  }
 	   
 	  

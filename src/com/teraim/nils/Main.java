@@ -51,11 +51,19 @@ public class Main extends Activity {
 	// askForColor,askForRuta;
 	final static int ASK_RUTA_RC = 1; 
 	final static int ASK_COLOR_RC = 2; 
+	final static int ASK_YTA_RC = 3; 
+	int noppe=0;
+	private void checkConditions2() {
+		final Intent testGPS = new Intent(getBaseContext(),TestGpsActivity.class);
+		startActivity(testGPS);
+	
+	}
 	private void checkConditions() {
+		final Intent testGPS = new Intent(getBaseContext(),TestGpsActivity.class);
+		
 		final Intent selectRutaIntent = new Intent(getBaseContext(),SelectRuta.class);
 		final Intent selectColorIntent = new Intent(getBaseContext(),SelectColor.class);
 		final Intent selectYtaIntent = new Intent(getBaseContext(),SelectYta.class);
-		final Intent takePictureIntent = new Intent(getBaseContext(),TakePicture.class);
 
 		//If Color not set, check.
 		String deviceColor = CommonVars.cv().getDeviceColor();		
@@ -67,24 +75,19 @@ public class Main extends Activity {
 			//if Ruta is not known, check.
 			String currentRuta = CommonVars.cv().getRutaId();
 			boolean askForRuta = (currentRuta.equals(CommonVars.UNDEFINED));
-			if (askForRuta) {
+			
+			//TODO: REMOVE!
+			if (askForRuta ||noppe++==0) {
 				startActivityForResult(selectRutaIntent,ASK_RUTA_RC);
 			}
 			else {
-
-				if(deviceColor.equals(CommonVars.blue())) {
-					Log.d("NILS","dosa blå!"+CommonVars.blue());				
-					startActivity(takePictureIntent);
-				}
-				else
-					startActivity(selectYtaIntent);            			
-				finish();		
+				startActivityForResult(selectYtaIntent,ASK_YTA_RC);       			
+					
 
 			}
 		}
 
 	}
-
 
 
 
@@ -96,12 +99,15 @@ public class Main extends Activity {
 @Override
 protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 	super.onActivityResult(requestCode, resultCode, data);
+	final Intent takePictureIntent = new Intent(getBaseContext(),TakePicture.class);
+	final Intent hittaYtaIntent = new Intent(getBaseContext(),HittaYta.class);
 
 	if (requestCode == ASK_COLOR_RC) //check if the request code is the one you've sent
 	{
 		if (resultCode == Activity.RESULT_OK) 
 		{
 			Log.d("NILS","Color is now set");
+			checkConditions();
 		} else 
 			Log.e("NILS","Color dialog was not executed properly.");
 	}
@@ -110,13 +116,28 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == Activity.RESULT_OK) 
 		{
 			Log.d("NILS","Ruta is now set");
+			checkConditions();
 			
-			}
-		}else {
+		}else 
 			Log.e("NILS","Ruta dialog was not executed properly.");
-		}
-	
-	checkConditions();
+	}
+	else if (requestCode == ASK_YTA_RC)
+	{
+		if (resultCode == Activity.RESULT_OK) 
+		{
+			Log.d("NILS","Yta is now set");
+			if(CommonVars.cv().getDeviceColor().equals(CommonVars.blue())) {
+				Log.d("NILS","dosa blå!"+CommonVars.blue());				
+				startActivity(takePictureIntent);
+			}
+			else
+				startActivity(hittaYtaIntent);     
+				
+			}
+		finish();
+		
+	}
+
 
 
 }

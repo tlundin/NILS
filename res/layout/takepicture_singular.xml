@@ -27,51 +27,49 @@
     <ImageView
         android:id="@+id/oldPic"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="300dp"
+        android:paddingBottom="3dp"
+        
         android:onClick="picZoom" />
-
+   <View
+        android:id="@+id/separator"
+        android:layout_width="fill_parent"
+        android:layout_height="0.2dp"
+        android:background="@android:color/darker_gray"
+        android:visibility="visible" />
+    
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
         android:text="Det här är nya bilden. Klicka för att ta ny."
         android:textAppearance="?android:attr/textAppearanceLarge" />
-		
+
     <ImageView
         android:id="@+id/newPic"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="300dp"
         android:onClick="takePhoto" />
 
+       <View
+        android:id="@+id/separator"
+        android:layout_width="fill_parent"
+        android:layout_height="0.2dp"
+        android:background="@android:color/darker_gray"
+        android:visibility="visible" />
+    
     <TextView
-        android:id="@+id/azimuth"
-        android:layout_width="match_parent"
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp" />
+        android:text="Kompass"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <TextView
-        android:id="@+id/pitch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:id="@+id/roll"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
+ 
     <view
         android:id="@+id/mycompass"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="300dp"
         class="com.teraim.nils.Compass" />
-
-    <Button
-        android:id="@+id/takepic"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="takePhoto"
-        android:text="Ta ny bild"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </LinearLayout>

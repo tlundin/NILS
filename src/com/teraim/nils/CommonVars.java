@@ -71,6 +71,7 @@ public class CommonVars {
 	//getter & setter for key values.
 	
 	public String getRutaId() {
+		
 		return sp.getString("rutId", UNDEFINED);
 	}
 

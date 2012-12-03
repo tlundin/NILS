@@ -40,7 +40,6 @@ public class TakePictureActivity extends Activity implements SensorEventListener
 	private ImageView oldPictureImageView,newPictureImageView; 
 	private String arkivBildUrl = null;
 
-	TextView readingAzimuth, readingPitch, readingRoll;
 	Compass myCompass;
 	private String dir = "";
 	String[] imageNames = {
@@ -87,9 +86,6 @@ public class TakePictureActivity extends Activity implements SensorEventListener
 		//oldPictureImageView.setBackgroundResource(1);
 
 		newPictureImageView.setImageBitmap(newPic);
-		readingAzimuth = (TextView)findViewById(R.id.azimuth);
-		readingPitch = (TextView)findViewById(R.id.pitch);
-		readingRoll = (TextView)findViewById(R.id.roll);
 		myCompass = (Compass)findViewById(R.id.mycompass);
 
 		sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
@@ -219,15 +215,6 @@ public class TakePictureActivity extends Activity implements SensorEventListener
 
 		if(success){
 			SensorManager.getOrientation(matrixR, matrixValues);
-
-			double azimuth = Math.toDegrees(matrixValues[0]);
-			double pitch = Math.toDegrees(matrixValues[1]);
-			double roll = Math.toDegrees(matrixValues[2]);
-
-			readingAzimuth.setText("Azimuth: " + String.valueOf(azimuth));
-			readingPitch.setText("Pitch: " + String.valueOf(pitch));
-			readingRoll.setText("Roll: " + String.valueOf(roll));
-
 			myCompass.update(matrixValues[0]);
 		}
 

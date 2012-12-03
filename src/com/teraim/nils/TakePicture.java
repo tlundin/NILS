@@ -4,18 +4,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
 
 /** 
  * 	
@@ -23,8 +25,11 @@ import android.widget.AdapterView.OnItemClickListener;
  * This function will guide the user in taking pictures of the current area.
  * 
  */
-public class TakePicture extends Activity {
+public class TakePicture extends Activity implements GeoUpdaterCb {
 
+	Button mittpunktB;
+	ProvYtaGeoUpdater pyg;
+	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
@@ -33,6 +38,11 @@ public class TakePicture extends Activity {
 
 
 		GridView gridViewNew = (GridView) findViewById(R.id.gridview_new);
+		ProvytaView provytaV = (ProvytaView) findViewById(R.id.provytaF);
+		mittpunktB = (Button) findViewById(R.id.mittpunktB);
+		pyg = new ProvYtaGeoUpdater(this,provytaV,this);
+		
+		
 		gridViewNew.setAdapter(new NewImagesAdapter(this));
 		gridViewNew.setOnItemClickListener(new OnItemClickListener()
 		{
@@ -56,25 +66,21 @@ public class TakePicture extends Activity {
 					View v, int position, long id)
 			{
 				Toast.makeText(getBaseContext(),
-						"pic" + (position + 1) + " tsssselected",
+						CommonVars.compassToPicName(position) + " picture selected",
 						Toast.LENGTH_SHORT).show();
 
 				Intent myIntent = new Intent(getBaseContext(),PictureZoom.class);
-				String picPath = Environment.getExternalStorageDirectory()+
-						CommonVars.NILS_BASE_DIR+"/delyta/"+
-						"1"+"/bilder/gamla/"+
+				String picName = CommonVars.cv().getCurrentPictureBasePath()+"/gamla/"+
 						CommonVars.compassToPicName(position)+".png";
-
-
-				myIntent.putExtra("picpath", picPath);
+				myIntent.putExtra("picpath", picName);
 				startActivity(myIntent);
-
-
 				//startActivity(intent);
 			}
 		});
 
 	}
+	
+	
 
 	final static int PIC_SIZE_X = 195;
 	final static int PIC_SIZE_Y = 195;
@@ -136,8 +142,16 @@ public class TakePicture extends Activity {
 			} else {
 				imageView = (ImageView) convertView;
 			}
-			imageView.setImageBitmap(pic[position]);
-			//imageView.setImageBitmap(bm[position]);
+			String picPath = CommonVars.cv().getCurrentPictureBasePath();
+
+			Bitmap bm = BitmapFactory.decodeFile(picPath+"/nya/"+
+					CommonVars.compassToPicName(position)+".png");
+			
+			if (bm==null)
+				imageView.setImageBitmap(pic[position]);
+			else
+				imageView.setImageBitmap(bm);
+				
 			return imageView;
 		}
 	}
@@ -182,6 +196,33 @@ public class TakePicture extends Activity {
 			return imageView;
 		}
 
+	}
+	
+	//callback for Button setMittpunkt.
+	public void setMittpunkt(View v) {
+		//get the ui element to display text.
+		TextView mt = (TextView)findViewById(R.id.mittText);
+		Location pos = pyg.getCurrentPosition();
+		if(pos!=null)
+			mt.setText("Mittpunkt satt till: "+pos.getLatitude()+" "+pos.getLongitude());
+	}
+
+	//callback for Button setRiktpunkter
+	public void setRiktpunkter(View v) {
+		Intent intent = new Intent(this,RiktpunktActivity.class);
+		startActivity(intent);
+	}
+	
+	@Override
+	protected void onPause() {
+		pyg.onPause();
+		super.onPause();
+	}
+
+	@Override
+	protected void onResume() {
+		pyg.onResume();
+		super.onResume();
 	}
 
 	@Override
@@ -228,6 +269,12 @@ public class TakePicture extends Activity {
 			return true;
 		}
 		return false;
+	}
+	public void onWithinFiveMeters() {
+		mittpunktB.setEnabled(true);
+	}
+	public void onOutsideFiveMeters() {
+		mittpunktB.setEnabled(false);
 	}
 
 }

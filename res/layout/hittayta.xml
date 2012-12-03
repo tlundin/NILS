@@ -4,52 +4,64 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
     
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="0dip"
-    android:orientation="horizontal"
-    android:layout_weight="3" >
-    
-<com.teraim.nils.Provyta 
+    <com.teraim.nils.ProvytaView 
     android:id="@+id/provyta" 
       android:layout_width="match_parent"
-      android:layout_height="match_parent" 
-      android:layout_weight="1"
-/>
+      android:layout_height="wrap_content"
+      android:layout_weight="3" />
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+     android:paddingLeft="10dp"
+    android:layout_weight="3" >
+    
 <TableLayout  
     xmlns:android="http://schemas.android.com/apk/res/android"  
     android:id="@+id/tagtabell"  
     android:layout_width="match_parent"  
     android:layout_height="match_parent"  
     android:shrinkColumns="*"  
-    android:stretchColumns="*"
-    android:layout_weight="1"
-    >
-    
+    android:stretchColumns="*"/>
+
+ <Button
+     android:id="@+id/tagknapp"  
+     android:layout_height="wrap_content"
+     android:layout_width="wrap_content"
+     android:text="Lägg till ett tåg"
+     android:gravity="left"
+     android:onClick="addRow" />
   
-    </TableLayout>
 </LinearLayout>
 
-
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="10dp"
+    android:layout_weight="3" >
+    
 <TextView
         android:id="@+id/oldpichead"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Arkivbilder (öst,väst,nord,syd)"
         android:textAppearance="?android:attr/textAppearanceMedium" 
+ 
         />
-    
-
 <GridView
         android:id="@+id/picgridview"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:columnWidth="150dp"
         android:horizontalSpacing="10dp"
         android:numColumns="auto_fit"
         android:stretchMode="columnWidth"
         android:verticalSpacing="10dp" 
-        
+          
+ 
         />
 
+</LinearLayout>
 </LinearLayout>
