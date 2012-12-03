@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+<TableLayout  
+    xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:id="@+id/riktpunkttable"  
+    android:layout_width="match_parent"  
+    android:layout_height="match_parent"  
+    android:layout_marginLeft="10dp"
+    android:shrinkColumns="*"  
+    android:stretchColumns="*">
+    
+    <TableRow 
+    	android:layout_width="match_parent"  
+    	android:layout_height="match_parent"
+    	android:paddingRight="5dp">
+    	
+    	  <TextView android:text="Riktning"
+    	      android:textStyle="bold" 
+    	      android:textSize="32sp"/>
+    	  <TextView android:text="Avstånd" 
+    	      android:textStyle="bold" 
+    	      android:textSize="32sp"/>
+    	  <TextView android:text="Objekt" 
+     	      android:textStyle="bold" 
+    	      android:textSize="32sp"/>
+    	  	  	  
+	</TableRow>
+	
+    <TableRow 
+    	android:layout_width="match_parent"  
+    	android:layout_height="match_parent"
+    	android:layout_margin="5dp">
+    	  
+    	  <EditText android:text=""
+    	      android:background="@color/white"
+    	      android:textColor="@color/black"   	      
+    	      android:textStyle="bold" 
+    	      android:textSize="32sp"/>
+    	  <EditText android:text="" 
+    	      android:background="@color/white"
+    	      android:textColor="@color/black"
+    	      android:editable="true"
+    	      android:textStyle="bold" 
+    	      android:textSize="32sp"/>
+    	  <ImageButton
+    	      android:src="@+drawable/asp"
+    	      
+    	      android:layout_width ="32dp"
+    	      android:layout_height ="32dp"
+    	      
+    	      android:contentDescription="Riktpunktsymbol"    	      
+    	      />
+    </TableRow>
+</TableLayout> 
+</LinearLayout>
