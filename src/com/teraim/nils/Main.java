@@ -51,7 +51,7 @@ public class Main extends Activity {
 	// askForColor,askForRuta;
 	final static int ASK_RUTA_RC = 1; 
 	final static int ASK_COLOR_RC = 2; 
-	final static int ASK_YTA_RC = 3; 
+	//final static int ASK_YTA_RC = 3; 
 	int noppe=0;
 	private void checkConditions2() {
 		final Intent testGPS = new Intent(getBaseContext(),TestGpsActivity.class);
@@ -81,7 +81,7 @@ public class Main extends Activity {
 				startActivityForResult(selectRutaIntent,ASK_RUTA_RC);
 			}
 			else {
-				startActivityForResult(selectYtaIntent,ASK_YTA_RC);       			
+				startActivity(selectYtaIntent);       			
 					
 
 			}
@@ -99,8 +99,6 @@ public class Main extends Activity {
 @Override
 protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 	super.onActivityResult(requestCode, resultCode, data);
-	final Intent takePictureIntent = new Intent(getBaseContext(),TakePicture.class);
-	final Intent hittaYtaIntent = new Intent(getBaseContext(),HittaYta.class);
 
 	if (requestCode == ASK_COLOR_RC) //check if the request code is the one you've sent
 	{
@@ -121,22 +119,15 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		}else 
 			Log.e("NILS","Ruta dialog was not executed properly.");
 	}
-	else if (requestCode == ASK_YTA_RC)
+	finish();
+	/*else if (requestCode == ASK_YTA_RC)
 	{
 		if (resultCode == Activity.RESULT_OK) 
-		{
 			Log.d("NILS","Yta is now set");
-			if(CommonVars.cv().getDeviceColor().equals(CommonVars.blue())) {
-				Log.d("NILS","dosa blå!"+CommonVars.blue());				
-				startActivity(takePictureIntent);
-			}
-			else
-				startActivity(hittaYtaIntent);     
-				
-			}
 		finish();
 		
 	}
+	*/
 
 
 

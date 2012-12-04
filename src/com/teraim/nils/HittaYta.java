@@ -3,6 +3,7 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
@@ -11,6 +12,8 @@ import android.os.Environment;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
@@ -108,6 +111,9 @@ public class HittaYta extends Activity {
 					TableRow row = new TableRow(this);
 					Button b = new Button(this);
 					b.setLongClickable(true);
+					//Tabs to setup markslag.
+					final Intent intent = new Intent(this,MarkslagsActivity.class);
+					
 					 b.setOnLongClickListener(new OnLongClickListener() {
 			            public boolean onLongClick(View v) {
 				                Toast.makeText(getBaseContext(), "Long CLick", Toast.LENGTH_SHORT).show();
@@ -118,6 +124,8 @@ public class HittaYta extends Activity {
 					  b.setOnClickListener(new OnClickListener() {
 				            public void onClick(View v) {
 					                Toast.makeText(getBaseContext(), "Short CLick", Toast.LENGTH_SHORT).show();
+					                
+					                startActivity(intent);
 					        }
 						 });
 					 
@@ -231,4 +239,51 @@ public class HittaYta extends Activity {
 			return imageView;
 		}
 	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
+		CreateMenu(menu);
+		return true;
+	}
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		return MenuChoice(item);
+	}
+
+	private void CreateMenu(Menu menu)
+	{
+		MenuItem mnu3 = menu.add(0, 2, 2, "Användare: "+CommonVars.cv().getUserName());
+		mnu3.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		MenuItem mnu4 = menu.add(0, 3, 3, "Färg: "+CommonVars.cv().getDeviceColor());
+		mnu4.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		MenuItem mnu5 = menu.add(0, 4, 4, "Item 5");
+		mnu5.setIcon(android.R.drawable.ic_menu_preferences);
+		mnu5.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		
+	}
+	private boolean MenuChoice(MenuItem item)
+	{
+		switch (item.getItemId()) {
+		case 0:
+			//Toast.makeText(this, "You clicked on Item 1",
+			//		Toast.LENGTH_LONG).show();
+		case 1:
+			//Toast.makeText(this, "You clicked on Item 2",
+			//		Toast.LENGTH_LONG).show();
+		case 2:
+			Toast.makeText(this, "Ändra användare",
+					Toast.LENGTH_LONG).show();
+		case 3:
+			Toast.makeText(this, "Ändra färg",
+					Toast.LENGTH_LONG).show();
+		case 4:
+			Intent intent = new Intent(getBaseContext(),ConfigMenu.class);
+			startActivity(intent);
+			return true;
+		}
+		return false;
+	}
+
 }

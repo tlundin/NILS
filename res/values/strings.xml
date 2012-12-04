@@ -9,4 +9,31 @@
     <string name="title_select_color">Välj dosans färg</string>
 	<color name="white">#FFFFFF</color>	
 	<color name="black">#000000</color>	
+	<string name="glaciar_header">GLACIÄR OCH SNÖTÄCKT MARK</string>
+		<string name="glaciartext">Detta är en välavgränsad och tydlig företeelse, som framför allt kännetecknas av att det inte finns så mycket annat på ytan att beskriva, och avgränsas lämpligtvis först av allt. Svåra gränsdragningar är framför allt mot tidvis avsmält (extrema snölegor)</string>
+	<string name="glaciar_detail">Har en permanent kärna av is som oftast skymtar fram genom snön.</string>
+	<string name="radio_glaciar">Glaciär</string>
+	<string name="permasnow_detail">Snölegor som överlever sommaren. Ligger oftast i väl skuggade områden på norra sidan av höjder på högfjället.</string>
+	<string name="radio_permasnow">Permanent snötäckt mark</string>
+	<string name="akvatisk_header">AKVATISK</string>
+	<string name="akvatisktext">En akvatisk yta definieras i princip av att den är permanent vattentäckt, vilket inte alltid är möjligt att se, vare sig i fält eller i flygbild. Därför har vi sedan tidigare bestämt att mark som är vattentäckt vid inventeringstillfället räknas som akvatisk. Om marken uppenbart är vattentäckt endast tillfälligt bör en blålapp skrivas som beskriver situationen för att underlätta omklassificering m.h.a. flygbildsdata.</string>
+	<string name="utom_mosaik_detail">Större gölar och flarkgölar som uppfyller stolekskravet på 500 m2</string>
+	<string name="radio_utom_mosaik">Akvatisk yta utom myrmosaik</string>
+	<string name="mosaik_detail">Akvatisk yta i myrmosaik är permanent vattentäckta delar inom en myr. Observera att storleken på vattenspegeln måste vara större än 500 m2</string>
+	<string name="radio_mosaik">Akvatisk yta i myrmosaik</string>
+	<string name="sa_header">SEMIAKVATISK NATURMARK UTOM SKOG</string>
+	<string name="sa_text"></string>
+	<string name="radio_sa1">Torvbildande mark (myr) utom stränder</string>
+	<string name="radio_sa2">Torvbildande mark (myr) vid stränder</string>
+	<string name="radio_sa3">Icke-torvbildande mark utom stränder</string>
+	<string name="radio_sa4">Icke-torvbildande mark vid stränder</string>
+	<string name="anlagd_header">ANLAGD MARK UTOM ÅKERMARK</string>
+	<string name="anlagd_text"></string>
+	<string name="radio_anlagd1">Transportområde</string>
+	<string name="radio_anlagd2">Bebyggelseområde</string>
+	<string name="radio_anlagd3">Industriområde</string>
+	<string name="radio_anlagd4">Rekreationsområde</string>
+	<string name="radio_anlagd5">Jordbruksområde</string>
+
+			
 </resources>

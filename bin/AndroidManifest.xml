@@ -55,6 +55,24 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".MarkslagsActivity"
+            android:exported="false"
+            android:label="Välj markslag" >
+            <intent-filter>
+                <action android:name="com.teraim.nils.MarkslagsActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.teraim.nils.MarkslagTab_Glaciar_Activity"/>
+        <activity
+            android:name="com.teraim.nils.MarkslagTab_Akvatisk_Activity"/>		
+        <activity
+            android:name="com.teraim.nils.MarkslagTab_Anlagd_Activity"/>
+        <activity
+            android:name="com.teraim.nils.MarkslagTab_SA_Activity"/>		
+        <activity
             android:name=".ConfigMenu"
             android:exported="false"
             android:label="@string/title_select_yta" >
@@ -76,15 +94,22 @@
                 <activity
             android:name=".RiktpunktActivity"
             android:exported="false"
-            android:theme="@android:style/Theme.Dialog"
             android:label="Sätt riktpunkter" >
             <intent-filter>
                 <action android:name="com.teraim.nils.RiktpunktActivity" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        
-         
+          <activity
+            android:name=".RiktpunktListViewActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Dialog"
+            android:label="Välj objekt" >
+            <intent-filter>
+                <action android:name="com.teraim.nils.RiktpunktListViewActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>           
               <activity
             android:name=".TestGpsActivity"
             android:exported="false"

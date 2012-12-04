@@ -57,8 +57,8 @@ public class Compass extends View {
 	  canvas.drawLine(
 	    w/2,
 	    h/2,
-	    (float)(w/2 + r * android.util.FloatMath.sin(-direction)),
-	    (float)(h/2 - r * android.util.FloatMath.cos(-direction)),
+	    (float)(w/2 + r * android.util.FloatMath.sin(direction)),
+	    (float)(h/2 - r * android.util.FloatMath.cos(direction)),
 	    paint);
 	 
 	  
