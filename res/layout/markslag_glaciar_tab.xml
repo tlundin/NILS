@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="vertical"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:layout_marginLeft="10dp">
+ 
+  <!-- Screen Design for Photos -->
+  <TextView 
+      android:text="@string/glaciar_header"
+            android:padding="15dp"
+            android:textSize="24sp"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"/>
+ <TextView 
+     android:text="@string/glaciartext"
+           android:padding="15dp"
+            android:textSize="16sp"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"/>
+ 
+   <RadioGroup
+        android:padding="15dp" 
+        android:id="@+id/glaciarRadio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+ 
+        <RadioButton
+            android:id="@+id/radioGlaciar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/radio_glaciar" 
+             />
+        <TextView 
+    	 	android:text="@string/glaciar_detail"
+           android:padding="15dp"
+            android:textSize="16sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+ 
+        <RadioButton
+            android:id="@+id/radioPermaSnow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/radio_permasnow" />
+         <TextView 
+    	 	android:text="@string/permasnow_detail"
+           android:padding="15dp"
+            android:textSize="16sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+ 
+    </RadioGroup>
+</LinearLayout>
