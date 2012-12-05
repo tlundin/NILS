@@ -91,6 +91,16 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".EditDelYta"
+            android:exported="false"
+            android:theme="@android:style/Theme.Dialog"
+            android:label="Delyta" >
+            <intent-filter>
+                <action android:name="com.teraim.nils.EditDelYta" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
                 <activity
             android:name=".RiktpunktActivity"
             android:exported="false"

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
 xmlns:android="http://schemas.android.com/apk/res/android" >
-<PreferenceCategory
+<PreferenceCategory android:title="Allmänt">
     android:title="Allmänt" 
-    android:layout="@layout/mypreflayout2">
  <ListPreference 
      android:key="deviceColor"
-     android:entryValues="@array/deviceColors" android:title="Dosans färg" android:entries="@array/deviceColors" android:layout="@layout/mypreflayout"/>
+     android:entryValues="@array/deviceColors" 
+     android:title="Dosans färg" 
+     android:entries="@array/deviceColors" />
     
 <EditTextPreference
             android:key="lagNr"
@@ -14,8 +15,7 @@ xmlns:android="http://schemas.android.com/apk/res/android" >
             android:summary="Lagets benämning"
             android:dialogTitle="Lag"
             android:dialogMessage="Lagets benämning"    
-            android:defaultValue="Lag 1" 
-			android:layout="@layout/mypreflayout" />
+            android:defaultValue="Lag 1" />
 <EditTextPreference 
     android:dialogTitle="Ange namn" 
     android:title="Användarens namn" 
@@ -23,11 +23,10 @@ xmlns:android="http://schemas.android.com/apk/res/android" >
     android:negativeButtonText="Cancel" 
     android:positiveButtonText="Ok" 
     android:key="username" 
-    android:layout="@layout/mypreflayout"
     /> 
  </PreferenceCategory>
 
-<PreferenceCategory android:title="Annat" android:layout="@layout/mypreflayout2">    
+<PreferenceCategory android:title="Annat" >    
 
 </PreferenceCategory>
 

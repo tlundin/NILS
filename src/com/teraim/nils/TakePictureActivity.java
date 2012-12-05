@@ -58,7 +58,7 @@ public class TakePictureActivity extends Activity implements SensorEventListener
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.takepicture_singular);
-
+		TextView textExisting = (TextView) findViewById(R.id.textExisting);
 		oldPictureImageView = (ImageView)findViewById(R.id.oldPic);
 		newPictureImageView = (ImageView)findViewById(R.id.newPic);
 		riktningstxt = 			(TextView)findViewById(R.id.riktningstxt);
@@ -76,12 +76,27 @@ public class TakePictureActivity extends Activity implements SensorEventListener
 		Log.d("NILS",picPath);
 		Bitmap oldPic = 
 			BitmapFactory.decodeFile(arkivBildUrl);
+		if(oldPic == null) {
+			textExisting.setVisibility(View.GONE);
+			oldPictureImageView.setVisibility(View.GONE);
+		}
+		else {
+			textExisting.setVisibility(View.VISIBLE);
+			oldPictureImageView.setVisibility(View.VISIBLE);
+			oldPictureImageView.setImageBitmap(oldPic);
+		}
+			
 		
 		Bitmap newPic = 
 				BitmapFactory.decodeFile(nyBildUrl);
-		//TODO: Replace with getrutaID when more pics.
+		if(newPic == null) {
+			Log.d("NILS", "newpic null");
+			newPic = 
+					BitmapFactory.decodeResource(getResources(), R.drawable.noimg);
+		}
+			
 		riktningstxt.setText("Ruta: "+CommonVars.cv().getRutaId()+" Provyta: "+CommonVars.cv().getProvytaId()+" Riktning: "+dir);
-		oldPictureImageView.setImageBitmap(oldPic);
+		
 
 		//oldPictureImageView.setBackgroundResource(1);
 
@@ -215,7 +230,7 @@ public class TakePictureActivity extends Activity implements SensorEventListener
 
 		if(success){
 			SensorManager.getOrientation(matrixR, matrixValues);
-			myCompass.update(matrixValues[0]);
+			myCompass.update(matrixValues[2]);
 		}
 
 	}

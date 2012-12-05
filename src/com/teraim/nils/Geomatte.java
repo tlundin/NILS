@@ -31,17 +31,26 @@ public class Geomatte {
 	
 		
 	
-	static double getRikt(double dest, double myY, double myX, double destY, double destX) {
+	static double getRikt(double dest, double centerY, double centerX, double destY, double destX) {
 		//dest is Opposite side length.
 		//We still 
-		double xAvst = Math.abs(myX-destX);
+		double b = destX-centerX;
+		//double a = Math.abs(destY-centerY); **not needed.
+		double c = dest;
 		
-		double alfa = Math.acos(xAvst/dest);
-		Log.d("NILS","avst: "+xAvst);
-		Log.d("NILS","Alfa vinkeln är: "+alfa);
-		double deg = alfa*(180.0/Math.PI);
-		Log.d("NILS","Alfa vinkeln är: "+deg);
-		return deg;
+		double  beta = Math.acos(b/c);
+		Log.d("NILS","b,c,beta: "+b+" "+c+" "+beta);
+		//Gamma is the top angle in a 90 deg. triangle.
+		double gamma = Math.PI/2-beta; // 90 grader - beta i radianer = 90*pi/180 = 1*pi/2.
+		//alfa is PI+gamma if destx - x is negative.
+		double alfa =  Math.PI+gamma;
+		Log.d("NILS","gamma: "+gamma);
+		
+		//Alfa should also be equal to Atan2(y,x).
+		double alfa2 = Math.atan2(destY, destX);
+		Log.d("NILS","ALFA: "+alfa+" ALFA (tan2): "+alfa2);
+		return alfa;
+		
 		
 	}
 	

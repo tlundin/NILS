@@ -30,6 +30,7 @@ import com.teraim.nils.Rutdata.Yta;
  * Activity for selecting an sub-area (del-yta).
  */
 public class SelectYta extends Activity {
+	
 	private static final double ZoomFactor = 250;
 	Rutdata rd=null;
 
@@ -126,6 +127,13 @@ public class SelectYta extends Activity {
 
 
 
+	@Override
+	protected void onResume() {
+		super.onResume();
+		refreshStatusRow();
+	}
+	
+
 	protected void provytaDialog(CharSequence ytID) {
 		Log.d("NILS","clicked button with id "+ytID);
 		if (ytID!=null)
@@ -182,16 +190,24 @@ public class SelectYta extends Activity {
 		return MenuChoice(item);
 	}
 
+	MenuItem mnu3=null,mnu4=null;
 	private void CreateMenu(Menu menu)
 	{
-		MenuItem mnu3 = menu.add(0, 2, 2, "Användare: "+CommonVars.cv().getUserName());
+		mnu3 = menu.add(0, 2, 2, "");
 		mnu3.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		MenuItem mnu4 = menu.add(0, 3, 3, "Färg: "+CommonVars.cv().getDeviceColor());
+		mnu4 = menu.add(0, 3, 3, "");
 		mnu4.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		MenuItem mnu5 = menu.add(0, 4, 4, "Item 5");
 		mnu5.setIcon(android.R.drawable.ic_menu_preferences);
 		mnu5.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		
+		refreshStatusRow();
+	}
+	
+	private void refreshStatusRow() {
+		if (mnu3!=null)
+			mnu3.setTitle("Användare: "+CommonVars.cv().getUserName());
+		if (mnu4!=null)
+			mnu4.setTitle("Färg: "+CommonVars.cv().getDeviceColor());
 	}
 	private boolean MenuChoice(MenuItem item)
 	{

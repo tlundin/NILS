@@ -209,8 +209,12 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 
 	//callback for Button setRiktpunkter
 	public void setRiktpunkter(View v) {
-		Intent intent = new Intent(this,RiktpunktActivity.class);
-		startActivity(intent);
+		//Intent intent = new Intent(this,RiktpunktActivity.class);
+		//startActivity(intent);
+		Location l = new Location("");
+		l.setLatitude(59.303402);
+		l.setLongitude(17.984898);
+		pyg.onLocationChanged(l);
 	}
 	
 	@Override

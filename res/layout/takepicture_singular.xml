@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginLeft="10dp"
     android:orientation="vertical"
     tools:context=".takePicture" >
 
@@ -16,21 +17,21 @@
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/textExisting"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
         android:layout_marginTop="20dp"
-        android:text="Det här är gamla bilden:"
+        android:text="Existerande bild:"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <ImageView
         android:id="@+id/oldPic"
         android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:paddingBottom="3dp"
-        
-        android:onClick="picZoom" />
+        android:layout_gravity="left"
+        android:onClick="picZoom"
+        android:paddingBottom="3dp" />
+
    <View
         android:id="@+id/separator"
         android:layout_width="fill_parent"
@@ -42,7 +43,7 @@
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Det här är nya bilden. Klicka för att ta ny."
+        android:text="Bild från pågående inventering. Klicka för att ta ny!"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <ImageView

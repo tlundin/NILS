@@ -72,8 +72,6 @@ public class HittaYta extends Activity {
 
 	private void createTagTabell(TableLayout tagtabell, ArrayList<Delyta> dy) {
 
-
-
 		if (dy==null)
 			return;
 
@@ -155,6 +153,7 @@ public class HittaYta extends Activity {
 		
 	}
 	
+	
 	private TextView addNum(int header) {
 		TextView title = new TextView(this);
 		title.setText(String.valueOf(header));  
@@ -184,6 +183,14 @@ public class HittaYta extends Activity {
 		rowTitle.addView(title, params); 
 		return rowTitle;
 	}
+	
+	
+	public void addRow(View v) {
+		Intent intent = new Intent(this,EditDelYta.class);
+		startActivity(intent);
+		
+	}
+	
 	public class ImageAdapter extends BaseAdapter
 	{
 

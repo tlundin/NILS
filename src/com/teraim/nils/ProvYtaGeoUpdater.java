@@ -4,6 +4,10 @@ package com.teraim.nils;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -14,7 +18,8 @@ import com.teraim.nils.Delningsdata.Delyta;
 import com.teraim.nils.Rutdata.Ruta;
 import com.teraim.nils.Rutdata.Yta;
 
-public class ProvYtaGeoUpdater implements LocationListener {
+public class ProvYtaGeoUpdater implements LocationListener
+ {
 
 	ProvytaView myView;
 	LocationManager lm;
@@ -24,6 +29,12 @@ public class ProvYtaGeoUpdater implements LocationListener {
 	//private double myCenterLong = 17.984738;
 	private Location myLocation, center,swerefC;
 	private GeoUpdaterCb geoCb;
+	SensorManager sensorManager;
+	private Sensor sensorAccelerometer;
+	private Sensor sensorMagneticField;
+
+
+
 
 	public ProvYtaGeoUpdater(Context c, ProvytaView w,GeoUpdaterCb cb) {
 
@@ -31,6 +42,12 @@ public class ProvYtaGeoUpdater implements LocationListener {
 		
 		if (lm==null) {
 			Log.e("NILS","Startup of GPS tracking failed in ProvYtaGeoUpdater");
+		}
+		//Sensor stuff
+		sensorManager = (SensorManager)c.getSystemService(Context.SENSOR_SERVICE);
+
+		if (sensorManager==null) {
+			Log.e("NILS","Startup of magnetic/tilt tracking failed in ProvYtaGeoUpdater");
 		}
 		geoCb = cb;
 		//Initialize provyta with center coordinates.
@@ -48,6 +65,10 @@ public class ProvYtaGeoUpdater implements LocationListener {
 		swerefC.setLongitude(dd[1]);
 		myView = w;
 		myView.showWaiting();
+		
+
+
+
 
 	}
 
@@ -63,7 +84,7 @@ public class ProvYtaGeoUpdater implements LocationListener {
 				0,
 				1,
 				this);
-
+ 
 	}
 
 	final static int ProvYtaRadiusInMeters = 100;
@@ -83,16 +104,14 @@ public class ProvYtaGeoUpdater implements LocationListener {
 		Log.d("NILS","Sweref avstånd: "+Geomatte.sweDist(swerefC.getLatitude(), swerefC.getLongitude(), xy[0], xy[1]));
 		Log.d("NILS","Latlong avstånd: "+Geomatte.dist(center.getLatitude(), center.getLongitude(), xy[0], xy[1]));		
 		Log.d("NILS","Platformsavstånd: "+arg0.distanceTo(center));		
-		double alfa = Geomatte.getRikt(dist, center.getLatitude(), center.getLongitude(), xy[0], xy[1]);
-		if (dist < ProvYtaRadiusInMeters) {
-			Log.d("NILS",CommonVars.cv().getDeviceColor()+" is visible!");
+		//double alfa = Geomatte.getRikt(dist, center.getLatitude(), center.getLongitude(), xy[0], xy[1]);
 			//myView.showUser(CommonVars.cv().getDeviceColor(),arg0,alfa,dist);
 			//distance in meters between target and center
 			int wy = (int)(swerefC.getLatitude() - xy[0]);
 			int wx = (int)(swerefC.getLongitude() - xy[1]);
 			//show user distance from middle point of circle
 			Log.d("NILS","user x y "+wx+" "+wy);
-			myView.showUser(CommonVars.cv().getDeviceColor(), wx,wy);
+			myView.showUser(CommonVars.cv().getDeviceColor(), wx,wy,(int)dist);
 			if (geoCb!=null && 
 					dist < InnerRadiusInMeters &&
 					!cbCalled) {
@@ -103,10 +122,7 @@ public class ProvYtaGeoUpdater implements LocationListener {
 					cbCalled=false;
 					geoCb.onOutsideFiveMeters();
 				}
-		} else {
-			Log.d("NILS","user is not visible");
-			myView.showUser(CommonVars.cv().getDeviceColor(), -1000, -1000);
-		}
+		
 		myView.showDistance((int)dist);
 		myView.invalidate();
 	}
@@ -135,6 +151,8 @@ public class ProvYtaGeoUpdater implements LocationListener {
 	public Location getCurrentPosition() {
 		return currentLocation;
 	}
+
+	
 
 
 }
