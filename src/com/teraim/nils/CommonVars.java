@@ -7,6 +7,8 @@ package com.teraim.nils;
  * For now, persistence implemented via SharedPreferences only.
  */
 
+import java.io.File;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
@@ -50,7 +52,7 @@ public class CommonVars {
 		Log.d("NILS","exit init. singleton is "+singleton);
 	}
 	
-	static CommonVars cv() {
+	public static CommonVars cv() {
 		if (singleton == null)
 			Log.d("NILS","Singleton is null");
 		return singleton;			 
@@ -118,6 +120,15 @@ public class CommonVars {
 		return Environment.getExternalStorageDirectory()+
 		NILS_BASE_DIR+"/delyta/"+
 		"1"+"/bilder";
+	}
+	
+	public static void createFoldersIfMissing(File file) {
+		final File parent_directory = file.getParentFile();
+
+		if (null != parent_directory)
+		{
+		    parent_directory.mkdirs();
+		}
 	}
 	
 

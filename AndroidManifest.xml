@@ -91,6 +91,15 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+                <activity
+            android:name=".TestPic"
+            android:exported="false"
+            android:label="TestPic" >
+            <intent-filter>
+                <action android:name="com.teraim.nils.TestPic" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".EditDelYta"
             android:exported="false"

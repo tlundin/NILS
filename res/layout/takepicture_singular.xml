@@ -33,8 +33,7 @@
         android:paddingBottom="3dp" />
 
    <View
-        android:id="@+id/separator"
-        android:layout_width="fill_parent"
+       android:layout_width="fill_parent"
         android:layout_height="0.2dp"
         android:background="@android:color/darker_gray"
         android:visibility="visible" />
@@ -53,24 +52,10 @@
         android:onClick="takePhoto" />
 
        <View
-        android:id="@+id/separator"
         android:layout_width="fill_parent"
         android:layout_height="0.2dp"
         android:background="@android:color/darker_gray"
         android:visibility="visible" />
     
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Kompass"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
- 
-    <view
-        android:id="@+id/mycompass"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        class="com.teraim.nils.Compass" />
 
 </LinearLayout>

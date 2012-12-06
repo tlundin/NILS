@@ -3,78 +3,76 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-    
-    <TextView
-        android:id="@+id/nyabilder"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="Nytagna bilder"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        />
-
-           <GridView
+        android:layout_margin="10dp"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+        <TextView
+            android:id="@+id/nyabilder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Nytagna bilder"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+        <GridView
             android:id="@+id/gridview_new"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"           
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:horizontalSpacing="10dp"
             android:numColumns="4"
             android:stretchMode="columnWidth"
-            android:weightSum="4" 
-             >
-        </GridView>
+            android:weightSum="4" />
 
-       <TextView
-        android:id="@+id/gamlabilder"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="Gamla bilder"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        />
+        <TextView
+            android:id="@+id/gamlabilder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Gamla bilder"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
-          <GridView
+        <GridView
             android:id="@+id/gridview_old"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"           
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:horizontalSpacing="10dp"
             android:numColumns="4"
             android:stretchMode="columnWidth"
-            android:weightSum="4" 
-             >
-        </GridView>
-   
-   <com.teraim.nils.ProvytaView 
-      android:id="@+id/provytaF" 
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_weight="2" />
-   
-   <LinearLayout
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:orientation="horizontal" >
+            android:weightSum="4" />
 
-       <Button
-           android:id="@+id/mittpunktB" 
-           android:text="Sätt mittpunkt"
-           android:enabled="false"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:onClick="setMittpunkt" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" >
 
-       <Button
-            android:id="@+id/riktpunktB" 
-           android:text="Sätt riktpunkter"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:onClick="setRiktpunkter" />
-	<TextView 
-	 	   android:id="@+id/mittText" 
-	       android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           
-	    />
-   </LinearLayout>
+            <Button
+                android:id="@+id/mittpunktB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:onClick="setMittpunkt"
+                android:text="Sätt mittpunkt" />
+
+            <Button
+                android:id="@+id/riktpunktB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="setRiktpunkter"
+                android:text="Sätt riktpunkter" />
+
+            <TextView
+                android:id="@+id/mittText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </LinearLayout>
+        <com.teraim.nils.ProvytaView
+        android:id="@+id/provytaF"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="500" />
+    
 
 </LinearLayout>

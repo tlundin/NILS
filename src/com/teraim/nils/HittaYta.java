@@ -1,4 +1,5 @@
 package com.teraim.nils;
+import java.io.File;
 import java.util.ArrayList;
 
 import android.app.Activity;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
@@ -26,8 +28,10 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
 
 import com.teraim.nils.Delningsdata.Delyta;
+import com.teraim.nils.TakePicture.OldImagesAdapter;
 
 public class HittaYta extends Activity {
 
@@ -45,26 +49,57 @@ public class HittaYta extends Activity {
 
 	ProvYtaGeoUpdater pyg;
 
-
+	//TODO: REPLACE if more than one RUTA...
+	
+	final String picPath = Environment.getExternalStorageDirectory()+
+			CommonVars.NILS_BASE_DIR+"/delyta/"+
+			"1"+"/bilder/gamla/";
+	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.hittayta);	
 		ProvytaView provytaV = (ProvytaView) findViewById(R.id.provyta);
-		GridView gridView = (GridView) findViewById(R.id.picgridview);
+		GridView gridViewOld = (GridView) findViewById(R.id.picgridview);
 		TableLayout tagtabell = (TableLayout) findViewById(R.id.tagtabell);
-		gridView.setAdapter(new ImageAdapter(this));
+		TextView gamlaBilder = (TextView) findViewById(R.id.oldpichead);
+
+		gridViewOld.setAdapter(new ImageAdapter(this));
+		gridViewOld.setOnItemClickListener(new OnItemClickListener()
+		{
+			public void onItemClick(AdapterView<?> parent,
+					View v, int position, long id)
+			{
+				Toast.makeText(getBaseContext(),
+						CommonVars.compassToPicName(position) + " picture selected",
+						Toast.LENGTH_SHORT).show();
+
+				Intent myIntent = new Intent(getBaseContext(),PictureZoom.class);
+				String picName = CommonVars.cv().getCurrentPictureBasePath()+"/gamla/"+
+						CommonVars.compassToPicName(position)+".png";
+				myIntent.putExtra("picpath", picName);
+				startActivity(myIntent);
+				
+			}
+		});
 		Delningsdata dd = Delningsdata.getSingleton(this);
 
 		pyg = new ProvYtaGeoUpdater(this,provytaV,null);
 
+		File directory = new File(picPath);
+		File[] contents = directory.listFiles();
+		
+		//If no old pictures, do not show the header!
+		if (contents == null) {
+			gamlaBilder.setVisibility(View.GONE);
+		}
+		
 
 		ArrayList<Delyta> dy = dd.getDelytor(CommonVars.cv().getRutaId(), CommonVars.cv().getProvytaId());
 		provytaV.setDelytor(dy);
 
 		Log.d("NILS","ruta: "+CommonVars.cv().getRutaId()+" provyta: "+CommonVars.cv().getProvytaId());
 		createTagTabell(tagtabell,dy);
-
 
 		provytaV.invalidate();
 
@@ -234,11 +269,9 @@ public class HittaYta extends Activity {
 				imageView = (ImageView) convertView;
 			}
 			//TODO:Replace with RutaId!
-			String picPath = Environment.getExternalStorageDirectory()+
-					CommonVars.NILS_BASE_DIR+"/delyta/"+
-					"1"+"/bilder";
 
-			Bitmap bm = BitmapFactory.decodeFile(picPath+"/gamla/"+
+
+			Bitmap bm = BitmapFactory.decodeFile(picPath+
 					CommonVars.compassToPicName(position)+".png");
 
 			imageView.setImageBitmap(bm);

@@ -22,21 +22,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
-public class TakePictureActivity extends Activity implements SensorEventListener {
+public class TakePictureActivity extends Activity {
 	private static int TAKE_PICTURE = 1;
 	private Uri outputFileUri=null;
-	SensorManager sensorManager;
-	private Sensor sensorAccelerometer;
-	private Sensor sensorMagneticField;
 
-	private float[] valuesAccelerometer;
-	private float[] valuesMagneticField;
-
-	private float[] matrixR;
-	private float[] matrixI;
-	private float[] matrixValues;
 	private ImageView oldPictureImageView,newPictureImageView; 
 	private String arkivBildUrl = null;
 
@@ -58,21 +50,43 @@ public class TakePictureActivity extends Activity implements SensorEventListener
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.takepicture_singular);
+		//takePhoto(null);
+		newPictureImageView = (ImageView)findViewById(R.id.newPic);
+		//TODO: Replace with getRutaId when more pics.
+		picPath = CommonVars.cv().getCurrentPictureBasePath();
+
+		String nyBildUrl = picPath+"/nya/"+dir+".png";
+	
+		Bitmap newPic = 
+				BitmapFactory.decodeFile(nyBildUrl);
+		if(newPic == null) {
+			Log.d("NILS", "newpic null");
+			newPic = 
+					BitmapFactory.decodeResource(getResources(), R.drawable.noimg);
+		}
+			
+
+		//oldPictureImageView.setBackgroundResource(1);
+
+		newPictureImageView.setImageBitmap(newPic);
+		
+		takePhoto(null);
+	}
+
+	/*
 		TextView textExisting = (TextView) findViewById(R.id.textExisting);
 		oldPictureImageView = (ImageView)findViewById(R.id.oldPic);
-		newPictureImageView = (ImageView)findViewById(R.id.newPic);
 		riktningstxt = 			(TextView)findViewById(R.id.riktningstxt);
+		riktningstxt.setText("Ruta: "+CommonVars.cv().getRutaId()+" Provyta: "+CommonVars.cv().getProvytaId()+" Riktning: "+dir);
 		
+	
 		//get the selected picture
 		compass = this.getIntent().getIntExtra("selectedpic", 0);
 		//translate number into string
 		
 		dir = CommonVars.compassToPicName(compass);
-		//TODO: Replace with getRutaId when more pics.
-		picPath = CommonVars.cv().getCurrentPictureBasePath();
 		//Check if there is an existing picture.
 		arkivBildUrl = picPath+"/gamla/"+dir+".png";
-		String nyBildUrl = picPath+"/nya/"+dir+".png";
 		Log.d("NILS",picPath);
 		Bitmap oldPic = 
 			BitmapFactory.decodeFile(arkivBildUrl);
@@ -101,28 +115,20 @@ public class TakePictureActivity extends Activity implements SensorEventListener
 		//oldPictureImageView.setBackgroundResource(1);
 
 		newPictureImageView.setImageBitmap(newPic);
-		myCompass = (Compass)findViewById(R.id.mycompass);
-
-		sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
-		sensorAccelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-		sensorMagneticField = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-
-		valuesAccelerometer = new float[3];
-		valuesMagneticField = new float[3];
-
-		matrixR = new float[9];
-		matrixI = new float[9];
-		matrixValues = new float[3];
 
 
 	}
 
+*/
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data){
-
+		super.onActivityResult(requestCode, resultCode, data);
 		if (requestCode == TAKE_PICTURE){
+			Toast.makeText(this, "Got back!", Toast.LENGTH_LONG).show();
 			Log.d("PIC",outputFileUri.toString());
-
+		}
+	}
+	/*
 			//Save file in temporary storage.
 			Bitmap bip = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory()+CommonVars.NILS_BASE_DIR+"/temp.png");		
 			int w = bip.getWidth();
@@ -160,17 +166,18 @@ public class TakePictureActivity extends Activity implements SensorEventListener
 
 	}
 
+*/
 
 	public void takePhoto(View v) {
 		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-		File file = new File(Environment.getExternalStorageDirectory()+CommonVars.NILS_BASE_DIR, "temp.png");
+		startActivityForResult(intent, TAKE_PICTURE);
+		//File file = new File(Environment.getExternalStorageDirectory()+CommonVars.NILS_BASE_DIR, "temp.png");
 
-		outputFileUri = Uri.fromFile(file);
+		//outputFileUri = Uri.fromFile(file);
 		//intent.putExtra(MediaStore.EXTRA_SIZE_LIMIT,"500");
 //		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 //		intent.putExtra(MediaStore.EXTRA_SCREEN_ORIENTATION,"portrait");
-		intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-		startActivityForResult(intent, TAKE_PICTURE);
+		//intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
 
 	}
 	
@@ -184,56 +191,14 @@ public class TakePictureActivity extends Activity implements SensorEventListener
 
 	protected void onResume() {
 
-		sensorManager.registerListener(this,
-				sensorAccelerometer,
-				SensorManager.SENSOR_DELAY_NORMAL);
-		sensorManager.registerListener(this,
-				sensorMagneticField,
-				SensorManager.SENSOR_DELAY_NORMAL);
-		super.onResume();
+			super.onResume();
 	}
 
 	@Override
 	protected void onPause() {
 
-		sensorManager.unregisterListener(this,
-				sensorAccelerometer);
-		sensorManager.unregisterListener(this,
-				sensorMagneticField);
 		super.onPause();
 	}
-
-	public void onAccuracyChanged(Sensor arg0, int arg1) {
-
-	}
-
-	public void onSensorChanged(SensorEvent event) {
-
-		switch(event.sensor.getType()){
-		case Sensor.TYPE_ACCELEROMETER:
-			for(int i =0; i < 3; i++){
-				valuesAccelerometer[i] = event.values[i];
-			}
-			break;
-		case Sensor.TYPE_MAGNETIC_FIELD:
-			for(int i =0; i < 3; i++){
-				valuesMagneticField[i] = event.values[i];
-			}
-			break;
-		}
-
-		boolean success = SensorManager.getRotationMatrix(
-				matrixR,
-				matrixI,
-				valuesAccelerometer,
-				valuesMagneticField);
-
-		if(success){
-			SensorManager.getOrientation(matrixR, matrixValues);
-			myCompass.update(matrixValues[2]);
-		}
-
-	}
-
-
 }
+
+
