@@ -20,7 +20,12 @@ public class Main extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		double PI = Math.PI;
+		Geomatte.getRikt2(0, 0, Math.sqrt(3), 1);
+		Geomatte.getRikt2(0, 0, -Math.sqrt(3), 1);
+		Geomatte.getRikt2(0, 0, -Math.sqrt(3), -1);
+		Geomatte.getRikt2(0, 0, Math.sqrt(3), -1);
+		
 		//Layer between application and persistent storage.
 		//The persistent storage used is Shared Preferences
 		//http://developer.android.com/guide/topics/data/data-storage.html#pref

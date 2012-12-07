@@ -27,21 +27,25 @@ public class Geomatte {
 		return Math.sqrt(Math.pow((myX-destX),2)+Math.pow(myY-destY, 2));
 		
 	}
-	/*
+	
 	static double getRikt2(double userY, double userX, double destY, double destX) {
-		double alfa;
+		double alfa=-100;
 		double PI = Math.PI;
-		double dy = userY-destY;
-		double dx = userX-destX;
+		double dy = destY-userY;
+		double dx = destX-userX;
 		double a2 = Math.atan2(dy,dx);
-		if (a2>0&&a2<PI/2)
-			alfa = PI/2-a2;
-		if (a2>-PI/2&&a2<0)
-			alfa = PI/+a2;
+		Log.d("NILS","ATAN2 (r) (g)"+a2+" "+57.2957795*a2);
+		if (a2>-PI&&a2<=PI/2)
+			alfa = (PI/2-a2);
+		else
+			alfa = (PI/2-a2)+2*PI;
+		Log.d("NILS","ALFA I RADIER: Grader: "+alfa+" "+ 57.2957795*alfa);
+		return alfa;
+		
 		
 	}
 		
-	*/
+	
 	static double getRikt(double dest, double centerY, double centerX, double destY, double destX) {
 		//dest is Opposite side length.
 		//We still 

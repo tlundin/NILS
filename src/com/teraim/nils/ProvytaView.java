@@ -137,7 +137,7 @@ public class ProvytaView extends View {
 			canvas.drawBitmap(red.bmp, ux, uy, null);
 			} else {
 				//Given that blue is outside current Max Radius, draw an arrow to indicate where..
-				double alfa = Geomatte.getRikt(red.getDistance(), cy, cx, red.y, red.x);
+				double alfa = Geomatte.getRikt2(0.0, 0.0, red.y, red.x);
 				float x = (float)(cx + r * Math.sin(alfa));
 				float y =  (float)(cy - r * Math.cos(alfa));
 				canvas.save();
@@ -158,7 +158,7 @@ public class ProvytaView extends View {
 			} else {
 				Log.d("NILS","Blue is outside radius");
 			//Given that blue is outside current Max Radius, draw an arrow to indicate where..
-			double alfa = Geomatte.getRikt(blue.getDistance(), 0, 0, blue.y, blue.x);
+			double alfa = Geomatte.getRikt2(0, 0, blue.y, blue.x);
 			float x = (float)(cx + r * Math.sin(alfa));
 			float y =  (float)(cy - r * Math.cos(alfa));
 			canvas.save();
