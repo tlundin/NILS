@@ -50,14 +50,14 @@
 
         <GridView
             android:id="@+id/picgridview"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-           	android:gravity="bottom"
+            android:layout_gravity="center_horizontal"
             android:horizontalSpacing="10dp"
             android:numColumns="4"
             android:stretchMode="columnWidth"
-            android:weightSum="4" >
+            android:weightSum="4" />
 
-        </GridView>
+        
     </LinearLayout>
 </LinearLayout>

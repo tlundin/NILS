@@ -2,6 +2,5 @@ package com.teraim.nils;
 
 public interface GeoUpdaterCb {
 
-	public void onWithinFiveMeters();
-	public void onOutsideFiveMeters();
+	public void onLocationUpdate(double dist, double rikt2);
 }

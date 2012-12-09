@@ -10,16 +10,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
@@ -37,7 +40,8 @@ import android.widget.Toast;
  */
 public class TakePicture extends Activity implements GeoUpdaterCb {
 
-	Button mittpunktB;
+	private Button mittpunktB;
+	private TextView userPosTextV;
 	ProvYtaGeoUpdater pyg;
 	final int TAKE_PICTURE = 133;
 	final String oldPicFolder = CommonVars.cv().getCurrentPictureBasePath()+"/gamla/";
@@ -54,7 +58,7 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 		gridViewNew = (GridView) findViewById(R.id.gridview_new);
 		ProvytaView provytaV = (ProvytaView) findViewById(R.id.provytaF);
 		mittpunktB = (Button) findViewById(R.id.mittpunktB);
-
+		userPosTextV = (TextView)findViewById(R.id.userPosText);
 
 		pyg = new ProvYtaGeoUpdater(this,provytaV,this);
 		gridViewNew.setAdapter(new NewImagesAdapter(this));
@@ -92,13 +96,18 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 		TextView oldPicHeader = (TextView) findViewById(R.id.gamlabilder);
 
 		File directory = new File(oldPicFolder);
-		File[] contents = directory.listFiles();
 
 		//If no old pictures, do not show the header!
-		if (contents == null) {
+		//TODO: Check this again in production code.
+		/*
+		 * 
+		 *	File[] contents = directory.listFiles();
+			if (contents == null) {
 			gridViewOld.setVisibility(View.GONE);
+			
 			oldPicHeader.setVisibility(View.GONE);
 		}
+		*/
 
 		gridViewOld.setAdapter(new OldImagesAdapter(this));
 		gridViewOld.setOnItemClickListener(new OnItemClickListener()
@@ -265,11 +274,18 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 		public View getView(int position, View convertView,
 				ViewGroup parent)
 		{
+			int h;			
 			ImageView imageView;
+			Display display = getWindowManager().getDefaultDisplay();
+			Point size = new Point();
+			display.getSize(size);
+			int height = size.y;
+			final int Margins = 100;
 			if (convertView == null) {
 				imageView = new ImageView(context);
+				
 				imageView.setLayoutParams(new
-						GridView.LayoutParams(195, 195));
+						GridView.LayoutParams(LayoutParams.MATCH_PARENT, (height-Margins)/getCount()));
 				imageView.setScaleType(
 						ImageView.ScaleType.CENTER_CROP);
 				imageView.setPadding(10, 5, 5, 5);
@@ -409,11 +425,15 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 		}
 		return false;
 	}
-	public void onWithinFiveMeters() {
-		mittpunktB.setEnabled(true);
+
+
+
+
+	public void onLocationUpdate(double dist, double rikt2) {
+		mittpunktB.setEnabled(dist<=ProvYtaGeoUpdater.InnerRadiusInMeters);
+		userPosTextV.setText("DISTANCE: "+dist+" VINKEL: "+rikt2);
 	}
-	public void onOutsideFiveMeters() {
-		mittpunktB.setEnabled(false);
-	}
+
+	
 
 }

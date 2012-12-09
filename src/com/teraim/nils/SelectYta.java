@@ -69,12 +69,12 @@ public class SelectYta extends Activity {
 		String rutaId = CommonVars.cv().getRutaId();
 		if (rutaId !=null) {
 			Ruta ruta = rd.findRuta(rutaId);
-
-			double[] minmax = ruta.getMinMaxValues();
+			Ruta.Sorted s = ruta.sort();
+			
 			//long=y 
-			double disty = (minmax[2]-minmax[0]);
+			double disty = (s.getMax_N_sweref_99()-s.getMin_N_sweref_99());
 			//lat=x
-			double distx = (minmax[3]-minmax[1]);
+			double distx = (s.getMax_E_sweref_99()-s.getMin_E_sweref_99());
 
 			//Set a 10% margin from the longest distance.
 			double Margin_Percentage = 0;
@@ -104,8 +104,8 @@ public class SelectYta extends Activity {
 			for(final Yta yta:ytor) {
 
 				//subtract min value from the coordinate to get normalized values
-				double normx = (yta.sweLat-minmax[1]);
-				double normy = (yta.sweLong-minmax[0]);
+				double normx = (yta.E-s.getMin_E_sweref_99());
+				double normy = (yta.N-s.getMin_N_sweref_99());
 				
 				//multiply with scale factor to get pixel size
 				float cordx = (float)(normx*screenZoom);

@@ -7,17 +7,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
+import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
@@ -33,7 +36,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import com.teraim.nils.Delningsdata.Delyta;
 import com.teraim.nils.TakePicture.OldImagesAdapter;
 
-public class HittaYta extends Activity {
+public class HittaYta extends Activity implements GeoUpdaterCb {
 
 	@Override
 	protected void onPause() {
@@ -85,7 +88,7 @@ public class HittaYta extends Activity {
 		});
 		Delningsdata dd = Delningsdata.getSingleton(this);
 
-		pyg = new ProvYtaGeoUpdater(this,provytaV,null);
+		pyg = new ProvYtaGeoUpdater(this,provytaV,this);
 
 		File directory = new File(picPath);
 		File[] contents = directory.listFiles();
@@ -258,21 +261,28 @@ public class HittaYta extends Activity {
 		public View getView(int position, View convertView,
 				ViewGroup parent)
 		{
+			int h;			
 			ImageView imageView;
+			Display display = getWindowManager().getDefaultDisplay();
+			Point size = new Point();
+			display.getSize(size);
+			int height = size.y;
+			final int Margins = 100;
 			if (convertView == null) {
 				imageView = new ImageView(context);
+				
 				imageView.setLayoutParams(new
-						GridView.LayoutParams(195, 195));
+						GridView.LayoutParams(LayoutParams.MATCH_PARENT, (height-Margins)/getCount()));
 				imageView.setScaleType(
 						ImageView.ScaleType.CENTER_CROP);
 				imageView.setPadding(10, 5, 5, 5);
 			} else {
 				imageView = (ImageView) convertView;
 			}
-			//TODO:Replace with RutaId!
+			//TODO: Get rid of 1 below!!
+			String picPath = CommonVars.cv().getCurrentPictureBasePath();
 
-
-			Bitmap bm = BitmapFactory.decodeFile(picPath+
+			Bitmap bm = BitmapFactory.decodeFile(picPath+"/gamla/"+
 					CommonVars.compassToPicName(position)+".png");
 			if (bm==null)
 				try {
@@ -285,6 +295,12 @@ public class HittaYta extends Activity {
 			//imageView.setImageBitmap(bm[position]);
 			return imageView;
 		}
+
+	}
+
+	public void onLocationUpdate(double dist, double rikt2) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	

@@ -120,7 +120,7 @@ public class CommonVars {
 	}
 	public String getCurrentPictureBasePath() {
 		return Environment.getExternalStorageDirectory()+
-		NILS_BASE_DIR+"/delyta/"+
+		NILS_BASE_DIR+"/ruta/"+
 		"1"+"/bilder";
 	}
 	

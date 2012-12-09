@@ -34,6 +34,8 @@ public class ProvytaView extends View {
 	private Paint px = new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
 
 	private Paint pl = new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
+	private Paint p50 = new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
+	private Paint p100 = new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
 
 	private User user;
 	private String msg = "";
@@ -56,7 +58,18 @@ public class ProvytaView extends View {
 		pl.setTypeface(Typeface.DEFAULT_BOLD); 
 		pl.setTextSize(25);
 
+		p50.setColor(Color.BLUE);
+		p50.setStrokeWidth(2);
+		p50.setStyle(Style.STROKE);
+		
+		p50.setTypeface(Typeface.SANS_SERIF); 
+		
 
+		p100.setColor(Color.RED);
+		p100.setStrokeWidth(3);
+		p100.setStyle(Style.STROKE);
+		p100.setTypeface(Typeface.SANS_SERIF); 
+	
 
 
 		user = new User(BitmapFactory.decodeResource(context.getResources(),
@@ -94,6 +107,11 @@ public class ProvytaView extends View {
 		}
 	}
 
+	final double innerRealRadiusInMeter = 10;
+	final double midRealRadiusInMeter = 50;
+	final double realRadiusinMeter = 100;
+	double rScaleF=0,oScaleF=0;
+
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);			
@@ -104,23 +122,36 @@ public class ProvytaView extends View {
 		int cy;
 		int cx;
 		r=(w>=h)?((h/2)-h*.1):((w/2)-w*.1);
-		scaleF = r/realRadiusinMeter;
 		cx = w/2;
 		cy = h/2;
 		//tag.lineTo(w-50,0);
 		Log.d("NILS","w h r"+w+" "+h+" "+r);
-		//draw 100 meter circle
-		canvas.drawCircle(cx, cy,(int)r, p);
-		//draw 10 meter circle if outside.
-		if ((user.getDistance()>innerRealRadiusInMeter))
-			canvas.drawCircle(cx, cy,(float)(10.0*scaleF), p);
-		else {
+		oScaleF = r/realRadiusinMeter;
+
+		if (user.getDistance()>midRealRadiusInMeter) {
+			canvas.drawCircle(cx, cy,(int)r, p100);
+			canvas.drawCircle(cx, cy,(float)(50.0*oScaleF), p50);
+			canvas.drawCircle(cx, cy,(float)(10.0*oScaleF), p);
+			rScaleF = oScaleF;
+			canvas.drawText("100",(int)(cx+r)-25, cy, p100);
+			canvas.drawText("50",(int)(cx+(50.0*oScaleF))-20, cy, p50);
+			canvas.drawText("10",(int)(cx+(10.0*oScaleF))-15, cy, p);
+		} else 
+		if (user.getDistance()>innerRealRadiusInMeter) {
+			rScaleF = r/midRealRadiusInMeter;
+			canvas.drawCircle(cx, cy,(int)r, p50);
+			canvas.drawCircle(cx, cy,(float)(10.0*rScaleF), p);		
+			canvas.drawText("50",(int)(cx+r)-25, cy, p50);
+			canvas.drawText("10",(int)(cx+(10.0*rScaleF))-15, cy, p);
+
+		} else {
+			canvas.drawCircle(cx, cy,(int)r, p);
+			rScaleF = r/innerRealRadiusInMeter;
+			canvas.drawText("10",(int)(r-15), cy, p);
 			if (delar !=null)
 				drawTag(canvas,cx,cy);
-			scaleF = r/innerRealRadiusInMeter;
-		}
-		//draw a "N" for north.
-		//30 is fontsize + padding.
+		}		
+
 		canvas.drawText("N",cx,(float)(h*.1), pl);
 
 		//canvas.drawLine(0, 0, w, h, p);
@@ -132,10 +163,10 @@ public class ProvytaView extends View {
 			Log.d("NILS","Blue has position");
 			if(user.getDistance()<realRadiusinMeter) {
 				alfa = user.getMovementDirection();
-				int ux = (int) (cx-user.x*scaleF)-User.Pic_H;;
+				int ux = (int) (cx-user.x*rScaleF)-User.Pic_H;;
 				//inverted north/south
 				//Subtract picture height. "Needle is in leftdown corner.
-				int uy = (int) (cy+user.y*scaleF)-User.Pic_H;
+				int uy = (int) (cy+user.y*rScaleF)-User.Pic_H;
 				Log.d("NILS","drawing geo at "+ux+" "+uy+" with direction angle set to "+alfa);
 				canvas.save();
 				canvas.rotate((float)(180+(180*alfa/Math.PI)), ux, uy);
@@ -181,9 +212,6 @@ public class ProvytaView extends View {
 		delar = dy;
 	}
 
-	final double innerRealRadiusInMeter = 10;
-	final double realRadiusinMeter = 100;
-	double scaleF=0;
 
 	public void drawTag(Canvas c,int cx,int cy) {
 
@@ -213,9 +241,9 @@ public class ProvytaView extends View {
 							//Grad-riktning. 360 är för avstånd 0
 							int rikt = tst[i][1];
 							double rr = (rikt-90) * Math.PI/180;
-							int x = (int) (cx+ avst*scaleF*(Math.cos(rr)));
-							int y = (int) (cy+ avst*scaleF*(Math.sin(rr)));
-							Log.d("NILS","avst "+avst+" scaleF "+scaleF+" rikt "+rikt+" radRikt "+rr+" cos: "+Math.cos(rr)+" sin:"+Math.sin(rr));
+							int x = (int) (cx+ avst*oScaleF*(Math.cos(rr)));
+							int y = (int) (cy+ avst*oScaleF*(Math.sin(rr)));
+							Log.d("NILS","avst "+avst+" rScaleF "+rScaleF+" rikt "+rikt+" radRikt "+rr+" cos: "+Math.cos(rr)+" sin:"+Math.sin(rr));
 							Log.d("NILS","X: "+x+" Y:"+y);
 
 							//y = 2*r-y;

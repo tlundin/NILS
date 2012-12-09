@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import android.content.Context;
 import android.location.Location;
@@ -30,26 +31,21 @@ public class Rutdata  {
 
 	protected class Yta {
 		String id;
-		double sweLat=0;
-		double sweLong=0;
+		double N=0;
+		double E=0;
 		double lat=0;
 		double longh=0;
 
-		public double[] getSweRefCoords() {
-			double[] ret = new double[2];
-			ret[0]=sweLat;
-			ret[1]=sweLong;
-			return ret;
-		}
+
 		public double[] getLatLong() {
 			double[] ret = new double[2];
 			ret[0]=lat;
 			ret[1]=longh;
 			return ret;
 		}
-		public void setSweRef(double lat, double longh) {
-			sweLat = lat;
-			sweLong = longh;
+		public void setSweRef(double n, double e) {
+			N = n;
+			E = e;
 		}
 		public void setGPS(double lat, double longh) {
 			this.lat = lat;
@@ -61,10 +57,12 @@ public class Rutdata  {
 	protected class Ruta {
 		String id;
 		ArrayList<Yta> ytor = new ArrayList<Yta>();
-		public Yta addYta(String ytId, String swelat, String swelong, String lat, String longh) {
+		public Yta addYta(String ytId, String north, String east, String lat, String longh) {
 			Yta yta = new Yta();
 			try {
-				yta.setSweRef(Double.parseDouble(swelat),Double.parseDouble(swelong));
+				
+				yta.setSweRef(Double.parseDouble(north),Double.parseDouble(east));
+				Log.d("NILS","Adding Yta ID:  N E:"+ytId+" "+ Double.parseDouble(north)+" "+Double.parseDouble(east));
 				yta.setGPS(Double.parseDouble(lat),Double.parseDouble(longh));
 			} catch (NumberFormatException e) {
 				Log.d("NILS","The center coordinates for yta "+ytId+" are not recognized as proper doubles");
@@ -77,26 +75,43 @@ public class Rutdata  {
 		public ArrayList<Yta> getYtor() {
 			return ytor;
 		}
-		//return minx,miny,maxx,maxy
-		double[] getMinMaxValues() {
-			double[] ret = {999999999,999999999,-1,-1};
-			//compare current values. Replace if lower/higher
-			for (Yta y:ytor) {
-				double v;			
-				v=y.sweLong;
-				if (v>ret[2])
-					ret[2]=v;
-				if(v<ret[0])
-					ret[0]=v;
-				v=y.sweLat;
-				if (v>ret[3])
-					ret[3]=v;
-				if(v<ret[1])
-					ret[1]=v;
-
-			}
-			return ret;
+		
+		public Sorted sort() {
+			Sorted s = new Sorted();
+			return s;
 		}
+		
+		public class Sorted {
+			double[] N = new double[ytor.size()];
+			double[] E = new double[ytor.size()];
+			public Sorted() {
+				int i = 0;
+				for(Yta y:ytor) {
+					N[i]= y.N;
+					E[i]= y.E;
+					Log.d("NILS","SN: "+y.N+" SE: "+y.E);
+					i++;
+				}
+				Arrays.sort(N);
+				Arrays.sort(E);
+			}
+			//return minx,miny,maxx,maxy
+			public double getMax_N_sweref_99() {
+				return N[N.length-1];
+			}
+			public double getMax_E_sweref_99() {
+				return E[E.length-1];
+			}
+			public double getMin_N_sweref_99() {
+				return N[0];
+			}
+			public double getMin_E_sweref_99() {
+				return E[0];
+			}
+		}
+		
+		
+
 		public Yta findYta(String ytId) {
 			for(Yta y:ytor) {
 				if(y.id.equals(ytId)) {
@@ -106,6 +121,7 @@ public class Rutdata  {
 			}
 			return null;
 		}
+
 
 	}
 
@@ -171,9 +187,9 @@ public class Rutdata  {
 		//This is done to be able to calculate the grid position.
 		Log.d("NILS","checking minmax...");
 		for (Ruta r:rutor) {
-			double f[] = r.getMinMaxValues();
-			Log.d("NILS","Ruta with id "+r.id+" has minxy: "+f[0]+" "+f[1]+
-					" and maxXy: "+f[2]+" "+f[3]);
+			Ruta.Sorted s = r.sort();
+			Log.d("NILS","Ruta with id "+r.id+" has minxy: "+s.getMin_E_sweref_99()+" "+s.getMin_N_sweref_99()+
+					" and maxXy: "+s.getMax_E_sweref_99()+" "+s.getMax_N_sweref_99());
 		}
 	}
 

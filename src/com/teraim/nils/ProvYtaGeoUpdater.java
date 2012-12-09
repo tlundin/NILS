@@ -59,10 +59,10 @@ public class ProvYtaGeoUpdater implements LocationListener
 		//This is in sweref.
 		center.setLatitude(cc[0]);
 		center.setLongitude(cc[1]);
-		double[] dd = y.getSweRefCoords();
+		
 		swerefC = new Location("");
-		swerefC.setLatitude(dd[0]);
-		swerefC.setLongitude(dd[1]);
+		swerefC.setLatitude(y.N);
+		swerefC.setLongitude(y.E);
 		myView = w;
 		myView.showWaiting();
 		
@@ -88,10 +88,8 @@ public class ProvYtaGeoUpdater implements LocationListener
 	}
 
 	final static int ProvYtaRadiusInMeters = 100;
-	//Has the callback been called already when user within 5 meter circle?
-	boolean cbCalled = false;
 	//Inner radius - if within, allow prressing the button for setMittPunkt
-	int InnerRadiusInMeters = 10;
+	public static final int InnerRadiusInMeters = 10;
 	private Location currentLocation=null;
 	
 	public void onLocationChanged(Location arg0) {
@@ -104,7 +102,6 @@ public class ProvYtaGeoUpdater implements LocationListener
 		Log.d("NILS","Sweref avstånd: "+Geomatte.sweDist(swerefC.getLatitude(), swerefC.getLongitude(), xy[0], xy[1]));
 		Log.d("NILS","Latlong avstånd: "+Geomatte.dist(center.getLatitude(), center.getLongitude(), xy[0], xy[1]));		
 		Log.d("NILS","Platformsavstånd: "+arg0.distanceTo(center));		
-		//double alfa = Geomatte.getRikt(dist, center.getLatitude(), center.getLongitude(), xy[0], xy[1]);
 			//myView.showUser(CommonVars.cv().getDeviceColor(),arg0,alfa,dist);
 			//distance in meters between target and center
 			int wy = (int)(swerefC.getLatitude() - xy[0]);
@@ -112,16 +109,11 @@ public class ProvYtaGeoUpdater implements LocationListener
 			//show user distance from middle point of circle
 			Log.d("NILS","user x y "+wx+" "+wy);
 			myView.showUser(CommonVars.cv().getDeviceColor(), wx,wy,(int)dist);
-			if (geoCb!=null && 
-					dist < InnerRadiusInMeters &&
-					!cbCalled) {
-				geoCb.onWithinFiveMeters();
-				cbCalled = true;
-			} else 
-				if(cbCalled) {
-					cbCalled=false;
-					geoCb.onOutsideFiveMeters();
-				}
+			if (geoCb == null)
+				Log.d("NILS","GEOSSSSDSDBUIII");
+			else
+				geoCb.onLocationUpdate(dist,Geomatte.getRikt2(xy[0], xy[1],0,0));
+			
 		
 		myView.showDistance((int)dist);
 		myView.invalidate();
