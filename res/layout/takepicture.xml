@@ -61,6 +61,13 @@
                 android:layout_height="wrap_content"
                 android:onClick="setRiktpunkter"
                 android:text="Sätt riktpunkter" />
+            
+             <Button
+                android:id="@+id/startB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="startCollect"
+                android:text="Börja datainsamling" />
 
             <TextView
                 android:id="@+id/mittText"

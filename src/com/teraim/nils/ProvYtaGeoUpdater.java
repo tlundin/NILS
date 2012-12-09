@@ -91,7 +91,7 @@ public class ProvYtaGeoUpdater implements LocationListener
 	//Has the callback been called already when user within 5 meter circle?
 	boolean cbCalled = false;
 	//Inner radius - if within, allow prressing the button for setMittPunkt
-	int InnerRadiusInMeters = 45;
+	int InnerRadiusInMeters = 10;
 	private Location currentLocation=null;
 	
 	public void onLocationChanged(Location arg0) {

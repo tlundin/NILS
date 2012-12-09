@@ -27,14 +27,14 @@ public class Rutdata  {
 		}
 		return singleton;
 	}
-	
+
 	protected class Yta {
 		String id;
 		double sweLat=0;
 		double sweLong=0;
 		double lat=0;
 		double longh=0;
-		
+
 		public double[] getSweRefCoords() {
 			double[] ret = new double[2];
 			ret[0]=sweLat;
@@ -56,8 +56,8 @@ public class Rutdata  {
 			this.longh = longh;
 		}
 	}
-	
-	
+
+
 	protected class Ruta {
 		String id;
 		ArrayList<Yta> ytor = new ArrayList<Yta>();
@@ -92,27 +92,27 @@ public class Rutdata  {
 				if (v>ret[3])
 					ret[3]=v;
 				if(v<ret[1])
-						ret[1]=v;
-				
+					ret[1]=v;
+
 			}
-		return ret;
+			return ret;
 		}
 		public Yta findYta(String ytId) {
 			for(Yta y:ytor) {
 				if(y.id.equals(ytId)) {
 					return y;
 				}
-					
+
 			}
 			return null;
 		}
 
 	}
-	
-	
+
+
 	InputStream csvFile;
 	ArrayList<Ruta> rutor = new ArrayList<Ruta>();
-	
+
 	private Rutdata(InputStream inputStream) {
 		csvFile = inputStream;
 
@@ -127,7 +127,7 @@ public class Rutdata  {
 		rutor.add(r);
 		return r;
 	}
-	
+
 	public String[] getRutIds() {
 		if (rutor != null) {
 			String[] contents = new String[rutor.size()];		
@@ -151,17 +151,17 @@ public class Rutdata  {
 			while((row = br.readLine())!=null) {
 				String  r[] = row.split(",");
 				if (r!=null&&r.length>3) {
-						Log.d("NILS",r[0]);
-						Ruta ruta=findRuta(r[0]);
-						int id = Integer.parseInt(r[1]);
-						//Skip IDs belonging to inner ytor.
-						if (id>12&&id<17)
-							continue;
-						if (ruta.addYta(r[1],r[2],r[3],r[7],r[8])!=null)
-							Log.d("NILS","added yta with ID "+r[1]);
-						else
-							Log.d("NILS","discarded yta with ID "+r[1]);
-				
+					Log.d("NILS",r[0]);
+					Ruta ruta=findRuta(r[0]);
+					int id = Integer.parseInt(r[1]);
+					//Skip IDs belonging to inner ytor.
+					if (id>12&&id<17)
+						continue;
+					if (ruta.addYta(r[1],r[2],r[3],r[7],r[8])!=null)
+						Log.d("NILS","added yta with ID "+r[1]);
+					else
+						Log.d("NILS","discarded yta with ID "+r[1]);
+
 				}
 			}
 		} catch (IOException e) {
@@ -179,6 +179,6 @@ public class Rutdata  {
 
 
 
-	
+
 
 }

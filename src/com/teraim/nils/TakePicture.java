@@ -114,6 +114,7 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 
 				String picName = CommonVars.cv().getCurrentPictureBasePath()+"/gamla/"+
 						CommonVars.compassToPicName(position)+".png";
+				myIntent.putExtra("pos", position);
 				myIntent.putExtra("picpath", picName);
 				startActivity(myIntent);
 
@@ -157,7 +158,7 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				gridViewNew.invalidate();
+				gridViewNew.invalidateViews();
 
 			} else if (resultCode == RESULT_CANCELED) {
 				Toast.makeText(this, "RESULT CANCELLED", Toast.LENGTH_LONG).show();
@@ -280,7 +281,13 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 
 			Bitmap bm = BitmapFactory.decodeFile(picPath+"/gamla/"+
 					CommonVars.compassToPicName(position)+".png");
-
+			if (bm==null)
+				try {
+					bm = BitmapFactory.decodeResource(getResources(),
+							R.drawable.class.getField(CommonVars.compassToPicName(position)+"_demo").getInt(null));
+				} catch (Exception e) {
+					// Will never happen..static naming..
+				}
 			imageView.setImageBitmap(bm);
 			//imageView.setImageBitmap(bm[position]);
 			return imageView;
@@ -298,11 +305,30 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 	}
 
 	//callback for Button setRiktpunkter
-	int tst = 0;
+//	int tst = 0;
+	
+	public void startCollect(View v) {
+		final Context ctx = this;
+		CommListener myListener = new CommListener() {
+
+			public void onValueRecievedCb(String value) {
+				Toast.makeText(ctx, "Got message: "+value, Toast.LENGTH_LONG).show();
+			}
+
+			public void onError(int errCode) {
+				Toast.makeText(ctx, "Got error: "+errCode, Toast.LENGTH_LONG).show();
+				
+			}
+			
+		};
+		CommManager cm = CommManager.getCommManager(myListener);
+		if (cm!=null)
+			cm.getParameter("markslag");
+	}
 	public void setRiktpunkter(View v) {
-		//Intent intent = new Intent(this,RiktpunktActivity.class);
-		//startActivity(intent);
-		Location l = new Location("");
+		Intent intent = new Intent(this,RiktpunktActivity.class);
+		startActivity(intent);
+/*		Location l = new Location("");
 		switch (tst) {
 		case 0:
 			l.setLatitude(59.304384);
@@ -323,7 +349,7 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 		}
 		pyg.onLocationChanged(l);
 		tst++;
-
+*/
 	}
 
 	@Override

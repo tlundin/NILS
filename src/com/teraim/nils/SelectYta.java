@@ -17,9 +17,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.teraim.nils.Rutdata.Ruta;
@@ -31,7 +31,7 @@ import com.teraim.nils.Rutdata.Yta;
  */
 public class SelectYta extends Activity {
 	
-	private static final double ZoomFactor = 250;
+	
 	Rutdata rd=null;
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -46,14 +46,20 @@ public class SelectYta extends Activity {
 		Display display = getWindowManager().getDefaultDisplay();
 		Point size = new Point();
 		display.getSize(size);
+		double widthOfOneGraphicalRepresentationOfAProvyta=50;
+		double heightOfOneGraphicalRepresentationOfAProvyta=50;
+		
+		double Menus = 125; //pixels.
+		double margin = 50; //about twice the size of one graphical elem.
+		double width = size.x-(margin+widthOfOneGraphicalRepresentationOfAProvyta);
+		double height = size.y-(Menus+margin);
 
-		double width = size.x;
-		double height = size.y;
-
-
-
+		//still need to subtract about 200 pixels from y because of system menus.
+		//height = height - 200;
+		//subtract at least width of circle button from X.
+		
+		//width = width -100;
 		Log.d("NILS","Device screen in pixel: "+width+", "+height);
-
 		//Size of the RUTA is 5 kilometer.
 		//Ruta is 2125 meters from provyta 1.
 
@@ -64,57 +70,67 @@ public class SelectYta extends Activity {
 		if (rutaId !=null) {
 			Ruta ruta = rd.findRuta(rutaId);
 
-			//Yta yta1 = ruta.findYta("1");
-			//double rutaX0 = yta1.x-DistanceToOrigo;
-			//double rutaY0 = yta1.y-DistanceToOrigo;
-
 			double[] minmax = ruta.getMinMaxValues();
+			//long=y 
 			double disty = (minmax[2]-minmax[0]);
+			//lat=x
 			double distx = (minmax[3]-minmax[1]);
 
-			//Add 250 meters to distance (zoom out a bit)
+			//Set a 10% margin from the longest distance.
+			double Margin_Percentage = 0;
+			boolean landscape = false;
+			double lengthRel;
+			
+			if (distx>disty) {
+				landscape = true;
+				lengthRel = disty/distx;
+			}
+			else {
+				lengthRel = distx/disty;
+			}
+			distx+= distx*Margin_Percentage;
+			disty+= disty*Margin_Percentage;
+			
+			//which of x,y has least space on the screen?
+			Log.d("NILS","Lat (x) in meters: "+distx+" Long (Y) in meters:"+disty);
+			
+			//scale it to screen size
+			
+			double screenZoom = Math.min(height/disty,width/distx);
 
-			distx+=ZoomFactor;
-			disty+=ZoomFactor;
-			Log.d("NILS","distx, disty"+distx+" ,"+disty);
+			Log.d("NILS","skalfaktor "+screenZoom);
 
-			//Figure out scaling by looking at the shortest of the div between screen width/height and distance between ytor.
-			double div;
-			double divx = width/distx;
-			double divy = height/disty;
-			div = (divx>divy)?divy:divx;
-
-			Log.d("NILS","div: "+div);
-			double marginx = (ZoomFactor*div)/3;
-			double marginy = (ZoomFactor*div);
-
-			//double divx = width/distx;
-			//double divy = height/disty;
-			//Log.d("NILS","divxy "+divx+" "+divy);
 			ArrayList<Yta> ytor = ruta.getYtor();
 			for(final Yta yta:ytor) {
 
 				//subtract min value from the coordinate to get normalized values
-				//add half the zoom factor to center..
-				double normx = (yta.sweLong-minmax[0]);
-				double normy = (yta.sweLat-minmax[1]);
-				//double normx = (yta.x-rutaX0);
-				//double normy = (yta.y-rutaY0);
-				Log.d("NILS","normxy "+normx+" "+normy);
-				//multiply with screen size to get screen norm values
-				//add a margin of 10%
-				int cordx = (int)(normx*div);
-				int cordy = (int)(normy*div);
-
-				Log.d("NILS","cordxy "+cordx+" "+cordy+" id "+yta.id);
+				double normx = (yta.sweLat-minmax[1]);
+				double normy = (yta.sweLong-minmax[0]);
+				
+				//multiply with scale factor to get pixel size
+				float cordx = (float)(normx*screenZoom);
+				float cordy = (float)(normy*screenZoom);
+				//Reverse position.
+				cordy = (float)height - cordy;
+				
+				//add back half the margin that was subtracted to center...
+				cordx+=margin/2+(width-distx*screenZoom)/2;
+				cordy+=margin/2;//+(landscape?(height-disty*screenZoom)/2:0);
+				cordy-=(height-disty*screenZoom)/2;
+				Log.d("NILS","X Y SKÄRM "+cordx+" "+cordy);
+				
 				Button b = new Button(this);
 				b.setText(yta.id);
-				//swap coordinates since origo for screen is topleft corner while ruta origo is bottomleft
-				b.setX((float) (cordx+marginx));
-				b.setY((float) (height-(cordy+marginy)));
+				
+				b.setX(cordx);
+				b.setY(cordy);
+				
+					
 				b.setBackgroundDrawable(getResources().getDrawable(R.drawable.roundshape));
-				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(50, 50);
-				b.setLayoutParams(layoutParams);b.setLayoutParams(layoutParams);
+				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams((int)widthOfOneGraphicalRepresentationOfAProvyta
+				,(int) heightOfOneGraphicalRepresentationOfAProvyta);
+				
+				b.setLayoutParams(layoutParams);
 				b.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
 						provytaDialog(((Button)v).getText());

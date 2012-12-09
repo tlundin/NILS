@@ -35,22 +35,21 @@ public class ProvytaView extends View {
 
 	private Paint pl = new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
 
-	private User red,blue,uncolored;
+	private User user;
 	private String msg = "";
-	
+
 	//private Path tag = new Path();
 
-	
-	private Bitmap needle; 
+
 	public ProvytaView(Context context, AttributeSet attrs) {
 		super(context,attrs);
-		
+
 
 		p.setColor(Color.BLACK);
 		p.setStyle(Style.STROKE);
 		px.setColor(Color.DKGRAY);
 		px.setTypeface(Typeface.SANS_SERIF);
-		
+
 
 		pl.setColor(Color.BLACK);
 		pl.setStyle(Style.STROKE);
@@ -60,15 +59,8 @@ public class ProvytaView extends View {
 
 
 
-		needle= 
-				BitmapFactory.decodeResource(getResources(), R.drawable.arrow);
-		needle = Bitmap.createScaledBitmap(needle, 32, 32, false);
-		
-		blue = new User(BitmapFactory.decodeResource(context.getResources(),
-				R.drawable.blue_pin_48));
-		red = new User(BitmapFactory.decodeResource(context.getResources(),R.drawable.red_pin_48));
-		
-		uncolored = red = new User(BitmapFactory.decodeResource(context.getResources(),R.drawable.red_pin_48));
+		user = new User(BitmapFactory.decodeResource(context.getResources(),
+				R.drawable.gps_pil));
 	}
 
 
@@ -79,15 +71,21 @@ public class ProvytaView extends View {
 		public int x,y;
 		private int dist;
 		protected Bitmap bmp;
-		
+		private int prevx,prevy;
+
 		public User(Bitmap bmp) {
-			x=y=dist=-1;
+			x=y=dist=0;
 			this.bmp = Bitmap.createScaledBitmap(bmp, 32, Pic_H, false);		
 		}
 		public void set(int x,int y,int dist) {
+			prevx=this.x; prevy=this.y;
 			this.x=x;this.y=y;this.dist = dist;
 		}
-	
+
+		public double getMovementDirection() {
+			return Geomatte.getRikt2(prevy, prevx, y, x);
+		}
+
 		public int getDistance() {
 			return dist;
 		}
@@ -95,7 +93,7 @@ public class ProvytaView extends View {
 			return dist>0;
 		}
 	}
-	
+
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);			
@@ -113,10 +111,14 @@ public class ProvytaView extends View {
 		Log.d("NILS","w h r"+w+" "+h+" "+r);
 		//draw 100 meter circle
 		canvas.drawCircle(cx, cy,(int)r, p);
-
-		//draw 10 meter circle
-		canvas.drawCircle(cx, cy,(float)(10.0*scaleF), p);
-
+		//draw 10 meter circle if outside.
+		if ((user.getDistance()>innerRealRadiusInMeter))
+			canvas.drawCircle(cx, cy,(float)(10.0*scaleF), p);
+		else {
+			if (delar !=null)
+				drawTag(canvas,cx,cy);
+			scaleF = r/innerRealRadiusInMeter;
+		}
 		//draw a "N" for north.
 		//30 is fontsize + padding.
 		canvas.drawText("N",cx,(float)(h*.1), pl);
@@ -125,48 +127,32 @@ public class ProvytaView extends View {
 		// canvas.drawPath(tag,p);
 		//mDrawable.draw(canvas);
 		//canvas.drawPath(tag, p);
-		if (delar !=null)
-			drawTag(canvas,cx,cy);
-		if (red.hasPosition()) {
-			if(red.getDistance()<realRadiusinMeter) {
-			int ux = (int) (cx-red.x*scaleF);
-			//inverted north/south
-			//Subtract picture height. "Needle is in leftdown corner.
-			int uy = (int) (cy+red.y*scaleF)-User.Pic_H;
-			Log.d("NILS","drawing red at "+ux+" "+uy);
-			canvas.drawBitmap(red.bmp, ux, uy, null);
+		if (user.hasPosition()) {
+			double alfa;
+			Log.d("NILS","Blue has position");
+			if(user.getDistance()<realRadiusinMeter) {
+				alfa = user.getMovementDirection();
+				int ux = (int) (cx-user.x*scaleF)-User.Pic_H;;
+				//inverted north/south
+				//Subtract picture height. "Needle is in leftdown corner.
+				int uy = (int) (cy+user.y*scaleF)-User.Pic_H;
+				Log.d("NILS","drawing geo at "+ux+" "+uy+" with direction angle set to "+alfa);
+				canvas.save();
+				canvas.rotate((float)(180+(180*alfa/Math.PI)), ux, uy);
+				canvas.drawBitmap(user.bmp, ux, uy, null);
+				canvas.restore();
 			} else {
+				//Log.d("NILS","Blue is outside radius");
 				//Given that blue is outside current Max Radius, draw an arrow to indicate where..
-				double alfa = Geomatte.getRikt2(0.0, 0.0, red.y, red.x);
+				alfa = Geomatte.getRikt2(user.y, user.x,0,0);
 				float x = (float)(cx + r * Math.sin(alfa));
 				float y =  (float)(cy - r * Math.cos(alfa));
 				canvas.save();
-				canvas.rotate((float)-alfa, x, y);
-				canvas.drawBitmap(needle, x, y, null);
+				canvas.rotate((float)(180+(180*alfa/Math.PI)), x, y);
+				canvas.drawBitmap(user.bmp, x, y, null);
 				canvas.restore();
-			} 
-		}
-		if (blue.hasPosition()) {
-			Log.d("NILS","Blue has position");
-			if(blue.getDistance()<realRadiusinMeter) {
-			int ux = (int) (cx-blue.x*scaleF)-User.Pic_H;;
-			//inverted north/south
-			//Subtract picture height. "Needle is in leftdown corner.
-			int uy = (int) (cy+blue.y*scaleF)-User.Pic_H;
-			Log.d("NILS","drawing blue at "+ux+" "+uy);
-			canvas.drawBitmap(blue.bmp, ux, uy, null);
-			} else {
-				Log.d("NILS","Blue is outside radius");
-			//Given that blue is outside current Max Radius, draw an arrow to indicate where..
-			double alfa = Geomatte.getRikt2(0, 0, blue.y, blue.x);
-			float x = (float)(cx + r * Math.sin(alfa));
-			float y =  (float)(cy - r * Math.cos(alfa));
-			canvas.save();
-			canvas.rotate((float)(180+(180*alfa/Math.PI)), x, y);
-			canvas.drawBitmap(needle, x, y, null);
-			canvas.restore();
-			//TODO:
-			//If last value closer than this value, draw arrow pointing towards middle
+				//TODO:
+				//If last value closer than this value, draw arrow pointing towards middle
 			} 
 		}
 
@@ -176,7 +162,7 @@ public class ProvytaView extends View {
 
 		//update compass.
 		//Rotate arrow symbol to point to real "current" north
-		
+
 		//int x = (int) (cx+ r*(Math.cos(oldNorth)));
 		//int y = (int) (cy+ r*(Math.sin(oldNorth)));
 
@@ -195,7 +181,7 @@ public class ProvytaView extends View {
 		delar = dy;
 	}
 
-
+	final double innerRealRadiusInMeter = 10;
 	final double realRadiusinMeter = 100;
 	double scaleF=0;
 
@@ -293,17 +279,9 @@ public class ProvytaView extends View {
 
 
 	public void showUser(String deviceColor, int wx, int wy,int dist) {
-		
-		Log.d("INIT","DIST "+dist);
-		if(deviceColor.equals(CommonVars.red()))  
-				red.set(wx, wy,dist);
-			
-		else 	
-			if(deviceColor.equals(CommonVars.blue()))
-				blue.set(wx, wy,dist);
-			else
-				uncolored.set(wx,wy,dist);
-	
+
+		user.set(wx,wy,dist);
+
 	}
 
 
@@ -313,7 +291,7 @@ public class ProvytaView extends View {
 		msg = "Väntar på GPS";
 	}
 
-	
+
 
 
 

@@ -9,6 +9,8 @@ package com.teraim.nils;
 
 import java.io.File;
 
+import com.teraim.nils.exceptions.SharedPrefMissingException;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;

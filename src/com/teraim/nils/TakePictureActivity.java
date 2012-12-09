@@ -45,6 +45,7 @@ public class TakePictureActivity extends Activity {
 	TextView riktningstxt;
 	int compass;
 	
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -128,6 +129,8 @@ public class TakePictureActivity extends Activity {
 			Log.d("PIC",outputFileUri.toString());
 		}
 	}
+	
+	
 	/*
 			//Save file in temporary storage.
 			Bitmap bip = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory()+CommonVars.NILS_BASE_DIR+"/temp.png");		

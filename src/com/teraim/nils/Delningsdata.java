@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+import com.teraim.nils.exceptions.IllegalCallException;
+
 import android.content.Context;
 import android.util.Log;
 

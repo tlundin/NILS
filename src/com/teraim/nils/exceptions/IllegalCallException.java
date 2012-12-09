@@ -1,4 +1,4 @@
-package com.teraim.nils;
+package com.teraim.nils.exceptions;
 
 public class IllegalCallException extends Exception {
 

@@ -14,7 +14,17 @@ public class PictureZoom extends Activity {
 		ImageView tmp = new ImageView(this);
 		Bitmap pic = 
 				BitmapFactory.decodeFile(this.getIntent().getStringExtra("picpath"));
-
+		if (pic==null)
+			
+			try {
+			
+			int position = this.getIntent().getIntExtra("pos", -1);
+			if (position != -1)
+				pic = BitmapFactory.decodeResource(getResources(),
+						R.drawable.class.getField(CommonVars.compassToPicName(position)+"_demo").getInt(null));
+			} catch (Exception e) {
+				
+			}
 		tmp.setImageBitmap(pic);
 		setContentView(tmp);
 		}
