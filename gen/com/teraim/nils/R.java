@@ -48,8 +48,8 @@ public final class R {
         public static final int icon=0x7f020012;
         public static final int life=0x7f020013;
         public static final int list_selector=0x7f020014;
-        public static final int markslag_tab1=0x7f020015;
-        public static final int mothlogo=0x7f020016;
+        public static final int logo_moth=0x7f020015;
+        public static final int markslag_tab1=0x7f020016;
         public static final int noimg=0x7f020017;
         public static final int norr_demo=0x7f020018;
         public static final int ost_demo=0x7f020019;
