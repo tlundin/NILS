@@ -16,7 +16,7 @@ public class CommManager implements BTListener {
 	static CommManager me=null;
 	CommListener mCaller;
 	private BluetoothRemoteDevice rd;
-	private boolean deviceActive = false;
+	
 	
 	private CommManager(CommListener caller) {
 		me = this; 

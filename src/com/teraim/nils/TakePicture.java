@@ -41,7 +41,6 @@ import android.widget.Toast;
 public class TakePicture extends Activity implements GeoUpdaterCb {
 
 	private Button mittpunktB;
-	private TextView userPosTextV;
 	ProvYtaGeoUpdater pyg;
 	final int TAKE_PICTURE = 133;
 	final String oldPicFolder = CommonVars.cv().getCurrentPictureBasePath()+"/gamla/";
@@ -58,7 +57,7 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 		gridViewNew = (GridView) findViewById(R.id.gridview_new);
 		ProvytaView provytaV = (ProvytaView) findViewById(R.id.provytaF);
 		mittpunktB = (Button) findViewById(R.id.mittpunktB);
-		userPosTextV = (TextView)findViewById(R.id.userPosText);
+		
 
 		pyg = new ProvYtaGeoUpdater(this,provytaV,this);
 		gridViewNew.setAdapter(new NewImagesAdapter(this));
@@ -429,9 +428,9 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 
 
 
-	public void onLocationUpdate(double dist, double rikt2) {
+	public void onLocationUpdate(double dist, double rikt2,int wx, int wy) {
 		mittpunktB.setEnabled(dist<=ProvYtaGeoUpdater.InnerRadiusInMeters);
-		userPosTextV.setText("DISTANCE: "+dist+" VINKEL: "+rikt2);
+		
 	}
 
 	

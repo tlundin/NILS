@@ -57,7 +57,8 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 	final String picPath = Environment.getExternalStorageDirectory()+
 			CommonVars.NILS_BASE_DIR+"/delyta/"+
 			"1"+"/bilder/gamla/";
-	
+	private TextView userPosTextV;
+
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
@@ -66,7 +67,7 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 		GridView gridViewOld = (GridView) findViewById(R.id.picgridview);
 		TableLayout tagtabell = (TableLayout) findViewById(R.id.tagtabell);
 		TextView gamlaBilder = (TextView) findViewById(R.id.oldpichead);
-
+		userPosTextV = (TextView)findViewById(R.id.userPosText);
 		gridViewOld.setAdapter(new ImageAdapter(this));
 		gridViewOld.setOnItemClickListener(new OnItemClickListener()
 		{
@@ -298,9 +299,12 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 
 	}
 
-	public void onLocationUpdate(double dist, double rikt2) {
-		// TODO Auto-generated method stub
+	public void onLocationUpdate(double dist, double rikt2,int wx,int wy) {
 		
+		userPosTextV.setText("Avst: "+(int)dist+
+				" Vinkel: "+(int)(rikt2*57.2957795)+
+				" X:"+wx+
+				" Y:"+wy);
 	}
 	
 	

@@ -211,10 +211,11 @@ public class SelectYta extends Activity {
 	{
 		mnu3 = menu.add(0, 2, 2, "");
 		mnu3.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		mnu4 = menu.add(0, 3, 3, "");
+		mnu4 = menu.add(0, 3, 3,"");
 		mnu4.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		MenuItem mnu5 = menu.add(0, 4, 4, "Item 5");
 		mnu5.setIcon(android.R.drawable.ic_menu_preferences);
+		//R.drawable.ic_menu_preferences
 		mnu5.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		refreshStatusRow();
 	}

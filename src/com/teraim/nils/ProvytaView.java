@@ -69,8 +69,6 @@ public class ProvytaView extends View {
 		p100.setStrokeWidth(3);
 		p100.setStyle(Style.STROKE);
 		p100.setTypeface(Typeface.SANS_SERIF); 
-	
-
 
 		user = new User(BitmapFactory.decodeResource(context.getResources(),
 				R.drawable.gps_pil));
@@ -80,7 +78,7 @@ public class ProvytaView extends View {
 
 
 	private class User {
-		final static int Pic_H = 32;
+		final static float Pic_H = 32;
 		public int x,y;
 		private int dist;
 		protected Bitmap bmp;
@@ -88,7 +86,7 @@ public class ProvytaView extends View {
 
 		public User(Bitmap bmp) {
 			x=y=dist=0;
-			this.bmp = Bitmap.createScaledBitmap(bmp, 32, Pic_H, false);		
+			this.bmp = Bitmap.createScaledBitmap(bmp, 32, (int)Pic_H, false);		
 		}
 		public void set(int x,int y,int dist) {
 			prevx=this.x; prevy=this.y;
@@ -147,7 +145,7 @@ public class ProvytaView extends View {
 		} else {
 			canvas.drawCircle(cx, cy,(int)r, p);
 			rScaleF = r/innerRealRadiusInMeter;
-			canvas.drawText("10",(int)(r-15), cy, p);
+			canvas.drawText("10",(int)(cx+r)-15, cy, p);
 			if (delar !=null)
 				drawTag(canvas,cx,cy);
 		}		
@@ -163,15 +161,21 @@ public class ProvytaView extends View {
 			Log.d("NILS","Blue has position");
 			if(user.getDistance()<realRadiusinMeter) {
 				alfa = user.getMovementDirection();
-				int ux = (int) (cx-user.x*rScaleF)-User.Pic_H;;
+				float degAlfa = (float)(180*alfa/Math.PI);
+				int ux = (int) (cx-user.x*rScaleF);
+				//icon is a rotating arrow. Get it to point exavtly on x,y.
+				int iconx = (int)(User.Pic_H/2+User.Pic_H *  Math.sin(alfa));
+				ux = ux - iconx;
 				//inverted north/south
-				//Subtract picture height. "Needle is in leftdown corner.
-				int uy = (int) (cy+user.y*rScaleF)-User.Pic_H;
-				Log.d("NILS","drawing geo at "+ux+" "+uy+" with direction angle set to "+alfa);
+				int uy = (int) (cy+user.y*rScaleF);
+				int icony = (int)(User.Pic_H/2+User.Pic_H *  Math.cos(alfa));
+				uy = uy + icony;
+				Log.d("NILS","iconx icony "+iconx+" "+icony);
 				canvas.save();
-				canvas.rotate((float)(180+(180*alfa/Math.PI)), ux, uy);
+				canvas.rotate(180+degAlfa, ux, uy);
 				canvas.drawBitmap(user.bmp, ux, uy, null);
 				canvas.restore();
+				msg = "X: "+ux+" Y: "+uy+" icX: "+(-iconx)+" icY: "+icony;
 			} else {
 				//Log.d("NILS","Blue is outside radius");
 				//Given that blue is outside current Max Radius, draw an arrow to indicate where..
