@@ -125,6 +125,8 @@ public class ProvytaView extends View {
 		//tag.lineTo(w-50,0);
 		Log.d("NILS","w h r"+w+" "+h+" "+r);
 		oScaleF = r/realRadiusinMeter;
+		//A dot in the middle!
+		canvas.drawPoint(cx, cy, p);
 
 		if (user.getDistance()>midRealRadiusInMeter) {
 			canvas.drawCircle(cx, cy,(int)r, p100);

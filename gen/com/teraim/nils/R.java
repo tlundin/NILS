@@ -49,15 +49,16 @@ public final class R {
         public static final int life=0x7f020013;
         public static final int list_selector=0x7f020014;
         public static final int markslag_tab1=0x7f020015;
-        public static final int noimg=0x7f020016;
-        public static final int norr_demo=0x7f020017;
-        public static final int ost_demo=0x7f020018;
-        public static final int roundshape=0x7f020019;
-        public static final int stub=0x7f02001a;
-        public static final int syd_demo=0x7f02001b;
-        public static final int tall=0x7f02001c;
-        public static final int threelines=0x7f02001d;
-        public static final int vast_demo=0x7f02001e;
+        public static final int mothlogo=0x7f020016;
+        public static final int noimg=0x7f020017;
+        public static final int norr_demo=0x7f020018;
+        public static final int ost_demo=0x7f020019;
+        public static final int roundshape=0x7f02001a;
+        public static final int stub=0x7f02001b;
+        public static final int syd_demo=0x7f02001c;
+        public static final int tall=0x7f02001d;
+        public static final int threelines=0x7f02001e;
+        public static final int vast_demo=0x7f02001f;
     }
     public static final class id {
         public static final int Distance_h=0x7f0c003e;

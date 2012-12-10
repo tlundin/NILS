@@ -299,10 +299,10 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 
 	}
 
-	public void onLocationUpdate(double dist, double rikt2,int wx,int wy) {
+	public void onLocationUpdate(double dist, double vinkel,int wx,int wy) {
 		
 		userPosTextV.setText("Avst: "+(int)dist+
-				" Vinkel: "+(int)(rikt2*57.2957795)+
+				" Vinkel: "+(int)(vinkel*57.2957795)+
 				" X:"+wx+
 				" Y:"+wy);
 	}

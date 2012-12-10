@@ -109,7 +109,7 @@ public class ProvYtaGeoUpdater implements LocationListener
 			//show user distance from middle point of circle
 			Log.d("NILS","user x y "+wx+" "+wy);
 			myView.showUser(CommonVars.cv().getDeviceColor(), wx,wy,(int)dist);
-			geoCb.onLocationUpdate(dist,Geomatte.getRikt2(wy, wx,0,0),wx,wy);
+			geoCb.onLocationUpdate(dist,Geomatte.getRikt2(0,0,wy,wx),wx,wy);
 			
 		
 		myView.showDistance((int)dist);
