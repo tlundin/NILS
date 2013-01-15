@@ -18,7 +18,7 @@ import android.widget.ListView;
 
 public class SelectColor extends ListActivity {
 
-	Rutdata rd=null;	
+	DataTypes rd=null;	
 	  public void onCreate(Bundle savedInstanceState) {
 		    super.onCreate(savedInstanceState);
 		    //Get the Singleton instance of RutData.

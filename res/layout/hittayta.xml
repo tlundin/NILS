@@ -38,18 +38,69 @@
         android:layout_gravity="bottom"
         android:layout_marginBottom="10dp"
         android:layout_marginLeft="10dp"
-        android:layout_weight="1"
         android:orientation="vertical" >
-
-        <TableLayout
+ 	<View   
+     android:layout_width="fill_parent"
+	android:layout_height="2dip"
+	android:background="#00000000" />
+ 	
+    <TextView android:id="@+id/header_line2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+         android:text="Tågtabell"
+          android:textAppearance="?android:attr/textAppearanceMedium"
+        />
+    <!-- Third header line and column headings -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#006"
+     >
+        <TextView android:id="@+id/column_header1"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Delyta"
+            android:textColor="#FFFFFF"
+            android:width="150dp"
+            
+            />
+        <TextView android:id="@+id/column_header2"
+             android:layout_height="wrap_content"
+             android:layout_width="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Markslag"
+            android:textColor="#FFFFFF"
+            android:width="150dp"
+            
+            />
+        
+         <TextView android:id="@+id/column_header3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Tåg (Avstånd, Riktning)"
+            android:textColor="#FFFFFF"
+            
+            />
+    </LinearLayout>
+        <ListView
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/tagtabell"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:shrinkColumns="*"
             android:stretchColumns="*" >
-        </TableLayout>
-
+        </ListView>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginRight="10dp"
+       android:orientation="horizontal" >
+         
         <Button
             android:id="@+id/tagknapp"
             android:layout_width="wrap_content"
@@ -57,9 +108,23 @@
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
             android:onClick="addRow"
-            android:text="Lägg till en ny delyta"
+            android:width="150dp"
+            android:text="+"
             android:textStyle="bold" />
-
+        
+         <Button
+            android:id="@+id/startCollectB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:onClick="startCollect"
+            android:width="150dp"
+            android:text="Klar"
+            android:textStyle="bold" />
+        
+ </LinearLayout>
         <TextView
             android:id="@+id/oldpichead"
             android:layout_width="wrap_content"

@@ -1,6 +1,9 @@
 package com.teraim.nils;
 
+import com.teraim.nils.exceptions.BluetoothNotSupportedException;
+
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -25,7 +28,7 @@ public class Main extends Activity {
 		Geomatte.getRikt2(0, 0, -Math.sqrt(3), 1);
 		Geomatte.getRikt2(0, 0, -Math.sqrt(3), -1);
 		Geomatte.getRikt2(0, 0, Math.sqrt(3), -1);
-		
+
 		//Layer between application and persistent storage.
 		//The persistent storage used is Shared Preferences
 		//http://developer.android.com/guide/topics/data/data-storage.html#pref
@@ -35,37 +38,45 @@ public class Main extends Activity {
 		CommonVars.init(this);
 		//Get the instance.
 		CommonVars cv = CommonVars.cv();
+
 		//Check the color. If no color, require it.
-		String deviceColor = cv.getDeviceColor();
-		Toast.makeText(this.getApplicationContext(), "Den här dosan är "+deviceColor, Toast.LENGTH_SHORT).show();
+		Toast.makeText(this.getApplicationContext(), "Den här dosan är "+cv.getDeviceColor(), Toast.LENGTH_SHORT).show();
 
 
 		setContentView(R.layout.loadscreen);
+		if (mBluetoothAdapter !=null && !mBluetoothAdapter.isEnabled()) 
+			startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+		else {
 
-		Handler mHandler = new Handler();
-		final String devCol = deviceColor;
-		mHandler.postDelayed(new Runnable() {
-			public void run() {
-				checkConditions();
-			}
-		}, INITIAL_DELAY);
+			Handler mHandler = new Handler();
+			mHandler.postDelayed(new Runnable() {
+				public void run() {
+					checkConditions();
+				}
+			}, INITIAL_DELAY);
 
-
+		}
+		
 	}
+	final BluetoothAdapter mBluetoothAdapter=BluetoothAdapter.getDefaultAdapter();
+	final Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 
 	// askForColor,askForRuta;
-	final static int ASK_RUTA_RC = 1; 
-	final static int ASK_COLOR_RC = 2; 
+	final static int ASK_RUTA_RC = 1;
+	final static int ASK_COLOR_RC = 2;
+	final static int REQUEST_ENABLE_BT = 3;
 	//final static int ASK_YTA_RC = 3; 
 	int noppe=0;
+	boolean serverStarted = false;
+
 	private void checkConditions2() {
 		final Intent testGPS = new Intent(getBaseContext(),TestGpsActivity.class);
 		startActivity(testGPS);
-	
+
 	}
+	
 	private void checkConditions() {
 		final Intent testGPS = new Intent(getBaseContext(),TestGpsActivity.class);
-		
 		final Intent selectRutaIntent = new Intent(getBaseContext(),SelectRuta.class);
 		final Intent selectColorIntent = new Intent(getBaseContext(),SelectColor.class);
 		final Intent selectYtaIntent = new Intent(getBaseContext(),SelectYta.class);
@@ -73,21 +84,36 @@ public class Main extends Activity {
 		//If Color not set, check.
 		String deviceColor = CommonVars.cv().getDeviceColor();		
 		boolean askForColor = (deviceColor.equals(CommonVars.UNDEFINED));
+		//Start the server listening thread..
+		if (mBluetoothAdapter !=null) {
+		Log.d("NILS","Bluetooth is"+mBluetoothAdapter.isEnabled()+" and serverStarted is "+serverStarted);
+		if (mBluetoothAdapter.isEnabled()&&!serverStarted) {
+			try {
+				BluetoothRemoteDevice.init();
+			} catch (BluetoothNotSupportedException e) {
+				
+				e.printStackTrace();
+			}
+			Log.d("NILS","xserverStarted is "+serverStarted);
+			serverStarted = true;
+		}
+		}
+			
 		if (askForColor) {
 			startActivityForResult(selectColorIntent,ASK_COLOR_RC);	
 		}
 		else {
 			//if Ruta is not known, check.
-			String currentRuta = CommonVars.cv().getRutaId();
+			String currentRuta = CommonVars.cv().getG("ruta_id");
 			boolean askForRuta = (currentRuta.equals(CommonVars.UNDEFINED));
-			
-			//TODO: REMOVE!
-			if (askForRuta ||noppe++==0) {
+
+			//TODO: REMOVE! NOPPE++ is there to ensure that it will always ask for RUTA.
+			if (noppe++==0||askForRuta) {
 				startActivityForResult(selectRutaIntent,ASK_RUTA_RC);
 			}
 			else {
 				startActivity(selectYtaIntent);       			
-					
+
 
 			}
 		}
@@ -101,46 +127,60 @@ public class Main extends Activity {
 
 
 
-@Override
-protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-	super.onActivityResult(requestCode, resultCode, data);
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
 
-	if (requestCode == ASK_COLOR_RC) //check if the request code is the one you've sent
-	{
-		if (resultCode == Activity.RESULT_OK) 
+		if (requestCode == REQUEST_ENABLE_BT) 
 		{
-			Log.d("NILS","Color is now set");
+			if (resultCode == Activity.RESULT_OK) 
+			{
+				Log.d("NILS","Bluetooth is now set");
+				
+			} else {
+				Log.e("NILS","Bluetooth was NOT turned on");
+				
+			}
 			checkConditions();
-		} else 
-			Log.e("NILS","Color dialog was not executed properly.");
-	}
-	else if (requestCode == ASK_RUTA_RC) //check if the request code is the one you've sent
-	{
-		if (resultCode == Activity.RESULT_OK) 
-		{
-			Log.d("NILS","Ruta is now set");
-			checkConditions();
+		}
 			
-		}else 
-			Log.e("NILS","Ruta dialog was not executed properly.");
-	}
-	finish();
-	/*else if (requestCode == ASK_YTA_RC)
+		else if (requestCode == ASK_COLOR_RC) //check if the request code is the one you've sent
+		{
+			if (resultCode == Activity.RESULT_OK) 
+			{
+				Log.d("NILS","Color is now set");
+				checkConditions();
+				
+			} else 
+				Log.e("NILS","Color dialog was not executed properly.");
+		}
+		else if (requestCode == ASK_RUTA_RC) //check if the request code is the one you've sent
+		{
+			if (resultCode == Activity.RESULT_OK) 
+			{
+				Log.d("NILS","Ruta is now set");
+				checkConditions();
+				finish();
+			}else 
+				Log.e("NILS","Ruta dialog was not executed properly.");
+		}
+		
+		/*else if (requestCode == ASK_YTA_RC)
 	{
 		if (resultCode == Activity.RESULT_OK) 
 			Log.d("NILS","Yta is now set");
 		finish();
-		
+
 	}
-	*/
+		 */
 
 
 
-}
+	}
 
 
-//Load JSON configuration 
-/*
+	//Load JSON configuration 
+	/*
 		String jsonStr = null;
 		InputStreamReader is = new InputStreamReader(getResources().openRawResource(R.raw.nils_json));
 		try {
@@ -170,19 +210,19 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 			e.printStackTrace();
 		}		
 
- */
-//treeList = (ListView) findViewById(R.id.treelist);
-///db.copyDBIfNeeded();
-//db.open();
-//Log.d("NILS","gets!");
-//SimpleCursorAdapter mAdapter = db.getAdapter();
-//Log.d("NILS","nogets!");
-//setListAdapter(mAdapter);
-//treeList.setAdapter(mAdapter);
-//treeList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+	 */
+	//treeList = (ListView) findViewById(R.id.treelist);
+	///db.copyDBIfNeeded();
+	//db.open();
+	//Log.d("NILS","gets!");
+	//SimpleCursorAdapter mAdapter = db.getAdapter();
+	//Log.d("NILS","nogets!");
+	//setListAdapter(mAdapter);
+	//treeList.setAdapter(mAdapter);
+	//treeList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
-// capture touches on the listview
-/*
+	// capture touches on the listview
+	/*
 		treeList.setOnItemClickListener(new OnItemClickListener() {
         	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         		// store the selected contact for later
@@ -190,33 +230,33 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 //        		contactToDelete = textView.getText().toString();
         	}
         });
- */
+	 */
 
-//db.close();
-
-
-//Show start screen
-//
-//XmlPullParser parser = Xml.newPullParser();
+	//db.close();
 
 
+	//Show start screen
+	//
+	//XmlPullParser parser = Xml.newPullParser();
 
 
 
 
 
 
-/*@Override
+
+
+	/*@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.activity_nils, menu);
 		return true;
 	}
- */
-public void onStart()
-{
-	super.onStart();
-	Log.d(tag, "In the onStart() event");
-	/*
+	 */
+	public void onStart()
+	{
+		super.onStart();
+		Log.d(tag, "In the onStart() event");
+		/*
 		//---get all params---
 		db.open();
 		Log.d("NILS","db opened!");
@@ -231,46 +271,46 @@ public void onStart()
 		db.close();
 
 		}
-	 */
-}
+		 */
+	}
 
 
 
-public void onRestart() {
-	super.onRestart();
-	Log.d(tag, "In the onRestart() event");
-}
+	public void onRestart() {
+		super.onRestart();
+		Log.d(tag, "In the onRestart() event");
+	}
 
-public void onResume()
-{
-	super.onResume();
-	Log.d(tag, "In the onResume() event");
-}
-public void onPause()
-{
-	super.onPause();
-	Log.d(tag, "In the onPause() event");
-}
-public void onStop()
-{
-	super.onStop();
-	Log.d(tag, "In the onStop() event");
-}
-public void onDestroy()
-{
-	super.onDestroy();
-	Log.d(tag, "In the onDestroy() event");
-}
+	public void onResume()
+	{
+		super.onResume();
+		Log.d(tag, "In the onResume() event");
+	}
+	public void onPause()
+	{
+		super.onPause();
+		Log.d(tag, "In the onPause() event");
+	}
+	public void onStop()
+	{
+		super.onStop();
+		Log.d(tag, "In the onStop() event");
+	}
+	public void onDestroy()
+	{
+		super.onDestroy();
+		Log.d(tag, "In the onDestroy() event");
+	}
 
-public void displayParams(Cursor c)
-{
-	Toast.makeText(this,
-			"id: " + c.getString(1) + "\n" +
-					"Name: " + c.getString(0) + "\n" +
-					"Value: " + c.getString(2),
-					Toast.LENGTH_LONG).show();
-}
-/*
+	public void displayParams(Cursor c)
+	{
+		Toast.makeText(this,
+				"id: " + c.getString(1) + "\n" +
+						"Name: " + c.getString(0) + "\n" +
+						"Value: " + c.getString(2),
+						Toast.LENGTH_LONG).show();
+	}
+	/*
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 	super.onCreateOptionsMenu(menu);
@@ -335,6 +375,6 @@ public void displayParams(Cursor c)
 	}
 	return false;
 	}
- */
+	 */
 
 }

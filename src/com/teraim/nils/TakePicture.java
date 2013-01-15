@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -31,6 +32,8 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.teraim.nils.exceptions.BluetoothNotSupportedException;
 
 /** 
  * 	
@@ -183,6 +186,7 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 
 	final static int PIC_SIZE_X = 195;
 	final static int PIC_SIZE_Y = 195;
+	private static final int REQUEST_ENABLE_BT = 0;
 
 
 	private abstract class ImageAdapter extends BaseAdapter {
@@ -321,24 +325,16 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 
 	//callback for Button setRiktpunkter
 //	int tst = 0;
+	RemoteDevice myRemoteDevice;
 	
 	public void startCollect(View v) {
-		final Context ctx = this;
-		CommListener myListener = new CommListener() {
-
-			public void onValueRecievedCb(String value) {
-				Toast.makeText(ctx, "Got message: "+value, Toast.LENGTH_LONG).show();
-			}
-
-			public void onError(int errCode) {
-				Toast.makeText(ctx, "Got error: "+errCode, Toast.LENGTH_LONG).show();
-				
-			}
+		//Check that all "markslag" has been set by the other device.
+		//This is a sync point. 
+		if (CommonVars.cv().getP("red_has_input_all_markslag").equals(CommonVars.TRUE))
+			Toast.makeText(this, "ok...markslag is set", Toast.LENGTH_LONG);
+		
 			
-		};
-		CommManager cm = CommManager.getCommManager(myListener);
-		if (cm!=null)
-			cm.getParameter("markslag");
+		
 	}
 	public void setRiktpunkter(View v) {
 		Intent intent = new Intent(this,RiktpunktActivity.class);
@@ -432,6 +428,12 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 		mittpunktB.setEnabled(dist<=ProvYtaGeoUpdater.InnerRadiusInMeters);
 		
 	}
+
+
+
+
+
+
 
 	
 

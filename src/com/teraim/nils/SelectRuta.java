@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.teraim.nils.DataTypes.Ruta;
+
 /**
  * @author Terje
  * If Ruta not set, ask user which ruta to use.
@@ -19,13 +21,13 @@ import android.widget.ListView;
 
  */
 public class SelectRuta extends ListActivity {
-	Rutdata rd=null;
+	DataTypes rd=null;
 	String[] values;
 	
 	  public void onCreate(Bundle savedInstanceState) {
 		    super.onCreate(savedInstanceState);
 		    //Get the Singleton instance of RutData.
-		    rd = Rutdata.getSingleton(this);	  
+		    rd = DataTypes.getSingleton(this);	  
 		    //Get the IDs
 		    values = rd.getRutIds();
 		    for(String s:values) 
@@ -44,10 +46,17 @@ public class SelectRuta extends ListActivity {
 	  protected void onListItemClick (ListView l, View v, int position, long id) {
 		  Log.d("NILS", "I was clicked "+position+" should be "+values[position]);
 		  	//Persist the Current Ruta ID in storage.
-			CommonVars.cv().setRutaId(values[position]);
-			Intent intent = getIntent();
-			setResult(Activity.RESULT_OK, intent);  //now you can use Activity.RESULT_OK, its irrelevant whats the resultCode    
-		    finish(); //finish the startNewOne activity
+		  	Ruta r = rd.findRuta(values[position]);
+		  	if (r!=null) {
+		  		CommonVars.cv().setRuta(r);
+		  		//Persist this choice so that next time Ruta will not be queried from user.
+		  		CommonVars.cv().putG("ruta_id",values[position]);
+		  	}
+		  	 else
+		  		Log.e("NILS", "Ruta not found in SelectRuta ID: "+values[position]);
+		  	Intent intent = getIntent();
+	  		setResult(Activity.RESULT_OK, intent);
+		    finish(); 
 			
 	  }
 	  

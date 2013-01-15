@@ -107,7 +107,7 @@ public class FindAreaActivity extends Activity implements LocationListener, Sens
 		sensorMagneticField = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
 		mittPunktView = (TextView)findViewById(R.id.txt_mittpunkt);
-		String mp = CommonVars.cv().get(MITTPUNKT_KEY);
+		String mp = CommonVars.cv().getR(MITTPUNKT_KEY);
 		if (mp!=null)
 			mittPunktView.setText(mp);
 		
@@ -120,7 +120,7 @@ public class FindAreaActivity extends Activity implements LocationListener, Sens
 					currentLocation.getLatitude()+" (Longitud) "+currentLocation.getLongitude();
 			mittPunktView.setText(txt);
 			//Persist the value
-			CommonVars.cv().put(MITTPUNKT_KEY,txt);
+			CommonVars.cv().putR(MITTPUNKT_KEY,txt);
 		}
 		
 		Toast.makeText(getBaseContext(),txt,Toast.LENGTH_SHORT).show();

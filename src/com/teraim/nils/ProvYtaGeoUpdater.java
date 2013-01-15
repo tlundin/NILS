@@ -5,8 +5,6 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -14,9 +12,9 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.teraim.nils.Delningsdata.Delyta;
-import com.teraim.nils.Rutdata.Ruta;
-import com.teraim.nils.Rutdata.Yta;
+import com.teraim.nils.DataTypes.Delyta;
+import com.teraim.nils.DataTypes.Provyta;
+import com.teraim.nils.DataTypes.Ruta;
 
 public class ProvYtaGeoUpdater implements LocationListener
  {
@@ -51,9 +49,7 @@ public class ProvYtaGeoUpdater implements LocationListener
 		}
 		geoCb = cb;
 		//Initialize provyta with center coordinates.
-		Rutdata rd = Rutdata.getSingleton(c);
-		Ruta r = rd.findRuta(CommonVars.cv().getRutaId());
-		Yta y = r.findYta(CommonVars.cv().getProvytaId());
+		Provyta y = CommonVars.cv().getProvyta();
 		double[] cc = y.getLatLong();
 		center = new Location("");
 		//This is in sweref.

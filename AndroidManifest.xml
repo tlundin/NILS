@@ -73,7 +73,10 @@
         <activity
             android:name="com.teraim.nils.MarkslagTab_Anlagd_Activity"/>
         <activity
-            android:name="com.teraim.nils.MarkslagTab_SA_Activity"/>		
+            android:name="com.teraim.nils.MarkslagTab_SA_Activity"/>	
+        <activity
+            android:name="com.teraim.nils.BluetoothRemoteDevice"/>
+        	
         <activity
             android:name=".ConfigMenu"
             android:exported="false"
@@ -106,7 +109,7 @@
             android:name=".EditDelYta"
             android:exported="false"
             android:theme="@android:style/Theme.Dialog"
-            android:label="Delyta" >
+            android:label="Delyte-definition" >
             <intent-filter>
                 <action android:name="com.teraim.nils.EditDelYta" />
                 <category android:name="android.intent.category.DEFAULT" />

@@ -191,6 +191,8 @@ public class TakePictureActivity extends Activity {
 		startActivity(myIntent);
 		
 	}
+	
+	
 
 	protected void onResume() {
 

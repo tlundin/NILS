@@ -19,26 +19,25 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.teraim.nils.Rutdata.Ruta;
-import com.teraim.nils.Rutdata.Yta;
+import com.teraim.nils.DataTypes.Provyta;
+import com.teraim.nils.DataTypes.Ruta;
 
 /**
  * @author Terje
  * Activity for selecting an sub-area (del-yta).
  */
 public class SelectYta extends Activity {
-	
-	
-	Rutdata rd=null;
+
+
+	DataTypes rd=null;
 
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.selectyta);
-		rd = Rutdata.getSingleton(this);
+		rd = DataTypes.getSingleton(this);
 
 		FrameLayout main = (FrameLayout) findViewById(R.id.ytselect);
 
@@ -48,7 +47,7 @@ public class SelectYta extends Activity {
 		display.getSize(size);
 		double widthOfOneGraphicalRepresentationOfAProvyta=50;
 		double heightOfOneGraphicalRepresentationOfAProvyta=50;
-		
+
 		double Menus = 125; //pixels.
 		double margin = 50; //about twice the size of one graphical elem.
 		double width = size.x-(margin+widthOfOneGraphicalRepresentationOfAProvyta);
@@ -57,7 +56,7 @@ public class SelectYta extends Activity {
 		//still need to subtract about 200 pixels from y because of system menus.
 		//height = height - 200;
 		//subtract at least width of circle button from X.
-		
+
 		//width = width -100;
 		Log.d("NILS","Device screen in pixel: "+width+", "+height);
 		//Size of the RUTA is 5 kilometer.
@@ -66,80 +65,78 @@ public class SelectYta extends Activity {
 		//First get the Ruta data.
 		//Bundle bu = getIntent().getExtras();
 		//String rutaId = bu.getString("ruta");
-		String rutaId = CommonVars.cv().getRutaId();
-		if (rutaId !=null) {
-			Ruta ruta = rd.findRuta(rutaId);
-			Ruta.Sorted s = ruta.sort();
-			
-			//long=y 
-			double disty = (s.getMax_N_sweref_99()-s.getMin_N_sweref_99());
-			//lat=x
-			double distx = (s.getMax_E_sweref_99()-s.getMin_E_sweref_99());
+		Ruta ruta = CommonVars.cv().getRuta();
+		Ruta.Sorted s = ruta.sort();
 
-			//Set a 10% margin from the longest distance.
-			double Margin_Percentage = 0;
-			boolean landscape = false;
-			double lengthRel;
-			
-			if (distx>disty) {
-				landscape = true;
-				lengthRel = disty/distx;
-			}
-			else {
-				lengthRel = distx/disty;
-			}
-			distx+= distx*Margin_Percentage;
-			disty+= disty*Margin_Percentage;
-			
-			//which of x,y has least space on the screen?
-			Log.d("NILS","Lat (x) in meters: "+distx+" Long (Y) in meters:"+disty);
-			
-			//scale it to screen size
-			
-			double screenZoom = Math.min(height/disty,width/distx);
+		//long=y 
+		double disty = (s.getMax_N_sweref_99()-s.getMin_N_sweref_99());
+		//lat=x
+		double distx = (s.getMax_E_sweref_99()-s.getMin_E_sweref_99());
 
-			Log.d("NILS","skalfaktor "+screenZoom);
+		//Set a 10% margin from the longest distance.
+		double Margin_Percentage = 0;
+		boolean landscape = false;
+		double lengthRel;
 
-			ArrayList<Yta> ytor = ruta.getYtor();
-			for(final Yta yta:ytor) {
+		if (distx>disty) {
+			landscape = true;
+			lengthRel = disty/distx;
+		}
+		else {
+			lengthRel = distx/disty;
+		}
+		distx+= distx*Margin_Percentage;
+		disty+= disty*Margin_Percentage;
 
-				//subtract min value from the coordinate to get normalized values
-				double normx = (yta.E-s.getMin_E_sweref_99());
-				double normy = (yta.N-s.getMin_N_sweref_99());
-				
-				//multiply with scale factor to get pixel size
-				float cordx = (float)(normx*screenZoom);
-				float cordy = (float)(normy*screenZoom);
-				//Reverse position.
-				cordy = (float)height - cordy;
-				
-				//add back half the margin that was subtracted to center...
-				cordx+=margin/2+(width-distx*screenZoom)/2;
-				cordy+=margin/2;//+(landscape?(height-disty*screenZoom)/2:0);
-				cordy-=(height-disty*screenZoom)/2;
-				Log.d("NILS","X Y SKÄRM "+cordx+" "+cordy);
-				
-				Button b = new Button(this);
-				b.setText(yta.id);
-				
-				b.setX(cordx);
-				b.setY(cordy);
-				
-					
-				b.setBackgroundDrawable(getResources().getDrawable(R.drawable.roundshape));
-				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams((int)widthOfOneGraphicalRepresentationOfAProvyta
-				,(int) heightOfOneGraphicalRepresentationOfAProvyta);
-				
-				b.setLayoutParams(layoutParams);
-				b.setOnClickListener(new View.OnClickListener() {
-					public void onClick(View v) {
-						provytaDialog(((Button)v).getText());
-					}
-				});
-				main.addView(b);  
-			}
+		//which of x,y has least space on the screen?
+		Log.d("NILS","Lat (x) in meters: "+distx+" Long (Y) in meters:"+disty);
+
+		//scale it to screen size
+
+		double screenZoom = Math.min(height/disty,width/distx);
+
+		Log.d("NILS","skalfaktor "+screenZoom);
+
+		ArrayList<Provyta> ytor = ruta.getAllProvYtor();
+		for(final Provyta yta:ytor) {
+
+			//subtract min value from the coordinate to get normalized values
+			double normx = (yta.E-s.getMin_E_sweref_99());
+			double normy = (yta.N-s.getMin_N_sweref_99());
+
+			//multiply with scale factor to get pixel size
+			float cordx = (float)(normx*screenZoom);
+			float cordy = (float)(normy*screenZoom);
+			//Reverse position.
+			cordy = (float)height - cordy;
+
+			//add back half the margin that was subtracted to center...
+			cordx+=margin/2+(width-distx*screenZoom)/2;
+			cordy+=margin/2;//+(landscape?(height-disty*screenZoom)/2:0);
+			cordy-=(height-disty*screenZoom)/2;
+			Log.d("NILS","X Y SKÄRM "+cordx+" "+cordy);
+
+			Button b = new Button(this);
+			b.setText(yta.getId());
+
+			b.setX(cordx);
+			b.setY(cordy);
+
+
+			b.setBackgroundDrawable(getResources().getDrawable(R.drawable.roundshape));
+			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams((int)widthOfOneGraphicalRepresentationOfAProvyta
+					,(int) heightOfOneGraphicalRepresentationOfAProvyta);
+
+			b.setLayoutParams(layoutParams);
+			b.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					provytaDialog(((Button)v).getText());
+				}
+			});
+			main.addView(b);  
 		}
 	}
+
 
 
 
@@ -148,12 +145,12 @@ public class SelectYta extends Activity {
 		super.onResume();
 		refreshStatusRow();
 	}
-	
 
+	CommonVars cv = CommonVars.cv();
 	protected void provytaDialog(CharSequence ytID) {
 		Log.d("NILS","clicked button with id "+ytID);
 		if (ytID!=null)
-			CommonVars.cv().setProvytaId(ytID.toString());
+			cv.setProvyta(cv.getRuta().findProvYta(ytID.toString()));
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
 		alert.setTitle("Provyta "+ytID);
@@ -209,6 +206,7 @@ public class SelectYta extends Activity {
 	MenuItem mnu3=null,mnu4=null;
 	private void CreateMenu(Menu menu)
 	{
+
 		mnu3 = menu.add(0, 2, 2, "");
 		mnu3.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		mnu4 = menu.add(0, 3, 3,"");
@@ -217,10 +215,16 @@ public class SelectYta extends Activity {
 		mnu5.setIcon(android.R.drawable.ic_menu_preferences);
 		//R.drawable.ic_menu_preferences
 		mnu5.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		MenuItem mnu2 = menu.add(0, 1, 1, "Item 2");
+		mnu2.setIcon(android.R.drawable.ic_menu_mylocation);
+		//R.drawable.ic_menu_preferences
+		mnu2.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 		refreshStatusRow();
 	}
-	
+
 	private void refreshStatusRow() {
+
 		if (mnu3!=null)
 			mnu3.setTitle("Användare: "+CommonVars.cv().getUserName());
 		if (mnu4!=null)

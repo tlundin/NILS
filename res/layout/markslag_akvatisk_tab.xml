@@ -31,6 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/radio_utom_mosaik" 
+            android:onClick="onRadioButtonClicked"
              />
         <TextView 
     	 	android:text="@string/utom_mosaik_detail"
@@ -43,7 +44,8 @@
             android:id="@+id/radio_mosaik"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/radio_mosaik" />
+            android:text="@string/radio_mosaik"
+            android:onClick="onRadioButtonClicked" />
          <TextView 
     	 	android:text="@string/mosaik_detail"
            android:padding="15dp"

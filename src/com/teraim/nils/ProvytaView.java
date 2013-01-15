@@ -18,7 +18,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
-import com.teraim.nils.Delningsdata.Delyta;
+import com.teraim.nils.DataTypes.Delyta;
 
 /**
  * @author Terje
@@ -236,8 +236,9 @@ public class ProvytaView extends View {
 				//draw each 
 				if (del !=null) {
 					tst = del.getPoints();
-
-					if (tst!=null) {
+					Log.d("NILS", "Tågets size is "+tst.length);
+					
+					if (tst.length>1 && tst!=null) {
 						for (int i=0;i<tst.length;i++) {
 							//avstånd från cirkelns mitt;
 							int avst = tst[i][0];
@@ -257,19 +258,22 @@ public class ProvytaView extends View {
 							xy[i][0]=x;
 							xy[i][1]=y;
 							c.drawText(Integer.toString(i), x, y, p);
-							//om inte första punkten
 							boolean isArc = (i>1)&&(tst[i][0]==tst[i-1][0]&&tst[i][0]==realRadiusinMeter);
+							Log.d("NILS","I: "+i);
 							if( 
+									//om andra punkten
 									i==1
 									||
-									i==(tst.length-1)
+									//...eller sista
+									((tst.length>1)&&(i==(tst.length-1)))
 									||
+									//..eller nästa är brytpunkt
 									tst[i+1][0]==-999
 									||
-									//...och Om två delningspunkter mellan första och sista brytpunkt.. 
-									//..INTE ligger på periferin..
-									//...så ska vi dra en linje.
-									((i>1)&&(isArc==false))) {
+									//...och det är inte en arc mellan...
+									((i>1)&&(isArc==false))
+									) {
+								//då ritar vi.
 								c.drawLine(xy[i-1][0], xy[i-1][1],x,y, p);
 							}
 
