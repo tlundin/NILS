@@ -6,11 +6,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import com.teraim.nils.exceptions.IllegalCallException;
+import java.util.List;
 
 import android.content.Context;
 import android.util.Log;
+
+import com.teraim.nils.DataTypes.Block;
+import com.teraim.nils.exceptions.IllegalCallException;
 
 
 /**
@@ -32,8 +34,92 @@ public class DataTypes  {
 		return singleton;
 	}
 
-	
+
 	private ArrayList<Ruta> rutor = new ArrayList<Ruta>();
+	
+	
+	//Workflow
+	public static class Workflow {
+		private List<Block> blocks;
+		public String id,name;
+
+		public List<Block> getBlocks() {
+			return blocks;
+		}
+		public void addBlocks(List<Block> _blocks) {
+			blocks = _blocks;
+		}
+		
+	}
+	
+	/**
+	 * Abstract base class Block
+	 * @author Terje
+	 *
+	 */
+	public abstract static class Block {
+
+	}
+	
+	/**
+	 * Startblock.
+	 * @author Terje
+	 *
+	 */
+	public static class StartBlock extends Block {
+	
+	}
+	
+	/**
+	 * buttonblock
+	 * @author Terje
+	 *
+	 */
+	public static class ButtonBlock extends Block {
+		String text="banarne";
+
+		public ButtonBlock(String text) {
+			Log.d("NILS","ButtonText is set to "+text);
+			this.text = text;
+		}
+
+		public String getText() {
+			return text;
+		}
+		
+	}
+	/**
+	 * Layoutblock
+	 * @author Terje
+	 *
+	 */
+	public static class LayoutBlock extends Block {
+
+		private String layoutDirection="", alignment="";
+
+		public String getLayoutDirection() {
+			return layoutDirection;
+		}
+		public String getAlignment() {
+			return alignment;
+		}
+		public LayoutBlock(String layoutDirection, String alignment) {
+			super();
+			this.layoutDirection = layoutDirection;
+			this.alignment = alignment;
+		}
+	}
+	
+	///ValuePair
+	
+	public class ValuePair {
+		public String mkey,mval;
+		public ValuePair(String key, String val) {
+			mkey=key;
+			mval=val;
+		}
+	}
+	
 
 	//Train class stores the "TÅG" in swedish, i.e. the dividing lines crossing the Provyta (TestArea).
 	//Train defined by points in a circle. Each point is described as an angle (rikt) and a distance (dist).
@@ -60,7 +146,6 @@ public class DataTypes  {
 		public void setAvst(int avs) throws IllegalCallException {
 			if(!nick) {
 				avst[current]=avs;
-
 				nick = true;
 				checkIfNext();
 			} else
@@ -100,73 +185,85 @@ public class DataTypes  {
 	}
 	public class Delyta extends ParameterCache {
 		final int Max_Points = 10;
-		private Train tr = new Train();
+		private Train tr=null; 
 		private final String myId;
 
-		
-	public Delyta(String id, String[] raw) {
 
-		int i = -1;
-		int val = -1;
-		boolean avst = true;
-		myId = id;
-		//Put -999 to signal null value.
-		if (raw!=null) {
-			for (String s:raw) {
+		public Delyta(String id, String[] raw) {
 
-				try {
-					val = Integer.parseInt(s);
-				} catch(NumberFormatException e) {
-					//If error, break! 
-					if (!s.equals("NA"))
-						Log.e("NILS", "Not a number in delytedata: "+s);
-					break;
-				}
-				if (val<0) {
-					break;
-				}
+			myId = id;
 
-				//If avst is true, the AVSTÅND will be set and the arraypointer moved forward.
-				if (avst) {
+			setPoints(raw);
 
-					avst = false;
-					try {
-						tr.setAvst(val);
-					} catch (IllegalCallException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				} else {
-					try {
-						tr.setRikt(val);
-					} catch (IllegalCallException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					avst = true;
-				}
-
-			}
 		}
-	}
-	public int[][] getPoints() {
-		return tr.getTag();
-	}
-	public String getId() {
-		return myId;
-	}
-	
+		public int[][] getPoints() {
+			if(tr!=null)
+				return tr.getTag();
+			else
+				return null;
+		}
+		public String getId() {
+			return myId;
+		}
+		public boolean setPoints(String[] tag) {
+			int val = -1;
+			boolean avst = true;
 
-}
+			//Put -999 to signal null value.
+			if (tag!=null) {
+				tr = new Train();
+				for (String s:tag) {
+
+					try {
+						val = Integer.parseInt(s);
+					} catch(NumberFormatException e) {
+						//If error, break! 
+						if (!s.equals("NA"))
+							Log.e("NILS", "Not a number in delytedata: "+s);
+						return false;
+					}
+					if (val<0) {
+						return false;
+					}
+
+					//If avst is true, the AVSTÅND will be set and the arraypointer moved forward.
+					if (avst) {
+
+						avst = false;
+						try {
+							tr.setAvst(val);
+						} catch (IllegalCallException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+							return false;
+						}
+					} else {
+						try {
+							tr.setRikt(val);
+						} catch (IllegalCallException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+							return false;
+						}
+						avst = true;
+					}
+
+				}
+			}
+			return true;
+		}
+
+
+	}
 
 	protected class Provyta {
-		
+
 		private String id;
 		double N=0;
 		double E=0;
 		double lat=0;
 		double longh=0;
-		
+
 		private ArrayList<Delyta>dy = new ArrayList<Delyta>();
 
 
@@ -192,11 +289,13 @@ public class DataTypes  {
 			this.lat = lat;
 			this.longh = longh;
 		}
-		
+
+		//ADD will add the delyta if new. Otherwise it will update the current value.
 		public void addDelyta(String delyteId, String[] raw) {
+
 			dy.add(new Delyta(delyteId,raw));
 		}
-		
+
 		public Delyta findDelyta(String delyteId) {
 			for(Delyta d:dy)
 				if(d.getId().equals(delyteId))
@@ -207,22 +306,27 @@ public class DataTypes  {
 		public ArrayList<Delyta>getDelytor() {
 			return dy;
 		}
+
+		public void updateDelyta(int index, String[] tag) {
+			Delyta d = dy.get(index);
+			d.setPoints(tag);
+		}
 	}
 
 
 	protected class Ruta {
 		private String myId;
-	
+
 		private ArrayList<Provyta> provytor = new ArrayList<Provyta>();
-		
+
 		public Ruta(String id) {
 			myId = id;
 		}
-		
+
 		public String getId() {
 			return myId;
 		}
-		
+
 		private void addDelYta(String provYteId,String delyteId,String[] raw) {
 
 			if (provYteId != null) {
@@ -231,16 +335,16 @@ public class DataTypes  {
 					Log.e("NILS","Provyta with id "+provYteId+" not  found in rutdata but found in delningsdata");
 					//_py = new ProvYta(provYteId);
 					//py.add(_py);
-					
+
 				} else
 					_py.addDelyta(delyteId, raw);
 			}
 		}
-		
+
 		public Provyta addProvYta_rutdata(String ytId, String north, String east, String lat, String longh) {
 			Provyta yta = new Provyta(ytId);
 			try {
-				
+
 				yta.setSweRef(Double.parseDouble(north),Double.parseDouble(east));
 				Log.d("NILS","Adding Yta ID:  N E:"+ytId+" "+ Double.parseDouble(north)+" "+Double.parseDouble(east));
 				yta.setGPS(Double.parseDouble(lat),Double.parseDouble(longh));
@@ -249,17 +353,19 @@ public class DataTypes  {
 				return null;
 			}
 			provytor.add(yta);
+			//Add default 0 delyta.
+			yta.addDelyta("0", null);
 			return yta;
 		}
 		public ArrayList<Provyta> getAllProvYtor() {
 			return provytor;
 		}
-		
+
 		public Sorted sort() {
 			Sorted s = new Sorted();
 			return s;
 		}
-		
+
 		public class Sorted {
 			double[] N = new double[provytor.size()];
 			double[] E = new double[provytor.size()];
@@ -288,8 +394,8 @@ public class DataTypes  {
 				return E[0];
 			}
 		}
-		
-		
+
+
 
 		public Provyta findProvYta(String ytId) {
 			for(Provyta y:provytor) {
@@ -323,7 +429,7 @@ public class DataTypes  {
 		}
 		return null;
 	}
-	
+
 	public ArrayList<Delyta> getDelytor(String rutId, String provyteId) {
 		Ruta r = findRuta(rutId);
 		if (r!=null) {
@@ -386,7 +492,7 @@ public class DataTypes  {
 					" and maxXy: "+s.getMax_E_sweref_99()+" "+s.getMax_N_sweref_99());
 		}
 	}
-	
+
 	//scan csv file for Rutor. Create if needed.
 	private void scanDelningsData(InputStream csvFile) {
 		InputStreamReader is = new InputStreamReader(csvFile);
@@ -414,7 +520,7 @@ public class DataTypes  {
 					//Currently only Rutor from Rutdata will matter.
 					/* ruta = new Ruta(r[2]);
 						rutor.add(ruta);
-						*/
+					 */
 
 				}
 			}

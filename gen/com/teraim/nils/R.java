@@ -59,10 +59,14 @@ public final class R {
         public static final int tall=0x7f02001d;
         public static final int threelines=0x7f02001e;
         public static final int vast_demo=0x7f02001f;
+        public static final int ytcirklar_aktiv=0x7f020020;
+        public static final int ytcirklar_init=0x7f020021;
+        public static final int ytcirklar_problem=0x7f020022;
+        public static final int ytcirklar_ready=0x7f020023;
     }
     public static final class id {
-        public static final int Distance_h=0x7f0c0057;
-        public static final int Long_h=0x7f0c0056;
+        public static final int Distance_h=0x7f0c0059;
+        public static final int Long_h=0x7f0c0058;
         public static final int akvatikRadio=0x7f0c002b;
         public static final int anlagdRadio=0x7f0c002e;
         public static final int arrow=0x7f0c0018;
@@ -71,7 +75,7 @@ public final class R {
         public static final int column_header2=0x7f0c0021;
         public static final int column_header3=0x7f0c0022;
         public static final int distance=0x7f0c0012;
-        public static final int distanceh=0x7f0c0058;
+        public static final int distanceh=0x7f0c005a;
         public static final int dy_e1=0x7f0c0000;
         public static final int dy_e10=0x7f0c0006;
         public static final int dy_e11=0x7f0c000a;
@@ -91,31 +95,33 @@ public final class R {
         public static final int dy_saveB=0x7f0c0010;
         public static final int edit_txt1_1=0x7f0c0040;
         public static final int edit_txt1_2=0x7f0c0041;
+        public static final int farg_spinner=0x7f0c0044;
         public static final int fieldBearing=0x7f0c0017;
-        public static final int gamlabilder=0x7f0c0049;
+        public static final int gamlabilder=0x7f0c004b;
         public static final int glaciarRadio=0x7f0c0034;
         public static final int gridview=0x7f0c001a;
-        public static final int gridview_new=0x7f0c0048;
-        public static final int gridview_old=0x7f0c004a;
+        public static final int gridview_new=0x7f0c004a;
+        public static final int gridview_old=0x7f0c004c;
         public static final int header_line2=0x7f0c001f;
         public static final int imageView1=0x7f0c002a;
         public static final int lat=0x7f0c0014;
-        public static final int lat_h=0x7f0c0054;
-        public static final int lath=0x7f0c0055;
+        public static final int lat_h=0x7f0c0056;
+        public static final int lath=0x7f0c0057;
         public static final int list_image=0x7f0c0029;
         public static final int listview=0x7f0c003e;
         public static final int longh=0x7f0c0015;
-        public static final int menu_settings=0x7f0c0059;
-        public static final int mittText=0x7f0c004e;
-        public static final int mittpunktB=0x7f0c004b;
-        public static final int newPic=0x7f0c0053;
-        public static final int nyabilder=0x7f0c0047;
-        public static final int oldPic=0x7f0c0052;
+        public static final int menu_settings=0x7f0c005c;
+        public static final int mittText=0x7f0c0050;
+        public static final int mittpunktB=0x7f0c004d;
+        public static final int myRoot=0x7f0c005b;
+        public static final int newPic=0x7f0c0055;
+        public static final int nyabilder=0x7f0c0049;
+        public static final int oldPic=0x7f0c0054;
         public static final int oldpichead=0x7f0c0019;
         public static final int pic=0x7f0c003b;
         public static final int picgridview=0x7f0c0026;
         public static final int provyta=0x7f0c001e;
-        public static final int provytaF=0x7f0c004f;
+        public static final int provytaF=0x7f0c0051;
         public static final int radioGlaciar=0x7f0c0035;
         public static final int radioPermaSnow=0x7f0c0036;
         public static final int radio_anlagd1=0x7f0c002f;
@@ -130,19 +136,20 @@ public final class R {
         public static final int radio_sa4=0x7f0c003a;
         public static final int radio_utom_mosaik=0x7f0c002c;
         public static final int rikt1_button=0x7f0c0042;
-        public static final int riktningstxt=0x7f0c0050;
-        public static final int riktpunktB=0x7f0c004c;
+        public static final int riktningstxt=0x7f0c0052;
+        public static final int riktpunktB=0x7f0c004e;
         public static final int riktpunkttable=0x7f0c003f;
-        public static final int startB=0x7f0c004d;
+        public static final int rut_spinner=0x7f0c0045;
+        public static final int startB=0x7f0c004f;
         public static final int startCollectB=0x7f0c0025;
-        public static final int tag_content=0x7f0c0046;
-        public static final int tag_markslag=0x7f0c0045;
-        public static final int tag_pop_delete=0x7f0c005b;
-        public static final int tag_pop_edit=0x7f0c005a;
-        public static final int tag_title=0x7f0c0044;
+        public static final int tag_content=0x7f0c0048;
+        public static final int tag_markslag=0x7f0c0047;
+        public static final int tag_pop_delete=0x7f0c005e;
+        public static final int tag_pop_edit=0x7f0c005d;
+        public static final int tag_title=0x7f0c0046;
         public static final int tagknapp=0x7f0c0024;
         public static final int tagtabell=0x7f0c0023;
-        public static final int textExisting=0x7f0c0051;
+        public static final int textExisting=0x7f0c0053;
         public static final int textView1=0x7f0c0011;
         public static final int textView2=0x7f0c0013;
         public static final int textview=0x7f0c003d;
@@ -172,10 +179,13 @@ public final class R {
         public static final int ruta_list_layout=0x7f03000e;
         public static final int selectruta=0x7f03000f;
         public static final int selectyta=0x7f030010;
-        public static final int tag_row=0x7f030011;
-        public static final int takepicture=0x7f030012;
-        public static final int takepicture_singular=0x7f030013;
-        public static final int testgps=0x7f030014;
+        public static final int spinneritem=0x7f030011;
+        public static final int startmenu=0x7f030012;
+        public static final int tag_row=0x7f030013;
+        public static final int takepicture=0x7f030014;
+        public static final int takepicture_singular=0x7f030015;
+        public static final int testgps=0x7f030016;
+        public static final int wf_default=0x7f030017;
     }
     public static final class menu {
         public static final int activity_nils=0x7f0b0000;
@@ -183,8 +193,9 @@ public final class R {
     }
     public static final class raw {
         public static final int delningsdata=0x7f050000;
-        public static final int nils_json=0x7f050001;
-        public static final int rutdata=0x7f050002;
+        public static final int mainflow=0x7f050001;
+        public static final int nils_json=0x7f050002;
+        public static final int rutdata=0x7f050003;
     }
     public static final class string {
         public static final int akvatisk_header=0x7f08000e;
@@ -196,6 +207,7 @@ public final class R {
         public static final int glaciar_detail=0x7f08000a;
         public static final int glaciar_header=0x7f080008;
         public static final int glaciartext=0x7f080009;
+        public static final int local_service_started=0x7f080022;
         public static final int menu_settings=0x7f080001;
         public static final int mosaik_detail=0x7f080012;
         public static final int permasnow_detail=0x7f08000c;

@@ -35,6 +35,6 @@
 	<string name="radio_anlagd4">Rekreationsområde</string>
 	<string name="radio_anlagd5">Jordbruksområde</string>
 	<string name="arkivbilder_st_v_st_nord_syd_">Arkivbilder (öst,väst,nord,syd)</string>
-
-			
+	<string name="local_service_started">123456789</string>
+				
 </resources>

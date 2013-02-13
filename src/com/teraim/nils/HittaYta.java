@@ -1,21 +1,20 @@
 package com.teraim.nils;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -31,7 +30,6 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -65,17 +63,16 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 			"1"+"/bilder/gamla/";
 	private TextView userPosTextV;
 	
-	private Context ctx;
-
 	private Button startCollectB;
 	
 	private Intent editDelytaIntent;
 
 	private ListView tagtabell;
+	
+	
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		ctx = this;
 		setContentView(R.layout.hittayta);	
 		
 		editDelytaIntent = new Intent(this,EditDelYta.class);
@@ -105,6 +102,17 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 				
 			}
 		});
+		
+/*		final Context ctx = this;
+		receiver = new BroadcastReceiver() {
+
+	        @Override
+	        public void onReceive(Context context, Intent intent) {
+	            Toast.makeText(ctx, intent.getExtras().getString("MSG"), Toast.LENGTH_SHORT).show();
+
+	        }
+	    };
+*/
 		DataTypes rd = DataTypes.getSingleton(this);
 
 		pyg = new ProvYtaGeoUpdater(this,provytaV,this);
@@ -124,9 +132,30 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 		provytaV.setDelytor(dy);
 		
 		startCollectB.setEnabled(isComplete(dy));
-		createTagTabell(tagtabell,dy);
+		
+		
+		
+		
 
+
+		registerForContextMenu(tagtabell);
+	    
+		final TableAdapter ta = new TableAdapter(this,dy);
+		final Intent intent = new Intent(this,MarkslagsActivity.class);
+		
+		tagtabell.setAdapter(ta);
+		//Add contect menu..
+		
+		tagtabell.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+               CommonVars.cv().setDelyta(ta.getItem(arg2));
+                startActivity(intent);
+			}});
+		
 		provytaV.invalidate();
+		tagtabell.invalidate();
 
 	}
 
@@ -154,10 +183,12 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 	        	//tell edit activity that this is edit of row x.
 	    		editDelytaIntent.putExtra("com.teraim.nils.addRow",(int)info.id);
 	    		startActivity(editDelytaIntent);
+	    		
 	            return true;
 	        case R.id.tag_pop_delete:
 	        	Log.d("NILS","User clicked delete "+info.id);
-	        	
+	        	((TableAdapter)tagtabell.getAdapter()).delete((int)info.id);
+	        	tagtabell.invalidate();
 	            return true;
 	        default:
 	            return super.onContextItemSelected(item);
@@ -166,15 +197,23 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 	
 	private class TableAdapter extends ArrayAdapter<Delyta> {
 		  private final Context context;
-		  private final Delyta[] values;
+		  private final List<Delyta> values;
 
-		public TableAdapter(Context context, Delyta[] values) {
+		  public TableAdapter(Context context, List<Delyta> values) {
 		    super(context, R.layout.tag_row, values);
 		    this.context = context;
 		    this.values = values;
+		    
+
 		  }
 		
-		  @Override
+		  public void delete(int id) {
+			if(values.remove(id)!=null)
+				Log.d("NILS","Succesfully removed item from listview");
+			this.notifyDataSetChanged();
+		}
+
+		@Override
 		  public View getView(int position, View convertView, ViewGroup parent) {
 		    LayoutInflater inflater = (LayoutInflater) context
 		        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -184,12 +223,12 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 		    TextView tag = (TextView) rowView.findViewById(R.id.tag_content);
 		    
 
-		    title.setText(values[position].getId());
-		    String m = values[position].get("markslag");
+		    title.setText(values.get(position).getId());
+		    String m = values.get(position).get("markslag");
 		    if (m==null)
 		    	m="?";
 		    markslag.setText(m);
-			int[][] ps = values[position].getPoints();
+			int[][] ps = values.get(position).getPoints();
 			String rowS = "";
 			if (ps!=null && ps.length!=0) {
 				int r,a;
@@ -209,14 +248,7 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 	
 	private void createTagTabell(ListView tagtabell, ArrayList<Delyta> dy) {
 
-		Delyta[] dya = new Delyta[0];
-		if (dy==null)
-			return;
-		dya = dy.toArray(dya);
-		final TableAdapter ta = new TableAdapter(this,dya);
-		tagtabell.setAdapter(ta);
-		//Add contect menu..
-		registerForContextMenu(tagtabell);
+
 		
 		
 		//Add title
@@ -243,16 +275,7 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 		//tagtabell.addView(rowHeader);
 		
 		//add delytetåg
-		final Intent intent = new Intent(this,MarkslagsActivity.class);
 		
-		tagtabell.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
-				Toast.makeText(getBaseContext(), "Clicked row: "+arg2, Toast.LENGTH_SHORT).show();		        
-                CommonVars.cv().setDelyta(ta.getItem(arg2));
-                startActivity(intent);
-			}});
 		
 		//for(final Delyta del:dy) {
 		//	if (del!=null) {

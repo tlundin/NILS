@@ -1,63 +1,89 @@
 package com.teraim.nils;
 
-import com.teraim.nils.exceptions.BluetoothNotSupportedException;
-
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.ArrayAdapter;
+import android.view.KeyEvent;
+import android.view.View;
 import android.widget.Toast;
 
 public class Main extends Activity {
 
 	private static final long INITIAL_DELAY = 2000; //pause for 2 secs to show logo.
-	String tag = "Lifecycle";
+	private String tag = "Lifecycle";
 	//ListView treeList = null;
+	private Activity me;
+	private CommonVars cv;
+	private DataTypes T;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		double PI = Math.PI;
-		Geomatte.getRikt2(0, 0, Math.sqrt(3), 1);
-		Geomatte.getRikt2(0, 0, -Math.sqrt(3), 1);
-		Geomatte.getRikt2(0, 0, -Math.sqrt(3), -1);
-		Geomatte.getRikt2(0, 0, Math.sqrt(3), -1);
 
-		//Layer between application and persistent storage.
-		//The persistent storage used is Shared Preferences
-		//http://developer.android.com/guide/topics/data/data-storage.html#pref
-		PreferenceManager.setDefaultValues(this,
-				R.xml.myprefs, false);
-		//Initialize common vars.
-		CommonVars.init(this);
-		//Get the instance.
-		CommonVars cv = CommonVars.cv();
-
-		//Check the color. If no color, require it.
-		Toast.makeText(this.getApplicationContext(), "Den här dosan är "+cv.getDeviceColor(), Toast.LENGTH_SHORT).show();
-
-
+		//show start picture
 		setContentView(R.layout.loadscreen);
-		if (mBluetoothAdapter !=null && !mBluetoothAdapter.isEnabled()) 
-			startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-		else {
 
-			Handler mHandler = new Handler();
-			mHandler.postDelayed(new Runnable() {
-				public void run() {
-					checkConditions();
-				}
-			}, INITIAL_DELAY);
+		//broadcastreceiver that will listen for bluetooth on/off.
+		//When bluetooth is started, the sync service will be started as well.
 
-		}
-		
+			//Layer between application and persistent storage.
+			//The persistent storage used is Shared Preferences
+			//http://developer.android.com/guide/topics/data/data-storage.html#pref
+			PreferenceManager.setDefaultValues(this,
+					R.xml.myprefs, false);
+
+			me = this;
+
+			//Initialize common vars.
+			CommonVars.init(this);
+			//Get the instance.
+			cv = CommonVars.cv();
+
+			//Load workflow bundle
+			cv.setWorkflows(WorkflowParser.parse(this));
+
+			//Load datatypes
+			T = DataTypes.getSingleton(this);
+
+			if (mBluetoothAdapter == null) {
+				new AlertDialog.Builder(this).setTitle("Ups!")
+				.setMessage("Din platta verkar inte stödja Blåtand. Utan blåtand fungerar inte den här versionen.")
+				.setNeutralButton("Jag förstår!", new OnClickListener() {
+					@Override
+					public void onClick(DialogInterface arg0, int arg1) {
+						checkConditions();
+					}})
+					.show();
+			} else {		
+				Intent in = new Intent(this,BluetoothRemoteDevice.class);
+				//If bluetooth supported, start the communication server.
+				startService(in);				
+
+				//Delay a little while so that the start pic is visible.			
+				Handler mHandler = new Handler();
+				mHandler.postDelayed(new Runnable() {
+					public void run() {
+						checkConditions();
+					}
+				}, INITIAL_DELAY);
+
+				//Test..
+				cv.setDeviceColor(CommonVars.UNDEFINED);
+				CommonVars.cv().putG("ruta_id",CommonVars.UNDEFINED);
+			}
 	}
+
 	final BluetoothAdapter mBluetoothAdapter=BluetoothAdapter.getDefaultAdapter();
 	final Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 
@@ -65,64 +91,47 @@ public class Main extends Activity {
 	final static int ASK_RUTA_RC = 1;
 	final static int ASK_COLOR_RC = 2;
 	final static int REQUEST_ENABLE_BT = 3;
+	final static int START_LISTENING_FOR_OTHER_DEVICE = 4;
 	//final static int ASK_YTA_RC = 3; 
-	int noppe=0;
-	boolean serverStarted = false;
 
-	private void checkConditions2() {
+	/*private void checkConditions2() {
 		final Intent testGPS = new Intent(getBaseContext(),TestGpsActivity.class);
 		startActivity(testGPS);
 
 	}
-	
+	 */
+
 	private void checkConditions() {
-		final Intent testGPS = new Intent(getBaseContext(),TestGpsActivity.class);
+		//final Intent testGPS = new Intent(getBaseContext(),TestGpsActivity.class);
 		final Intent selectRutaIntent = new Intent(getBaseContext(),SelectRuta.class);
 		final Intent selectColorIntent = new Intent(getBaseContext(),SelectColor.class);
-		final Intent selectYtaIntent = new Intent(getBaseContext(),SelectYta.class);
+		final Intent startMenuIntent = new Intent(getBaseContext(),StartMenuActivity.class);
 
 		//If Color not set, check.
-		String deviceColor = CommonVars.cv().getDeviceColor();		
+		String deviceColor = cv.getDeviceColor();		
 		boolean askForColor = (deviceColor.equals(CommonVars.UNDEFINED));
 		//Start the server listening thread..
-		if (mBluetoothAdapter !=null) {
-		Log.d("NILS","Bluetooth is"+mBluetoothAdapter.isEnabled()+" and serverStarted is "+serverStarted);
-		if (mBluetoothAdapter.isEnabled()&&!serverStarted) {
-			try {
-				BluetoothRemoteDevice.init();
-			} catch (BluetoothNotSupportedException e) {
-				
-				e.printStackTrace();
-			}
-			Log.d("NILS","xserverStarted is "+serverStarted);
-			serverStarted = true;
-		}
-		}
-			
+
 		if (askForColor) {
 			startActivityForResult(selectColorIntent,ASK_COLOR_RC);	
 		}
 		else {
 			//if Ruta is not known, check.
-			String currentRuta = CommonVars.cv().getG("ruta_id");
+			String currentRuta = cv.getG("ruta_id");
 			boolean askForRuta = (currentRuta.equals(CommonVars.UNDEFINED));
-
-			//TODO: REMOVE! NOPPE++ is there to ensure that it will always ask for RUTA.
-			if (noppe++==0||askForRuta) {
+			if (askForRuta) {
 				startActivityForResult(selectRutaIntent,ASK_RUTA_RC);
 			}
 			else {
-				startActivity(selectYtaIntent);       			
-
-
+				//If Rutaid known, create the Ruta from the input files.
+				//TODO: Some error checking needed here...
+				cv.setRuta(T.findRuta(cv.getG("ruta_id")));
+				startActivity(startMenuIntent); 
+				finish();
 			}
 		}
 
 	}
-
-
-
-
 
 
 
@@ -136,21 +145,21 @@ public class Main extends Activity {
 			if (resultCode == Activity.RESULT_OK) 
 			{
 				Log.d("NILS","Bluetooth is now set");
-				
+
 			} else {
 				Log.e("NILS","Bluetooth was NOT turned on");
-				
+
 			}
 			checkConditions();
 		}
-			
-		else if (requestCode == ASK_COLOR_RC) //check if the request code is the one you've sent
+
+
+		if (requestCode == ASK_COLOR_RC) //check if the request code is the one you've sent
 		{
 			if (resultCode == Activity.RESULT_OK) 
 			{
 				Log.d("NILS","Color is now set");
 				checkConditions();
-				
 			} else 
 				Log.e("NILS","Color dialog was not executed properly.");
 		}
@@ -160,11 +169,10 @@ public class Main extends Activity {
 			{
 				Log.d("NILS","Ruta is now set");
 				checkConditions();
-				finish();
 			}else 
 				Log.e("NILS","Ruta dialog was not executed properly.");
 		}
-		
+
 		/*else if (requestCode == ASK_YTA_RC)
 	{
 		if (resultCode == Activity.RESULT_OK) 
@@ -256,6 +264,8 @@ public class Main extends Activity {
 	{
 		super.onStart();
 		Log.d(tag, "In the onStart() event");
+
+
 		/*
 		//---get all params---
 		db.open();
@@ -285,21 +295,32 @@ public class Main extends Activity {
 	{
 		super.onResume();
 		Log.d(tag, "In the onResume() event");
+
+
+
 	}
 	public void onPause()
 	{
 		super.onPause();
 		Log.d(tag, "In the onPause() event");
+
 	}
+
 	public void onStop()
 	{
 		super.onStop();
 		Log.d(tag, "In the onStop() event");
+
 	}
+
+
+
+	
 	public void onDestroy()
 	{
 		super.onDestroy();
 		Log.d(tag, "In the onDestroy() event");
+
 	}
 
 	public void displayParams(Cursor c)

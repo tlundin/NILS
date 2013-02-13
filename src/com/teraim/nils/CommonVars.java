@@ -8,9 +8,15 @@ package com.teraim.nils;
  */
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -19,6 +25,7 @@ import android.util.Log;
 import com.teraim.nils.DataTypes.Delyta;
 import com.teraim.nils.DataTypes.Provyta;
 import com.teraim.nils.DataTypes.Ruta;
+import com.teraim.nils.DataTypes.Workflow;
 import com.teraim.nils.exceptions.SharedPrefMissingException;
 
 public class CommonVars {
@@ -28,6 +35,11 @@ public class CommonVars {
 	//Shared Preferences
 	private SharedPreferences sp = null;
 	
+	
+	//String constants
+	public static String NILS_BASE_DIR = "/nils";
+	public static String UNDEFINED = "undefined";
+
 	
 	//NILS uid
 	public static final UUID RED_UID = UUID.fromString("58500d27-6fd9-47c9-bf6b-d0969ce78bb3");
@@ -85,40 +97,42 @@ public class CommonVars {
 			Log.d("NILS","Singleton is null");
 		return singleton;			 
 	}
-
-	private Context ctx;
-
+	
 	private SharedPreferences rutaP;
 	private SharedPreferences ytaP;
 	private SharedPreferences delytaP;
 	
-	
-	
+	private int syncStatus=BluetoothRemoteDevice.SYNK_STOPPED;
+
 	private CommonVars(Context ctx) throws SharedPrefMissingException  {
 			
-		this.ctx = ctx;
 			sp=PreferenceManager.getDefaultSharedPreferences(ctx);
     		if (sp == null)
     			throw new SharedPrefMissingException();
  			
 	}
-	
-	public static String NILS_BASE_DIR = "/nils";
-		
-	public static String UNDEFINED = "undefined";
 
 	//Root object for the data structure.
 	private Ruta myRuta = null;
 	private Delyta myDelyta = null;
 	private Provyta myProvyta = null;
 	
-	//The application context
 	
-	public Context getContext() {
-		return ctx;
+	
+	//Enter workflows into a hash with id as key.
+	private Map<String,Workflow> myWfs = new HashMap<String,Workflow>();
+	
+	public void setWorkflows(List<Workflow> l) {
+		for (Workflow wf:l)
+			if (wf!=null) {
+				Log.d("NILS","Adding wf with id "+wf.id);
+				myWfs.put(wf.id, wf);
+			}
 	}
 	
-	
+	public Workflow getWorkflow(String id) {
+		return myWfs.get(id);
+	}
 	
 	
 	
@@ -226,6 +240,39 @@ public class CommonVars {
 		}
 	}
 
+
+	public int getSyncStatus() {
+		return syncStatus;
+	}
 	
+	public String getSyncStatusS() {
+		switch (syncStatus) {
+		case BluetoothRemoteDevice.SYNK_STOPPED:
+			return "AV";
+		case BluetoothRemoteDevice.SYNK_SEARCHING:
+			return "SÖKER";
+		case BluetoothRemoteDevice.SYNK_RUNNING:
+			return "PÅ";
+		default:
+			return "?";
+		}
+	}
+	
+	public void setSyncStatus(int status) {
+		syncStatus = status;
+	}
+
+	
+	public void sendParameter(Context ctx,String key,String value,int scope) {
+		if (syncStatus == BluetoothRemoteDevice.SYNK_RUNNING)
+			BluetoothRemoteDevice.getSingleton().sendParameter(key, value, scope);
+		else if (syncStatus == BluetoothRemoteDevice.SYNK_STOPPED)
+		{
+			Intent intent = new Intent(ctx,BluetoothRemoteDevice.class);
+			ctx.startService(intent);
+		}
+		//Otherwise ongoing sync. just wait?
+			
+	}
 
 }

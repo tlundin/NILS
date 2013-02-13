@@ -30,8 +30,6 @@ public class SelectRuta extends ListActivity {
 		    rd = DataTypes.getSingleton(this);	  
 		    //Get the IDs
 		    values = rd.getRutIds();
-		    for(String s:values) 
-		    	Log.d("NILS","SELECTRUTA: "+s);
 		    if (values == null) {
 		    	values = new String[1];
 		    	values[0]="Oops...no data found";

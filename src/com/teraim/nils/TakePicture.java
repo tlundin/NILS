@@ -6,9 +6,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
+import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
@@ -33,8 +36,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.teraim.nils.exceptions.BluetoothNotSupportedException;
-
 /** 
  * 	
  * @author Terje
@@ -49,18 +50,31 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 	final String oldPicFolder = CommonVars.cv().getCurrentPictureBasePath()+"/gamla/";
 	GridView gridViewNew;
 	int selectedPic;
-
+	//Broadcastreceiver for messages coming from other device.
+	private BroadcastReceiver receiver;
+	
+	
+	
+	
+	
+	//Standard onCreate
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-
 		setContentView(R.layout.takepicture);
-
 
 		gridViewNew = (GridView) findViewById(R.id.gridview_new);
 		ProvytaView provytaV = (ProvytaView) findViewById(R.id.provytaF);
 		mittpunktB = (Button) findViewById(R.id.mittpunktB);
+		final Context ctx = this;
 		
+		receiver = new BroadcastReceiver() {
+
+	        @Override
+	        public void onReceive(Context context, Intent intent) {
+	            Toast.makeText(ctx, intent.getExtras().getString("MSG"), Toast.LENGTH_SHORT).show();
+
+	        }
+	    };
 
 		pyg = new ProvYtaGeoUpdater(this,provytaV,this);
 		gridViewNew.setAdapter(new NewImagesAdapter(this));
@@ -131,6 +145,8 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 
 			}
 		});
+		
+
 
 	}
 
@@ -140,7 +156,6 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data){
 
 		if (requestCode == TAKE_PICTURE){
-			Toast.makeText(this, "Got back!", Toast.LENGTH_LONG).show();
 			if (resultCode == Activity.RESULT_OK) 
 			{
 				Toast.makeText(this, "RESULT OK", Toast.LENGTH_LONG).show();
@@ -330,10 +345,21 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 	public void startCollect(View v) {
 		//Check that all "markslag" has been set by the other device.
 		//This is a sync point. 
-		if (CommonVars.cv().getP("red_has_input_all_markslag").equals(CommonVars.TRUE))
-			Toast.makeText(this, "ok...markslag is set", Toast.LENGTH_LONG);
-		
-			
+		/*new AlertDialog.Builder(this)
+	    .setTitle("Inte implementerat.")
+	    .setMessage("Den dynamiska insamlingsdelen är ännu inte klar.")
+	    .setPositiveButton("Okej, jag förstår.", new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int which) { 
+	           
+	        }
+	     })
+	     .show();
+	     */
+		Intent intent = new Intent(this, FlowEngineActivity.class);
+		Bundle b = new Bundle();
+		b.putString("workflow_id", "1"); //Your id
+		intent.putExtras(b); //Put your id to your next Intent
+		startActivity(intent);
 		
 	}
 	public void setRiktpunkter(View v) {
@@ -366,61 +392,19 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 	@Override
 	protected void onPause() {
 		pyg.onPause();
+		unregisterReceiver(receiver);
 		super.onPause();
 	}
 
 	@Override
 	protected void onResume() {
 		pyg.onResume();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("com.teraim.nils.bluetooth");
+       	registerReceiver(receiver, filter);
+        Log.d("NILS","READY TO RECEIVE");
 		super.onResume();
 	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		super.onCreateOptionsMenu(menu);
-		CreateMenu(menu);
-		return true;
-	}
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item)
-	{
-		return MenuChoice(item);
-	}
-
-	private void CreateMenu(Menu menu)
-	{
-		MenuItem mnu3 = menu.add(0, 2, 2, "Användare: "+CommonVars.cv().getUserName());
-		mnu3.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		MenuItem mnu4 = menu.add(0, 3, 3, "Färg: "+CommonVars.cv().getDeviceColor());
-		mnu4.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		MenuItem mnu5 = menu.add(0, 4, 4, "Item 5");
-		mnu5.setIcon(android.R.drawable.ic_menu_preferences);
-		mnu5.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-	}
-	private boolean MenuChoice(MenuItem item)
-	{
-		switch (item.getItemId()) {
-		case 0:
-			//Toast.makeText(this, "You clicked on Item 1",
-			//		Toast.LENGTH_LONG).show();
-		case 1:
-			//Toast.makeText(this, "You clicked on Item 2",
-			//		Toast.LENGTH_LONG).show();
-		case 2:
-			Toast.makeText(this, "Ändra användare",
-					Toast.LENGTH_LONG).show();
-		case 3:
-			Toast.makeText(this, "Ändra färg",
-					Toast.LENGTH_LONG).show();
-		case 4:
-			Intent intent = new Intent(getBaseContext(),ConfigMenu.class);
-			startActivity(intent);
-			return true;
-		}
-		return false;
-	}
-
 
 
 

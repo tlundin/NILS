@@ -2,9 +2,12 @@ package com.teraim.nils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.text.Editable;
 import android.view.View;
 import android.widget.EditText;
@@ -36,7 +39,7 @@ public class EditDelYta extends Activity {
 			
 			Delyta d = p.getDelytor().get(index);
 			int points[][] = d.getPoints();
-			
+			if (points !=null) {
 			//Insert the existing values into the edit fields.
 			EditText et;
 			int i = 0;
@@ -62,6 +65,7 @@ public class EditDelYta extends Activity {
 					break;
 					
 			}
+			}
 		}
 				
 	}
@@ -69,7 +73,7 @@ public class EditDelYta extends Activity {
 	
 	public void onSave(View v) {
 		String id;
-		if (p.getDelytor()==null)
+		if (p.getDelytor()==null || p.getDelytor().size()==0)
 			id = "1";
 		//Is row index set? then this is an edit.
 		else if (index != -1)
@@ -91,6 +95,7 @@ public class EditDelYta extends Activity {
 				//IF non-numeric ID - improvise.
 				id = lastId+"_"+size;
 		}
+		//Transfer values from the edit fields to the data structure.
 		String[] tag=new String[16];
 		for (int i=0;i<tag.length;i++)
 			tag[i++]="-1";
@@ -119,7 +124,10 @@ public class EditDelYta extends Activity {
 		     })
 		     .show();
 		} else {
-		p.addDelyta(id, tag);
+			if (index != -1) {
+				p.updateDelyta(index, tag);
+			} else
+				p.addDelyta(id, tag);
 		finish();
 		}
 	}
@@ -127,4 +135,7 @@ public class EditDelYta extends Activity {
 	public void onCancel(View v) {
 		finish();
 	}
+	
+
+	   
 }

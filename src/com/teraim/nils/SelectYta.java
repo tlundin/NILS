@@ -7,8 +7,12 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,7 +32,7 @@ import com.teraim.nils.DataTypes.Ruta;
  * @author Terje
  * Activity for selecting an sub-area (del-yta).
  */
-public class SelectYta extends Activity {
+public class SelectYta extends MenuActivity {
 
 
 	DataTypes rd=null;
@@ -45,8 +49,8 @@ public class SelectYta extends Activity {
 		Display display = getWindowManager().getDefaultDisplay();
 		Point size = new Point();
 		display.getSize(size);
-		double widthOfOneGraphicalRepresentationOfAProvyta=50;
-		double heightOfOneGraphicalRepresentationOfAProvyta=50;
+		double widthOfOneGraphicalRepresentationOfAProvyta=75;
+		double heightOfOneGraphicalRepresentationOfAProvyta=75;
 
 		double Menus = 125; //pixels.
 		double margin = 50; //about twice the size of one graphical elem.
@@ -98,6 +102,11 @@ public class SelectYta extends Activity {
 		Log.d("NILS","skalfaktor "+screenZoom);
 
 		ArrayList<Provyta> ytor = ruta.getAllProvYtor();
+		//TODO: Change to real..
+		final int[] ids = {R.drawable.ytcirklar_init,R.drawable.ytcirklar_ready, 
+				R.drawable.ytcirklar_problem, R.drawable.ytcirklar_aktiv};
+		int r=0;
+
 		for(final Provyta yta:ytor) {
 
 			//subtract min value from the coordinate to get normalized values
@@ -117,13 +126,15 @@ public class SelectYta extends Activity {
 			Log.d("NILS","X Y SKÄRM "+cordx+" "+cordy);
 
 			Button b = new Button(this);
+
 			b.setText(yta.getId());
 
 			b.setX(cordx);
 			b.setY(cordy);
 
 
-			b.setBackgroundDrawable(getResources().getDrawable(R.drawable.roundshape));
+			//b.setBackgroundDrawable(getResources().getDrawable(R.drawable.roundshape));
+			b.setBackgroundDrawable(getResources().getDrawable(ids[r++%ids.length]));
 			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams((int)widthOfOneGraphicalRepresentationOfAProvyta
 					,(int) heightOfOneGraphicalRepresentationOfAProvyta);
 
@@ -143,7 +154,6 @@ public class SelectYta extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		refreshStatusRow();
 	}
 
 	CommonVars cv = CommonVars.cv();
@@ -191,67 +201,6 @@ public class SelectYta extends Activity {
 
 
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		super.onCreateOptionsMenu(menu);
-		CreateMenu(menu);
-		return true;
-	}
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item)
-	{
-		return MenuChoice(item);
-	}
-
-	MenuItem mnu3=null,mnu4=null;
-	private void CreateMenu(Menu menu)
-	{
-
-		mnu3 = menu.add(0, 2, 2, "");
-		mnu3.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		mnu4 = menu.add(0, 3, 3,"");
-		mnu4.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		MenuItem mnu5 = menu.add(0, 4, 4, "Item 5");
-		mnu5.setIcon(android.R.drawable.ic_menu_preferences);
-		//R.drawable.ic_menu_preferences
-		mnu5.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		MenuItem mnu2 = menu.add(0, 1, 1, "Item 2");
-		mnu2.setIcon(android.R.drawable.ic_menu_mylocation);
-		//R.drawable.ic_menu_preferences
-		mnu2.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-		refreshStatusRow();
-	}
-
-	private void refreshStatusRow() {
-
-		if (mnu3!=null)
-			mnu3.setTitle("Användare: "+CommonVars.cv().getUserName());
-		if (mnu4!=null)
-			mnu4.setTitle("Färg: "+CommonVars.cv().getDeviceColor());
-	}
-	private boolean MenuChoice(MenuItem item)
-	{
-		switch (item.getItemId()) {
-		case 0:
-			//Toast.makeText(this, "You clicked on Item 1",
-			//		Toast.LENGTH_LONG).show();
-		case 1:
-			//Toast.makeText(this, "You clicked on Item 2",
-			//		Toast.LENGTH_LONG).show();
-		case 2:
-			Toast.makeText(this, "Ändra användare",
-					Toast.LENGTH_LONG).show();
-		case 3:
-			Toast.makeText(this, "Ändra färg",
-					Toast.LENGTH_LONG).show();
-		case 4:
-			Intent intent = new Intent(getBaseContext(),ConfigMenu.class);
-			startActivity(intent);
-			return true;
-		}
-		return false;
-	}
 
 
 }

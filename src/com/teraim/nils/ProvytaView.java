@@ -123,7 +123,7 @@ public class ProvytaView extends View {
 		cx = w/2;
 		cy = h/2;
 		//tag.lineTo(w-50,0);
-		Log.d("NILS","w h r"+w+" "+h+" "+r);
+		//Log.d("NILS","w h r"+w+" "+h+" "+r);
 		oScaleF = r/realRadiusinMeter;
 		//A dot in the middle!
 		canvas.drawPoint(cx, cy, p);
@@ -160,7 +160,7 @@ public class ProvytaView extends View {
 		//canvas.drawPath(tag, p);
 		if (user.hasPosition()) {
 			double alfa;
-			Log.d("NILS","Blue has position");
+			//Log.d("NILS","Blue has position");
 			if(user.getDistance()<realRadiusinMeter) {
 				alfa = user.getMovementDirection();
 				float degAlfa = (float)(180*alfa/Math.PI);
@@ -172,7 +172,7 @@ public class ProvytaView extends View {
 				int uy = (int) (cy+user.y*rScaleF);
 				int icony = (int)(User.Pic_H/2+User.Pic_H *  Math.cos(alfa));
 				uy = uy + icony;
-				Log.d("NILS","iconx icony "+iconx+" "+icony);
+				//Log.d("NILS","iconx icony "+iconx+" "+icony);
 				canvas.save();
 				canvas.rotate(180+degAlfa, ux, uy);
 				canvas.drawBitmap(user.bmp, ux, uy, null);
@@ -230,15 +230,15 @@ public class ProvytaView extends View {
 		tst = null;
 		//Are there any divisions of this Yta?
 		if(delar!=null&&delar.size()>0) {
-			Log.d("NILS", "DELAR size is "+delar.size());
+			//Log.d("NILS", "DELAR size is "+delar.size());
 			for (Delyta del:delar) {
 
 				//draw each 
 				if (del !=null) {
 					tst = del.getPoints();
-					Log.d("NILS", "Tågets size is "+tst.length);
+					//Log.d("NILS", "Tågets size is "+tst.length);
 					
-					if (tst.length>1 && tst!=null) {
+					if (tst!=null && tst.length>1) {
 						for (int i=0;i<tst.length;i++) {
 							//avstånd från cirkelns mitt;
 							int avst = tst[i][0];
@@ -250,8 +250,8 @@ public class ProvytaView extends View {
 							double rr = (rikt-90) * Math.PI/180;
 							int x = (int) (cx+ avst*oScaleF*(Math.cos(rr)));
 							int y = (int) (cy+ avst*oScaleF*(Math.sin(rr)));
-							Log.d("NILS","avst "+avst+" rScaleF "+rScaleF+" rikt "+rikt+" radRikt "+rr+" cos: "+Math.cos(rr)+" sin:"+Math.sin(rr));
-							Log.d("NILS","X: "+x+" Y:"+y);
+							//Log.d("NILS","avst "+avst+" rScaleF "+rScaleF+" rikt "+rikt+" radRikt "+rr+" cos: "+Math.cos(rr)+" sin:"+Math.sin(rr));
+							//Log.d("NILS","X: "+x+" Y:"+y);
 
 							//y = 2*r-y;
 							//x = x - 2*(x-r);
@@ -259,7 +259,7 @@ public class ProvytaView extends View {
 							xy[i][1]=y;
 							c.drawText(Integer.toString(i), x, y, p);
 							boolean isArc = (i>1)&&(tst[i][0]==tst[i-1][0]&&tst[i][0]==realRadiusinMeter);
-							Log.d("NILS","I: "+i);
+							//Log.d("NILS","I: "+i);
 							if( 
 									//om andra punkten
 									i==1

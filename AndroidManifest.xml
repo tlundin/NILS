@@ -17,6 +17,8 @@
         android:icon="@drawable/logo_moth"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+        
+        
         <activity
             android:name=".Main"
             android:label="@string/title_activity_nils" >
@@ -75,8 +77,10 @@
         <activity
             android:name="com.teraim.nils.MarkslagTab_SA_Activity"/>	
         <activity
-            android:name="com.teraim.nils.BluetoothRemoteDevice"/>
-        	
+            android:name="com.teraim.nils.FlowEngineActivity"/>        	
+        <activity
+            android:name="com.teraim.nils.StartMenuActivity"/>        	
+       
         <activity
             android:name=".ConfigMenu"
             android:exported="false"
@@ -170,11 +174,10 @@
             android:label="@string/title_take_picture" >
             <intent-filter>
                 <action android:name="com.teraim.nils.TakePicture" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-                      <activity
+        <activity
             android:name=".TakePictureActivity"
             android:exported="false"
             android:label="@string/title_take_picture" >
@@ -194,6 +197,14 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        
+       <service
+        android:name=".BluetoothRemoteDevice"
+        android:label="BluetoothRemoteDevice" >
+            <intent-filter>
+           <action android:name="com.teraim.nils.StartService" /> 
+            </intent-filter> 
+    </service>
     </application>
 
 </manifest>
