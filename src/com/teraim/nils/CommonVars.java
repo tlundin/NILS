@@ -9,12 +9,11 @@ package com.teraim.nils;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import android.app.AlertDialog;
-import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,6 +26,9 @@ import com.teraim.nils.DataTypes.Provyta;
 import com.teraim.nils.DataTypes.Ruta;
 import com.teraim.nils.DataTypes.Workflow;
 import com.teraim.nils.exceptions.SharedPrefMissingException;
+import com.teraim.nils.expr.Aritmetic;
+import com.teraim.nils.expr.Literal;
+import com.teraim.nils.expr.Numeric;
 
 public class CommonVars {
 
@@ -119,15 +121,59 @@ public class CommonVars {
 	
 	
 	
-	//Enter workflows into a hash with id as key.
+	private Hashtable<String,Variable> myVars = new Hashtable<String,Variable>();
+
+	public synchronized Numeric makeNumeric(String name) {
+		Variable result = myVars.get(name);
+		if (result == null) {
+		    myVars.put(name, result = new Numeric(name));
+		    return (Numeric)result;
+		}
+		else {
+			Log.e("NILS","WARNING: The variable you created already exist: "+name);
+			return (Numeric)result;
+		}
+	}public synchronized Aritmetic makeAritmetic(String name) {
+		Variable result = myVars.get(name);
+		if (result == null) {
+		    myVars.put(name, result = new Aritmetic(name));
+		    return (Aritmetic)result;
+		}
+		else {
+			Log.e("NILS","WARNING: The variable you created already exist: "+name);
+			return (Aritmetic)result;
+		}
+	}
+	public synchronized Literal makeLiteral(String name) {
+		Variable result = myVars.get(name);
+		if (result == null) {
+		    myVars.put(name, result = new Literal(name));
+		    return (Literal)result;
+		}
+		else {
+			Log.e("NILS","WARNING: The variable you created already exist: "+name);
+			return (Literal)result;
+		}
+	}
+	
+	public Variable getVariable(String name) {
+		return myVars.get(name);
+	}
+	
+	
+	//Enter workflows into a hash with name as key.
 	private Map<String,Workflow> myWfs = new HashMap<String,Workflow>();
 	
 	public void setWorkflows(List<Workflow> l) {
 		for (Workflow wf:l)
 			if (wf!=null) {
-				Log.d("NILS","Adding wf with id "+wf.id);
-				myWfs.put(wf.id, wf);
-			}
+				if (wf.getName()!=null) {
+					Log.d("NILS","Adding wf with id "+wf.getName());
+					myWfs.put(wf.getName(), wf);
+				} else
+					Log.d("NILS","Workflow name was null in setWorkflows");
+			} else
+				Log.d("NILS","Workflow was null in setWorkflows");
 	}
 	
 	public Workflow getWorkflow(String id) {

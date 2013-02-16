@@ -193,9 +193,8 @@ public final class R {
     }
     public static final class raw {
         public static final int delningsdata=0x7f050000;
-        public static final int mainflow=0x7f050001;
-        public static final int nils_json=0x7f050002;
-        public static final int rutdata=0x7f050003;
+        public static final int nils_json=0x7f050001;
+        public static final int rutdata=0x7f050002;
     }
     public static final class string {
         public static final int akvatisk_header=0x7f08000e;

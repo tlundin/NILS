@@ -11,8 +11,12 @@ import java.util.List;
 import android.content.Context;
 import android.util.Log;
 
-import com.teraim.nils.DataTypes.Block;
+import com.teraim.nils.exceptions.EvalException;
 import com.teraim.nils.exceptions.IllegalCallException;
+import com.teraim.nils.expr.Aritmetic;
+import com.teraim.nils.expr.Literal;
+import com.teraim.nils.expr.Parser;
+import com.teraim.nils.expr.SyntaxException;
 
 
 /**
@@ -36,12 +40,38 @@ public class DataTypes  {
 
 
 	private ArrayList<Ruta> rutor = new ArrayList<Ruta>();
-	
-	
+
+	/*
+	public abstract static class Variable {
+		String uniqueName;
+
+	}
+
+	public static class Int_Variable extends Variable {
+		int value;
+
+		Int_Variable(String _name, int _value) {
+			uniqueName = _name;
+			value = _value;
+		}
+
+	}
+	public static class String_Variable extends Variable {
+		String value;
+
+		String_Variable(String _name, String _value) {
+			uniqueName = _name;
+			value = _value;
+		}
+
+	}
+	 */
+
+
 	//Workflow
 	public static class Workflow {
 		private List<Block> blocks;
-		public String id,name;
+		private String name=null;
 
 		public List<Block> getBlocks() {
 			return blocks;
@@ -49,36 +79,63 @@ public class DataTypes  {
 		public void addBlocks(List<Block> _blocks) {
 			blocks = _blocks;
 		}
-		
+
+		public String getName() {
+			if (name==null) {
+				if (blocks!=null && blocks.size()>0)
+					name = ((StartBlock)blocks.get(0)).getName();
+
+			}
+			return name;
+		}
+
 	}
-	
+
 	/**
 	 * Abstract base class Block
 	 * @author Terje
 	 *
 	 */
 	public abstract static class Block {
+		private String label;
 
+		public void setLabel(String lbl) {
+			label = lbl;
+		}
+
+		public String getLabel() {
+			return label;
+		}
 	}
-	
+
 	/**
 	 * Startblock.
 	 * @author Terje
 	 *
 	 */
 	public static class StartBlock extends Block {
-	
+		private String workflowName;
+
+		public StartBlock(String lbl,String wfn) {
+			setLabel(lbl);
+			workflowName = wfn;
+		}
+
+		public String getName() {
+			return workflowName;
+		}
 	}
-	
+
 	/**
 	 * buttonblock
 	 * @author Terje
 	 *
 	 */
 	public static class ButtonBlock extends Block {
-		String text="banarne";
+		String text;
 
-		public ButtonBlock(String text) {
+		public ButtonBlock(String lbl,String text) {
+			setLabel(lbl);
 			Log.d("NILS","ButtonText is set to "+text);
 			this.text = text;
 		}
@@ -86,8 +143,92 @@ public class DataTypes  {
 		public String getText() {
 			return text;
 		}
-		
+
 	}
+
+	/**
+	 * CreateFieldBlock.
+	 * @author Terje
+	 *
+	 */
+	public static class CreateFieldBlock extends Block {
+		private String varName=null,varType=null,purpose=null;
+
+
+
+		//Create a fieldblock.
+		//SIDEEFFECT: Creates Variable if not already created.
+		public CreateFieldBlock(String lbl,String _varName,String _varType, String _purpose) {
+			setLabel(lbl);
+			varName = _varName;
+			varType = _varType;
+			purpose = _purpose;
+
+			Variable var = CommonVars.cv().getVariable(varName);
+			//IS this a new variable? 
+			if (var==null) {
+				//Integer is created as a Aritmetic.
+				if (varType.equals(Variable.NUMERIC))
+					CommonVars.cv().makeNumeric(varName);
+				else if (varType.equals(Variable.ARITMETIC))
+					CommonVars.cv().makeAritmetic(varName);
+				else if (varType.equals(Variable.LITERAL))
+					CommonVars.cv().makeLiteral(varName);
+				Log.d("NILS", "Var created with name "+varName);
+			}
+		}
+		public boolean isEditable() {
+			return purpose.equals("edit");
+		}
+		
+		public String getVariableReference() {
+			return varName;
+		}
+
+		public String getType() {
+			return varType;
+		}
+
+	}
+
+
+
+
+	/**
+	 * setvalueblock.
+	 * @author Terje
+	 *
+	 */
+	public static class SetValueBlock extends Block {
+		private String varRef;
+		private String expr;
+
+		//Save references.
+		public SetValueBlock(String lbl,String _varReference,String _expr) {
+			setLabel(lbl);
+			varRef = _varReference;
+			expr = _expr;
+		}
+
+		//Assign value of Expr to Variable.
+		public void run() throws EvalException, SyntaxException {
+			//Var Ref must refer to an existing variable.		
+			Variable var = CommonVars.cv().getVariable(varRef);
+			if (var==null)
+				throw new EvalException("Variable does not exist");
+			//Should expression be evaluated?
+			if (var.getType().equals(Variable.ARITMETIC)) {
+				double val =-1;
+				val = Parser.parse(expr).value();
+				((Aritmetic)var).setValue(val);
+			} else
+				((Literal)var).setValue(expr);
+		}
+
+
+
+	}
+
 	/**
 	 * Layoutblock
 	 * @author Terje
@@ -103,15 +244,15 @@ public class DataTypes  {
 		public String getAlignment() {
 			return alignment;
 		}
-		public LayoutBlock(String layoutDirection, String alignment) {
-			super();
+		public LayoutBlock(String lbl, String layoutDirection, String alignment) {
+			setLabel(lbl);
 			this.layoutDirection = layoutDirection;
 			this.alignment = alignment;
 		}
 	}
-	
+
 	///ValuePair
-	
+
 	public class ValuePair {
 		public String mkey,mval;
 		public ValuePair(String key, String val) {
@@ -119,7 +260,7 @@ public class DataTypes  {
 			mval=val;
 		}
 	}
-	
+
 
 	//Train class stores the "TÅG" in swedish, i.e. the dividing lines crossing the Provyta (TestArea).
 	//Train defined by points in a circle. Each point is described as an angle (rikt) and a distance (dist).

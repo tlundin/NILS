@@ -6,16 +6,14 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.IntentFilter;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.View;
 import android.widget.Toast;
 
 public class Main extends Activity {
@@ -27,8 +25,24 @@ public class Main extends Activity {
 	private CommonVars cv;
 	private DataTypes T;
 
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		PreferenceManager.setDefaultValues(this,R.xml.myprefs, false);
+		CommonVars.init(this);
+		//Get the instance.
+		cv = CommonVars.cv();
+
+		//Load workflow bundle
+		new WorkflowParser().execute(this);
+
+	}
+	
+
+	//@Override
+	public void oonCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		//show start picture
@@ -37,39 +51,51 @@ public class Main extends Activity {
 		//broadcastreceiver that will listen for bluetooth on/off.
 		//When bluetooth is started, the sync service will be started as well.
 
-			//Layer between application and persistent storage.
-			//The persistent storage used is Shared Preferences
-			//http://developer.android.com/guide/topics/data/data-storage.html#pref
-			PreferenceManager.setDefaultValues(this,
-					R.xml.myprefs, false);
+		//Layer between application and persistent storage.
+		//The persistent storage used is Shared Preferences
+		//http://developer.android.com/guide/topics/data/data-storage.html#pref
+		PreferenceManager.setDefaultValues(this,
+				R.xml.myprefs, false);
 
-			me = this;
+		me = this;
 
-			//Initialize common vars.
-			CommonVars.init(this);
-			//Get the instance.
-			cv = CommonVars.cv();
+		//Initialize common vars.
+		CommonVars.init(this);
+		//Get the instance.
+		cv = CommonVars.cv();
 
-			//Load workflow bundle
-			cv.setWorkflows(WorkflowParser.parse(this));
+		//Load workflow bundle
+		cv.setWorkflows(WorkflowParser.parse(this));
 
-			//Load datatypes
-			T = DataTypes.getSingleton(this);
+		//Load datatypes
+		T = DataTypes.getSingleton(this);
 
-			if (mBluetoothAdapter == null) {
+		//check bluetooth
+		if (mBluetoothAdapter == null) {
+			new AlertDialog.Builder(this).setTitle("Ups!")
+			.setMessage("Din platta verkar inte stödja Blåtand. Utan blåtand fungerar inte den här versionen.")
+			.setNeutralButton("Jag förstår!", new OnClickListener() {
+				@Override
+				public void onClick(DialogInterface arg0, int arg1) {
+					checkConditions();
+				}})
+				.show();
+			//check that there is a bonded device 
+		} else {	
+			if (mBluetoothAdapter.getBondedDevices().isEmpty()) {
 				new AlertDialog.Builder(this).setTitle("Ups!")
-				.setMessage("Din platta verkar inte stödja Blåtand. Utan blåtand fungerar inte den här versionen.")
+				.setMessage("Din datainsamlare är inte kopplad (bondad) till en annan datainsamlare! Måste göras i systemets blåtandsmeny. Annars fungerar inte synkroniseringen!")
 				.setNeutralButton("Jag förstår!", new OnClickListener() {
 					@Override
 					public void onClick(DialogInterface arg0, int arg1) {
 						checkConditions();
 					}})
-					.show();
-			} else {		
+					.show();				
+			} else {
+				//mBluetoothAdapter.getBondedDevices().iterator().next().getBluetoothClass().
 				Intent in = new Intent(this,BluetoothRemoteDevice.class);
 				//If bluetooth supported, start the communication server.
 				startService(in);				
-
 				//Delay a little while so that the start pic is visible.			
 				Handler mHandler = new Handler();
 				mHandler.postDelayed(new Runnable() {
@@ -77,11 +103,11 @@ public class Main extends Activity {
 						checkConditions();
 					}
 				}, INITIAL_DELAY);
-
-				//Test..
-				cv.setDeviceColor(CommonVars.UNDEFINED);
-				CommonVars.cv().putG("ruta_id",CommonVars.UNDEFINED);
 			}
+			//Test..
+			cv.setDeviceColor(CommonVars.UNDEFINED);
+			CommonVars.cv().putG("ruta_id",CommonVars.UNDEFINED);
+		}
 	}
 
 	final BluetoothAdapter mBluetoothAdapter=BluetoothAdapter.getDefaultAdapter();
@@ -315,7 +341,7 @@ public class Main extends Activity {
 
 
 
-	
+
 	public void onDestroy()
 	{
 		super.onDestroy();

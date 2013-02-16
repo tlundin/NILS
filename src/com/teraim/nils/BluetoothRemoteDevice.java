@@ -52,16 +52,12 @@ public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 	public final static String SYNK_SERVICE_CLIENT_CONNECT_FAIL = "com.teraim.nils.synk_no_connect";
 	public final static String SYNK_SERVICE_SERVER_CONNECT_FAIL = "com.teraim.nils.synk_lost_connect";
 	public final static String SYNK_PING_MESSAGE_RECEIVED = "com.teraim.nils.ping";
+	public final static String SYNK_NO_BONDED_DEVICE = "com.teraim.nils.binderror";
 
 	public final static int SYNK_SEARCHING = 0;
 	public final static int SYNK_RUNNING = 1;
 	public final static int SYNK_STOPPED = 2;
 	
-	//Callback ID for BT
-	private final static int REQUEST_ENABLE_BT = 11;	
-	private final static Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-	//Start the Server thread to listen for incoming calls.
-	//Also turn Bluetooth on if off.
 
 	//Ping_delay
 	protected static final long PING_DELAY = 5000;
@@ -122,6 +118,8 @@ public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 					}, PING_DELAY);
 					
 				}
+
+				
 				else if (action.equals(BluetoothRemoteDevice.SYNK_SERVICE_MESSAGE_RECEIVED))
 					Toast.makeText(me, intent.getStringExtra("MSG"), Toast.LENGTH_LONG).show();
 				else if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
@@ -292,12 +290,14 @@ public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 		BluetoothDevice pair;
 		if (pairedDevices.isEmpty()) {
 			Log.e("NILS","DIDNT FIND ANY PAIRED DEVICE");
+			
 			throw new BluetoothDevicesNotPaired();
 		}
 		else {
 			pair = pairedDevices.iterator().next();
 			Log.d("NILS","FIRST PAIRED DEVICE IS: "+pair.getName());
-
+			Log.d("NILS","Device type major class: "+pair.getBluetoothClass().getMajorDeviceClass());
+			Log.d("NILS","Device type majorminor class: "+pair.getBluetoothClass().getDeviceClass());
 			client = new ClientConnectThread(this,pair);
 			client.start();
 			if (pairedDevices.size()>1)
@@ -687,8 +687,10 @@ public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 				msgBuf.add(o);
 
 			} catch (BluetoothDevicesNotPaired e) {
-				Log.d("NILS","No bounded (paired) device found");
-				e.printStackTrace();
+				Toast.makeText(getBaseContext(),"No bounded (paired) device found",Toast.LENGTH_LONG).show();
+				Intent intent = new Intent();
+				intent.setAction(BluetoothRemoteDevice.SYNK_NO_BONDED_DEVICE);
+				sendBroadcast(intent);
 			} catch (BluetoothDeviceExtra e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

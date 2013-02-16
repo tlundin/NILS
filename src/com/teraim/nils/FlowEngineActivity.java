@@ -4,12 +4,15 @@ import java.util.List;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.teraim.nils.DataTypes.Block;
 import com.teraim.nils.DataTypes.ButtonBlock;
+import com.teraim.nils.DataTypes.CreateFieldBlock;
 import com.teraim.nils.DataTypes.LayoutBlock;
 import com.teraim.nils.DataTypes.StartBlock;
 import com.teraim.nils.DataTypes.Workflow;
@@ -20,7 +23,9 @@ import com.teraim.nils.DataTypes.Workflow;
  * Activity that runs a workflow that has a user interface.
  * Pressing Back button will return flow to parent workflow.
  */
+
 public class FlowEngineActivity extends Activity {
+
 
 	Workflow wf;
 
@@ -30,15 +35,15 @@ public class FlowEngineActivity extends Activity {
 
 		//Find out the name of the workflow to execute.
 		Bundle b = getIntent().getExtras();
-		String id = b.getString("workflow_id");
-		if (id!=null) 
-			wf = CommonVars.cv().getWorkflow(id);
+		String name = b.getString("workflow_name");
+		if (name!=null) 
+			wf = CommonVars.cv().getWorkflow(name);
 
-		if (wf==null||id==null) {
-			Log.e("NILS","Workflow "+id+" NOT found! ID: "+id+" WF: "+wf);
+		if (wf==null||name==null) {
+			Log.e("NILS","Workflow "+name+" NOT found!");
 			return;
 		} else {
-			Log.d("NILS","Now executing workflow "+wf.name);
+			Log.d("NILS","Now executing workflow "+name);
 			setContentView(R.layout.wf_default);
 			execute();
 		}
@@ -74,6 +79,24 @@ public class FlowEngineActivity extends Activity {
 				Log.d("NILS","Text is "+bl.getText());
 				bu.setText(bl.getText());
 				my_root.addView(bu);
+			}
+			else if (b instanceof CreateFieldBlock) {
+				Log.d("NILS","Createfield block found");
+				CreateFieldBlock bl = (CreateFieldBlock)b;
+				Log.d("NILS","Variable is "+bl.getVariableReference());
+				Variable var = CommonVars.cv().getVariable(bl.getVariableReference());
+				//Create a numeric input field.
+				if (var.getType().equals(Variable.NUMERIC)) {
+					EditText et = new EditText(this);
+					et.setInputType(InputType.TYPE_CLASS_NUMBER);
+					my_root.addView(et);
+				}
+					
+			}
+			else if (b instanceof CreateFieldBlock) {
+				Log.d("NILS","Createfield block found");
+				CreateFieldBlock bl = (CreateFieldBlock)b;
+				Log.d("NILS","Variable is "+bl.getVariableReference());
 			}
 
 
