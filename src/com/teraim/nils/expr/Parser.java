@@ -89,7 +89,7 @@ public class Parser {
 	return reparse();
  }
 
- static private final String operatorChars = "*/+-^<>=,()";
+ static private final String operatorChars = "*/+-^<>=,()GTLEN";
 
  private Expr reparse() throws SyntaxException {
 	tokens.index = -1;
@@ -119,13 +119,14 @@ public class Parser {
 
 	    switch (token.ttype) {
 
-	    case '<':         l = 20; r = 21; rator = Expr.LT; break;
+	    case '<':         
+	    case Token.TT_LT: l = 20; r = 21; rator = Expr.LT; break;
 	    case Token.TT_LE: l = 20; r = 21; rator = Expr.LE; break;
 	    case '=':         l = 20; r = 21; rator = Expr.EQ; break;
 	    case Token.TT_NE: l = 20; r = 21; rator = Expr.NE; break;
 	    case Token.TT_GE: l = 20; r = 21; rator = Expr.GE; break;
-	    case '>':         l = 20; r = 21; rator = Expr.GT; break;
-
+	    case '>':         
+	    case Token.TT_GT: l = 20; r = 21; rator = Expr.GT; break;
 	    case '+': l = 30; r = 31; rator = Expr.ADD; break;
 	    case '-': l = 30; r = 31; rator = Expr.SUB; break;
 	
@@ -340,9 +341,15 @@ public class Parser {
 	    ts[i++] = new Token(Token.TT_WORD, 0, procs2[m], t);
 
 	ts[i++] = new Token(Token.TT_LE, 0, "<=", t);
+	ts[i++] = new Token(Token.TT_LE, 0, "LE", t);
 	ts[i++] = new Token(Token.TT_NE, 0, "<>", t);
+	ts[i++] = new Token(Token.TT_NE, 0, "NE", t);
 	ts[i++] = new Token(Token.TT_GE, 0, ">=", t);
+	ts[i++] = new Token(Token.TT_GE, 0, "GE", t);
 	ts[i++] = new Token(Token.TT_WORD, 0, "if", t);
+	ts[i++] = new Token(Token.TT_LT, 0, "LT", t);
+	ts[i++] = new Token(Token.TT_GT, 0, "GT", t);
+
 	
 	return ts;
  }

@@ -4,6 +4,8 @@ package com.teraim.nils.expr;
 
 import java.util.Vector;
 
+import android.util.Log;
+
 
 class Scanner {
 
@@ -90,12 +92,18 @@ class Scanner {
 	    if (i+1 < s.length()) {
 		String pair = s.substring(i, i+2);
 		int ttype = 0;
-		if (pair.equals("<="))
+		if (pair.equals("<=")||pair.equals("LE"))
 		    ttype = Token.TT_LE;
-		else if (pair.equals(">="))
+		else if (pair.equals(">=")||pair.equals("GE")) {
 		    ttype = Token.TT_GE;
-		else if (pair.equals("<>"))
+		    Log.e("NILS","GETS HERE DANGGGG");
+		}
+		else if (pair.equals("<>")||pair.equals("NE"))
 		    ttype = Token.TT_NE;
+		else if (pair.equals("GT"))
+		    ttype = Token.TT_GT;
+		else if (pair.equals("LT"))
+		    ttype = Token.TT_LT;
 		if (0 != ttype) {
 		    tokens.addElement(new Token(ttype, 0, s, i, i+2));
 		    return i+2;

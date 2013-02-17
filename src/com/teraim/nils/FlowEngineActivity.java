@@ -1,5 +1,6 @@
 package com.teraim.nils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Map;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -18,17 +20,20 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TableLayout.LayoutParams;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.teraim.nils.DataTypes.AddRuleBlock;
 import com.teraim.nils.DataTypes.Block;
 import com.teraim.nils.DataTypes.ButtonBlock;
+import com.teraim.nils.DataTypes.ButtonBlock.Action;
 import com.teraim.nils.DataTypes.CreateFieldBlock;
 import com.teraim.nils.DataTypes.LayoutBlock;
 import com.teraim.nils.DataTypes.SetValueBlock;
 import com.teraim.nils.DataTypes.StartBlock;
 import com.teraim.nils.DataTypes.Workflow;
 import com.teraim.nils.exceptions.EvalException;
+import com.teraim.nils.exceptions.RuleException;
 import com.teraim.nils.expr.Aritmetic;
-import com.teraim.nils.expr.Literal;
 import com.teraim.nils.expr.Numeric;
 import com.teraim.nils.expr.SyntaxException;
 
@@ -45,7 +50,8 @@ public class FlowEngineActivity extends Activity {
 	Workflow wf;
 	View view;
 	//Keep track of input in below arraylist.
-	HashMap<Variable,View> bindings = new HashMap<Variable,View>();
+	Map<Variable,View> bindings = new HashMap<Variable,View>();
+	private List<AddRuleBlock> rules = new ArrayList<AddRuleBlock>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +93,7 @@ public class FlowEngineActivity extends Activity {
 					l.setOrientation(LinearLayout.HORIZONTAL);
 					my_root.addView(l);
 					my_root = l;
-					
+
 				}
 
 			}
@@ -103,19 +109,25 @@ public class FlowEngineActivity extends Activity {
 				bu.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View arg0) {
-						String action = bl.getAction();
+						Action action = bl.getAction();
 						//ACtion = workflow to execute.
 						//Commence!
+						save();
 						if (action!=null) {
-							Intent intent = new Intent(me, FlowEngineActivity.class);
-							Bundle b = new Bundle();
-							b.putString("workflow_name", action); //Your id
-							intent.putExtras(b); //Put your id to your next Intent
-							//save all changes
-							save();
-							me.startActivity(intent);
+							//Workflow?
+							if (action.isWorkflow()){
+								Intent intent = new Intent(me, FlowEngineActivity.class);
+								Bundle b = new Bundle();
+								b.putString("workflow_name", action.wfName); //Your id
+								intent.putExtras(b); //Put your id to your next Intent
+								//save all changes
 
-						}
+								me.startActivity(intent);
+								//Validation?
+							} else
+								validate();
+						} else
+							Log.e("NILS","Action was null for "+bl.getName());
 					}
 
 				});
@@ -183,19 +195,56 @@ public class FlowEngineActivity extends Activity {
 
 				}
 			}
+			else if (b instanceof AddRuleBlock) {
+				Log.d("NILS","AddRule block found");
+				AddRuleBlock bl = (AddRuleBlock)b;
+				rules.add(bl);
+			}
+
 
 		}
 
 	}
-	
+
 	private void save() {
-		 Iterator<Map.Entry<Variable,View>> it = bindings.entrySet().iterator();
-		    while (it.hasNext()) {
-		        Map.Entry<Variable,View> pairs = (Map.Entry<Variable,View>)it.next();
-		        System.out.println(pairs.getKey() + " = " + pairs.getValue());
-		        EditText et = (EditText)pairs.getValue();
-		        pairs.getKey().setValue(et.getText().toString());
-		    }
+		Iterator<Map.Entry<Variable,View>> it = bindings.entrySet().iterator();
+		while (it.hasNext()) {
+			Map.Entry<Variable,View> pairs = (Map.Entry<Variable,View>)it.next();
+			System.out.println(pairs.getKey() + " = " + pairs.getValue());
+			EditText et = (EditText)pairs.getValue();
+			pairs.getKey().setValue(et.getText().toString());
+		}
 	}
+
+	private void validate() {
+		boolean result=false;
+		for(AddRuleBlock bl:rules) {
+			try {
+				//Test...
+				result = bl.execute();
+			}  catch (SyntaxException e) {
+				Log.e("NILS","SyntaxException! "+e.getMessage());
+				continue;
+			}
+				//Find the target.
+				Variable target;
+				try {
+					target = bl.getTarget();
+				} catch (RuleException e) {
+					//If the variable does not exist, continue
+					Log.e("NILS","Variable was missing in rule validation: "+bl.getName());
+					continue;
+				}
+				View v = bindings.get(target);
+				//Change color.
+				if(result==false) 
+					v.setBackgroundColor(Color.RED);
+				else 
+					v.setBackgroundColor(0xFF051417);
+				Toast.makeText(this, bl.getErrorMessage(), Toast.LENGTH_LONG).show();
+			}
+		}
+
+	
 
 }

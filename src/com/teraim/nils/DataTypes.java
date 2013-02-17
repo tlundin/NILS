@@ -13,7 +13,9 @@ import android.util.Log;
 
 import com.teraim.nils.exceptions.EvalException;
 import com.teraim.nils.exceptions.IllegalCallException;
+import com.teraim.nils.exceptions.RuleException;
 import com.teraim.nils.expr.Aritmetic;
+import com.teraim.nils.expr.Expr;
 import com.teraim.nils.expr.Literal;
 import com.teraim.nils.expr.Parser;
 import com.teraim.nils.expr.SyntaxException;
@@ -99,7 +101,7 @@ public class DataTypes  {
 	public abstract static class Block {
 		private String label;
 
-		public void setLabel(String lbl) {
+		public Block(String lbl) {
 			label = lbl;
 		}
 
@@ -117,7 +119,7 @@ public class DataTypes  {
 		private String workflowName;
 
 		public StartBlock(String lbl,String wfn) {
-			setLabel(lbl);
+			super(lbl);
 			workflowName = wfn;
 		}
 
@@ -128,25 +130,51 @@ public class DataTypes  {
 
 	/**
 	 * buttonblock
+	 * 
+	 * name is ID for now..
+	 * 
 	 * @author Terje
 	 *
 	 */
 	public static class ButtonBlock extends Block {
-		String text,action;
+		String text,action,name;
 
-		public ButtonBlock(String lbl,String text, String action) {
-			setLabel(lbl);
+		public ButtonBlock(String lbl,String text, String action, String name) {
+			super(lbl);
 			Log.d("NILS","ButtonText is set to "+text);
 			this.text = text;
 			this.action=action;
+			this.name=name;
 		}
 
 		public String getText() {
 			return text;
 		}
 
-		public String getAction() {
-			return action;
+		public Action getAction() {
+			return new Action(action);
+		}
+		
+		public String getName() {
+			return name;
+		}
+		
+		public class Action {
+			public final static int VALIDATE = -1;
+			public final static int WF_EXECUTE = -2;
+			
+			private int type;
+			public String wfName=null;
+			public Action(String t) {
+				if (t.equals("validate"))
+					type = VALIDATE;
+				else
+					type = WF_EXECUTE;
+				wfName = t;
+			}
+			public boolean isWorkflow() {
+				return type==WF_EXECUTE;
+			}
 		}
 	}
 
@@ -163,7 +191,7 @@ public class DataTypes  {
 		//Create a fieldblock.
 		//SIDEEFFECT: Creates Variable if not already created.
 		public CreateFieldBlock(String lbl,String _varName,String _varType, String _purpose) {
-			setLabel(lbl);
+			super(lbl);
 			varName = _varName;
 			varType = _varType;
 			purpose = _purpose;
@@ -209,7 +237,7 @@ public class DataTypes  {
 
 		//Save references.
 		public SetValueBlock(String lbl,String _varReference,String _expr) {
-			setLabel(lbl);
+			super(lbl);
 			varRef = _varReference;
 			expr = _expr;
 		}
@@ -253,12 +281,55 @@ public class DataTypes  {
 			return alignment;
 		}
 		public LayoutBlock(String lbl, String layoutDirection, String alignment) {
-			setLabel(lbl);
+			super(lbl);
 			this.layoutDirection = layoutDirection;
 			this.alignment = alignment;
 		}
 	}
 
+	
+	/**
+	 * AddRuleBlock
+	 * @author Terje
+	 *
+	 */
+	public static class AddRuleBlock extends Block {
+
+		private String targetName, condition, action, errorMsg,name;
+
+		
+		public AddRuleBlock(String lbl, String ruleName,String target, String condition, String action, String errorMsg) {
+			super(lbl);
+			this.name=ruleName;
+			this.targetName=target;
+			this.condition=condition;
+			this.action=action;
+			this.errorMsg=errorMsg;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		public Variable getTarget() throws RuleException {
+			Variable var = CommonVars.cv().getVariable(targetName);
+			if (var==null)
+				throw new RuleException("Variable "+targetName+" must exist");
+			return var;
+		}
+		
+		//Execute Rule. Target will be colored accordingly.
+		public boolean execute() throws SyntaxException {
+			Expr result=null;
+			result = Parser.parse(condition);
+			Log.d("NILS","Result of eval was: "+result.value());
+			return (result.value()==1.0);
+		}
+		
+		public String getErrorMessage() {
+			return errorMsg;
+		}
+	}
+	
 	///ValuePair
 
 	public class ValuePair {

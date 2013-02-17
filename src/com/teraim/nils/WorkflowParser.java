@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.Xml;
 
+import com.teraim.nils.DataTypes.AddRuleBlock;
 import com.teraim.nils.DataTypes.Block;
 import com.teraim.nils.DataTypes.ButtonBlock;
 import com.teraim.nils.DataTypes.CreateFieldBlock;
@@ -39,8 +40,8 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 
 	Context context;
 	//Location of bundle.
-	private final static String serverUrl = "http://83.250.104.137:8080/nilsbundle.xml";
-	//private final static String serverUrl = "http://teraim.com/nilsbundle.xml";
+	//private final static String serverUrl = "http://83.250.104.137:8080/nilsbundle.xml";
+	private final static String serverUrl = "http://teraim.com/nilsbundle.xml";
 	//Take input file from remote web server and parse it.
 	//Generates a list of workflows from a Bundle.
 	@Override
@@ -167,6 +168,8 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 					blocks.add(readBlockSetValue(parser));
 				else if (name.equals("block_create_field")) 
 					blocks.add(readBlockCreateField(parser));
+				else if (name.equals("block_add_rule")) 
+					blocks.add(readBlockAddRule(parser));
 				else
 					skip(parser);
 		}
@@ -214,7 +217,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 	//For now just create dummy.
 	private static ButtonBlock readBlockButton(XmlPullParser parser) throws IOException, XmlPullParserException {
 		Log.d("NILS","Button block...");
-		String text=null,label=null,action=null;
+		String text=null,label=null,action=null,myname=null;
 		parser.require(XmlPullParser.START_TAG, null,"block_button");
 		while (parser.next() != XmlPullParser.END_TAG) {
 			if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -225,12 +228,14 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 				text = readText("text",parser);
 			else if (name.equals("action")) 
 				action = readText("action",parser);
+			else if (name.equals("name")) 
+				myname = readText("name",parser);
 			else if (name.equals("label")) 
 				label = readText("label",parser);
 			else
 				skip(parser);
 		}
-		return new ButtonBlock(label,text,action);
+		return new ButtonBlock(label,text,action,myname);
 	}
 	
 	/**
@@ -325,6 +330,41 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 		return new LayoutBlock(label,layout,align);
 	}
 	
+	/**
+	 * Creates a AddRuleBlock. Adds a rule to a variable or object. 
+	 * @param parser
+	 * @return
+	 * @throws IOException
+	 * @throws XmlPullParserException
+	 */
+	private static AddRuleBlock readBlockAddRule(XmlPullParser parser) throws IOException, XmlPullParserException {
+
+		Log.d("NILS","Add rule block...");		
+		String label=null, target=null, condition=null, action=null, errorMsg=null,myname=null;
+		parser.require(XmlPullParser.START_TAG, null,"block_add_rule");
+		while (parser.next() != XmlPullParser.END_TAG) {
+			if (parser.getEventType() != XmlPullParser.START_TAG) {
+				continue;
+			}		
+			String name= parser.getName();
+			if (name.equals("target")) {
+				target = readText("target",parser);
+			} else if (name.equals("condition")) {
+				condition = readText("condition",parser);
+			} else if (name.equals("action")) {
+				action = readText("action",parser);
+			} else if (name.equals("errorMsg")) {
+				errorMsg = readText("errorMsg",parser);
+			} else if (name.equals("name")) {
+				myname = readText("name",parser);
+			}else if (name.equals("label")) {
+				label = readText("label",parser);
+			} else 
+				skip(parser);
+			
+		}
+		return new AddRuleBlock(label,myname,target,condition,action,errorMsg);
+	}
 	
 	// Read symbol from tag.
 	private static String readSymbol(String tag,XmlPullParser parser) throws IOException, XmlPullParserException {

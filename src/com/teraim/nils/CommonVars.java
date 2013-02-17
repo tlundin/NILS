@@ -130,7 +130,6 @@ public class CommonVars {
 		    return (Numeric)result;
 		}
 		else {
-			Log.e("NILS","WARNING: The variable you created already exist: "+name);
 			return (Numeric)result;
 		}
 	}public synchronized Aritmetic makeAritmetic(String name) {
@@ -140,7 +139,6 @@ public class CommonVars {
 		    return (Aritmetic)result;
 		}
 		else {
-			Log.e("NILS","WARNING: The variable you created already exist: "+name);
 			return (Aritmetic)result;
 		}
 	}
@@ -151,7 +149,6 @@ public class CommonVars {
 		    return (Literal)result;
 		}
 		else {
-			Log.e("NILS","WARNING: The variable you created already exist: "+name);
 			return (Literal)result;
 		}
 	}
@@ -165,15 +162,18 @@ public class CommonVars {
 	private Map<String,Workflow> myWfs = new HashMap<String,Workflow>();
 	
 	public void setWorkflows(List<Workflow> l) {
-		for (Workflow wf:l)
-			if (wf!=null) {
-				if (wf.getName()!=null) {
-					Log.d("NILS","Adding wf with id "+wf.getName());
-					myWfs.put(wf.getName(), wf);
+		if (l==null)
+			Log.e("NILS","Parse Error: Workflowlist is null in SetWorkFlows");
+		else 
+			for (Workflow wf:l)
+				if (wf!=null) {
+					if (wf.getName()!=null) {
+						Log.d("NILS","Adding wf with id "+wf.getName());
+						myWfs.put(wf.getName(), wf);
+					} else
+						Log.d("NILS","Workflow name was null in setWorkflows");
 				} else
-					Log.d("NILS","Workflow name was null in setWorkflows");
-			} else
-				Log.d("NILS","Workflow was null in setWorkflows");
+					Log.d("NILS","Workflow was null in setWorkflows");
 	}
 	
 	public Workflow getWorkflow(String id) {

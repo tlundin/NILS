@@ -29,7 +29,7 @@
     <EditText
         android:id="@+id/editfieldinput"
         style="@style/Field_Style"
-        android:layout_width="0dip"
+        android:layout_width="60dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginBottom="6dp"
