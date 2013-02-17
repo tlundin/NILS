@@ -132,18 +132,22 @@ public class DataTypes  {
 	 *
 	 */
 	public static class ButtonBlock extends Block {
-		String text;
+		String text,action;
 
-		public ButtonBlock(String lbl,String text) {
+		public ButtonBlock(String lbl,String text, String action) {
 			setLabel(lbl);
 			Log.d("NILS","ButtonText is set to "+text);
 			this.text = text;
+			this.action=action;
 		}
 
 		public String getText() {
 			return text;
 		}
 
+		public String getAction() {
+			return action;
+		}
 	}
 
 	/**
@@ -217,12 +221,16 @@ public class DataTypes  {
 			if (var==null)
 				throw new EvalException("Variable does not exist");
 			//Should expression be evaluated?
-			if (var.getType().equals(Variable.ARITMETIC)) {
+			if (var.getType().equals(Variable.ARITMETIC)||
+					var.getType().equals(Variable.NUMERIC)) {
 				double val =-1;
 				val = Parser.parse(expr).value();
 				((Aritmetic)var).setValue(val);
-			} else
+				Log.d("NILS","Expr: "+expr+" evaluated to: "+val);
+			} else {
 				((Literal)var).setValue(expr);
+				
+			}
 		}
 
 

@@ -39,8 +39,8 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 
 	Context context;
 	//Location of bundle.
-	//private final static String serverUrl = "http://83.250.104.137:8080/nilsbundle.xml";
-	private final static String serverUrl = "http://teraim.com/nilsbundle.xml";
+	private final static String serverUrl = "http://83.250.104.137:8080/nilsbundle.xml";
+	//private final static String serverUrl = "http://teraim.com/nilsbundle.xml";
 	//Take input file from remote web server and parse it.
 	//Generates a list of workflows from a Bundle.
 	@Override
@@ -214,7 +214,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 	//For now just create dummy.
 	private static ButtonBlock readBlockButton(XmlPullParser parser) throws IOException, XmlPullParserException {
 		Log.d("NILS","Button block...");
-		String text=null,label=null;
+		String text=null,label=null,action=null;
 		parser.require(XmlPullParser.START_TAG, null,"block_button");
 		while (parser.next() != XmlPullParser.END_TAG) {
 			if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -223,12 +223,14 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 			String name= parser.getName();
 			if (name.equals("text")) 
 				text = readText("text",parser);
+			else if (name.equals("action")) 
+				action = readText("action",parser);
 			else if (name.equals("label")) 
 				label = readText("label",parser);
 			else
 				skip(parser);
 		}
-		return new ButtonBlock(label,text);
+		return new ButtonBlock(label,text,action);
 	}
 	
 	/**

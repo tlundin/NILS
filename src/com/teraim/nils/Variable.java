@@ -13,5 +13,6 @@ public interface Variable {
 
 	public String getName();
 	
+	public void setValue(String value);
 	
 }

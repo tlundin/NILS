@@ -64,4 +64,14 @@ public String getType() {
 	return Variable.ARITMETIC;
 }
 
+
+@Override
+public void setValue(String value) {
+	try {val=Double.parseDouble(value);}
+	catch (NumberFormatException e) {
+		Log.d("NILS","Numberinput in wrong format");
+	}
+	Log.d("NILS","Variable "+this.toString()+" set to "+val+" from string "+value);
+}
+
 }

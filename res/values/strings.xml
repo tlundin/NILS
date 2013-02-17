@@ -9,6 +9,7 @@
     <string name="title_select_color">Välj dosans färg</string>
 	<color name="white">#FFFFFF</color>	
 	<color name="black">#000000</color>	
+	<color name="brown">#3D352A</color>
 	<string name="glaciar_header">GLACIÄR OCH SNÖTÄCKT MARK</string>
 		<string name="glaciartext">Detta är en välavgränsad och tydlig företeelse, som framför allt kännetecknas av att det inte finns så mycket annat på ytan att beskriva, och avgränsas lämpligtvis först av allt. Svåra gränsdragningar är framför allt mot tidvis avsmält (extrema snölegor)</string>
 	<string name="glaciar_detail">Har en permanent kärna av is som oftast skymtar fram genom snön.</string>
@@ -36,5 +37,31 @@
 	<string name="radio_anlagd5">Jordbruksområde</string>
 	<string name="arkivbilder_st_v_st_nord_syd_">Arkivbilder (öst,väst,nord,syd)</string>
 	<string name="local_service_started">123456789</string>
+	
+	
+	<style name="Field_Style">
+	<item name="android:textColor">@color/white</item>
+    <item name="android:textSize">30sp</item>
+    <item name="android:textStyle">bold</item>
+    <item name="android:shadowColor">@color/black</item>
+    <item name="android:shadowDx">1</item>
+    <item name="android:shadowDy">1</item>
+    <item name="android:shadowRadius">2</item>
+    
+	</style>
+    	
+	<style name="WF_Text">
+    <item name="android:layout_width">fill_parent</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:textColor">#ffffff</item>
+    <item name="android:gravity">center</item>
+    <item name="android:layout_margin">3dp</item>
+    <item name="android:textSize">30sp</item>
+    <item name="android:textStyle">bold</item>
+    <item name="android:shadowColor">#000000</item>
+    <item name="android:shadowDx">1</item>
+    <item name="android:shadowDy">1</item>
+    <item name="android:shadowRadius">2</item>
+	</style>
 				
 </resources>
