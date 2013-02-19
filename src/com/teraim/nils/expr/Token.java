@@ -12,6 +12,8 @@ class Token {
  public static final int TT_GE     = -7;
  public static final int TT_LT     = -8;
  public static final int TT_GT     = -9;
+ public static final int TT_EQ     = -10;
+ 
 
 
  public Token(int ttype, double nval, String input, int start, int end) {

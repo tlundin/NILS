@@ -94,16 +94,16 @@ class Scanner {
 		int ttype = 0;
 		if (pair.equals("<=")||pair.equals("LE"))
 		    ttype = Token.TT_LE;
-		else if (pair.equals(">=")||pair.equals("GE")) {
-		    ttype = Token.TT_GE;
-		    Log.e("NILS","GETS HERE DANGGGG");
-		}
+		else if (pair.equals(">=")||pair.equals("GE")) 
+		    ttype = Token.TT_GE;		
 		else if (pair.equals("<>")||pair.equals("NE"))
 		    ttype = Token.TT_NE;
 		else if (pair.equals("GT"))
 		    ttype = Token.TT_GT;
 		else if (pair.equals("LT"))
 		    ttype = Token.TT_LT;
+		else if (pair.equals("EQ"))
+		    ttype = Token.TT_EQ;
 		if (0 != ttype) {
 		    tokens.addElement(new Token(ttype, 0, s, i, i+2));
 		    return i+2;

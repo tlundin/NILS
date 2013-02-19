@@ -293,30 +293,24 @@ public class DataTypes  {
 	 * @author Terje
 	 *
 	 */
-	public static class AddRuleBlock extends Block {
-
-		private String targetName, condition, action, errorMsg,name;
-
+	public static class Rule {
 		
-		public AddRuleBlock(String lbl, String ruleName,String target, String condition, String action, String errorMsg) {
-			super(lbl);
+		public String targetName, condition, action, errorMsg,name;
+
+		public Rule(String ruleName, String target, String condition,
+				String action, String errorMsg) {
 			this.name=ruleName;
 			this.targetName=target;
 			this.condition=condition;
 			this.action=action;
 			this.errorMsg=errorMsg;
 		}
-		
-		public String getName() {
-			return name;
-		}
 		public Variable getTarget() throws RuleException {
 			Variable var = CommonVars.cv().getVariable(targetName);
 			if (var==null)
 				throw new RuleException("Variable "+targetName+" must exist");
 			return var;
-		}
-		
+		}	
 		//Execute Rule. Target will be colored accordingly.
 		public boolean execute() throws SyntaxException {
 			Expr result=null;
@@ -328,6 +322,26 @@ public class DataTypes  {
 		public String getErrorMessage() {
 			return errorMsg;
 		}
+		public String getName() {
+			return name;
+		}	
+	}
+	
+	public static class AddRuleBlock extends Block {
+
+	private Rule r;
+		
+		public AddRuleBlock(String lbl, String ruleName,String target, String condition, String action, String errorMsg) {
+			super(lbl);
+			this.r = new Rule(ruleName,target,condition,action,errorMsg);
+
+		}
+		
+		public Rule getRule() {
+			return r;
+		}
+	
+
 	}
 	
 	///ValuePair

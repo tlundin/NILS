@@ -1,9 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/myRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#051417" 
+        android:divider="#b5b5b5"
+        android:dividerHeight="1dp">
+    
+<LinearLayout 
+    android:id="@+id/validator_layer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:visibility="gone"
+    android:layout_weight="4"
+    android:background="#051417" >
+
+      <ListView
+        android:id="@+id/validatorlist"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:listSelector="@drawable/validator_list_selector" 
+        android:layout_weight="2" >
+    </ListView>   
+	
+	<View 
+    android:layout_height="fill_parent"
+    android:layout_width="1dip"
+    android:background="#ffffffff" />
+
+   <TextView android:id="@+id/errortext"
+                  android:layout_width="fill_parent" 
+                  android:layout_height="match_parent"
+                  android:maxLines="10" 
+                  android:singleLine="false"  
+                  android:layout_weight="2"
+                  android:textSize="15sp"
+                  android:textColor="@color/white"  
+                  android:layout_margin="6dp"                       
+                  android:text="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum." >
+     </TextView> 
+    
+</LinearLayout>
+	<View 
+    android:layout_width="fill_parent"
+    android:layout_height="1dip"
+    android:background="#ffffffff" />
+
+<ScrollView 
+    android:layout_width="fill_parent" 
+    android:layout_height="fill_parent"
+    android:layout_weight="1"
+    >
+   
+<LinearLayout 
+    android:id="@+id/myRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="#051417" >
 
 </LinearLayout>
+
+</ScrollView>
+
+   
+</LinearLayout>
+

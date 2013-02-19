@@ -15,9 +15,12 @@ import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TableLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +31,7 @@ import com.teraim.nils.DataTypes.ButtonBlock;
 import com.teraim.nils.DataTypes.ButtonBlock.Action;
 import com.teraim.nils.DataTypes.CreateFieldBlock;
 import com.teraim.nils.DataTypes.LayoutBlock;
+import com.teraim.nils.DataTypes.Rule;
 import com.teraim.nils.DataTypes.SetValueBlock;
 import com.teraim.nils.DataTypes.StartBlock;
 import com.teraim.nils.DataTypes.Workflow;
@@ -51,8 +55,13 @@ public class FlowEngineActivity extends Activity {
 	View view;
 	//Keep track of input in below arraylist.
 	Map<Variable,View> bindings = new HashMap<Variable,View>();
-	private List<AddRuleBlock> rules = new ArrayList<AddRuleBlock>();
+	private List<Rule> rules = new ArrayList<Rule>();
+	private final ArrayList<Rule>brokenRules = new ArrayList<Rule>();	
 
+	private ListView lv; 
+	private ValidatorListAdapter mAdapter;
+	private View validator_layer;
+	private TextView errorView;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -69,6 +78,19 @@ public class FlowEngineActivity extends Activity {
 		} else {
 			Log.d("NILS","Now executing workflow "+name);
 			setContentView(R.layout.wf_default);
+			errorView = (TextView)findViewById(R.id.errortext);
+			validator_layer = findViewById(R.id.validator_layer);
+			//The list of all rules currently not ok
+			mAdapter = new ValidatorListAdapter(this,brokenRules);
+			lv = (ListView)findViewById(R.id.validatorlist);
+	        lv.setAdapter(mAdapter);
+	        lv.setOnItemClickListener(new OnItemClickListener(){
+
+				@Override
+				public void onItemClick(AdapterView<?> arg0, View arg1,
+						int index, long arg3) {
+					errorView.setText(brokenRules.get(index).getErrorMessage());
+				}});
 			execute();
 		}
 
@@ -198,7 +220,7 @@ public class FlowEngineActivity extends Activity {
 			else if (b instanceof AddRuleBlock) {
 				Log.d("NILS","AddRule block found");
 				AddRuleBlock bl = (AddRuleBlock)b;
-				rules.add(bl);
+				rules.add(bl.getRule());
 			}
 
 
@@ -216,12 +238,16 @@ public class FlowEngineActivity extends Activity {
 		}
 	}
 
+	//Evaluate all rules.
+	//Show the rules that were broken in the UI.
 	private void validate() {
+		
 		boolean result=false;
-		for(AddRuleBlock bl:rules) {
+		brokenRules.clear();
+		for(Rule rule:rules) {
 			try {
 				//Test...
-				result = bl.execute();
+				result = rule.execute();
 			}  catch (SyntaxException e) {
 				Log.e("NILS","SyntaxException! "+e.getMessage());
 				continue;
@@ -229,20 +255,31 @@ public class FlowEngineActivity extends Activity {
 				//Find the target.
 				Variable target;
 				try {
-					target = bl.getTarget();
+					target = rule.getTarget();
 				} catch (RuleException e) {
 					//If the variable does not exist, continue
-					Log.e("NILS","Variable was missing in rule validation: "+bl.getName());
+					Log.e("NILS","Variable was missing in rule validation: "+rule.getName());
 					continue;
 				}
 				View v = bindings.get(target);
-				//Change color.
-				if(result==false) 
+				//Found a broken rule!
+				if(result==false) {
 					v.setBackgroundColor(Color.RED);
+					brokenRules.add(rule);
+					Toast.makeText(this, rule.getErrorMessage(), Toast.LENGTH_LONG).show();
+				}
 				else 
 					v.setBackgroundColor(0xFF051417);
-				Toast.makeText(this, bl.getErrorMessage(), Toast.LENGTH_LONG).show();
+				
 			}
+		if (brokenRules.size()>0) {
+			validator_layer.setVisibility(View.VISIBLE);
+			mAdapter.notifyDataSetChanged();
+			lv.requestFocusFromTouch();
+			lv.setSelection(0);
+			errorView.setText(brokenRules.get(0).getErrorMessage());
+		} else
+			validator_layer.setVisibility(View.GONE);
 		}
 
 	

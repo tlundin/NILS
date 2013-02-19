@@ -89,7 +89,7 @@ public class Parser {
 	return reparse();
  }
 
- static private final String operatorChars = "*/+-^<>=,()GTLEN";
+ static private final String operatorChars = "*/+-^<>=,()GTLEQN";
 
  private Expr reparse() throws SyntaxException {
 	tokens.index = -1;
@@ -122,7 +122,9 @@ public class Parser {
 	    case '<':         
 	    case Token.TT_LT: l = 20; r = 21; rator = Expr.LT; break;
 	    case Token.TT_LE: l = 20; r = 21; rator = Expr.LE; break;
-	    case '=':         l = 20; r = 21; rator = Expr.EQ; break;
+	    case '=':         
+	    case Token.TT_EQ: l = 20; r = 21; rator = Expr.EQ; break;
+	    
 	    case Token.TT_NE: l = 20; r = 21; rator = Expr.NE; break;
 	    case Token.TT_GE: l = 20; r = 21; rator = Expr.GE; break;
 	    case '>':         
@@ -349,6 +351,7 @@ public class Parser {
 	ts[i++] = new Token(Token.TT_WORD, 0, "if", t);
 	ts[i++] = new Token(Token.TT_LT, 0, "LT", t);
 	ts[i++] = new Token(Token.TT_GT, 0, "GT", t);
+	ts[i++] = new Token(Token.TT_EQ, 0, "EQ", t);
 
 	
 	return ts;
