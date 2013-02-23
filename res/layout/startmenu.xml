@@ -2,16 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center_vertical"
+    android:gravity="left"
+    android:layout_marginLeft="50dp"
     android:orientation="vertical" >
-    
-    <LinearLayout
-   android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginLeft="40dp"
-    
-    android:orientation="vertical"
- >
+        
+ 
     <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -48,14 +43,49 @@
         android:layout_height="wrap_content" />
 
     </LinearLayout>
-
-</LinearLayout>
+    
     <Button
         android:id="@+id/button1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
+        android:layout_gravity="left"
         android:minWidth="128dp"
-        android:text="Start" 
+        android:text="Starta App" 
         android:onClick="onButton"/>
+    
+    <View
+    android:layout_width="fill_parent"
+    android:layout_height="1dip"
+    android:layout_marginTop="20dp"
+    android:layout_marginBottom="20dp"
+    android:background="#000000" />
+    
+     <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" 
+    >
+    <TextView 
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textSize="30sp"   
+    android:text="Välj flödesmaskin: "/>
+
+    <Spinner
+        android:id="@+id/flow_spinner"  
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    </LinearLayout>
+  
+     <Button
+        android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:minWidth="128dp"
+        android:text="Starta valt arbetsflöde" 
+        android:onClick="onWorkflowButton"/>
+    
+    
 </LinearLayout>

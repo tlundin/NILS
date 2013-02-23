@@ -11,6 +11,7 @@ import java.util.List;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.teraim.nils.exceptions.EvalException;
 import com.teraim.nils.exceptions.IllegalCallException;
 import com.teraim.nils.exceptions.RuleException;
@@ -598,6 +599,29 @@ public class DataTypes  {
 		public Sorted sort() {
 			Sorted s = new Sorted();
 			return s;
+		}
+		
+		public LatLng[] getCorners() {
+			//North south
+			double[] lat = new double[provytor.size()];
+			//East west
+			double[] lon = new double[provytor.size()];
+			int i = 0;
+					
+			for(Provyta y:provytor) {
+				lat[i]= y.lat;
+				lon[i]= y.longh;
+				Log.d("NILS","SN: "+y.N+" SE: "+y.E);
+				i++;
+			}
+			Arrays.sort(lat);
+			Arrays.sort(lon);
+			LatLng[] ret = new LatLng[2];
+			//sw
+			ret[0] = new LatLng(lat[0],lon[0]);
+			//ne
+			ret[1]= new LatLng(lat[lat.length-1],  lon[lon.length-1]);
+			return ret;
 		}
 
 		public class Sorted {

@@ -180,6 +180,13 @@ public class CommonVars {
 		return myWfs.get(id);
 	}
 	
+	public String[] getWorkflowNames() {
+		if (myWfs==null)
+			return null;
+		String[] array = new String[myWfs.keySet().size()];
+		return myWfs.keySet().toArray(array);
+		 
+	}
 	
 	
 	//getter & setter for current ruta,provyta,delyta..

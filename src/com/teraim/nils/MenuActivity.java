@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 /**
@@ -100,7 +101,7 @@ public class MenuActivity extends Activity {
 		refreshStatusRow();
 	}
 
-	private void refreshStatusRow() {
+	protected void refreshStatusRow() {
 		Log.d("NILS","Refreshing status row");
 		if (mnu2!=null)
 			mnu2.setTitle("Synkning: "+CommonVars.cv().getSyncStatusS());
@@ -108,7 +109,10 @@ public class MenuActivity extends Activity {
 			mnu3.setTitle("Användare: "+CommonVars.cv().getUserName());
 		if (mnu4!=null)
 			mnu4.setTitle("Färg: "+CommonVars.cv().getDeviceColor());
+		
 	}
+
+	
 	private boolean MenuChoice(MenuItem item) {
 
 	

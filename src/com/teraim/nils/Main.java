@@ -1,12 +1,10 @@
 package com.teraim.nils;
 
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.IntentFilter;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.database.Cursor;
@@ -15,6 +13,9 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 
 public class Main extends Activity {
 
@@ -35,15 +36,22 @@ public class Main extends Activity {
 		//Get the instance.
 		cv = CommonVars.cv();
 
-		//Load workflow bundle
-		new WorkflowParser().execute(this);
-
+		if(GooglePlayServicesUtil.isGooglePlayServicesAvailable(this)
+				== ConnectionResult.SUCCESS)
+			Toast.makeText(this, "Google Services found", Toast.LENGTH_LONG).show();
+		else
+			Toast.makeText(this, "Google Services not found: "+
+					GooglePlayServicesUtil.isGooglePlayServicesAvailable(this)
+		, Toast.LENGTH_LONG).show();
+		
+		oonCreate(savedInstanceState);
+			
 	}
 	
-
+	
 	//@Override
 	public void oonCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+		//super.onCreate(savedInstanceState);
 
 		//show start picture
 		setContentView(R.layout.loadscreen);
@@ -65,7 +73,7 @@ public class Main extends Activity {
 		cv = CommonVars.cv();
 
 		//Load workflow bundle
-		cv.setWorkflows(WorkflowParser.parse(this));
+		//cv.setWorkflows(WorkflowParser.parse(this));
 
 		//Load datatypes
 		T = DataTypes.getSingleton(this);
@@ -104,9 +112,6 @@ public class Main extends Activity {
 					}
 				}, INITIAL_DELAY);
 			}
-			//Test..
-			cv.setDeviceColor(CommonVars.UNDEFINED);
-			CommonVars.cv().putG("ruta_id",CommonVars.UNDEFINED);
 		}
 	}
 
@@ -152,7 +157,9 @@ public class Main extends Activity {
 				//If Rutaid known, create the Ruta from the input files.
 				//TODO: Some error checking needed here...
 				cv.setRuta(T.findRuta(cv.getG("ruta_id")));
-				startActivity(startMenuIntent); 
+				//startActivity(startMenuIntent); 
+				WorkflowParser wfp = new WorkflowParser();
+				wfp.execute(this);
 				finish();
 			}
 		}

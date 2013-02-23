@@ -35,7 +35,6 @@ import com.teraim.nils.DataTypes.Workflow;
  * Will try to parse the XML into a list.
  * TODO: Must implement good syntax error messages.
  */
-//class RetreiveFeedTask extends AsyncTask<String, Void, RSSFeed> {
 public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 
 	Context context;
@@ -52,13 +51,13 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 	
 	 @Override
 	 protected void onPostExecute(List<Workflow> result) {
-		 Log.d("NILS","Gets here!");
+		 Log.d("NILS","Workflows parsed");
+		 
 		 CommonVars.cv().setWorkflows(result);
-		Intent intent = new Intent(context, FlowEngineActivity.class);
-		Bundle b = new Bundle();
-		b.putString("workflow_name", "main"); //Your id
-		intent.putExtras(b); //Put your id to your next Intent
-		context.startActivity(intent);
+		 
+	    Intent startMenu = new Intent(context, StartMenuActivity.class);
+		 
+		context.startActivity(startMenu);
 			
 	   }
 
