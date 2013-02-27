@@ -4,8 +4,8 @@ import com.teraim.nils.Variable;
 
 public class Numeric extends Aritmetic {
 
-	public Numeric(String name) {
-		super(name);
+	public Numeric(String name, String label) {
+		super(name,label);
 	}
 
 	@Override

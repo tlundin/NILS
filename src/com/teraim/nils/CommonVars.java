@@ -27,6 +27,7 @@ import com.teraim.nils.DataTypes.Ruta;
 import com.teraim.nils.DataTypes.Workflow;
 import com.teraim.nils.exceptions.SharedPrefMissingException;
 import com.teraim.nils.expr.Aritmetic;
+import com.teraim.nils.expr.Bool;
 import com.teraim.nils.expr.Literal;
 import com.teraim.nils.expr.Numeric;
 
@@ -123,29 +124,40 @@ public class CommonVars {
 	
 	private Hashtable<String,Variable> myVars = new Hashtable<String,Variable>();
 
-	public synchronized Numeric makeNumeric(String name) {
+	public synchronized Bool makeBoolean(String name, String label) {
 		Variable result = myVars.get(name);
 		if (result == null) {
-		    myVars.put(name, result = new Numeric(name));
+		    myVars.put(name, result = new Bool(name,label));
+		    return (Bool)result;
+		}
+		else {
+			return (Bool)result;
+		}
+	}
+		
+	public synchronized Numeric makeNumeric(String name, String label) {
+		Variable result = myVars.get(name);
+		if (result == null) {
+		    myVars.put(name, result = new Numeric(name,label));
 		    return (Numeric)result;
 		}
 		else {
 			return (Numeric)result;
 		}
-	}public synchronized Aritmetic makeAritmetic(String name) {
+	}public synchronized Aritmetic makeAritmetic(String name, String label) {
 		Variable result = myVars.get(name);
 		if (result == null) {
-		    myVars.put(name, result = new Aritmetic(name));
+		    myVars.put(name, result = new Aritmetic(name,label));
 		    return (Aritmetic)result;
 		}
 		else {
 			return (Aritmetic)result;
 		}
 	}
-	public synchronized Literal makeLiteral(String name) {
+	public synchronized Literal makeLiteral(String name, String label) {
 		Variable result = myVars.get(name);
 		if (result == null) {
-		    myVars.put(name, result = new Literal(name));
+		    myVars.put(name, result = new Literal(name,label));
 		    return (Literal)result;
 		}
 		else {
@@ -168,7 +180,7 @@ public class CommonVars {
 			for (Workflow wf:l)
 				if (wf!=null) {
 					if (wf.getName()!=null) {
-						Log.d("NILS","Adding wf with id "+wf.getName());
+						Log.d("NILS","Adding wf with id "+wf.getName()+" and length "+wf.getName().length());
 						myWfs.put(wf.getName(), wf);
 					} else
 						Log.d("NILS","Workflow name was null in setWorkflows");
@@ -177,6 +189,12 @@ public class CommonVars {
 	}
 	
 	public Workflow getWorkflow(String id) {
+		String o = myWfs.keySet().iterator().next();
+		Log.d("NILS","first key is "+o);
+		Log.d("NILS","searched key is "+id);
+		Log.d("NILS","Are they equal? "+o.equals(id));
+		Log.d("NILS","lengt of key1, key2 "+o.length()+" "+id.length());
+
 		return myWfs.get(id);
 	}
 	
@@ -184,7 +202,8 @@ public class CommonVars {
 		if (myWfs==null)
 			return null;
 		String[] array = new String[myWfs.keySet().size()];
-		return myWfs.keySet().toArray(array);
+		myWfs.keySet().toArray(array);
+		return array;
 		 
 	}
 	
@@ -327,5 +346,6 @@ public class CommonVars {
 		//Otherwise ongoing sync. just wait?
 			
 	}
+
 
 }

@@ -100,8 +100,9 @@ class Scanner {
 		    ttype = Token.TT_NE;
 		else if (pair.equals("GT"))
 		    ttype = Token.TT_GT;
-		else if (pair.equals("LT"))
+		else if (pair.equals("LT")) 
 		    ttype = Token.TT_LT;
+		
 		else if (pair.equals("EQ"))
 		    ttype = Token.TT_EQ;
 		if (0 != ttype) {
@@ -111,7 +112,7 @@ class Scanner {
 	    }
 	    tokens.addElement(new Token(s.charAt(i), 0, s, i, i+1));
          return i+1;
-     } else if (Character.isLetter(s.charAt(i))) {
+     } else if (isLetter(s.charAt(i))) {
          return scanSymbol(i);
      } else if (Character.isDigit(s.charAt(i)) || '.' == s.charAt(i)) {
          return scanNumber(i);
@@ -124,10 +125,12 @@ class Scanner {
  private int scanSymbol(int i) {
 	int from = i;
      while (i < s.length() 
-	       && (Character.isLetter(s.charAt(i))
+	       && (isLetter(s.charAt(i))
 		   || Character.isDigit(s.charAt(i))))
+    	 
          ++i;
 	tokens.addElement(new Token(Token.TT_WORD, 0, s, from, i));
+	
 	return i;
  }
 
@@ -139,7 +142,7 @@ class Scanner {
      for (; i < s.length(); ++i)
 	    if ('.' != s.charAt(i)
 		&& !Character.isDigit(s.charAt(i))
-		&& !Character.isLetter(s.charAt(i)))
+		&& !isLetter(s.charAt(i)))
              break;
 
      String text = s.substring(from, i);
@@ -157,5 +160,9 @@ class Scanner {
 
  private Token makeErrorToken(int from, int i) {
 	return new Token(Token.TT_ERROR, 0, s, from, i);
+ }
+ 
+ private boolean isLetter(char c) {
+	 return Character.isLetter(c)|| (c=='_');
  }
 }

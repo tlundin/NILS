@@ -4,10 +4,12 @@ import com.teraim.nils.Variable;
 
 public class Literal implements Variable {
 
-	private String name,value;
+	private String name,label,value;
 	
-	public Literal(String _name) {
-		value=null;name=_name;
+	public Literal(String name,String label) {
+		value=null;
+		this.name=name;
+		this.label=label;
 	}
 
 	
@@ -25,5 +27,11 @@ public class Literal implements Variable {
 	public String getName() {
 		return name;
 	}
+	
+	@Override
+	public String getLabel() {
+		return label;
+	}
+	
 
 }

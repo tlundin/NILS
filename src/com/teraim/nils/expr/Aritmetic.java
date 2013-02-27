@@ -25,30 +25,44 @@ public class Aritmetic extends Expr implements Variable {
   *         yet exist */
  
 
- private String name;
+ private String name,label;
  private double val;
 
  /**
-  * Create a new variable, with initial value 0.
+  * Create a new variable, with initial value NaN.
   * @param name the variable's name
+  * @param label the name as presented in the ui.
   */
- public Aritmetic(String name) { 
-	this.name = name; val = 0; 
+ public Aritmetic(String name, String label) { 
+	this.name=name;
+	this.label=label;
+	val = Double.NaN; 
  }
  
  
  public static Aritmetic make(String name) {
-	return CommonVars.cv().makeAritmetic(name);
+	return CommonVars.cv().makeAritmetic(name,name);
  }
 
  /** Return the name. */
  @Override
  public String toString() { return name; }
+	
  @Override
- public String getName() { return name; }
-
+ public String getName() {
+		return name;
+ }
+	
+ @Override
+ public String getLabel() {
+		return label;
+ }
+ 
+ 
+ 
  /** Get the value.
   * @return the current value */
+ @Override
  public double value() { 
 	return val; 
  }

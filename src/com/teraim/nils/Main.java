@@ -90,7 +90,7 @@ public class Main extends Activity {
 				.show();
 			//check that there is a bonded device 
 		} else {	
-			if (mBluetoothAdapter.getBondedDevices().isEmpty()) {
+			if (mBluetoothAdapter.isEnabled() && mBluetoothAdapter.getBondedDevices().isEmpty()) {
 				new AlertDialog.Builder(this).setTitle("Ups!")
 				.setMessage("Din datainsamlare är inte kopplad (bondad) till en annan datainsamlare! Måste göras i systemets blåtandsmeny. Annars fungerar inte synkroniseringen!")
 				.setNeutralButton("Jag förstår!", new OnClickListener() {

@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/field"
+    android:background="@drawable/field_bg_selector"
     android:layout_marginBottom="20dp"
     android:layout_marginTop="20dp"
     android:orientation="horizontal" >
@@ -25,23 +25,24 @@
 	    android:layout_gravity="center_vertical"
 	    android:layout_marginRight="25dp"
 	    android:layout_weight="2"
+	    android:baselineAligned="false"
 	    android:gravity="right"
 	    android:orientation="horizontal" >
-
+	
     <EditText
         android:id="@+id/editfieldinput"
         style="@style/Field_Style"
         android:layout_width="60dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_marginBottom="6dp"
-        android:layout_marginTop="6dp"
+        android:layout_margin="6dp"
         android:layout_marginRight="30dp"
-        android:background="#051417"
+       	android:padding="6dp"
         android:clickable="true"
         android:cursorVisible="true"
         android:minWidth="60dp"
+        android:background="@drawable/editview_bg"
         android:textCursorDrawable="@null" />
-
+ 
    </LinearLayout>
 </LinearLayout>

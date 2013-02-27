@@ -1,5 +1,7 @@
 package com.teraim.nils.expr;
 
+import android.util.Log;
+
 //A lexical token from an input string.
 
 class Token {
@@ -23,6 +25,12 @@ class Token {
 	this.location = start;
 	
 	int count = 0;
+	
+	Log.d("PARSER","Found token: "+sval);
+	if (sval.length()==1) {
+		if (Character.isLetter(sval.charAt(0)))
+			Log.d("PARSER","...and this is a letter");
+	}
 	for (int i = start-1; 0 <= i; --i) {
 	    if (!Character.isWhitespace(input.charAt(i)))
 		break;

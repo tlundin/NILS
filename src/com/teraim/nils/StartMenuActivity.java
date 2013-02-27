@@ -106,6 +106,7 @@ public class StartMenuActivity extends MenuActivity {
 		Intent intent = new Intent(this, FlowEngineActivity.class);
 		Bundle b = new Bundle();
 		b.putString("workflow_name", flow); //Your id
+		Log.d("NILS ","Workflow "+flow+" selected with length "+flow.length());
 		intent.putExtras(b); //Put your id to your next Intent	
 		startActivity(intent);
 	}

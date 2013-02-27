@@ -95,20 +95,21 @@ public class DataTypes  {
 	}
 
 	/**
+	 * XML_Variable
+	 * Used to describe variables defined in XML
+	 */
+	public static class XML_Variable {		
+		String name,label,type,purpose;
+	}
+
+	/**
 	 * Abstract base class Block
+	 * Marker class.
 	 * @author Terje
 	 *
 	 */
 	public abstract static class Block {
-		private String label;
 
-		public Block(String lbl) {
-			label = lbl;
-		}
-
-		public String getLabel() {
-			return label;
-		}
 	}
 
 	/**
@@ -120,7 +121,6 @@ public class DataTypes  {
 		private String workflowName;
 
 		public StartBlock(String lbl,String wfn) {
-			super(lbl);
 			workflowName = wfn;
 		}
 
@@ -141,7 +141,6 @@ public class DataTypes  {
 		String text,action,name;
 
 		public ButtonBlock(String lbl,String text, String action, String name) {
-			super(lbl);
 			Log.d("NILS","ButtonText is set to "+text);
 			this.text = text;
 			this.action=action;
@@ -155,15 +154,15 @@ public class DataTypes  {
 		public Action getAction() {
 			return new Action(action);
 		}
-		
+
 		public String getName() {
 			return name;
 		}
-		
+
 		public class Action {
 			public final static int VALIDATE = -1;
 			public final static int WF_EXECUTE = -2;
-			
+
 			private int type;
 			public String wfName=null;
 			public Action(String t) {
@@ -172,6 +171,7 @@ public class DataTypes  {
 				else
 					type = WF_EXECUTE;
 				wfName = t;
+				Log.e("NILS","Workflowname in ACTION is "+t+" with length "+t.length());
 			}
 			public boolean isWorkflow() {
 				return type==WF_EXECUTE;
@@ -185,45 +185,90 @@ public class DataTypes  {
 	 *
 	 */
 	public static class CreateFieldBlock extends Block {
-		private String varName=null,varType=null,purpose=null;
-
-
-
 		//Create a fieldblock.
 		//SIDEEFFECT: Creates Variable if not already created.
-		public CreateFieldBlock(String lbl,String _varName,String _varType, String _purpose) {
-			super(lbl);
-			varName = _varName;
-			varType = _varType;
-			purpose = _purpose;
+		XML_Variable mXvar;
 
-			Variable var = CommonVars.cv().getVariable(varName);
+		public CreateFieldBlock(XML_Variable Xvar) throws EvalException {
+			mXvar = Xvar;
+			Variable var = CommonVars.cv().getVariable(Xvar.name);
 			//IS this a new variable? 
 			if (var==null) {
 				//Integer is created as a Aritmetic.
-				if (varType.equals(Variable.NUMERIC))
-					CommonVars.cv().makeNumeric(varName);
-				else if (varType.equals(Variable.ARITMETIC))
-					CommonVars.cv().makeAritmetic(varName);
-				else if (varType.equals(Variable.LITERAL))
-					CommonVars.cv().makeLiteral(varName);
-				Log.d("NILS", "Var created with name "+varName);
+				if (Xvar.type==null||
+						Xvar.type.equals(Variable.NUMERIC))
+					CommonVars.cv().makeNumeric(Xvar.name,Xvar.label);
+				else if (Xvar.type.equals(Variable.ARITMETIC))
+					CommonVars.cv().makeAritmetic(Xvar.name,Xvar.label);
+				else if (Xvar.type.equals(Variable.LITERAL))
+					CommonVars.cv().makeLiteral(Xvar.name,Xvar.label);
+				else if (Xvar.type.equals(Variable.BOOLEAN))
+					CommonVars.cv().makeBoolean(Xvar.name,Xvar.label);
+
+				Log.d("NILS", "Var created with name "+Xvar.name);
+			} else {
+				if (!Xvar.type.equals(var.getType()))
+					throw new EvalException("Variable "+var.getName()+" has inconsistent type in CreateField blocks");
 			}
 		}
 		public boolean isEditable() {
-			return purpose.equals("edit");
+			return mXvar.equals("edit");
 		}
-		
+
 		public String getVariableReference() {
-			return varName;
+			return mXvar.name;
 		}
 
 		public String getType() {
-			return varType;
+			return mXvar.type;
 		}
 
 	}
 
+	/**
+	 * CreateFieldBlock.
+	 * @author Terje
+	 *
+	 */
+	public static class CreateListEntryBlock extends Block {
+		//Create a fieldblock.
+		//SIDEEFFECT: Creates Variable if not already created.
+		ArrayList<XML_Variable> mXvars;
+		String myName;
+
+		public CreateListEntryBlock(ArrayList<XML_Variable> Xvars, String name) throws EvalException {
+			mXvars = Xvars;
+			myName = name;
+			for (XML_Variable Xvar:Xvars) {
+				Variable var = CommonVars.cv().getVariable(Xvar.name);
+				//IS this a new variable? 
+				if (var==null) {
+					//Integer is created as a Aritmetic.
+					if (Xvar.type==null||
+							Xvar.type.equals(Variable.NUMERIC))
+						CommonVars.cv().makeNumeric(Xvar.name,Xvar.label);
+					else if (Xvar.type.equals(Variable.ARITMETIC))
+						CommonVars.cv().makeAritmetic(Xvar.name,Xvar.label);
+					else if (Xvar.type.equals(Variable.LITERAL))
+						CommonVars.cv().makeLiteral(Xvar.name,Xvar.label);
+					else if (Xvar.type.equals(Variable.BOOLEAN))
+						CommonVars.cv().makeBoolean(Xvar.name,Xvar.label);
+
+					Log.d("NILS", "Var created with name "+Xvar.name);
+				} else {
+					if (!Xvar.type.equals(var.getType()))
+						throw new EvalException("Variable "+var.getName()+" has inconsistent type in CreateField blocks");
+				}
+			}
+		}
+
+		public String getName() {
+			return myName;
+		}
+		public ArrayList<XML_Variable> getVariables() {
+			return mXvars;
+		}
+	}
 
 
 
@@ -238,7 +283,6 @@ public class DataTypes  {
 
 		//Save references.
 		public SetValueBlock(String lbl,String _varReference,String _expr) {
-			super(lbl);
 			varRef = _varReference;
 			expr = _expr;
 		}
@@ -258,7 +302,7 @@ public class DataTypes  {
 				Log.d("NILS","Expr: "+expr+" evaluated to: "+val);
 			} else {
 				((Literal)var).setValue(expr);
-				
+
 			}
 		}
 
@@ -282,20 +326,19 @@ public class DataTypes  {
 			return alignment;
 		}
 		public LayoutBlock(String lbl, String layoutDirection, String alignment) {
-			super(lbl);
 			this.layoutDirection = layoutDirection;
 			this.alignment = alignment;
 		}
 	}
 
-	
+
 	/**
 	 * AddRuleBlock
 	 * @author Terje
 	 *
 	 */
 	public static class Rule {
-		
+
 		public String targetName, condition, action, errorMsg,name;
 
 		public Rule(String ruleName, String target, String condition,
@@ -305,11 +348,14 @@ public class DataTypes  {
 			this.condition=condition;
 			this.action=action;
 			this.errorMsg=errorMsg;
+			Log.e("NILS","Create Rule with name "+ruleName+" and target "+target+" and cond "+ condition);
+			
 		}
 		public Variable getTarget() throws RuleException {
 			Variable var = CommonVars.cv().getVariable(targetName);
 			if (var==null)
 				throw new RuleException("Variable "+targetName+" must exist");
+			
 			return var;
 		}	
 		//Execute Rule. Target will be colored accordingly.
@@ -319,7 +365,7 @@ public class DataTypes  {
 			Log.d("NILS","Result of eval was: "+result.value());
 			return (result.value()==1.0);
 		}
-		
+
 		public String getErrorMessage() {
 			return errorMsg;
 		}
@@ -327,24 +373,23 @@ public class DataTypes  {
 			return name;
 		}	
 	}
-	
+
 	public static class AddRuleBlock extends Block {
 
-	private Rule r;
-		
+		private Rule r;
+
 		public AddRuleBlock(String lbl, String ruleName,String target, String condition, String action, String errorMsg) {
-			super(lbl);
 			this.r = new Rule(ruleName,target,condition,action,errorMsg);
 
 		}
-		
+
 		public Rule getRule() {
 			return r;
 		}
-	
+
 
 	}
-	
+
 	///ValuePair
 
 	public class ValuePair {
@@ -600,14 +645,14 @@ public class DataTypes  {
 			Sorted s = new Sorted();
 			return s;
 		}
-		
+
 		public LatLng[] getCorners() {
 			//North south
 			double[] lat = new double[provytor.size()];
 			//East west
 			double[] lon = new double[provytor.size()];
 			int i = 0;
-					
+
 			for(Provyta y:provytor) {
 				lat[i]= y.lat;
 				lon[i]= y.longh;
