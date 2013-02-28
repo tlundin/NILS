@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:listSelector="@drawable/validator_list_selector" >
+            android:listSelector="@drawable/validate_list_selector" >
         </ListView>
 
         <View

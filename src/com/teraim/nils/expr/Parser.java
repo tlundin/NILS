@@ -138,10 +138,10 @@ public class Parser {
 	    case '^': l = 50; r = 50; rator = Expr.POW; break;
 	
 	    default:
-		if (token.ttype == Token.TT_WORD && token.sval.equals("and")) {
+		if (token.ttype == Token.TT_WORD && token.sval.equalsIgnoreCase("and")) {
 		    l = 5; r = 6; rator = Expr.AND; break;
 		} 
-		if (token.ttype == Token.TT_WORD && token.sval.equals("or")) {
+		if (token.ttype == Token.TT_WORD && token.sval.equalsIgnoreCase("or")) {
 		    l = 10; r = 11; rator = Expr.OR; break;
 		} 
 		break loop;

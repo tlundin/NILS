@@ -188,20 +188,18 @@ containing a value of this type.
         public static final int syd_demo=0x7f020023;
         public static final int tall=0x7f020024;
         public static final int threelines=0x7f020025;
-        public static final int validator_entry=0x7f020026;
-        public static final int validator_entry_selected=0x7f020027;
-        public static final int validator_list_selector=0x7f020028;
-        public static final int vast_demo=0x7f020029;
-        public static final int white_cursor=0x7f02002a;
-        public static final int yellow=0x7f02002b;
-        public static final int ytcirklar_aktiv=0x7f02002c;
-        public static final int ytcirklar_init=0x7f02002d;
-        public static final int ytcirklar_problem=0x7f02002e;
-        public static final int ytcirklar_ready=0x7f02002f;
-        public static final int ytcirklar_s_aktiv=0x7f020030;
-        public static final int ytcirklar_s_init=0x7f020031;
-        public static final int ytcirklar_s_problem=0x7f020032;
-        public static final int ytcirklar_s_ready=0x7f020033;
+        public static final int validate_list_selector=0x7f020026;
+        public static final int vast_demo=0x7f020027;
+        public static final int white_cursor=0x7f020028;
+        public static final int yellow=0x7f020029;
+        public static final int ytcirklar_aktiv=0x7f02002a;
+        public static final int ytcirklar_init=0x7f02002b;
+        public static final int ytcirklar_problem=0x7f02002c;
+        public static final int ytcirklar_ready=0x7f02002d;
+        public static final int ytcirklar_s_aktiv=0x7f02002e;
+        public static final int ytcirklar_s_init=0x7f02002f;
+        public static final int ytcirklar_s_problem=0x7f020030;
+        public static final int ytcirklar_s_ready=0x7f020031;
     }
     public static final class id {
         public static final int Distance_h=0x7f060067;
@@ -236,8 +234,8 @@ containing a value of this type.
         public static final int edit_txt1_2=0x7f06004d;
         public static final int editfieldinput=0x7f060016;
         public static final int editfieldtext=0x7f060015;
-        public static final int enter_layer=0x7f06006e;
-        public static final int errortext=0x7f06006c;
+        public static final int enter_layer=0x7f06006f;
+        public static final int errortext=0x7f06006d;
         public static final int farg_spinner=0x7f060051;
         public static final int fieldBearing=0x7f06001d;
         public static final int flow_spinner=0x7f060053;
@@ -259,10 +257,10 @@ containing a value of this type.
         public static final int listview=0x7f06004a;
         public static final int longh=0x7f06001b;
         public static final int map=0x7f060050;
-        public static final int menu_settings=0x7f06006f;
+        public static final int menu_settings=0x7f060070;
         public static final int mittText=0x7f06005e;
         public static final int mittpunktB=0x7f06005b;
-        public static final int myRoot=0x7f06006d;
+        public static final int myRoot=0x7f06006e;
         public static final int nej=0x7f060030;
         public static final int newPic=0x7f060063;
         public static final int none=0x7f060000;
@@ -298,8 +296,8 @@ containing a value of this type.
         public static final int startCollectB=0x7f06002b;
         public static final int tag_content=0x7f060056;
         public static final int tag_markslag=0x7f060055;
-        public static final int tag_pop_delete=0x7f060071;
-        public static final int tag_pop_edit=0x7f060070;
+        public static final int tag_pop_delete=0x7f060072;
+        public static final int tag_pop_edit=0x7f060071;
         public static final int tag_title=0x7f060054;
         public static final int tagknapp=0x7f06002a;
         public static final int tagtabell=0x7f060029;
@@ -313,9 +311,10 @@ containing a value of this type.
         public static final int txt=0x7f060048;
         public static final int txt_mittpunkt=0x7f060022;
         public static final int userPosText=0x7f060023;
-        public static final int validator_layer=0x7f06006a;
-        public static final int validator_text=0x7f060069;
-        public static final int validatorlist=0x7f06006b;
+        public static final int validator_layer=0x7f06006b;
+        public static final int validator_list_image=0x7f060069;
+        public static final int validator_text=0x7f06006a;
+        public static final int validatorlist=0x7f06006c;
         public static final int watevar=0x7f06001c;
         public static final int ytselect=0x7f06004f;
     }

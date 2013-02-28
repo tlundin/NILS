@@ -1,12 +1,15 @@
 package com.teraim.nils;
 
-import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.teraim.nils.DataTypes.Rule;
@@ -14,11 +17,13 @@ import com.teraim.nils.DataTypes.Rule;
 public class ValidatorListAdapter extends BaseAdapter {
 
 	private static LayoutInflater inflater=null;
-	private ArrayList<Rule> data;
+	private  Map<Rule,Boolean> data;
+	private Context ctx;
 	
-	public ValidatorListAdapter(Context activity, ArrayList<Rule> data) {
+	public ValidatorListAdapter(Context activity, Map<Rule,Boolean> data) {
 		inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.data=data;
+		this.ctx = activity;
 	}
 	@Override
 	public int getCount() {
@@ -39,9 +44,18 @@ public class ValidatorListAdapter extends BaseAdapter {
 	public View getView(int row, View arg1, ViewGroup arg2) {
 		View v = inflater.inflate(R.layout.validator_list_row, null);
 		TextView tv = (TextView)v.findViewById(R.id.validator_text);
-		tv.setText(data.get(row).getName());
+		ImageView iv = (ImageView)v.findViewById(R.id.validator_list_image);
 		
+		Iterator<Entry<Rule, Boolean>> it =data.entrySet().iterator();
+		int i = 0; Entry<Rule, Boolean>e = null;
+		while (i++<=row&&it.hasNext())
+			e = it.next();
+		if (e!=null) {
+			tv.setText(e.getKey().getName());
+			iv.setImageDrawable( ctx.getResources().getDrawable((e.getValue()?R.drawable.green:R.drawable.red)));
+		}
 		return v;
+
 	}
 
 }

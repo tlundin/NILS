@@ -41,7 +41,6 @@
         android:clickable="true"
         android:cursorVisible="true"
         android:minWidth="60dp"
-        android:background="@drawable/editview_bg"
         android:textCursorDrawable="@null" />
  
    </LinearLayout>

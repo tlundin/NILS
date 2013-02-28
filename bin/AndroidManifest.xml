@@ -224,7 +224,7 @@
     
        <meta-data
     android:name="com.google.android.maps.v2.API_KEY"
-    android:value="AIzaSyCXuXxkCLbTZ0KaP4qa3_3HNlgmWjbmMPI"/>
+  android:value="AIzaSyCXuXxkCLbTZ0KaP4qa3_3HNlgmWjbmMPI"/>
 
    </application>
 

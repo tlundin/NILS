@@ -3,8 +3,10 @@ package com.teraim.nils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -65,7 +67,7 @@ public class FlowEngineActivity extends Activity {
 	//Keep track of input in below arraylist.
 	Map<Variable,View> bindings = new HashMap<Variable,View>();
 	private List<Rule> rules = new ArrayList<Rule>();
-	private final ArrayList<Rule>brokenRules = new ArrayList<Rule>();	
+	private final Map<Rule,Boolean>executedRules = new LinkedHashMap<Rule,Boolean>();	
 
 	private ListView lv; 
 	private ValidatorListAdapter mAdapter;
@@ -105,7 +107,7 @@ public class FlowEngineActivity extends Activity {
 			validator_layer = findViewById(R.id.validator_layer);
 			enter_layer = (RelativeLayout)findViewById(R.id.enter_layer);
 			//The list of all rules currently not ok
-			mAdapter = new ValidatorListAdapter(this,brokenRules);
+			mAdapter = new ValidatorListAdapter(this,executedRules);
 			lv = (ListView)findViewById(R.id.validatorlist);
 			lv.setAdapter(mAdapter);
 			lv.setOnItemClickListener(new OnItemClickListener(){
@@ -113,7 +115,11 @@ public class FlowEngineActivity extends Activity {
 				@Override
 				public void onItemClick(AdapterView<?> arg0, View arg1,
 						int index, long arg3) {
-					errorView.setText(brokenRules.get(index).getErrorMessage());
+					Iterator<Entry<Rule, Boolean>> it =executedRules.entrySet().iterator();
+					int i = 0; Entry<Rule, Boolean>e = null;
+					while (i++<=index&&it.hasNext())
+						e = it.next();
+					errorView.setText(e.getKey().getErrorMessage());
 				}});
 			execute();
 		}
@@ -450,7 +456,8 @@ public class FlowEngineActivity extends Activity {
 				} else {
 					TextView tv = (TextView)pairs.getValue();
 					String[] tmp = tv.getText().toString().split("=");
-					pairs.getKey().setValue(tmp[1]);
+					pairs.getKey().setValue((tmp.length>1?tmp[1]:""));
+					
 				}
 			}
 		}
@@ -461,7 +468,7 @@ public class FlowEngineActivity extends Activity {
 	private void validate() {
 
 		boolean result=false;
-		brokenRules.clear();
+		executedRules.clear();
 		for(Rule rule:rules) {
 			try {
 				//Test...
@@ -487,19 +494,25 @@ public class FlowEngineActivity extends Activity {
 			//Found a broken rule!
 			if(result==false) {
 				v.setBackgroundColor(Color.RED);
-				brokenRules.add(rule);
+				
 				Toast.makeText(this, rule.getErrorMessage(), Toast.LENGTH_LONG).show();
 			}
 			else 
 				v.setBackgroundColor(getResources().getColor(R.color.background));
+				
+			executedRules.put(rule,result);
 
 		}
-		if (brokenRules.size()>0) {
+		if (executedRules.size()>0) {
 			validator_layer.setVisibility(View.VISIBLE);
 			mAdapter.notifyDataSetChanged();
 			lv.requestFocusFromTouch();
 			lv.setSelection(0);
-			errorView.setText(brokenRules.get(0).getErrorMessage());
+			Iterator<Entry<Rule, Boolean>> it = executedRules.entrySet().iterator();
+			Entry<Rule, Boolean>e = null;
+			e = it.next();
+			if (e!=null) 
+				errorView.setText(e.getKey().getErrorMessage());
 		} else
 			validator_layer.setVisibility(View.GONE);
 	}
