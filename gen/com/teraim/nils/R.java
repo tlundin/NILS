@@ -182,24 +182,25 @@ containing a value of this type.
         public static final int noimg=0x7f02001d;
         public static final int norr_demo=0x7f02001e;
         public static final int ost_demo=0x7f02001f;
-        public static final int red=0x7f020020;
-        public static final int roundshape=0x7f020021;
-        public static final int stub=0x7f020022;
-        public static final int syd_demo=0x7f020023;
-        public static final int tall=0x7f020024;
-        public static final int threelines=0x7f020025;
-        public static final int validate_list_selector=0x7f020026;
-        public static final int vast_demo=0x7f020027;
-        public static final int white_cursor=0x7f020028;
-        public static final int yellow=0x7f020029;
-        public static final int ytcirklar_aktiv=0x7f02002a;
-        public static final int ytcirklar_init=0x7f02002b;
-        public static final int ytcirklar_problem=0x7f02002c;
-        public static final int ytcirklar_ready=0x7f02002d;
-        public static final int ytcirklar_s_aktiv=0x7f02002e;
-        public static final int ytcirklar_s_init=0x7f02002f;
-        public static final int ytcirklar_s_problem=0x7f020030;
-        public static final int ytcirklar_s_ready=0x7f020031;
+        public static final int r262_4=0x7f020020;
+        public static final int red=0x7f020021;
+        public static final int roundshape=0x7f020022;
+        public static final int stub=0x7f020023;
+        public static final int syd_demo=0x7f020024;
+        public static final int tall=0x7f020025;
+        public static final int threelines=0x7f020026;
+        public static final int validate_list_selector=0x7f020027;
+        public static final int vast_demo=0x7f020028;
+        public static final int white_cursor=0x7f020029;
+        public static final int yellow=0x7f02002a;
+        public static final int ytcirklar_aktiv=0x7f02002b;
+        public static final int ytcirklar_init=0x7f02002c;
+        public static final int ytcirklar_problem=0x7f02002d;
+        public static final int ytcirklar_ready=0x7f02002e;
+        public static final int ytcirklar_s_aktiv=0x7f02002f;
+        public static final int ytcirklar_s_init=0x7f020030;
+        public static final int ytcirklar_s_problem=0x7f020031;
+        public static final int ytcirklar_s_ready=0x7f020032;
     }
     public static final class id {
         public static final int Distance_h=0x7f060067;
@@ -356,6 +357,8 @@ containing a value of this type.
         public static final int delningsdata=0x7f050000;
         public static final int nils_json=0x7f050001;
         public static final int rutdata=0x7f050002;
+        public static final int rutdata_v2=0x7f050003;
+        public static final int rutdata_v3=0x7f050004;
     }
     public static final class string {
         public static final int akvatisk_header=0x7f070019;

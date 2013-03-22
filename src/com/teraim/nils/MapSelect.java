@@ -20,7 +20,6 @@ package com.teraim.nils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -35,7 +34,6 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.animation.BounceInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.Toast;
-
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
@@ -43,7 +41,9 @@ import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -127,36 +127,62 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMarkerDragListene
 				}
 			});
 		}
+		
+		//final Bitmap bm = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory().getPath()+"/nils/r262_1.jpg");
+		//final BitmapDescriptor image = BitmapDescriptorFactory.fromBitmap(bm);
+		//BitmapFactory.Options options = new BitmapFactory.Options(); options.inPurgeable = true; and Bitmap.createScaledBitmap(srcBitmap, width, height, false); 
+		final BitmapDescriptor image = BitmapDescriptorFactory.fromResource(R.drawable.r262_4);
+
+		LatLng ne,sw;
+		//Coordinates specifically for RUTA 262
+		ne = new LatLng(59.864728,17.855059);
+		sw = new LatLng(59.818519,17.768633);
+		LatLngBounds bounds = new LatLngBounds(sw,ne);
+		mMap.addGroundOverlay(new GroundOverlayOptions().image(image).positionFromBounds(bounds));
 	}
 
 	private void addMarkersToMap() {
 		final int[] ids = {R.drawable.ytcirklar_s_init,R.drawable.ytcirklar_s_ready, 
 				R.drawable.ytcirklar_s_problem, R.drawable.ytcirklar_s_aktiv};
-		int r=0;
+		
 		LatLng latlong = new LatLng(-27.47093, 153.0235);
 		double[] latlon;
 		if (mMap == null)
-			Toast.makeText(this, "UPPPPPSSS", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, "MAP NULL in addMarkersToMap(), MapSelect.java", Toast.LENGTH_LONG).show();
 		else {
-			int j=1;
+			int hue = 0;
+			float[] colors = {BitmapDescriptorFactory.HUE_RED,BitmapDescriptorFactory.HUE_YELLOW,BitmapDescriptorFactory.HUE_GREEN};
 			for(final Provyta yta:ytor) {
 				latlon = yta.getLatLong();
 				latlong = new LatLng(latlon[0],latlon[1]);
-				Log.d("NILS","yta "+j++);
 				Log.d("NILS","latlong "+latlong.latitude+" "+latlong.longitude);
 				Log.d("NILS","yta id"+yta.getId());
 				markers.put(mMap.addMarker(new MarkerOptions()
 
 				.position(latlong)
-				.title(yta.getId())
+				.title(getType(yta.getId())+" "+yta.getId())
 				.snippet("E: "+yta.E+" N: "+yta.N)
-				.icon(BitmapDescriptorFactory.fromResource(ids[r++%ids.length]))),yta);
+				
+				.icon(BitmapDescriptorFactory.defaultMarker(colors[hue++%3]))),yta);
+				//.icon(BitmapDescriptorFactory.fromResource(ids[r++%ids.length]))),yta);
 
 			}   	
 		}
 
 	}
 
+	private String getType(String idS) {
+		String ret="";
+		int id = Integer.parseInt(idS);
+		if (id<13)
+			ret ="NILS";
+		else if (id>=200 && id <=400)
+			ret = "MOTH";
+		else if (id>=50 && id <=80)
+			ret = "ÄBO";
+		return ret;
+	}
+	
 	private boolean checkReady() {
 		if (mMap == null) {
 			Toast.makeText(this, "Kartan är inte klar", Toast.LENGTH_SHORT).show();

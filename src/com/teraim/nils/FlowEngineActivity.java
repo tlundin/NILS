@@ -13,10 +13,13 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -109,7 +112,7 @@ public class FlowEngineActivity extends Activity {
 			//The list of all rules currently not ok
 			mAdapter = new ValidatorListAdapter(this,executedRules);
 			lv = (ListView)findViewById(R.id.validatorlist);
-			lv.setAdapter(mAdapter);
+			lv.setAdapter(mAdapter);		
 			lv.setOnItemClickListener(new OnItemClickListener(){
 
 				@Override
@@ -120,7 +123,7 @@ public class FlowEngineActivity extends Activity {
 					while (i++<=index&&it.hasNext())
 						e = it.next();
 					errorView.setText(e.getKey().getErrorMessage());
-				}});
+			}});
 			execute();
 		}
 
@@ -132,6 +135,7 @@ public class FlowEngineActivity extends Activity {
 	 */
 	private void execute() {
 		LinearLayout my_root = (LinearLayout) findViewById(R.id.myRoot);
+		
 		List<Block>blocks = wf.getBlocks();
 		for (Block b:blocks) {
 			if (b instanceof StartBlock)
@@ -155,8 +159,25 @@ public class FlowEngineActivity extends Activity {
 				Button bu = new Button(this);
 				bu.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_bg_selector));
 				bu.setTextAppearance(this, R.style.WF_Text);
-				Log.d("NILS","Text is "+bl.getText());
 				bu.setText(bl.getText());
+				
+				LayoutParams params = new LayoutParams();
+				params.width = LayoutParams.WRAP_CONTENT;
+				params.height = LayoutParams.MATCH_PARENT;
+				params.leftMargin = 100;
+				params.rightMargin = 100;
+				//Not sure about these..
+				params.bottomMargin = 10;
+				params.topMargin = 10;
+				
+				Display display = getWindowManager().getDefaultDisplay();
+				Point size = new Point();
+				display.getSize(size);
+				int width = size.x;
+				bu.setMinimumWidth(width-200);
+				
+				bu.setLayoutParams(params);
+				
 				bu.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View arg0) {
@@ -224,6 +245,7 @@ public class FlowEngineActivity extends Activity {
 					if (var.getType().equals(Variable.NUMERIC)) {
 						Log.d("NILS","NUMERIC");
 						et.setInputType(InputType.TYPE_CLASS_NUMBER);
+						et.setRawInputType(Configuration.KEYBOARD_12KEY);					
 						LayoutParams params = new LayoutParams();
 						params.width=100;
 						et.setLayoutParams(params);
@@ -295,7 +317,7 @@ public class FlowEngineActivity extends Activity {
 						TextView te = new TextView(this);
 						te.setText(xv.label+"="+(Double.isNaN(v.value())?"?":v.value()));
 						te.setTextColor(Color.BLACK);
-						te.setTextSize(15);
+						te.setTextSize(20);
 						tvs.add(te);
 						LayoutParams p = new LayoutParams();
 						p.rightMargin=15;

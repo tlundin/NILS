@@ -35,7 +35,7 @@ public class DataTypes  {
 	public static DataTypes getSingleton(Context c) {
 		if (singleton == null) {
 			singleton = new DataTypes();
-			singleton.scanRutData(c.getResources().openRawResource(R.raw.rutdata));
+			singleton.scanRutData(c.getResources().openRawResource(R.raw.rutdata_v3));
 			singleton.scanDelningsData(c.getResources().openRawResource(R.raw.delningsdata));
 		}
 		return singleton;
