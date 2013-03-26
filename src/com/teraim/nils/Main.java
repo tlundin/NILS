@@ -22,15 +22,15 @@ public class Main extends Activity {
 	private static final long INITIAL_DELAY = 2000; //pause for 2 secs to show logo.
 	private String tag = "Lifecycle";
 	//ListView treeList = null;
-	private Activity me;
 	private CommonVars cv;
-	private DataTypes T;
 
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		WorkflowParser wfp = new WorkflowParser();
+		wfp.execute(this);
+		
 		PreferenceManager.setDefaultValues(this,R.xml.myprefs, false);
 		CommonVars.init(this);
 		//Get the instance.
@@ -44,15 +44,7 @@ public class Main extends Activity {
 					GooglePlayServicesUtil.isGooglePlayServicesAvailable(this)
 		, Toast.LENGTH_LONG).show();
 		
-		oonCreate(savedInstanceState);
-			
-	}
-	
-	
-	//@Override
-	public void oonCreate(Bundle savedInstanceState) {
-		//super.onCreate(savedInstanceState);
-
+		
 		//show start picture
 		setContentView(R.layout.loadscreen);
 
@@ -64,19 +56,15 @@ public class Main extends Activity {
 		//http://developer.android.com/guide/topics/data/data-storage.html#pref
 		PreferenceManager.setDefaultValues(this,
 				R.xml.myprefs, false);
-
-		me = this;
-
-		//Initialize common vars.
-		CommonVars.init(this);
+		
 		//Get the instance.
 		cv = CommonVars.cv();
 
 		//Load workflow bundle
 		//cv.setWorkflows(WorkflowParser.parse(this));
 
-		//Load datatypes
-		T = DataTypes.getSingleton(this);
+		//Parse input data files.
+		DataTypes.parse(this);
 
 		//check bluetooth
 		if (mBluetoothAdapter == null) {
@@ -156,10 +144,8 @@ public class Main extends Activity {
 			else {
 				//If Rutaid known, create the Ruta from the input files.
 				//TODO: Some error checking needed here...
-				cv.setRuta(T.findRuta(cv.getG("ruta_id")));
-				//startActivity(startMenuIntent); 
-				WorkflowParser wfp = new WorkflowParser();
-				wfp.execute(this);
+				//cv.setRuta(DataTypes.getSingleton().findRuta(cv.getG("ruta_id")));
+				startActivity(startMenuIntent); 
 				finish();
 			}
 		}

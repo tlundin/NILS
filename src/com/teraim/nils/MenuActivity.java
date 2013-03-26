@@ -1,5 +1,7 @@
 package com.teraim.nils;
 
+import com.teraim.nils.DataTypes.Provyta;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -86,9 +88,11 @@ public class MenuActivity extends Activity {
 		return MenuChoice(item);
 	}
 
-	MenuItem mnu2 = null,mnu3=null,mnu4=null;
+	MenuItem mnu1 = null,mnu2 = null,mnu3=null,mnu4=null;
 	private void CreateMenu(Menu menu)
 	{
+		mnu1 = menu.add(0, 0, 0, "");
+		mnu1.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		mnu2 = menu.add(0, 1, 1, "");
 		mnu2.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		mnu3 = menu.add(0, 2, 2, "");
@@ -103,6 +107,13 @@ public class MenuActivity extends Activity {
 
 	protected void refreshStatusRow() {
 		Log.d("NILS","Refreshing status row");
+		if (mnu1!=null) {
+			String p="?";
+			Provyta py = CommonVars.cv().getProvyta();
+			if (py!=null)
+				p=py.getId();
+			mnu1.setTitle("Ruta/Provyta: "+CommonVars.cv().getRuta().getId()+"/"+p);
+		}
 		if (mnu2!=null)
 			mnu2.setTitle("Synkning: "+CommonVars.cv().getSyncStatusS());
 		if (mnu3!=null)
@@ -147,15 +158,15 @@ public class MenuActivity extends Activity {
 		};
 		
 		switch (item.getItemId()) {
-		case 0:
-			//Toast.makeText(this, "You clicked on Item 1",
-			//		Toast.LENGTH_LONG).show();
+			
 		case 1:
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle("Synkronisering")
 			.setMessage("Vill du "+(CommonVars.cv().getSyncStatus()==BluetoothRemoteDevice.SYNK_STOPPED?"slå på ":"stänga av ")+"synkroniseringen?").setPositiveButton("Ja", dialogClickListener)
 			.setNegativeButton("Nej", dialogClickListener).show();
 			break;
+		case 0:
+			Toast.makeText(this,"ändra ruta eller provyta",Toast.LENGTH_LONG).show();
 		case 2:
 			Toast.makeText(this, "Ändra användare",
 					Toast.LENGTH_LONG).show();

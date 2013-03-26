@@ -59,9 +59,9 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 
 		CommonVars.cv().setWorkflows(result);
 
-		Intent startMenu = new Intent(context, StartMenuActivity.class);
+		//Intent startMenu = new Intent(context, StartMenuActivity.class);
 
-		context.startActivity(startMenu);
+		//context.startActivity(startMenu);
 
 	}
 

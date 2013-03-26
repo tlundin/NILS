@@ -150,9 +150,22 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMarkerDragListene
 		if (mMap == null)
 			Toast.makeText(this, "MAP NULL in addMarkersToMap(), MapSelect.java", Toast.LENGTH_LONG).show();
 		else {
-			int hue = 0;
-			float[] colors = {BitmapDescriptorFactory.HUE_RED,BitmapDescriptorFactory.HUE_YELLOW,BitmapDescriptorFactory.HUE_GREEN};
+			int hue;
+			
+			float[] colors = {BitmapDescriptorFactory.HUE_RED,BitmapDescriptorFactory.HUE_YELLOW,BitmapDescriptorFactory.HUE_GREEN,190};
 			for(final Provyta yta:ytor) {
+				hue = 3;
+				if (yta.getId().equals("1"))
+					hue=2;
+				if (yta.getId().equals("2"))
+					hue=2;
+				if (yta.getId().equals("3"))
+					hue=2;
+				if (yta.getId().equals("4"))
+					hue=2;
+				if (yta.getId().equals("5"))
+					hue=0;
+				
 				latlon = yta.getLatLong();
 				latlong = new LatLng(latlon[0],latlon[1]);
 				Log.d("NILS","latlong "+latlong.latitude+" "+latlong.longitude);
@@ -163,7 +176,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMarkerDragListene
 				.title(getType(yta.getId())+" "+yta.getId())
 				.snippet("E: "+yta.E+" N: "+yta.N)
 				
-				.icon(BitmapDescriptorFactory.defaultMarker(colors[hue++%3]))),yta);
+				.icon(BitmapDescriptorFactory.defaultMarker(colors[hue]))),yta);
 				//.icon(BitmapDescriptorFactory.fromResource(ids[r++%ids.length]))),yta);
 
 			}   	
@@ -254,50 +267,18 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMarkerDragListene
 		return false;
 	}
 
+	//On select provyta, return to main menu.
 	private void onProvytaClick(Provyta yta) {
 		CommonVars cv = CommonVars.cv();
 		cv.setProvyta(yta);
-		AlertDialog.Builder alert = new AlertDialog.Builder(this);
-
-
-		alert.setMessage("Ska ytan inventeras?");
-
-		alert.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-
-				final Intent takePictureIntent = new Intent(getBaseContext(),TakePicture.class);
-				final Intent hittaYtaIntent = new Intent(getBaseContext(),HittaYta.class);
-
-
-				if(CommonVars.cv().getDeviceColor().equals(CommonVars.blue())) {
-					Log.d("NILS","dosa blå!"+CommonVars.blue());				
-					startActivity(takePictureIntent);
-				}
-				else {
-					startActivity(hittaYtaIntent);     
-
-				}
-				//finish();
-				// Intent intent = getIntent();
-				//setResult(Activity.RESULT_OK, intent);
-
-			}
-		});
-
-		alert.setNegativeButton("Nej", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				// Canceled.
-			}
-		});
-
-		alert.show();
-
-
+		finish();
 	}
 
 	@Override
 	public void onInfoWindowClick(Marker marker) {
-		Toast.makeText(getBaseContext(), "Click Info Window", Toast.LENGTH_SHORT).show();
+		if (currentSelected !=null && currentSelected.equals(markers.get(marker)))
+			//Pressed second time the same
+			onProvytaClick(currentSelected);
 	}
 
 	@Override

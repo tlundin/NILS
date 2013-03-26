@@ -207,6 +207,7 @@ public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 		Intent intent = new Intent();
 		intent.setAction(SYNK_SERVICE_STOPPED);
 		this.sendBroadcast(intent);
+		this.unregisterReceiver(brr);
 	}
 
 

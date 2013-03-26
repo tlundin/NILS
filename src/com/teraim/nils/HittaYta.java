@@ -113,7 +113,7 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 	        }
 	    };
 */
-		DataTypes rd = DataTypes.getSingleton(this);
+		DataTypes rd = DataTypes.getSingleton();
 
 		pyg = new ProvYtaGeoUpdater(this,provytaV,this);
 
@@ -432,12 +432,21 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 			//TODO: Get rid of 1 below!!
 			String picPath = CommonVars.cv().getCurrentPictureBasePath();
 
+			final BitmapFactory.Options options = new BitmapFactory.Options();
+			options.inJustDecodeBounds = true;
+		    
+		    // Calculate inSampleSize
+		    options.inSampleSize = 4;
+		    // Decode bitmap with inSampleSize set
+		    options.inJustDecodeBounds = false;
+		    
 			Bitmap bm = BitmapFactory.decodeFile(picPath+"/gamla/"+
-					CommonVars.compassToPicName(position)+".png");
+					CommonVars.compassToPicName(position)+".png",options);
+			
 			if (bm==null)
 				try {
 					bm = BitmapFactory.decodeResource(getResources(),
-							R.drawable.class.getField(CommonVars.compassToPicName(position)+"_demo").getInt(null));
+							R.drawable.class.getField(CommonVars.compassToPicName(position)+"_demo").getInt(null),options);
 				} catch (Exception e) {
 					// Will never happen..static naming..
 				}
@@ -449,9 +458,9 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 	}
 
 	public void onLocationUpdate(double dist, double vinkel,int wx,int wy) {
-		
+		char c = '\u00B0';
 		userPosTextV.setText("Avst: "+(int)dist+
-				" Vinkel: "+(int)(vinkel*57.2957795)+
+				" m. Vinkel: "+(int)(vinkel*57.2957795)+c+
 				" X:"+wx+
 				" Y:"+wy);
 	}

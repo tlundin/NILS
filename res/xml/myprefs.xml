@@ -8,7 +8,10 @@ xmlns:android="http://schemas.android.com/apk/res/android" >
      android:entryValues="@array/deviceColors" 
      android:title="Dosans färg" 
      android:entries="@array/deviceColors" />
-    
+  <ListPreference 
+     android:key="ruta_id"
+     android:title="Vald ruta" 
+      />   
 <EditTextPreference
             android:key="lagNr"
             android:title="Lag" 

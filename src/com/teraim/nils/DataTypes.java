@@ -31,16 +31,21 @@ import com.teraim.nils.expr.SyntaxException;
  */
 public class DataTypes  {
 
+	static Context myC;
 	static DataTypes singleton;
-	public static DataTypes getSingleton(Context c) {
+	
+	public static DataTypes getSingleton() {
+		return singleton;
+	}
+
+	public static void parse(Context c) {
+		myC = c;
 		if (singleton == null) {
 			singleton = new DataTypes();
 			singleton.scanRutData(c.getResources().openRawResource(R.raw.rutdata_v3));
 			singleton.scanDelningsData(c.getResources().openRawResource(R.raw.delningsdata));
-		}
-		return singleton;
+		}		
 	}
-
 
 	private ArrayList<Ruta> rutor = new ArrayList<Ruta>();
 

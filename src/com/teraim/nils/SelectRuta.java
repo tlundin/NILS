@@ -27,7 +27,7 @@ public class SelectRuta extends ListActivity {
 	  public void onCreate(Bundle savedInstanceState) {
 		    super.onCreate(savedInstanceState);
 		    //Get the Singleton instance of RutData.
-		    rd = DataTypes.getSingleton(this);	  
+		    rd = DataTypes.getSingleton();	  
 		    //Get the IDs
 		    values = rd.getRutIds();
 		    if (values == null) {
@@ -46,7 +46,7 @@ public class SelectRuta extends ListActivity {
 		  	//Persist the Current Ruta ID in storage.
 		  	Ruta r = rd.findRuta(values[position]);
 		  	if (r!=null) {
-		  		CommonVars.cv().setRuta(r);
+		  		//CommonVars.cv().setRuta(r);
 		  		//Persist this choice so that next time Ruta will not be queried from user.
 		  		CommonVars.cv().putG("ruta_id",values[position]);
 		  	}

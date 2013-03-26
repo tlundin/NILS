@@ -1,5 +1,7 @@
 package com.teraim.nils;
 
+import java.util.ArrayList;
+
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
@@ -41,6 +43,19 @@ public class ConfigMenu extends PreferenceActivity {
 
 			epref = (EditTextPreference) findPreference("username");
 			epref.setSummary(epref.getText());
+			
+			ListPreference ruta = (ListPreference)findPreference("ruta_id");
+			
+			if (ruta != null) {
+				ruta.setSummary(ruta.getValue());
+				String[] rutlist = DataTypes.getSingleton().getRutIds();
+			    CharSequence entries[] = rutlist;
+			    CharSequence entryValues[] = rutlist;
+			    ruta.setEntries(entries);
+			    ruta.setEntryValues(entryValues);
+			}
+			
+			
 		}
 
 		public void onSharedPreferenceChanged(
@@ -53,7 +68,9 @@ public class ConfigMenu extends PreferenceActivity {
 			else if (pref instanceof ListPreference) {
 				ListPreference letp = (ListPreference) pref;
 				pref.setSummary(letp.getValue());
+				
 			}
+
 		}
 
 	}

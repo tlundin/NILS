@@ -96,8 +96,9 @@ public class CommonVars {
 	}
 	
 	public static CommonVars cv() {
-		if (singleton == null)
-			Log.d("NILS","Singleton is null");
+		if (singleton == null) {
+			Log.e("NILS","Singleton is null");
+		}
 		return singleton;			 
 	}
 	
@@ -215,7 +216,7 @@ public class CommonVars {
 	}
 	
 	public Ruta getRuta() {
-		return myRuta;
+		return DataTypes.getSingleton().findRuta(getG("ruta_id"));
 	}
 	
 	public void setDelyta(Delyta d) {

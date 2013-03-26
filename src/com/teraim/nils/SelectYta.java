@@ -33,7 +33,7 @@ public class SelectYta extends MenuActivity {
 
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.selectyta);
-		rd = DataTypes.getSingleton(this);
+		rd = DataTypes.getSingleton();
 
 		FrameLayout main = (FrameLayout) findViewById(R.id.ytselect);
 
