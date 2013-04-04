@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -273,11 +275,26 @@ public class StartMenuActivity extends MenuActivity {
 	        } else {
 	            imageView = (ImageView) convertView;
 	        }
-
-	        imageView.setImageResource(mThumbIds[position]);
+	        
+	        BitmapFactory.Options options = new BitmapFactory.Options();
+	        options.inJustDecodeBounds = true;
+	        BitmapFactory.decodeResource(getResources(), mThumbIds[position], options);
+	        int imageHeight = options.outHeight;
+	        int imageWidth = options.outWidth;
+	        String imageType = options.outMimeType;
+	        
+	        imageView.setImageBitmap(
+	        	    CommonVars.decodeSampledBitmapFromResource(getResources(), mThumbIds[position], 100,100));
+	        //imageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), mThumbIds[position], options));
+	        
+	        
+			//imageView.setImageResource(mThumbIds[position]);
+			
 	        return imageView;
 	    }
-
+	    
+	   
+	    
 	    // references to our images
 	    private Integer[] mThumbIds = {
 	            R.drawable.orientera, R.drawable.kamera,

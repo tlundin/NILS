@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapFactory.Options;
 import android.graphics.Point;
 import android.location.Location;
 import android.net.Uri;
@@ -159,8 +160,11 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 			if (resultCode == Activity.RESULT_OK) 
 			{
 				Toast.makeText(this, "RESULT OK", Toast.LENGTH_LONG).show();
+				final BitmapFactory.Options options = new BitmapFactory.Options();
+			    // Calculate inSampleSize
+			    options.inSampleSize = 6;
 				//Save file in temporary storage.
-				Bitmap bip = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory()+CommonVars.NILS_BASE_DIR+"/temp.png");		
+				Bitmap bip = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory()+CommonVars.NILS_BASE_DIR+"/temp.png",options);		
 				int w = bip.getWidth();
 				int h = bip.getHeight();
 				bip = Bitmap.createScaledBitmap(bip, w/6, h/6, false);
@@ -235,10 +239,16 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 		{
 			context = c;
 			int picId=-1;
+	       
+	
+
 			for (int i=0;i<empty_pic_names.length;i++) {
-				picId = getResources().getIdentifier(empty_pic_names[i], "drawable", context.getPackageName());
-				pic[i] = BitmapFactory.decodeResource(context.getResources(),
-						picId);
+				//picId = getResources().getIdentifier(empty_pic_names[i], "drawable", context.getPackageName());
+				
+				pic[i] = CommonVars.decodeSampledBitmapFromResource(getResources(), 
+						getResources().getIdentifier(empty_pic_names[i], "drawable", context.getPackageName()), 100,100);
+				//BitmapFactory.decodeResource(context.getResources(),
+				//		picId);
 			}
 		}
 		//---returns the number of images---
@@ -317,12 +327,18 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 					CommonVars.compassToPicName(position)+".png");
 			if (bm==null)
 				try {
-					bm = BitmapFactory.decodeResource(getResources(),
-							R.drawable.class.getField(CommonVars.compassToPicName(position)+"_demo").getInt(null));
+
+			        imageView.setImageBitmap(
+			        	    CommonVars.decodeSampledBitmapFromResource(getResources(), 
+			        	    		R.drawable.class.getField(CommonVars.compassToPicName(position)+"_demo").getInt(null), 200,200));
+
+//					bm = BitmapFactory.decodeResource(getResources(),
+//							R.drawable.class.getField(CommonVars.compassToPicName(position)+"_demo").getInt(null));
 				} catch (Exception e) {
 					// Will never happen..static naming..
 				}
-			imageView.setImageBitmap(bm);
+			else
+				imageView.setImageBitmap(bm);
 			//imageView.setImageBitmap(bm[position]);
 			return imageView;
 		}

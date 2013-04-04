@@ -24,6 +24,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
@@ -128,10 +129,16 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMarkerDragListene
 			});
 		}
 		
-		//final Bitmap bm = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory().getPath()+"/nils/r262_1.jpg");
-		//final BitmapDescriptor image = BitmapDescriptorFactory.fromBitmap(bm);
-		//BitmapFactory.Options options = new BitmapFactory.Options(); options.inPurgeable = true; and Bitmap.createScaledBitmap(srcBitmap, width, height, false); 
-		final BitmapDescriptor image = BitmapDescriptorFactory.fromResource(R.drawable.r262_4);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeResource(getResources(), R.drawable.r262_4, options);
+        int imageHeight = options.outHeight;
+        int imageWidth = options.outWidth;
+       // String imageType = options.outMimeType;
+        
+        Log.d("NILS","image size is w:"+ imageWidth+" h:"+imageHeight);
+		
+		final BitmapDescriptor image = BitmapDescriptorFactory.fromBitmap(CommonVars.decodeSampledBitmapFromResource(getResources(), R.drawable.r262_4, 500,500)); //.fromResource(R.drawable.r262_4);
 
 		LatLng ne,sw;
 		//Coordinates specifically for RUTA 262
