@@ -58,8 +58,7 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 
 	//TODO: REPLACE if more than one RUTA...
 	
-	final String picPath = Environment.getExternalStorageDirectory()+
-			CommonVars.NILS_BASE_DIR+"/delyta/"+
+	final String picPath = CommonVars.NILS_ROOT_DIR+"/delyta/"+
 			"1"+"/bilder/gamla/";
 	private TextView userPosTextV;
 	

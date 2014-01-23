@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import com.teraim.nils.flowtemplates.DefaultTemplate;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -91,8 +93,7 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 						Toast.LENGTH_SHORT).show();
 				selectedPic = position;
 				Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-				String tempFolder = Environment.getExternalStorageDirectory().getAbsolutePath()+
-						CommonVars.NILS_BASE_DIR;
+				String tempFolder = CommonVars.NILS_ROOT_DIR;
 				File file = new File(tempFolder, "temp.png");
 				CommonVars.createFoldersIfMissing(file);
 				Toast.makeText(getBaseContext(),
@@ -164,7 +165,7 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 			    // Calculate inSampleSize
 			    options.inSampleSize = 6;
 				//Save file in temporary storage.
-				Bitmap bip = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory()+CommonVars.NILS_BASE_DIR+"/temp.png",options);		
+				Bitmap bip = BitmapFactory.decodeFile(CommonVars.NILS_ROOT_DIR+"/temp.png",options);		
 				int w = bip.getWidth();
 				int h = bip.getHeight();
 				bip = Bitmap.createScaledBitmap(bip, w/6, h/6, false);
@@ -371,7 +372,7 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 	     })
 	     .show();
 	     */
-		Intent intent = new Intent(this, FlowEngineActivity.class);
+		Intent intent = new Intent(this, DefaultTemplate.class);
 		Bundle b = new Bundle();
 		b.putString("workflow_id", "1"); //Your id
 		intent.putExtras(b); //Put your id to your next Intent

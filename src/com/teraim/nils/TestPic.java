@@ -31,7 +31,7 @@ public class TestPic extends Activity {
 		//setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		//intent.putExtra(MediaStore.EXTRA_SCREEN_ORIENTATION,"landscape");
 		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-		File file = new File(Environment.getExternalStorageDirectory()+CommonVars.NILS_BASE_DIR, "temp.png");
+		File file = new File(CommonVars.NILS_ROOT_DIR, "temp.png");
 		Uri outputFileUri = Uri.fromFile(file);
 		intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
 		startActivityForResult(intent, TAKE_PICTURE);
@@ -45,7 +45,7 @@ public class TestPic extends Activity {
 		if (requestCode == TAKE_PICTURE){
 			Toast.makeText(this, "Got back!", Toast.LENGTH_LONG).show();
 			//Save file in temporary storage.
-			Bitmap bip = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory()+CommonVars.NILS_BASE_DIR+"/temp.png");		
+			Bitmap bip = BitmapFactory.decodeFile(CommonVars.NILS_ROOT_DIR+"/temp.png");		
 			int w = bip.getWidth();
 			int h = bip.getHeight();
 			bip = Bitmap.createScaledBitmap(bip, w/6, h/6, false);

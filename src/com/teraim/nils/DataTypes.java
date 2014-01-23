@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
@@ -20,6 +21,8 @@ import com.teraim.nils.expr.Expr;
 import com.teraim.nils.expr.Literal;
 import com.teraim.nils.expr.Parser;
 import com.teraim.nils.expr.SyntaxException;
+import com.teraim.nils.flowtemplates.DefaultTemplate;
+import com.teraim.nils.flowtemplates.ListInputTemplate;
 
 
 /**
@@ -82,6 +85,12 @@ public class DataTypes  {
 	public static class Workflow {
 		private List<Block> blocks;
 		private String name=null;
+		
+		public enum Type
+		{
+			plain,
+			variable_selection
+		}
 
 		public List<Block> getBlocks() {
 			return blocks;
@@ -98,7 +107,42 @@ public class DataTypes  {
 			}
 			return name;
 		}
+		
+		public Class getWfClass() {
+		Class ret = null;
+			switch (getType()) {
+			case plain:
+				ret = DefaultTemplate.class;
+			break;
+			case variable_selection:
+				ret = ListInputTemplate.class;
+				break;
+			
+			}
+			return ret;
+		}
 
+		private Type getType() {
+			for (Block b:blocks) {
+				if (b instanceof PageDefineBlock) {
+					PageDefineBlock bl = (PageDefineBlock)b;
+					final String type = bl.getPageType();
+					if (type.equals("plain"))
+						return Type.plain;
+					else 
+						if (type.equals("variable_selection"))
+							return Type.variable_selection;
+						else {
+						 Log.e("NILS","Type of page not recognized in workflow "+this.getName()+" Will default to plain");
+						}
+						return Type.plain;	
+				}
+				
+			}
+			 Log.e("NILS","Could not find PageDefineBlock for workflow "+this.getName()+" Will default to plain type");
+			 return Type.plain;
+		}
+		
 	}
 
 	/**
@@ -106,7 +150,11 @@ public class DataTypes  {
 	 * Used to describe variables defined in XML
 	 */
 	public static class XML_Variable {		
-		String name,label,type,purpose;
+		public String name;
+		public String label;
+		String type;
+		String purpose;
+		String unit;
 	}
 
 	/**
@@ -119,20 +167,40 @@ public class DataTypes  {
 
 	}
 
+	/**Blocks that so far implements only signal
+	 * 
+	 * @author Terje
+	 *
+	 */
+	public static class AddDisplayOfSelectionsBlock extends Block {
+		
+	}
+	public static class SortingBlock extends Block {
+		
+	}
+	public static class FilterBlock extends Block {
+		
+	}
 	/**
 	 * Startblock.
 	 * @author Terje
 	 *
 	 */
 	public static class StartBlock extends Block {
-		private String workflowName;
-
-		public StartBlock(String lbl,String wfn) {
+		final private String workflowName;
+		final private String[] args;
+		
+		public StartBlock(String[] args,String wfn) {
 			workflowName = wfn;
+			this.args = args;
 		}
 
 		public String getName() {
 			return workflowName;
+		}
+		
+		public String[] getArgs() {
+			return args;
 		}
 	}
 
@@ -147,9 +215,9 @@ public class DataTypes  {
 	public static class ButtonBlock extends Block {
 		String text,action,name;
 
-		public ButtonBlock(String lbl,String text, String action, String name) {
+		public ButtonBlock(String lbl,String action, String name) {
 			Log.d("NILS","ButtonText is set to "+text);
-			this.text = text;
+			this.text = lbl;
 			this.action=action;
 			this.name=name;
 		}
@@ -231,9 +299,22 @@ public class DataTypes  {
 		}
 
 	}
+	
+	public static class CreateListEntriesBlock extends Block {
+		String fileName=null;
+
+		public String getFileName() {
+			return fileName;
+		}
+		
+		public CreateListEntriesBlock(String fileName) {
+			this.fileName =fileName;
+		}
+	}
+
 
 	/**
-	 * CreateFieldBlock.
+	 * CreateListEntryBlock.
 	 * @author Terje
 	 *
 	 */
@@ -338,7 +419,52 @@ public class DataTypes  {
 		}
 	}
 
+	/**
+	 * Page Definition block
+	 * @author Terje
+	 *
+	 */
+	public static class PageDefineBlock extends Block {
 
+		private String pageName="",pageType=null,pageLabel="";
+
+		public String getPageName() {
+			return pageName;
+		}
+		public String getPageType() {
+			return pageType;
+		}
+		public String getPageLabel() {
+			return pageLabel;
+		}
+		public PageDefineBlock(String pageName,String pageType,String pageLabel) {
+			this.pageName =pageName;
+			this.pageType = pageType;
+			this.pageLabel=pageLabel;
+		}
+	}
+	
+	/**
+	 * Container Definition block
+	 * @author Terje
+	 *
+	 */
+	public static class ContainerDefineBlock extends Block {
+
+		private String containerName="",containerType=null;
+
+		public String getContainerName() {
+			return containerName;
+		}
+		public String getContainerType() {
+			return containerType;
+		}
+		
+		public ContainerDefineBlock(String containerName, String containerType) {
+			this.containerName =containerName;
+			this.containerType = containerType;
+		}
+	}
 	/**
 	 * AddRuleBlock
 	 * @author Terje

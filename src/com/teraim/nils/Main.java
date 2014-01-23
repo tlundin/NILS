@@ -1,12 +1,19 @@
 package com.teraim.nils;
 
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,6 +23,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+
 
 public class Main extends Activity {
 
@@ -35,6 +43,9 @@ public class Main extends Activity {
 		CommonVars.init(this);
 		//Get the instance.
 		cv = CommonVars.cv();
+		
+		//create folders if firsttime.
+		initIfFirstTime();
 
 		if(GooglePlayServicesUtil.isGooglePlayServicesAvailable(this)
 				== ConnectionResult.SUCCESS)
@@ -350,6 +361,80 @@ public class Main extends Activity {
 						"Value: " + c.getString(2),
 						Toast.LENGTH_LONG).show();
 	}
+	
+	
+	private void initIfFirstTime() {
+		//If testFile doesnt exist it will be created and found next time.
+		String t = CommonVars.NILS_ROOT_DIR +
+				"ifiexistthenallisfine.txt";
+		File f = new File(t);
+		Log.d("Strand","Checking if this is first time use...");
+		boolean exists = f.exists(); 
+
+		if (!exists) {
+			Log.d("Strand","Yes..executing  first time init");
+			initialize();   
+			//create token file to stop further calls to init.
+			try {
+				f.createNewFile();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		else 
+			Log.d("Strand","..Not first time");
+
+	}
+
+	private void initialize() {
+		//create data folder. This will also create the ROOT folder for the Strand app.
+		File folder = new File(CommonVars.CONFIG_FILES_DIR);
+		if(!folder.mkdirs())
+			Log.e("NILS","Failed to create config root folder");
+			
+		
+		//copy the configuration files into the root dir.
+		copyAssets();
+	}
+	
+	/**
+     * -- Copy the file from the assets folder to the sdCard
+     * ===========================================================
+     **/
+    private void copyAssets() {
+        AssetManager assetManager = getAssets();
+        String[] files = null;
+        try {
+            files = assetManager.list("");
+        } catch (IOException e) {
+            Log.e("tag", e.getMessage());
+        }
+        for (int i = 0; i < files.length; i++) {
+            InputStream in = null;
+            OutputStream out = null;
+            try {
+                in = assetManager.open(files[i]);
+                out = new FileOutputStream(CommonVars.CONFIG_FILES_DIR + files[i]);
+                copyFile(in, out);
+                in.close();
+                in = null;
+                out.flush();
+                out.close();
+                out = null;
+            } catch (Exception e) {
+                Log.e("tag", e.getMessage());
+            }
+        }
+    }
+
+    private void copyFile(InputStream in, OutputStream out) throws IOException {
+        byte[] buffer = new byte[1024];
+        int read;
+        while ((read = in.read(buffer)) != -1) {
+            out.write(buffer, 0, read);
+        }
+    }
 	/*
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

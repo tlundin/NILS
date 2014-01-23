@@ -19,6 +19,8 @@ import android.widget.GridView;
 import android.widget.ImageView;
 
 import com.teraim.nils.DataTypes.Provyta;
+import com.teraim.nils.flowtemplates.DefaultTemplate;
+import com.teraim.nils.flowtemplates.ListInputTemplate;
 
 public class StartMenuActivity extends MenuActivity {
 
@@ -36,8 +38,8 @@ public class StartMenuActivity extends MenuActivity {
 		 final Intent i_map =  new Intent(getBaseContext(),MapSelect.class);
 		 final Intent i_pic =  new Intent(getBaseContext(),TakePicture.class);
 		 final Intent i_find = new Intent(getBaseContext(),HittaYta.class);
- 		 final Intent i_wf = new Intent(this, FlowEngineActivity.class);
-
+ 		 //final Intent i_wf = new Intent(this, TemplateListInput.class);
+		 final Intent i_wf = new Intent(this, DefaultTemplate.class);
 		
 
 		/*

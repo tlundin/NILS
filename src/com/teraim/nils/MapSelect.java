@@ -20,7 +20,6 @@ package com.teraim.nils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -116,7 +115,6 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMarkerDragListene
 		final View mapView = getSupportFragmentManager().findFragmentById(R.id.map).getView();
 		if (mapView.getViewTreeObserver().isAlive()) {
 			mapView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-				@SuppressLint("NewApi") // We check which build version we are using.
 				@Override
 				public void onGlobalLayout() {
 					LatLng[] corners = CommonVars.cv().getRuta().getCorners();

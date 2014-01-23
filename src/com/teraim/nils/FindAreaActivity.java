@@ -162,8 +162,7 @@ public class FindAreaActivity extends Activity implements LocationListener, Sens
 				imageView = (ImageView) convertView;
 			}
 			//TODO: Get rid of 1 below!!
-			String picPath = Environment.getExternalStorageDirectory()+
-					CommonVars.NILS_BASE_DIR+"/delyta/"+
+			String picPath =CommonVars.NILS_ROOT_DIR+"/delyta/"+
 					"1"+"/bilder";
 			
 			Bitmap bm = BitmapFactory.decodeFile(picPath+"/gamla/"+

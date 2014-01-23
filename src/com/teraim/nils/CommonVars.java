@@ -43,7 +43,14 @@ public class CommonVars {
 	
 	
 	//String constants
-	public static String NILS_BASE_DIR = "/nils";
+	//The root folder for the SD card is in the global Environment.
+		private final static String path = Environment.getExternalStorageDirectory().getPath();
+		//Remember to always add system root path before any app specific path!
+
+	//Root for NILS
+	public final static String NILS_ROOT_DIR = path+"/nils/";
+	public final static String CONFIG_FILES_DIR = NILS_ROOT_DIR + "config/";
+	//public static String NILS_BASE_DIR = "/nils";
 	public static String UNDEFINED = "undefined";
 
 	
@@ -302,8 +309,7 @@ public class CommonVars {
 		return un;
 	}
 	public String getCurrentPictureBasePath() {
-		return Environment.getExternalStorageDirectory()+
-		NILS_BASE_DIR+"/ruta/"+
+		return NILS_ROOT_DIR+"/ruta/"+
 		"1"+"/bilder";
 	}
 	
