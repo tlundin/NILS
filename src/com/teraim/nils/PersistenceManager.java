@@ -5,11 +5,11 @@ import android.content.SharedPreferences;
 
 public class PersistenceManager {
 	
-	private Dbhelper myDb;
+	private DbHelper myDb;
 	private SharedPreferences tDb;
 	
 	private PersistenceManager(Context ctx) {
-		myDb = new Dbhelper(ctx);
+		myDb = new DbHelper(ctx);
 		tDb = ctx.getSharedPreferences("NILS_prefs", 0);
 		
 	}

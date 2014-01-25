@@ -1,24 +1,26 @@
 package com.teraim.nils;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
 
-public class ParameterCache implements Serializable {
+public class ParameterCache  {
 	
-	Map<String,String> sp = new HashMap<String,String>();
+	DbHelper db;
+	
+	public ParameterCache(DbHelper db){
+		this.db = db;
+	}
 
 	//Generic function to get a specific String key from shared prefs.
-	public String get(String key) {
-		return sp.get(key);
+	public String getVar(String key) {
+		return db.;
 	}
 	//Global variable put.
-	public void put(String key, String value) {
+	public void putVar(String key, String value) {
 		sp.put(key,value);
 	}
 	
-	public Map<String,String> getParameters() {
-		return sp;
+	public ArrayList<StoredVariable> getVars() {
+		
 	}
 	
 	public void freeze() {

@@ -669,7 +669,7 @@ public class DataTypes  {
 
 	}
 
-	protected class Provyta {
+	protected class Provyta extends ParameterCache {
 
 		private String id;
 		double N=0;
@@ -727,7 +727,7 @@ public class DataTypes  {
 	}
 
 
-	protected class Ruta {
+	protected class Ruta extends ParameterCache {
 		private String myId;
 
 		private ArrayList<Provyta> provytor = new ArrayList<Provyta>();
@@ -968,8 +968,121 @@ public class DataTypes  {
 
 	}
 
+	public static class VarToListConfigRow {
+		
+		public String getListEntryName() {
+			return listEntryName;
+		}
 
+		public String getVarName() {
+			return varName;
+		}
 
+		public String getEntryLabel() {
+			return entryLabel;
+		}
+
+		public String getAction() {
+			return action;
+		}
+
+		public String getVarLabel() {
+			return varLabel;
+		}
+
+		public String getVarType() {
+			return varType;
+		}
+
+		public boolean isDisplayInList() {
+			return displayInList;
+		}
+
+		public Unit getUnit() {
+			return unit;
+		}
+
+		static final int VAR_TO_LIST_CONFIG_ROW_LENGTH = 9;
+	
+		enum Unit {
+			percentage,
+			dm,
+			undefined
+			
+		};
+		
+		String listEntryName;
+		String varName;
+		String entryLabel;
+		String action;
+		String varLabel;
+		String varType;
+		boolean displayInList=false;
+		Unit unit;
+		
+		private VarToListConfigRow(String[] row,boolean display,Unit unit) {
+			int c=0;
+			listEntryName=row[c++];
+			varName=row[c++];
+			entryLabel=row[c++];
+			action=row[c++];
+			varLabel=row[c++];
+			varType=row[c++];
+			displayInList=display;
+			this.unit=unit;
+		}
+		
+		public static VarToListConfigRow createRow(String[] row) {
+			if(row.length!=VAR_TO_LIST_CONFIG_ROW_LENGTH) {
+				Log.e("NILS","Row is either too short or too long: "+row.length);
+				return null;
+			}
+			String t = row[6];
+			String u = row[7];	
+			Unit unit;
+			if (u.equals("dm"))
+				unit = Unit.dm;
+			else if(u.equals("%"))
+				unit = Unit.percentage;
+			else {
+				unit = Unit.undefined;
+				Log.d("nils","Could not recognize unit: "+u+". Supported: % and dm");
+			}
+			return new VarToListConfigRow(row,!(t==null||t.equalsIgnoreCase("FALSE")),
+					unit);
+
+		}
+	}
+	
+	
+	
+	public ArrayList <VarToListConfigRow> scanListConfigData(InputStream csvFile) {
+		ArrayList <VarToListConfigRow> varList = new ArrayList <VarToListConfigRow> (); 
+		InputStreamReader is = new InputStreamReader(csvFile);
+		BufferedReader br = new BufferedReader(is);
+		String header;
+		try {
+			String row;
+			header = br.readLine();
+			Log.d("NILS","Scanning listdatafile with header "+header);
+			//Find all RutIDs from csv. Create Ruta Class for each.
+			while((row = br.readLine())!=null) {
+				String[]  r = row.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+				VarToListConfigRow p;
+				if (r!=null) {
+					p=VarToListConfigRow.createRow(r);
+					Log.d("NILS",r[0]);
+					if (p!=null)
+						varList.add(p);
+					else
+						Log.e("nils","one row in config file corrupt");
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return varList;
+	}
 
 
 }

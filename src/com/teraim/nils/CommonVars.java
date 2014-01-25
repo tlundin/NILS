@@ -8,6 +8,7 @@ package com.teraim.nils;
  */
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
@@ -24,6 +25,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.teraim.nils.CommonVars.StoredVariable.Type;
 import com.teraim.nils.DataTypes.Delyta;
 import com.teraim.nils.DataTypes.Provyta;
 import com.teraim.nils.DataTypes.Ruta;
@@ -38,9 +40,7 @@ public class CommonVars {
 
 	private static CommonVars singleton = null;
 	
-	//Shared Preferences
-	private SharedPreferences sp = null;
-	
+	public static PersistenceHelper ph = null;
 	
 	//String constants
 	//The root folder for the SD card is in the global Environment.
@@ -112,27 +112,112 @@ public class CommonVars {
 		return singleton;			 
 	}
 	
-	private SharedPreferences rutaP;
-	private SharedPreferences ytaP;
-	private SharedPreferences delytaP;
+	
 	
 	private int syncStatus=BluetoothRemoteDevice.SYNK_STOPPED;
 
 	private CommonVars(Context ctx) throws SharedPrefMissingException  {
 			
-			sp=PreferenceManager.getDefaultSharedPreferences(ctx);
+		SharedPreferences sp=PreferenceManager.getDefaultSharedPreferences(ctx);
     		if (sp == null)
     			throw new SharedPrefMissingException();
- 			
+    		else {
+    			ph = new PersistenceHelper(sp);
+    		}
 	}
 
-	//Root object for the data structure.
-	private Ruta myRuta = null;
-	private Delyta myDelyta = null;
-	private Provyta myProvyta = null;
+	
+	public static class PersistenceHelper {
+		public static final String UNDEFINED = "";
+		SharedPreferences sp;
+		
+		ArrayList<String> delta = new ArrayList<String>();
+		
+		public PersistenceHelper(SharedPreferences sp) {
+			this.sp = sp;
+		}
+		
+
+		public String get(String key) {
+			return sp.getString(key,UNDEFINED);
+		}
+
+		public void put(String key, String value) {
+			sp.edit().putString(key,value).commit();
+		}
+		
+		public void setCurrentRuta(String rutaId) {
+			currentRuta = rutaId;
+		}
+		
+		public void setCurrentProvyta(String provytaId) {
+			currentProvyta = provytaId;
+		}
+		
+		public void setCurrentDelyta(String delyteId) {
+			currentDelyta = delyteId;
+		}
+		
+		public void setR(String varId, String value) {
+			assert(currentRuta!=null);
+			String fullId = currentRuta+"|"+varId;
+			put(fullId,value);
+			delta.add(fullId);
+		}
+
+		public void setP(String varId, String value) {
+			assert(currentRuta!=null);
+			assert(currentProvyta!=null);
+			String fullId = currentRuta+"|"+currentProvyta+"|"+varId;
+			put(fullId,value);
+			delta.add(fullId);
+		}
+		public void setD(String varId, String value) {
+			assert(currentRuta!=null);
+			assert(currentProvyta!=null);
+			assert(currentDelyta!=null);
+			String fullId = currentRuta+"|"+currentProvyta+"|"+currentDelyta+varId;
+			put(fullId,value);
+			delta.add(fullId);
+		}
+		
+		public StoredVariable getVar(String varId) {
+			if (varId == null)
+				return null;
+			String[] s = varId.split("|");
+			if (s==null || s.length==1) {
+				Log.e("nils","This does not seem to be a Variable: "+varId);
+				return null;
+			}
+			StoredVariable sv = new StoredVariable();
+			//Ruta
+			if (s.length==2) {
+				sv.rutId = s[0];
+				sv.value = s[1];
+				sv.type = Type.ruta;
+			} else if (s.length==3) {
+				sv.rutId = s[0];
+				sv.provytaId = s[1];
+				sv.value = s[2];
+				sv.type = Type.provyta;
+			} else if (s.length==4) {
+				sv.rutId = s[0];
+				sv.provytaId = s[1];
+				sv.delytaId = s[3];
+				sv.value = s[4];
+				sv.type = Type.delyta;
+			} else {
+				Log.e("nils","This Variable has too many parts: "+varId);
+				return null;		
+			}
+			return sv;
+		
+		}
+	}
 	
 	
 	
+
 	private Hashtable<String,Variable> myVars = new Hashtable<String,Variable>();
 
 	public synchronized Bool makeBoolean(String name, String label) {
@@ -226,7 +311,7 @@ public class CommonVars {
 	}
 	
 	public Ruta getRuta() {
-		return DataTypes.getSingleton().findRuta(getG("ruta_id"));
+		return DataTypes.getSingleton().findRuta(ph.get("ruta_id"));
 	}
 	
 	public void setDelyta(Delyta d) {
@@ -248,12 +333,12 @@ public class CommonVars {
 	//Persisted variables.
 
 	public void setDeviceColor(String color) {
-		sp.edit().putString("deviceColor", color).commit();
+		ph.put("deviceColor", color);
 		
 	}
 	
 	public String getDeviceColor() {
-		return sp.getString("deviceColor", UNDEFINED);		
+		return ph.get("deviceColor");		
 	}
 
 	public String getRemoteDeviceColor() {
@@ -261,49 +346,14 @@ public class CommonVars {
 		return (myC==null||myC.equals(UNDEFINED)||myC.equals(nocolor())?null:
 			myC.equals(red())?blue():red());
 	}
-	//Generic function to get a specific String key from shared prefs.
-	public String getG(String key) {
-		return sp.getString(key,UNDEFINED);
-	}
-	//Global variable put.
-	public void putG(String key, String value) {
-		sp.edit().putString(key,value).commit();
-	}
 	
-	//PUT for specific ruta & provyta & delyta.
-	public void putD(String key, String value){
-		delytaP.edit().putString(key, value);
-	}
-	
-	//GET for specific ruta & provyta & delyta.
-	public String getD(String key) {
-		return delytaP.getString(key,UNDEFINED);
-	}
-	
-	//PUT for specific ruta & provyta .
-	public void putP(String key, String value){
-		ytaP.edit().putString(key, value);
-	}
-	
-	//GET for specific ruta & provyta .
-	public String getP(String key) {
-		return ytaP.getString(key,UNDEFINED);
-	}
-	
-	//PUT for specific ruta 
-	public void putR(String key, String value){
-		rutaP.edit().putString(key, value);
-	}
-	
-	//GET for specific ruta 
-	public String getR(String key) {
-		return rutaP.getString(key,UNDEFINED);
-	}
 	
 	
 	public String getUserName() {
 		final int MAX_NAME_LENGTH = 16;
-		String un = sp.getString("username", "?");
+		String un = ph.get("username");
+		if (un.equals(UNDEFINED))
+			un = "?";
 		if (un.length()>MAX_NAME_LENGTH)
 			un = un.substring(0, MAX_NAME_LENGTH);
 		return un;
