@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"   
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+    android:layout_weight="0.3"
+        android:orientation="horizontal" >
+
+        <ScrollView
+            android:id="@+id/scrollView1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:scrollbars="none"
+            android:layout_weight="0.5" >
+
+            <LinearLayout
+                android:id="@+id/selected"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                  >
+
+            </LinearLayout>
+
+        </ScrollView>
+
+        <LinearLayout
+            android:id="@+id/aggregates"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:orientation="vertical" >
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+                android:layout_height="0dp"
+    android:layout_weight="0.3"
+         >
+
+        <LinearLayout
+            android:id="@+id/filterPanel"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical" 
+            android:layout_weight="0.2">
+
+        </LinearLayout>
+
+        <ScrollView
+            android:id="@+id/scrollView2"
+            android:layout_width="0dp"
+            
+            android:layout_height="match_parent" 
+            android:layout_weight="0.1">
+
+            <LinearLayout
+                android:id="@+id/buttonPanel"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical" >
+
+            </LinearLayout>
+        </ScrollView>
+
+        <ScrollView
+            android:id="@+id/scrollView3"          
+            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="0.7" >
+
+            <LinearLayout
+                android:id="@+id/fieldList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical" >
+
+            </LinearLayout>
+        </ScrollView>
+
+    </LinearLayout>
+
+</LinearLayout>
