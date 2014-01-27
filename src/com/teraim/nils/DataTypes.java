@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -883,6 +884,7 @@ public class Ruta extends ParameterCache {
 			}
 
 		}
+		Log.d("nils","Couldn't find provyta with ID "+ytId);
 		return null;
 	}
 
@@ -908,8 +910,10 @@ public class Ruta extends ParameterCache {
 }
 
 public Ruta findRuta(String id) {
-	if (id == null)
+	Log.d("nils","Findruta called with ID> "+id);
+	if (id == null) {
 		return null;
+	}
 	for (Ruta r:rutor) 
 		if (r.getId().equals(id))
 			return r;
@@ -1127,7 +1131,10 @@ public static class VarToListConfigRow {
 
 public ArrayList <VarToListConfigRow> scanListConfigData(InputStream csvFile) {
 	ArrayList <VarToListConfigRow> varList = new ArrayList <VarToListConfigRow> (); 
+	
+	
 	InputStreamReader is = new InputStreamReader(csvFile);
+	
 	BufferedReader br = new BufferedReader(is);
 	String header;
 	try {

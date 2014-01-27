@@ -287,12 +287,7 @@ public class CommonVars {
 	}
 	
 	public Workflow getWorkflow(String id) {
-		String o = myWfs.keySet().iterator().next();
-		Log.d("NILS","first key is "+o);
-		Log.d("NILS","searched key is "+id);
-		Log.d("NILS","Are they equal? "+o.equals(id));
-		Log.d("NILS","lengt of key1, key2 "+o.length()+" "+id.length());
-
+		//String o = myWfs.keySet().iterator().next();
 		return myWfs.get(id);
 	}
 	
@@ -318,17 +313,21 @@ public class CommonVars {
 	public Provyta getCurrentProvyta() {
 		Ruta r = getCurrentRuta();
 		if (r!=null) 
-			return r.findProvYta(PersistenceHelper.CURRENT_PROVYTA_ID_KEY);
+			return r.findProvYta(ph.get(PersistenceHelper.CURRENT_PROVYTA_ID_KEY));
 		else
+			Log.e("nils","getCurrentprovyta returns null, since getCurrentRuta failed");
 			return null;
 	}
 		
 	public Delyta getCurrentDelyta() {
 		Provyta p = getCurrentProvyta();
 		if (p!=null) 
-			return p.findDelyta(PersistenceHelper.CURRENT_DELYTA_ID_KEY);
-		else
+			return p.findDelyta(ph.get(PersistenceHelper.CURRENT_DELYTA_ID_KEY));
+		else {
+			Log.e("nils","getCurrentdelyta returns null, since getCurrentProvyta failed");
+			Log.e("nils","Current provyta ID: "+ph.get(PersistenceHelper.CURRENT_PROVYTA_ID_KEY));
 			return null;
+		}
 	}
 	
 	

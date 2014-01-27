@@ -199,8 +199,8 @@ public class DbHelper extends SQLiteOpenHelper {
     			selection,selectionArgs,null,null,null,null);
     	
     	 // 3. if we got results get the first one
-        if (c != null) {
-            c.moveToFirst();
+        if (c != null && c.moveToFirst()) {
+            
             String id = c.getString(0);
             if (id!=null) {
             	return Long.parseLong(id);
@@ -233,8 +233,7 @@ public class DbHelper extends SQLiteOpenHelper {
     	Cursor c = db.query(TABLE_VARIABLES,new String[]{"id","serialized"},
     			selection,selectionArgs,null,null,null,null);
     	StoredVariable stV=null;
-        if (c != null) {
-            c.moveToFirst();
+        if (c != null && c.moveToFirst() ) {
             String id = c.getString(0);
             stV = (StoredVariable)Tools.deSerialize(c.getBlob(1));
             stV.setId(Long.parseLong(id));

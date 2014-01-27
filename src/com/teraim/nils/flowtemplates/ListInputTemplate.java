@@ -46,9 +46,6 @@ public class ListInputTemplate extends BaseTemplate {
 	 */
 	private void execute() {
 		//TEST CODE
-		//TODO: REMOVE
-		CommonVars.ph.put(PersistenceHelper.CURRENT_PROVYTA_ID_KEY, "1");
-		CommonVars.ph.put(PersistenceHelper.CURRENT_DELYTA_ID_KEY, "1");
 		//LinearLayout my_root = (LinearLayout) findViewById(R.id.myRoot);
 
 		List<Block>blocks = wf.getBlocks();
@@ -69,27 +66,36 @@ public class ListInputTemplate extends BaseTemplate {
 				}
 				if (rows!=null) {
 					Log.d("nils","Config file had "+rows.size()+" entries");
+					int index = 0;
+					ClickableField listRow=null;
 					for(VarToListConfigRow r:rows) {
-						//If the variable exist, we send the value. null otherwhise.
-						ClickableField listRow=null;
-						if (r.getAction().equals("create")) {
-							listRow = new ClickableField(r.getEntryLabel());
-							fieldBg.addView(listRow.getView());	
-						} 
-						if (!r.getAction().equals("add")||!r.getAction().equals("create"))
-							Log.e("nils","something is wrong...action is neither Create or Add");
-						else
-							listRow.addVariable(r.getVarLabel(), r.getVarName(), r.getUnit(), r.getnumType(),r.getVarType(), r.isDisplayInList());
-
+						if (r==null) {
+							Log.e("nils","found null value in config file row "+index);
+						} else {
+							if (r.getAction().equals("create")) {
+								listRow = new ClickableField(r.getEntryLabel());
+								fieldBg.addView(listRow.getView());	
+							} 
+							if (!r.getAction().equals("add")&&!r.getAction().equals("create"))
+								Log.e("nils","something is wrong...action is neither Create or Add: "+r.getAction());
+							else {
+								Log.d("nils","add...");
+								if (listRow!=null) {
+									Log.d("nils","var added "+r.getVarLabel());
+									listRow.addVariable(r.getVarLabel(), r.getVarName(), r.getUnit(), r.getnumType(),r.getVarType(), r.isDisplayInList());
+								}
+							}
+						}
+						index++;
 					}
 				}
 				else
 					Log.d("nils","failed to scan input file");
 			}
-			
-			
+
+
 		}
-		
+
 	}
 
 

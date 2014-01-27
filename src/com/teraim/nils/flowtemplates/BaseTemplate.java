@@ -200,9 +200,6 @@ public class BaseTemplate extends Activity {
 							save();
 							refreshOutPut();
 						}
-
-
-
 					});
 					alert.setNegativeButton("Avbryt", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int whichButton) {
@@ -241,7 +238,7 @@ public class BaseTemplate extends Activity {
 				bindings.put(varIdentifier,view);
 			}
 			else {
-
+				Log.d("nils","adding variable "+varId);
 				View l = LayoutInflater.from(BaseTemplate.this).inflate(R.layout.edit_field,null);
 				TextView header = (TextView)l.findViewById(R.id.header);
 				EditText view = (EditText)l.findViewById(R.id.edit);

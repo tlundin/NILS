@@ -36,7 +36,7 @@ public class VarIdentifier {
 
 	public String getPrintedValue() {
 		if (pc==null) {
-			Log.e("nils","No parametercache identified for variable "+id);
+			Log.e("nils","Print: No parametercache identified for variable "+id);
 			return "";
 		}
 		StoredVariable sv;		
