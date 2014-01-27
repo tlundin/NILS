@@ -8,11 +8,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.android.gms.internal.cv;
 import com.google.android.gms.maps.model.LatLng;
+import com.teraim.nils.CommonVars.PersistenceHelper;
+import com.teraim.nils.DataTypes.Delyta;
+import com.teraim.nils.DataTypes.Provyta;
+import com.teraim.nils.StoredVariable.Type;
 import com.teraim.nils.exceptions.EvalException;
 import com.teraim.nils.exceptions.IllegalCallException;
 import com.teraim.nils.exceptions.RuleException;
@@ -36,7 +40,7 @@ public class DataTypes  {
 
 	static Context myC;
 	static DataTypes singleton;
-	
+
 	public static DataTypes getSingleton() {
 		return singleton;
 	}
@@ -77,15 +81,15 @@ public class DataTypes  {
 
 	}
 	 */
-	
-	
+
+
 
 
 	//Workflow
 	public static class Workflow {
 		private List<Block> blocks;
 		private String name=null;
-		
+
 		public enum Type
 		{
 			plain,
@@ -107,17 +111,17 @@ public class DataTypes  {
 			}
 			return name;
 		}
-		
+
 		public Class getWfClass() {
-		Class ret = null;
+			Class ret = null;
 			switch (getType()) {
 			case plain:
 				ret = DefaultTemplate.class;
-			break;
+				break;
 			case variable_selection:
 				ret = ListInputTemplate.class;
 				break;
-			
+
 			}
 			return ret;
 		}
@@ -133,16 +137,16 @@ public class DataTypes  {
 						if (type.equals("variable_selection"))
 							return Type.variable_selection;
 						else {
-						 Log.e("NILS","Type of page not recognized in workflow "+this.getName()+" Will default to plain");
+							Log.e("NILS","Type of page not recognized in workflow "+this.getName()+" Will default to plain");
 						}
-						return Type.plain;	
+					return Type.plain;	
 				}
-				
+
 			}
-			 Log.e("NILS","Could not find PageDefineBlock for workflow "+this.getName()+" Will default to plain type");
-			 return Type.plain;
+			Log.e("NILS","Could not find PageDefineBlock for workflow "+this.getName()+" Will default to plain type");
+			return Type.plain;
 		}
-		
+
 	}
 
 	/**
@@ -152,9 +156,9 @@ public class DataTypes  {
 	public static class XML_Variable {		
 		public String name;
 		public String label;
-		String type;
+		Variable.Type type;
 		String purpose;
-		String unit;
+		Unit unit;
 	}
 
 	/**
@@ -173,13 +177,13 @@ public class DataTypes  {
 	 *
 	 */
 	public static class AddDisplayOfSelectionsBlock extends Block {
-		
+
 	}
 	public static class SortingBlock extends Block {
-		
+
 	}
 	public static class FilterBlock extends Block {
-		
+
 	}
 	/**
 	 * Startblock.
@@ -189,7 +193,7 @@ public class DataTypes  {
 	public static class StartBlock extends Block {
 		final private String workflowName;
 		final private String[] args;
-		
+
 		public StartBlock(String[] args,String wfn) {
 			workflowName = wfn;
 			this.args = args;
@@ -198,7 +202,7 @@ public class DataTypes  {
 		public String getName() {
 			return workflowName;
 		}
-		
+
 		public String[] getArgs() {
 			return args;
 		}
@@ -271,13 +275,13 @@ public class DataTypes  {
 			if (var==null) {
 				//Integer is created as a Aritmetic.
 				if (Xvar.type==null||
-						Xvar.type.equals(Variable.NUMERIC))
+						Xvar.type==Variable.Type.NUMERIC)
 					CommonVars.cv().makeNumeric(Xvar.name,Xvar.label);
-				else if (Xvar.type.equals(Variable.ARITMETIC))
+				else if (Xvar.type==Variable.Type.ARITMETIC)
 					CommonVars.cv().makeAritmetic(Xvar.name,Xvar.label);
-				else if (Xvar.type.equals(Variable.LITERAL))
+				else if (Xvar.type==Variable.Type.LITERAL)
 					CommonVars.cv().makeLiteral(Xvar.name,Xvar.label);
-				else if (Xvar.type.equals(Variable.BOOLEAN))
+				else if (Xvar.type==Variable.Type.BOOLEAN)
 					CommonVars.cv().makeBoolean(Xvar.name,Xvar.label);
 
 				Log.d("NILS", "Var created with name "+Xvar.name);
@@ -294,19 +298,19 @@ public class DataTypes  {
 			return mXvar.name;
 		}
 
-		public String getType() {
+		public Variable.Type getType() {
 			return mXvar.type;
 		}
 
 	}
-	
+
 	public static class CreateListEntriesBlock extends Block {
 		String fileName=null;
 
 		public String getFileName() {
 			return fileName;
 		}
-		
+
 		public CreateListEntriesBlock(String fileName) {
 			this.fileName =fileName;
 		}
@@ -333,13 +337,13 @@ public class DataTypes  {
 				if (var==null) {
 					//Integer is created as a Aritmetic.
 					if (Xvar.type==null||
-							Xvar.type.equals(Variable.NUMERIC))
+							Xvar.type==Variable.Type.NUMERIC)
 						CommonVars.cv().makeNumeric(Xvar.name,Xvar.label);
-					else if (Xvar.type.equals(Variable.ARITMETIC))
+					else if (Xvar.type==Variable.Type.ARITMETIC)
 						CommonVars.cv().makeAritmetic(Xvar.name,Xvar.label);
-					else if (Xvar.type.equals(Variable.LITERAL))
+					else if (Xvar.type==Variable.Type.LITERAL)
 						CommonVars.cv().makeLiteral(Xvar.name,Xvar.label);
-					else if (Xvar.type.equals(Variable.BOOLEAN))
+					else if (Xvar.type==Variable.Type.BOOLEAN)
 						CommonVars.cv().makeBoolean(Xvar.name,Xvar.label);
 
 					Log.d("NILS", "Var created with name "+Xvar.name);
@@ -382,8 +386,8 @@ public class DataTypes  {
 			if (var==null)
 				throw new EvalException("Variable does not exist");
 			//Should expression be evaluated?
-			if (var.getType().equals(Variable.ARITMETIC)||
-					var.getType().equals(Variable.NUMERIC)) {
+			if (var.getType()==Variable.Type.ARITMETIC||
+					var.getType()==Variable.Type.NUMERIC) {
 				double val =-1;
 				val = Parser.parse(expr).value();
 				((Aritmetic)var).setValue(val);
@@ -443,7 +447,7 @@ public class DataTypes  {
 			this.pageLabel=pageLabel;
 		}
 	}
-	
+
 	/**
 	 * Container Definition block
 	 * @author Terje
@@ -459,7 +463,7 @@ public class DataTypes  {
 		public String getContainerType() {
 			return containerType;
 		}
-		
+
 		public ContainerDefineBlock(String containerName, String containerType) {
 			this.containerName =containerName;
 			this.containerType = containerType;
@@ -482,13 +486,13 @@ public class DataTypes  {
 			this.action=action;
 			this.errorMsg=errorMsg;
 			Log.e("NILS","Create Rule with name "+ruleName+" and target "+target+" and cond "+ condition);
-			
+
 		}
 		public Variable getTarget() throws RuleException {
 			Variable var = CommonVars.cv().getVariable(targetName);
 			if (var==null)
 				throw new RuleException("Variable "+targetName+" must exist");
-			
+
 			return var;
 		}	
 		//Execute Rule. Target will be colored accordingly.
@@ -600,15 +604,14 @@ public class DataTypes  {
 		final int Max_Points = 10;
 		private Train tr=null; 
 		private final String myId;
+		private Provyta myParent;
 
-
-		public Delyta(String id, String[] raw) {
-
+		public Delyta(String id, Provyta parent, String[] raw) {
 			myId = id;
-
+			myParent = parent;
 			setPoints(raw);
-
 		}
+
 		public int[][] getPoints() {
 			if(tr!=null)
 				return tr.getTag();
@@ -618,6 +621,7 @@ public class DataTypes  {
 		public String getId() {
 			return myId;
 		}
+
 		public boolean setPoints(String[] tag) {
 			int val = -1;
 			boolean avst = true;
@@ -666,10 +670,25 @@ public class DataTypes  {
 			return true;
 		}
 
+		public StoredVariable getVariable(String varId) {
+			if (myParent == null) {
+				Log.e("nils","Getvariable called on delyta without parent..?");
+				return null;
+			} else
+				return getDelyteVariable(this.myParent.getParent().getId(),this.myParent.getId(),this.myId,varId);
+		}
+
+		@Override
+		public StoredVariable storeVariable(String varId, String value) {
+			return this.storeVariable(new StoredVariable(myParent.getParent().getId(), myParent.getId(), this.getId(),
+					value, 	varId,
+					Type.delyta));		
+		}
+
 
 	}
 
-	protected class Provyta extends ParameterCache {
+	public class Provyta extends ParameterCache {
 
 		private String id;
 		double N=0;
@@ -679,13 +698,19 @@ public class DataTypes  {
 
 		private ArrayList<Delyta>dy = new ArrayList<Delyta>();
 
+		private Ruta myParent;
 
-		public Provyta(String id) {
+		public Provyta(String id, Ruta parent) {
 			this.id = id;
+			myParent = parent;
 		}
 
 		public String getId() {
 			return id;
+		}
+
+		public Ruta getParent() {
+			return myParent;
 		}
 
 		public double[] getLatLong() {
@@ -706,7 +731,7 @@ public class DataTypes  {
 		//ADD will add the delyta if new. Otherwise it will update the current value.
 		public void addDelyta(String delyteId, String[] raw) {
 
-			dy.add(new Delyta(delyteId,raw));
+			dy.add(new Delyta(delyteId,this,raw));
 		}
 
 		public Delyta findDelyta(String delyteId) {
@@ -724,365 +749,411 @@ public class DataTypes  {
 			Delyta d = dy.get(index);
 			d.setPoints(tag);
 		}
+
+		@Override
+		public StoredVariable getVariable(String varId) {
+			if (myParent == null) {
+				Log.e("nils","Getvariable called on provyta without parent..?");
+				return null;
+			} else
+				return getProvyteVariable(myParent.getId(),id,varId);
+		}
+
+		@Override
+		public StoredVariable storeVariable(String varId, String value) {
+			return this.storeVariable(new StoredVariable(myParent.getId(), this.getId(), null,
+					value, 	varId,
+					Type.provyta));
+			
+		}
 	}
 
 
-	protected class Ruta extends ParameterCache {
-		private String myId;
 
-		private ArrayList<Provyta> provytor = new ArrayList<Provyta>();
+public class Ruta extends ParameterCache {
+	private String myId;
 
-		public Ruta(String id) {
-			myId = id;
+	private ArrayList<Provyta> provytor = new ArrayList<Provyta>();
+
+	public Ruta(String id) {
+		myId = id;
+	}
+
+	public String getId() {
+		return myId;
+	}
+
+	private void addDelYta(String provYteId,String delyteId,String[] raw) {
+
+		if (provYteId != null) {
+			Provyta _py = findProvYta(provYteId);
+			if (_py==null) {
+				Log.e("NILS","Provyta with id "+provYteId+" not  found in rutdata but found in delningsdata");
+				//_py = new ProvYta(provYteId);
+				//py.add(_py);
+
+			} else
+				_py.addDelyta(delyteId, raw);
 		}
+	}
 
-		public String getId() {
-			return myId;
+	public Provyta addProvYta_rutdata(String ytId, String north, String east, String lat, String longh) {
+		Provyta yta = new Provyta(ytId,this);
+		try {
+
+			yta.setSweRef(Double.parseDouble(north),Double.parseDouble(east));
+			Log.d("NILS","Adding Yta ID:  N E:"+ytId+" "+ Double.parseDouble(north)+" "+Double.parseDouble(east));
+			yta.setGPS(Double.parseDouble(lat),Double.parseDouble(longh));
+		} catch (NumberFormatException e) {
+			Log.d("NILS","The center coordinates for yta "+ytId+" are not recognized as proper doubles");
+			return null;
 		}
+		provytor.add(yta);
+		//Add default 0 delyta.
+		yta.addDelyta("0", null);
+		return yta;
+	}
+	public ArrayList<Provyta> getAllProvYtor() {
+		return provytor;
+	}
 
-		private void addDelYta(String provYteId,String delyteId,String[] raw) {
+	public Sorted sort() {
+		Sorted s = new Sorted();
+		return s;
+	}
 
-			if (provYteId != null) {
-				Provyta _py = findProvYta(provYteId);
-				if (_py==null) {
-					Log.e("NILS","Provyta with id "+provYteId+" not  found in rutdata but found in delningsdata");
-					//_py = new ProvYta(provYteId);
-					//py.add(_py);
+	public LatLng[] getCorners() {
+		//North south
+		double[] lat = new double[provytor.size()];
+		//East west
+		double[] lon = new double[provytor.size()];
+		int i = 0;
 
-				} else
-					_py.addDelyta(delyteId, raw);
-			}
+		for(Provyta y:provytor) {
+			lat[i]= y.lat;
+			lon[i]= y.longh;
+			Log.d("NILS","SN: "+y.N+" SE: "+y.E);
+			i++;
 		}
+		Arrays.sort(lat);
+		Arrays.sort(lon);
+		LatLng[] ret = new LatLng[2];
+		//sw
+		ret[0] = new LatLng(lat[0],lon[0]);
+		//ne
+		ret[1]= new LatLng(lat[lat.length-1],  lon[lon.length-1]);
+		return ret;
+	}
 
-		public Provyta addProvYta_rutdata(String ytId, String north, String east, String lat, String longh) {
-			Provyta yta = new Provyta(ytId);
-			try {
-
-				yta.setSweRef(Double.parseDouble(north),Double.parseDouble(east));
-				Log.d("NILS","Adding Yta ID:  N E:"+ytId+" "+ Double.parseDouble(north)+" "+Double.parseDouble(east));
-				yta.setGPS(Double.parseDouble(lat),Double.parseDouble(longh));
-			} catch (NumberFormatException e) {
-				Log.d("NILS","The center coordinates for yta "+ytId+" are not recognized as proper doubles");
-				return null;
-			}
-			provytor.add(yta);
-			//Add default 0 delyta.
-			yta.addDelyta("0", null);
-			return yta;
-		}
-		public ArrayList<Provyta> getAllProvYtor() {
-			return provytor;
-		}
-
-		public Sorted sort() {
-			Sorted s = new Sorted();
-			return s;
-		}
-
-		public LatLng[] getCorners() {
-			//North south
-			double[] lat = new double[provytor.size()];
-			//East west
-			double[] lon = new double[provytor.size()];
+	public class Sorted {
+		double[] N = new double[provytor.size()];
+		double[] E = new double[provytor.size()];
+		public Sorted() {
 			int i = 0;
-
 			for(Provyta y:provytor) {
-				lat[i]= y.lat;
-				lon[i]= y.longh;
+				N[i]= y.N;
+				E[i]= y.E;
 				Log.d("NILS","SN: "+y.N+" SE: "+y.E);
 				i++;
 			}
-			Arrays.sort(lat);
-			Arrays.sort(lon);
-			LatLng[] ret = new LatLng[2];
-			//sw
-			ret[0] = new LatLng(lat[0],lon[0]);
-			//ne
-			ret[1]= new LatLng(lat[lat.length-1],  lon[lon.length-1]);
-			return ret;
+			Arrays.sort(N);
+			Arrays.sort(E);
 		}
-
-		public class Sorted {
-			double[] N = new double[provytor.size()];
-			double[] E = new double[provytor.size()];
-			public Sorted() {
-				int i = 0;
-				for(Provyta y:provytor) {
-					N[i]= y.N;
-					E[i]= y.E;
-					Log.d("NILS","SN: "+y.N+" SE: "+y.E);
-					i++;
-				}
-				Arrays.sort(N);
-				Arrays.sort(E);
-			}
-			//return minx,miny,maxx,maxy
-			public double getMax_N_sweref_99() {
-				return N[N.length-1];
-			}
-			public double getMax_E_sweref_99() {
-				return E[E.length-1];
-			}
-			public double getMin_N_sweref_99() {
-				return N[0];
-			}
-			public double getMin_E_sweref_99() {
-				return E[0];
-			}
+		//return minx,miny,maxx,maxy
+		public double getMax_N_sweref_99() {
+			return N[N.length-1];
 		}
-
-
-
-		public Provyta findProvYta(String ytId) {
-			for(Provyta y:provytor) {
-				if(y.id.equals(ytId)) {
-					return y;
-				}
-
-			}
-			return null;
+		public double getMax_E_sweref_99() {
+			return E[E.length-1];
 		}
-
-
+		public double getMin_N_sweref_99() {
+			return N[0];
+		}
+		public double getMin_E_sweref_99() {
+			return E[0];
+		}
 	}
 
-	public Ruta findRuta(String id) {
-		if (id == null)
-			return null;
-		for (Ruta r:rutor) 
-			if (r.getId().equals(id))
-				return r;
-		return null;
-	}
 
-	public String[] getRutIds() {
-		if (rutor != null) {
-			String[] contents = new String[rutor.size()];		
-			int i=0;
-			for (Ruta r:rutor)
-				contents[i++]=r.getId();
-			return contents;
+
+	public Provyta findProvYta(String ytId) {
+		for(Provyta y:provytor) {
+			if(y.getId().equals(ytId)) {
+				return y;
+			}
+
 		}
 		return null;
 	}
 
-	public ArrayList<Delyta> getDelytor(String rutId, String provyteId) {
-		Ruta r = findRuta(rutId);
-		if (r!=null) {
-			Log.d("NILS","found ruta "+ rutId);
-			Provyta p = r.findProvYta(provyteId);
-			if (p!=null) {
-				Log.d("NILS","Found provyta"+ provyteId);			
-				return (p.getDelytor());
-			} else {
-				Log.e("NILS","DID NOT FIND Provyta for id "+provyteId);
-				//TODO: Files must contains same provytor!
-				//Fix for now: Generate default if missing.
-				//p.addDelyta("1", null);
-				//r.addProvYta(provyteId, "1", null);
-				//return getDelytor(rutId,provyteId);
-			}
+	@Override
+	public StoredVariable getVariable(String varId) {
+		if (myId == null) {
+			Log.e("nils","My ID was null in getVariable Ruta for variable: "+varId);
+			return null;
 		} else
-			Log.e("NILS","DID NOT FIND RUTA "+ rutId);
-		return null;
-	}
-	//scan csv file for Rutor. Create if needed.
-	private void scanRutData(InputStream csvFile) {
-		InputStreamReader is = new InputStreamReader(csvFile);
-		BufferedReader br = new BufferedReader(is);
-		String header;
-		try {
-			String row;
-			header = br.readLine();
-			Log.d("nils",header);
-			//Find all RutIDs from csv. Create Ruta Class for each.
-			while((row = br.readLine())!=null) {
-				String  r[] = row.split(",");
-				if (r!=null&&r.length>3) {
-					Log.d("NILS",r[0]);
-					Ruta ruta=findRuta(r[0]);
-					if (ruta ==null) {
-						ruta = new Ruta(r[0]);
-						rutor.add(ruta);
-					}
-					int id = Integer.parseInt(r[1]);
-					//Skip IDs belonging to inner ytor.
-					if (id>12&&id<17)
-						continue;
-					if (ruta.addProvYta_rutdata(r[1],r[2],r[3],r[7],r[8])!=null)
-						Log.d("NILS","added provyta with ID "+r[1]);
-					else
-						Log.d("NILS","discarded provyta with ID "+r[1]);
-
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		//Calculate the distance between smallest and biggest x,y values
-		//This is done to be able to calculate the grid position.
-		Log.d("NILS","checking minmax...");
-		for (Ruta r:rutor) {
-			Ruta.Sorted s = r.sort();
-			Log.d("NILS","Ruta with id "+r.getId()+" has minxy: "+s.getMin_E_sweref_99()+" "+s.getMin_N_sweref_99()+
-					" and maxXy: "+s.getMax_E_sweref_99()+" "+s.getMax_N_sweref_99());
-		}
-	}
-
-	//scan csv file for Rutor. Create if needed.
-	private void scanDelningsData(InputStream csvFile) {
-		InputStreamReader is = new InputStreamReader(csvFile);
-		BufferedReader br = new BufferedReader(is);
-		final int noPo = 16;
-		try {
-			String row;
-			String header = br.readLine();
-			Log.d("NILS",header);
-			//Find rutId etc
-			while((row = br.readLine())!=null) {
-				String  r[] = row.split("\t");
-				if (r!=null) {	
-					if (r[2]==null)
-						continue;
-					Ruta ruta = findRuta(r[2]);
-					//if this is a new ruta, add it to the array
-					if (ruta!=null) {
-						//Extract the delningståg out from the data.
-						String[] points = new String[noPo];
-						System.arraycopy(r, 6, points, 0, noPo);
-						ruta.addDelYta(r[4],r[5],points);
-					}
-					//TODO: Add this as ELSE when the files match. 
-					//Currently only Rutor from Rutdata will matter.
-					/* ruta = new Ruta(r[2]);
-						rutor.add(ruta);
-					 */
-
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		//Calculate the distance between smallest and biggest x,y values
-		//This is done to be able to calculate the grid position.
-
-	}
-
-	public static class VarToListConfigRow {
-		
-		public String getListEntryName() {
-			return listEntryName;
-		}
-
-		public String getVarName() {
-			return varName;
-		}
-
-		public String getEntryLabel() {
-			return entryLabel;
-		}
-
-		public String getAction() {
-			return action;
-		}
-
-		public String getVarLabel() {
-			return varLabel;
-		}
-
-		public String getVarType() {
-			return varType;
-		}
-
-		public boolean isDisplayInList() {
-			return displayInList;
-		}
-
-		public Unit getUnit() {
-			return unit;
-		}
-
-		static final int VAR_TO_LIST_CONFIG_ROW_LENGTH = 9;
-	
-		enum Unit {
-			percentage,
-			dm,
-			undefined
 			
-		};
-		
-		String listEntryName;
-		String varName;
-		String entryLabel;
-		String action;
-		String varLabel;
-		String varType;
-		boolean displayInList=false;
-		Unit unit;
-		
-		private VarToListConfigRow(String[] row,boolean display,Unit unit) {
-			int c=0;
-			listEntryName=row[c++];
-			varName=row[c++];
-			entryLabel=row[c++];
-			action=row[c++];
-			varLabel=row[c++];
-			varType=row[c++];
-			displayInList=display;
-			this.unit=unit;
-		}
-		
-		public static VarToListConfigRow createRow(String[] row) {
-			if(row.length!=VAR_TO_LIST_CONFIG_ROW_LENGTH) {
-				Log.e("NILS","Row is either too short or too long: "+row.length);
-				return null;
-			}
-			String t = row[6];
-			String u = row[7];	
-			Unit unit;
-			if (u.equals("dm"))
-				unit = Unit.dm;
-			else if(u.equals("%"))
-				unit = Unit.percentage;
-			else {
-				unit = Unit.undefined;
-				Log.d("nils","Could not recognize unit: "+u+". Supported: % and dm");
-			}
-			return new VarToListConfigRow(row,!(t==null||t.equalsIgnoreCase("FALSE")),
-					unit);
+			return getRutVariable(myId, varId);
+	}
 
-		}
+	@Override
+	public StoredVariable storeVariable(String varId, String value) {
+		return this.storeVariable(new StoredVariable(this.getId(), null, null,
+				value, 	varId,
+				Type.ruta));
+		
 	}
-	
-	
-	
-	public ArrayList <VarToListConfigRow> scanListConfigData(InputStream csvFile) {
-		ArrayList <VarToListConfigRow> varList = new ArrayList <VarToListConfigRow> (); 
-		InputStreamReader is = new InputStreamReader(csvFile);
-		BufferedReader br = new BufferedReader(is);
-		String header;
-		try {
-			String row;
-			header = br.readLine();
-			Log.d("NILS","Scanning listdatafile with header "+header);
-			//Find all RutIDs from csv. Create Ruta Class for each.
-			while((row = br.readLine())!=null) {
-				String[]  r = row.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-				VarToListConfigRow p;
-				if (r!=null) {
-					p=VarToListConfigRow.createRow(r);
-					Log.d("NILS",r[0]);
-					if (p!=null)
-						varList.add(p);
-					else
-						Log.e("nils","one row in config file corrupt");
+
+
+}
+
+public Ruta findRuta(String id) {
+	if (id == null)
+		return null;
+	for (Ruta r:rutor) 
+		if (r.getId().equals(id))
+			return r;
+	return null;
+}
+
+public String[] getRutIds() {
+	if (rutor != null) {
+		String[] contents = new String[rutor.size()];		
+		int i=0;
+		for (Ruta r:rutor)
+			contents[i++]=r.getId();
+		return contents;
+	}
+	return null;
+}
+
+public ArrayList<Delyta> getDelytor(String rutId, String provyteId) {
+	Ruta r = findRuta(rutId);
+	if (r!=null) {
+		Log.d("NILS","found ruta "+ rutId);
+		Provyta p = r.findProvYta(provyteId);
+		if (p!=null) {
+			Log.d("NILS","Found provyta"+ provyteId);			
+			return (p.getDelytor());
+		} else {
+			Log.e("NILS","DID NOT FIND Provyta for id "+provyteId);
+			//TODO: Files must contains same provytor!
+			//Fix for now: Generate default if missing.
+			//p.addDelyta("1", null);
+			//r.addProvYta(provyteId, "1", null);
+			//return getDelytor(rutId,provyteId);
+		}
+	} else
+		Log.e("NILS","DID NOT FIND RUTA "+ rutId);
+	return null;
+}
+//scan csv file for Rutor. Create if needed.
+private void scanRutData(InputStream csvFile) {
+	InputStreamReader is = new InputStreamReader(csvFile);
+	BufferedReader br = new BufferedReader(is);
+	String header;
+	try {
+		String row;
+		header = br.readLine();
+		Log.d("nils",header);
+		//Find all RutIDs from csv. Create Ruta Class for each.
+		while((row = br.readLine())!=null) {
+			String  r[] = row.split(",");
+			if (r!=null&&r.length>3) {
+				Log.d("NILS",r[0]);
+				Ruta ruta=findRuta(r[0]);
+				if (ruta ==null) {
+					ruta = new Ruta(r[0]);
+					rutor.add(ruta);
 				}
+				int id = Integer.parseInt(r[1]);
+				//Skip IDs belonging to inner ytor.
+				if (id>12&&id<17)
+					continue;
+				if (ruta.addProvYta_rutdata(r[1],r[2],r[3],r[7],r[8])!=null)
+					Log.d("NILS","added provyta with ID "+r[1]);
+				else
+					Log.d("NILS","discarded provyta with ID "+r[1]);
+
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
-		return varList;
+	} catch (IOException e) {
+		e.printStackTrace();
 	}
+	//Calculate the distance between smallest and biggest x,y values
+	//This is done to be able to calculate the grid position.
+	Log.d("NILS","checking minmax...");
+	for (Ruta r:rutor) {
+		Ruta.Sorted s = r.sort();
+		Log.d("NILS","Ruta with id "+r.getId()+" has minxy: "+s.getMin_E_sweref_99()+" "+s.getMin_N_sweref_99()+
+				" and maxXy: "+s.getMax_E_sweref_99()+" "+s.getMax_N_sweref_99());
+	}
+}
+
+//scan csv file for Rutor. Create if needed.
+private void scanDelningsData(InputStream csvFile) {
+	InputStreamReader is = new InputStreamReader(csvFile);
+	BufferedReader br = new BufferedReader(is);
+	final int noPo = 16;
+	try {
+		String row;
+		String header = br.readLine();
+		Log.d("NILS",header);
+		//Find rutId etc
+		while((row = br.readLine())!=null) {
+			String  r[] = row.split("\t");
+			if (r!=null) {	
+				if (r[2]==null)
+					continue;
+				Ruta ruta = findRuta(r[2]);
+				//if this is a new ruta, add it to the array
+				if (ruta!=null) {
+					//Extract the delningståg out from the data.
+					String[] points = new String[noPo];
+					System.arraycopy(r, 6, points, 0, noPo);
+					ruta.addDelYta(r[4],r[5],points);
+				}
+				//TODO: Add this as ELSE when the files match. 
+				//Currently only Rutor from Rutdata will matter.
+				/* ruta = new Ruta(r[2]);
+						rutor.add(ruta);
+				 */
+
+			}
+		}
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
+	//Calculate the distance between smallest and biggest x,y values
+	//This is done to be able to calculate the grid position.
+
+}
+public enum Unit {
+	percentage,
+	dm,
+	undefined
+
+};
+
+public static class VarToListConfigRow {
+
+	public String getListEntryName() {
+		return listEntryName;
+	}
+
+	public String getVarName() {
+		return varName;
+	}
+
+	public String getEntryLabel() {
+		return entryLabel;
+	}
+
+	public String getAction() {
+		return action;
+	}
+
+	public String getVarLabel() {
+		return varLabel;
+	}
+
+	public Variable.Type getnumType() {
+		return numType;
+	}
+
+	public StoredVariable.Type getVarType() {
+		return Type.delyta;
+	}
+	
+	public boolean isDisplayInList() {
+		return displayInList;
+	}
+
+	public Unit getUnit() {
+		return unit;
+	}
+
+	static final int VAR_TO_LIST_CONFIG_ROW_LENGTH = 9;
+
+	
+
+	String listEntryName;
+	String varName;
+	String entryLabel;
+	String action;
+	String varLabel;
+	//StoredVariable.Type varType;
+	Variable.Type numType;
+	boolean displayInList=false;
+	Unit unit;
+
+	private VarToListConfigRow(String[] row,boolean display,Unit unit) {
+		int c=0;
+		listEntryName=row[c++];
+		varName=row[c++];
+		entryLabel=row[c++];
+		action=row[c++];
+		varLabel=row[c++];
+		String type = row[c++];
+		numType= (type.equals("number"))?Variable.Type.NUMERIC:Variable.Type.LITERAL;
+		
+		displayInList=display;
+		this.unit=unit;
+	}
+
+	public static VarToListConfigRow createRow(String[] row) {
+		if(row.length!=VAR_TO_LIST_CONFIG_ROW_LENGTH) {
+			Log.e("NILS","Row is either too short or too long: "+row.length);
+			return null;
+		}
+		String t = row[6];
+		String u = row[7];	
+		Unit unit;
+		if (u.equals("dm"))
+			unit = Unit.dm;
+		else if(u.equals("%"))
+			unit = Unit.percentage;
+		else {
+			unit = Unit.undefined;
+			Log.d("nils","Could not recognize unit: "+u+". Supported: % and dm");
+		}
+		return new VarToListConfigRow(row,!(t==null||t.equalsIgnoreCase("FALSE")),
+				unit);
+
+	}
+}
+
+
+
+public ArrayList <VarToListConfigRow> scanListConfigData(InputStream csvFile) {
+	ArrayList <VarToListConfigRow> varList = new ArrayList <VarToListConfigRow> (); 
+	InputStreamReader is = new InputStreamReader(csvFile);
+	BufferedReader br = new BufferedReader(is);
+	String header;
+	try {
+		String row;
+		header = br.readLine();
+		Log.d("NILS","Scanning listdatafile with header "+header);
+		//Find all RutIDs from csv. Create Ruta Class for each.
+		while((row = br.readLine())!=null) {
+			String[]  r = row.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+			VarToListConfigRow p;
+			if (r!=null) {
+				p=VarToListConfigRow.createRow(r);
+				Log.d("NILS",r[0]);
+				if (p!=null)
+					varList.add(p);
+				else
+					Log.e("nils","one row in config file corrupt");
+			}
+		}
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
+	return varList;
+}
+
+
 
 
 }

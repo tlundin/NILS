@@ -25,7 +25,7 @@ public abstract class RB_Activity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		//Global parameter transfer of delyta.
-		delyta = CommonVars.cv().getDelyta();
+		delyta = CommonVars.cv().getCurrentDelyta();
 
 	}
 
@@ -42,7 +42,8 @@ public abstract class RB_Activity extends Activity {
 				final String value = genName(i);
 				Log.d("NILS","Generated name "+value);
 				//Save the parameter.
-				delyta.put("markslag", value);   
+				
+				delyta.storeVariable("markslag", value);   
 				CommonVars.cv().sendParameter(this,"markslag",value,-1);
 				//BluetoothRemoteDevice.getSingleton().sendParameter("markslag", value,-1);
 				/*ServiceConnection serviceConnection = new ServiceConnection() {

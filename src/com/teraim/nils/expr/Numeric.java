@@ -1,6 +1,7 @@
 package com.teraim.nils.expr;
 
 import com.teraim.nils.Variable;
+import com.teraim.nils.Variable.Type;
 
 public class Numeric extends Aritmetic {
 
@@ -9,8 +10,8 @@ public class Numeric extends Aritmetic {
 	}
 
 	@Override
-	public String getType() {
-		return Variable.NUMERIC;
+	public Type getType() {
+		return Type.NUMERIC;
 	}
 	
 }

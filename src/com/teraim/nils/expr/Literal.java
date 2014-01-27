@@ -1,6 +1,7 @@
 package com.teraim.nils.expr;
 
 import com.teraim.nils.Variable;
+import com.teraim.nils.Variable.Type;
 
 public class Literal implements Variable {
 
@@ -19,8 +20,8 @@ public class Literal implements Variable {
 	}
 
 	@Override
-	public String getType() {
-		return Variable.LITERAL;
+	public Type getType() {
+		return Type.LITERAL;
 	}
 
 	@Override

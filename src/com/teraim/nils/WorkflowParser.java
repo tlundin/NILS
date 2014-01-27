@@ -30,9 +30,11 @@ import com.teraim.nils.DataTypes.PageDefineBlock;
 import com.teraim.nils.DataTypes.SetValueBlock;
 import com.teraim.nils.DataTypes.SortingBlock;
 import com.teraim.nils.DataTypes.StartBlock;
+import com.teraim.nils.DataTypes.Unit;
 import com.teraim.nils.DataTypes.Workflow;
 import com.teraim.nils.DataTypes.XML_Variable;
 import com.teraim.nils.exceptions.EvalException;
+import com.teraim.nils.utils.Tools;
 
 /**
  * 
@@ -301,13 +303,14 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 					}
 					Xvar = new XML_Variable();
 					Xvar.name = readText("varname",parser);
-					Xvar.type = "numeric";
+					Xvar.type = Variable.Type.NUMERIC;
 					Xvar.purpose = "editable";
 					Xvar.label = Xvar.name;
 				}
 				else if (Xvar!=null) {
 					if (name.equals("vartype")) 
-						Xvar.type = readText("vartype",parser);
+						Xvar.type = Tools.convertToType(readText("vartype",parser));
+					
 					else if (name.equals("purpose")) 
 						Xvar.purpose = readText("purpose",parser);
 					else if (name.equals("field_label")) 
@@ -381,14 +384,23 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 			 if (name.equals("name")) 
 				 var.name = readText("name",parser);
 			 else if (name.equals("type")) 
-				 var.type = readText("type",parser);
+				 var.type = Tools.convertToType(readText("type",parser));
 			 //TODO: PAGENAME.			
 			 else if (name.equals("purpose")) 
 				 var.purpose = readText("purpose",parser);
 			 else if (name.equals("label")) 
 				 var.label = readText("label",parser);
-			 else if (name.equals("unit"))
-				 var.unit = readText("unit",parser);
+			 else if (name.equals("unit")) {
+				 var.unit = Tools.convertToUnit(readText("unit",parser));
+				 if (var.unit==null) {
+					 var.unit=Unit.undefined;
+					 Log.e("nils","Failed to understand Unit: "+readText("unit",parser)+" revert to no unit.");
+					 Log.e("nils","Allowed units: ");
+					 for (int i = 0 ; i<Unit.values().length;i++)
+						 Log.e("nils",Unit.values()[i].name());
+				 }
+			 }
+			 	
 			 else
 				 skip(parser);
 		 }

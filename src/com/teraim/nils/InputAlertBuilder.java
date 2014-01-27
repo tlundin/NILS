@@ -6,15 +6,18 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
 
 public class InputAlertBuilder {
 
-	public static OnClickListener createAlert(final int id,final String headerT, final String bodyT, final AlertBuildHelper abh, final View outputView) {
-
 	
-		return new OnClickListener() {
+	public static OnClickListener createAlert(final StoredVariable var,final String headerT, final String bodyT, final ViewGroup outputView) {
 
+		
+		return new OnClickListener() {
+			
 			@Override
 			public void onClick(View v) {
 
@@ -22,10 +25,16 @@ public class InputAlertBuilder {
 				AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
 				alert.setTitle(headerT);
 				alert.setMessage(bodyT);
-				final View inputView = abh.createView();
+				final LinearLayout inputView = new LinearLayout(v.getContext());
+				inputView.setOrientation(LinearLayout.VERTICAL);
+	            inputView.setLayoutParams(new LinearLayout.LayoutParams(
+	                                LinearLayout.LayoutParams.MATCH_PARENT, 
+	                               LinearLayout.LayoutParams.MATCH_PARENT,
+	                                1));
+
 				alert.setPositiveButton("Spara", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {				  
-						abh.setResult(id,inputView,outputView);
+						
 					}
 
 				});
@@ -50,13 +59,20 @@ public class InputAlertBuilder {
 	public static abstract class AlertBuildHelper {
 
 		public Context c;
+		protected ViewGroup myView;
 		
 		public AlertBuildHelper(Context c) {
 			this.c = c;
 		}
-		public abstract View createView();
+		public abstract ViewGroup createView(ViewGroup root);
+		
+		
+		
+		public void addView(View v) {
+			myView.addView(v);
+		}
 
-		public abstract void setResult(int resultId, View inputView,View outputView);	
+		public abstract void setResult(StoredVariable[] var, View inputView,View outputView);	
 	}
 	
 	

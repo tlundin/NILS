@@ -33,6 +33,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.teraim.nils.CommonVars.PersistenceHelper;
 import com.teraim.nils.DataTypes.Delyta;
 
 
@@ -126,8 +127,8 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 		
 		//Fetch delytor for the current ruta and provyta.
 		
-		ArrayList<Delyta> dy = rd.getDelytor(CommonVars.cv().getRuta().getId(), 
-				CommonVars.cv().getProvyta().getId());
+		ArrayList<Delyta> dy = rd.getDelytor(CommonVars.cv().getCurrentRuta().getId(), 
+				CommonVars.cv().getCurrentProvyta().getId());
 		provytaV.setDelytor(dy);
 		
 		startCollectB.setEnabled(isComplete(dy));
@@ -149,7 +150,7 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
-               CommonVars.cv().setDelyta(ta.getItem(arg2));
+               CommonVars.ph.put(PersistenceHelper.CURRENT_DELYTA_ID_KEY,ta.getItem(arg2).getId());
                 startActivity(intent);
 			}});
 		
@@ -160,7 +161,7 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 
 	private boolean isComplete(ArrayList<Delyta> dy) {
 		for (Delyta d:dy)
-			if (d.get("markslag")==null)
+			if (d.getVariable("markslag")==null)
 				return false;
 		return true;
 	}
@@ -223,10 +224,10 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 		    
 
 		    title.setText(values.get(position).getId());
-		    String m = values.get(position).get("markslag");
-		    if (m==null)
-		    	m="?";
-		    markslag.setText(m);
+		    
+		    StoredVariable m = values.get(position).getVariable("markslag");
+		    
+		    markslag.setText(m==null?"?":m.getValue());
 			int[][] ps = values.get(position).getPoints();
 			String rowS = "";
 			if (ps!=null && ps.length!=0) {

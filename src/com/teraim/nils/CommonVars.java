@@ -25,7 +25,6 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.teraim.nils.CommonVars.StoredVariable.Type;
 import com.teraim.nils.DataTypes.Delyta;
 import com.teraim.nils.DataTypes.Provyta;
 import com.teraim.nils.DataTypes.Ruta;
@@ -41,6 +40,8 @@ public class CommonVars {
 	private static CommonVars singleton = null;
 	
 	public static PersistenceHelper ph = null;
+	
+	public static DbHelper db = null;
 	
 	//String constants
 	//The root folder for the SD card is in the global Environment.
@@ -101,6 +102,9 @@ public class CommonVars {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}  
+    		db = new DbHelper(ctx);
+    		  
+
     	
 		Log.d("NILS","exit init. singleton is "+singleton);
 	}
@@ -129,6 +133,11 @@ public class CommonVars {
 	
 	public static class PersistenceHelper {
 		public static final String UNDEFINED = "";
+		public static final String CURRENT_RUTA_ID_KEY = "ruta_id";
+		public static final String CURRENT_PROVYTA_ID_KEY = "provyta_id";
+		public static final String CURRENT_DELYTA_ID_KEY = "delyta_id";
+		public static final String USER_ID_KEY = "user_id";
+		public static final String LAG_ID_KEY = "lag_id";
 		SharedPreferences sp;
 		
 		ArrayList<String> delta = new ArrayList<String>();
@@ -146,18 +155,8 @@ public class CommonVars {
 			sp.edit().putString(key,value).commit();
 		}
 		
-		public void setCurrentRuta(String rutaId) {
-			currentRuta = rutaId;
-		}
-		
-		public void setCurrentProvyta(String provytaId) {
-			currentProvyta = provytaId;
-		}
-		
-		public void setCurrentDelyta(String delyteId) {
-			currentDelyta = delyteId;
-		}
-		
+
+		/*
 		public void setR(String varId, String value) {
 			assert(currentRuta!=null);
 			String fullId = currentRuta+"|"+varId;
@@ -181,6 +180,8 @@ public class CommonVars {
 			delta.add(fullId);
 		}
 		
+		*/
+		/*
 		public StoredVariable getVar(String varId) {
 			if (varId == null)
 				return null;
@@ -213,6 +214,7 @@ public class CommonVars {
 			return sv;
 		
 		}
+		*/
 	}
 	
 	
@@ -305,31 +307,33 @@ public class CommonVars {
 	
 	
 	//getter & setter for current ruta,provyta,delyta..
+	Delyta myDelyta=null; Provyta myProvyta=null;
 	
-	public void setRuta(Ruta r) {
-		myRuta = r;
+	
+	public Ruta getCurrentRuta() {
+		return DataTypes.getSingleton().findRuta(ph.get(PersistenceHelper.CURRENT_RUTA_ID_KEY));
+			
 	}
 	
-	public Ruta getRuta() {
-		return DataTypes.getSingleton().findRuta(ph.get("ruta_id"));
+	public Provyta getCurrentProvyta() {
+		Ruta r = getCurrentRuta();
+		if (r!=null) 
+			return r.findProvYta(PersistenceHelper.CURRENT_PROVYTA_ID_KEY);
+		else
+			return null;
+	}
+		
+	public Delyta getCurrentDelyta() {
+		Provyta p = getCurrentProvyta();
+		if (p!=null) 
+			return p.findDelyta(PersistenceHelper.CURRENT_DELYTA_ID_KEY);
+		else
+			return null;
 	}
 	
-	public void setDelyta(Delyta d) {
-		myDelyta = d;
-	}
 	
-	public Delyta getDelyta() {
-		return myDelyta;
-	}
 	
-	public void setProvyta(Provyta p) {
-		myProvyta = p;
-	}
 	
-	public Provyta getProvyta() {
-		return myProvyta;
-	}
-
 	//Persisted variables.
 
 	public void setDeviceColor(String color) {

@@ -74,8 +74,8 @@ public class Aritmetic extends Expr implements Variable {
 
 
 @Override
-public String getType() {
-	return Variable.ARITMETIC;
+public Type getType() {
+	return Type.ARITMETIC;
 }
 
 

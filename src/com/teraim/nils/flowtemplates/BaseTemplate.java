@@ -6,50 +6,52 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Bundle;
-import android.text.InputType;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.TableLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.TableLayout.LayoutParams;
 
 import com.teraim.nils.CommonVars;
-import com.teraim.nils.DataTypes.Workflow.Type;
-import com.teraim.nils.Variable;
 import com.teraim.nils.DataTypes.ButtonBlock;
-import com.teraim.nils.DataTypes.Rule;
-import com.teraim.nils.DataTypes.Workflow;
 import com.teraim.nils.DataTypes.ButtonBlock.Action;
-import com.teraim.nils.InputAlertBuilder;
-import com.teraim.nils.InputAlertBuilder.AlertBuildHelper;
+import com.teraim.nils.DataTypes.Delyta;
+import com.teraim.nils.DataTypes.Rule;
+import com.teraim.nils.DataTypes.Unit;
+import com.teraim.nils.DataTypes.Workflow;
+import com.teraim.nils.R;
+import com.teraim.nils.StoredVariable;
+import com.teraim.nils.VarIdentifier;
+import com.teraim.nils.Variable;
 import com.teraim.nils.exceptions.RuleException;
 import com.teraim.nils.expr.Bool;
 import com.teraim.nils.expr.SyntaxException;
-import com.teraim.nils.R;
 
 public class BaseTemplate extends Activity {
 
 	protected Workflow wf;
 	//Keep track of input in below arraylist.
-	protected Map<Variable,View> bindings = new HashMap<Variable,View>();
+	protected Map<VarIdentifier,View> bindings = new HashMap<VarIdentifier,View>();
 
 	protected final Map<Rule,Boolean>executedRules = new LinkedHashMap<Rule,Boolean>();	
 
@@ -64,7 +66,7 @@ public class BaseTemplate extends Activity {
 	}
 
 
-
+	
 
 	protected Workflow getFlow() {
 		Workflow wf=null;
@@ -140,7 +142,7 @@ public class BaseTemplate extends Activity {
 							Log.e("NILS","Cannot find wf referenced by button "+b.getName()+
 									"Workflow not found is named "+wf.getName());
 						} else {
-							
+
 							Intent intent = new Intent(me,wf.getWfClass());
 							Bundle b = new Bundle();
 							b.putString("workflow_name", action.wfName); //Your id
@@ -160,25 +162,139 @@ public class BaseTemplate extends Activity {
 		return bu;
 	}
 
-	protected View addNormalInput(ViewGroup bg,final String headerT,final String bodyT,final String currValue, final int id, final int inputType) {
-		final View v = createClickableField(bg, headerT,currValue);
-		final TextView et = (TextView)v.findViewById(R.id.editfieldinput);
+	public class ClickableField {
+
+		View myView;
+		TextView myHeader;
+		protected Map<VarIdentifier,TextView> myOutputFields = new HashMap<VarIdentifier,TextView>();
+		final LinearLayout outputContainer, inputContainer;
+
+		public  ClickableField(final String headerT) {
+			myView = LayoutInflater.from(getBaseContext()).inflate(R.layout.clickable_field_normal,null);			
+			myHeader = (TextView)myView.findViewById(R.id.editfieldtext);
+			outputContainer = (LinearLayout)myView.findViewById(R.id.outputContainer);
+			SpannableString content = new SpannableString(headerT);
+			content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+			myHeader.setText(content);
+
+			inputContainer = new LinearLayout(getBaseContext());
+			inputContainer.setOrientation(LinearLayout.VERTICAL);
+			inputContainer.setLayoutParams(new LinearLayout.LayoutParams(
+					LinearLayout.LayoutParams.MATCH_PARENT, 
+					LinearLayout.LayoutParams.MATCH_PARENT,
+					1));
+
+
+			myView.setClickable(true);	
+			myView.setOnClickListener(new OnClickListener() {			
+				@Override
+				public void onClick(View v) {
+
+					//On click, create dialog 			
+					AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
+					alert.setTitle(headerT);
+					alert.setMessage("what should this text be?");
+
+					alert.setPositiveButton("Spara", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {				  
+							save();
+							refreshOutPut();
+						}
+
+
+
+					});
+					alert.setNegativeButton("Avbryt", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+						}
+					});	
+					Dialog d = alert.setView(inputContainer).create();
+					//WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+					//lp.copyFrom(d.getWindow().getAttributes());
+					//lp.height = WindowManager.LayoutParams.FILL_PARENT;
+					//lp.height = 600;
+
+					d.show();
+
+					//d.getWindow().setAttributes(lp);
+				}		
+			});	
+		}
+
+
+		public void addVariable(String varLabel, String varId, Unit unit, Variable.Type numType, StoredVariable.Type varType, boolean displayOut) {
+			// Set an EditText view to get user input 
+			VarIdentifier varIdentifier = new VarIdentifier(varLabel,varId,numType,varType,unit);
+			if (numType == Variable.Type.BOOLEAN) {
+				View view = LayoutInflater.from(BaseTemplate.this).inflate(R.layout.ja_nej_radiogroup,null);
+				RadioButton ja = (RadioButton)view.findViewById(R.id.ja);
+				RadioButton nej = (RadioButton)view.findViewById(R.id.nej);
+				String value = varIdentifier.getPrintedValue();
+				if(value!=null) {
+					if(value.equals("1"))
+						ja.setEnabled(true);
+					else
+						nej.setEnabled(true);
+					ja.setChecked(true);
+				}
+				inputContainer.addView(view);
+				bindings.put(varIdentifier,view);
+			}
+			else {
+
+				View l = LayoutInflater.from(BaseTemplate.this).inflate(R.layout.edit_field,null);
+				TextView header = (TextView)l.findViewById(R.id.header);
+				EditText view = (EditText)l.findViewById(R.id.edit);
+				header.setText(varLabel+" ("+unit.name()+")");
+				view.setText(varIdentifier.getPrintedValue());
+				inputContainer.addView(l);
+				bindings.put(varIdentifier,view);
+			}
+			if (displayOut) {
+				TextView o = (TextView)LayoutInflater.from(BaseTemplate.this).inflate(R.layout.output_field,null);
+				o.setText(varLabel+": "+varIdentifier.getPrintedValue()+" ("+unit.name()+")");
+				myOutputFields.put(varIdentifier,o);
+				outputContainer.addView(o);
+			}
+
+		}
+
+		private void refreshOutPut() {
+			Iterator<Map.Entry<VarIdentifier,TextView>> it = myOutputFields.entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry<VarIdentifier,TextView> pairs = (Map.Entry<VarIdentifier,TextView>)it.next();
+				VarIdentifier varId = pairs.getKey();
+				TextView out = pairs.getValue();
+				out.setText(varId.label+": "+varId.getPrintedValue()+" ("+varId.unit.name()+")");
+			}
+		}
+
+
+		public View getView() {
+			return myView;
+		}
+
+	}
+
+	
+	/*
 		final InputAlertBuilder.AlertBuildHelper abh = new AlertBuildHelper(this.getBaseContext()) {
 			@Override
-			public View createView() {
+			public View createView(ViewGroup root) {
 				// Set an EditText view to get user input 
+				myView = root;
 
 				int typeId = (inputType ==InputType.TYPE_CLASS_NUMBER)?R.layout.edit_field:R.layout.edit_field_komma;
 				final EditText input = (EditText)LayoutInflater.from(c).inflate(typeId, null);
 
-				input.setText(et.getText());
+				//input.setText(et.getText());
 				//input.setInputType(inputType);
 
 				return input;
 			}
 
 			@Override
-			public void setResult(int id,View inputView,View outputView) {
+			public void setResult(StoredVariable[] sv,View inputView,View outputView) {
 				setStringValue(id,((EditText)inputView).getText().toString(),outputView);
 			}};
 
@@ -187,59 +303,33 @@ public class BaseTemplate extends Activity {
 			return v;		
 
 	}
+	 */
 
-	private View createClickableField(ViewGroup bg,String headerT,String defValue) {
-		return createClickableField(bg,headerT,defValue,R.layout.clickable_field_normal);
-	}
-	private View createClickableListField(ViewGroup bg,String headerT,String defValue) {
-		return createClickableField(bg,headerT,defValue,R.layout.clickable_field_list);
-	}
-	private View createClickableYesNoField(ViewGroup bg,String headerT,String defValue) {
-		return createClickableField(bg,headerT,defValue,R.layout.clickable_field_yes_no);
-	}
-
-	private View createClickableField(ViewGroup bg,String headerT,String defValue, int res) {
-		View view = LayoutInflater.from(getBaseContext()).inflate(res,null);
-		bg.addView(view);
-		TextView header = (TextView)view.findViewById(R.id.editfieldtext);
-		SpannableString content = new SpannableString(headerT);
-		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-		header.setText(content);
-		getTextView(view).setText(defValue);
-		view.setClickable(true);
-		return view;	
-	}
-
-	public TextView getTextView(View v) {
-		return (TextView)v.findViewById(R.id.editfieldinput);
-	}
-
-	private void setStringValue(int id, String value, View v) { 
-		switch(id) {
-		}
-	}
 
 	private void save() {
-		Iterator<Map.Entry<Variable,View>> it = bindings.entrySet().iterator();
+		//for now only delytevariabler. 
+		Iterator<Map.Entry<VarIdentifier,View>> it = bindings.entrySet().iterator();
 		while (it.hasNext()) {
-			Map.Entry<Variable,View> pairs = (Map.Entry<Variable,View>)it.next();
-			Variable var = pairs.getKey();
-			if (var.getType().equals(Variable.BOOLEAN)) {
+			Map.Entry<VarIdentifier,View> pairs = (Map.Entry<VarIdentifier,View>)it.next();
+			VarIdentifier varId = pairs.getKey();
+			View view = pairs.getValue();
+			if (varId.numType == Variable.Type.BOOLEAN) {
 				//Get the yes radiobutton.
-				RadioButton rb = (RadioButton)pairs.getValue();
+				RadioButton rb = (RadioButton)view;
 				//If checked set value to True.
-				((Bool)var).setValue(rb.isChecked());
+				if (rb.isChecked())
+					varId.setValue(rb.isChecked()?"1":"0");
 			} else {
-				if (pairs.getValue() instanceof EditText) {
-					EditText et = (EditText)pairs.getValue();
-					pairs.getKey().setValue(et.getText().toString());
+				EditText et = (EditText)view;
+				varId.setValue(et.getText().toString());
 
-				} else {
+				/*} else {
 					TextView tv = (TextView)pairs.getValue();
 					String[] tmp = tv.getText().toString().split("=");
 					pairs.getKey().setValue((tmp.length>1?tmp[1]:""));
 
 				}
+				*/
 			}
 		}
 	}

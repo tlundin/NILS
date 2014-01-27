@@ -49,7 +49,7 @@ public class ProvYtaGeoUpdater implements LocationListener
 		}
 		geoCb = cb;
 		//Initialize provyta with center coordinates.
-		Provyta y = CommonVars.cv().getProvyta();
+		Provyta y = CommonVars.cv().getCurrentProvyta();
 		double[] cc = y.getLatLong();
 		center = new Location("");
 		//This is in sweref.

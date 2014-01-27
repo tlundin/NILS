@@ -169,7 +169,7 @@ public class StartMenuActivity extends MenuActivity {
 			}
 
 			private boolean provytaSelected() {
-				Provyta py= CommonVars.cv().getProvyta();
+				Provyta py= CommonVars.cv().getCurrentProvyta();
 				if (py !=null) {
 					Log.d("NILS","Provyta var inte null");
 				return true;

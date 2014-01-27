@@ -2,28 +2,42 @@ package com.teraim.nils;
 
 import java.util.ArrayList;
 
-public class ParameterCache  {
+public abstract class ParameterCache  {
 	
 	DbHelper db;
 	
-	public ParameterCache(DbHelper db){
-		this.db = db;
+	public ParameterCache(){
+		db = CommonVars.db;
 	}
 
-	//Generic function to get a specific String key from shared prefs.
-	public String getVar(String key) {
-		return db.;
-	}
-	//Global variable put.
-	public void putVar(String key, String value) {
-		sp.put(key,value);
+	//Abstracts that implement crud for variables on a database implementation.
+	
+	public abstract StoredVariable getVariable(String varId);
+	public abstract StoredVariable storeVariable(String varId, String value);
+	
+	protected StoredVariable storeVariable(StoredVariable var) {
+		db.insertVariable(var);
+		return var;
 	}
 	
-	public ArrayList<StoredVariable> getVars() {
-		
+	protected void deleteVariable(StoredVariable var) {
+		db.deleteVariable(var);
 	}
 	
-	public void freeze() {
-		
+	protected StoredVariable getDelyteVariable(String rutId, String provyteId, String delyteId, String varId) {
+		return db.getVariable(StoredVariable.Type.delyta,rutId, provyteId, delyteId, varId);
 	}
+	protected StoredVariable getProvyteVariable(String rutId, String provyteId, String varId) {
+		return db.getVariable(StoredVariable.Type.provyta,rutId, provyteId, null, varId);
+	}
+	
+	protected StoredVariable getRutVariable(String rutId,String varId) {
+		return db.getVariable(StoredVariable.Type.ruta,rutId, null, null, varId);
+	}
+		
+	
+	
+	
+	
+	
 }

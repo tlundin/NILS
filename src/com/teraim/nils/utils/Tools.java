@@ -7,6 +7,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import com.teraim.nils.DataTypes.Unit;
+import com.teraim.nils.Variable.Type;
+
 import android.util.Log;
 
 public class Tools {
@@ -48,5 +51,32 @@ public class Tools {
                   } 
           } 
           return result; 
-  } 
+	  }
+	  
+	  //This cannot be part of Variable, since Variable is an interface.
+	  
+	  public static Type convertToType(String text) {
+			Type[] types = Type.values();	
+			//Special cases
+			if (text.equals("number"))
+				return Type.NUMERIC;
+			for (int i =0;i<types.length;i++) {
+				if (text.equalsIgnoreCase(types[i].name()))
+					return types[i];
+			
+			}
+			return null;
+		}
+	  
+	  public static Unit convertToUnit(String unit) {
+		  if (unit == null ||unit.length()==0)
+			  return Unit.undefined;
+		  Unit[] units = Unit.values();
+			for (int i =0;i<units.length;i++) {
+				if (unit.equalsIgnoreCase(units[i].name()))
+					return units[i];
+			
+			}
+			return null;				
+	  }
 }

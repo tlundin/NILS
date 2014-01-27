@@ -2,6 +2,8 @@ package com.teraim.nils;
 
 import java.util.ArrayList;
 
+import com.teraim.nils.CommonVars.PersistenceHelper;
+
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
@@ -35,16 +37,16 @@ public class ConfigMenu extends PreferenceActivity {
 			getPreferenceScreen().getSharedPreferences()
 			.registerOnSharedPreferenceChangeListener(this);
 
-			EditTextPreference epref = (EditTextPreference) findPreference("lagNr");
+			EditTextPreference epref = (EditTextPreference) findPreference(PersistenceHelper.LAG_ID_KEY);
 			epref.setSummary(epref.getText());
 
 			ListPreference color = (ListPreference)findPreference("deviceColor");
 			color.setSummary(color.getValue());
 
-			epref = (EditTextPreference) findPreference("username");
+			epref = (EditTextPreference) findPreference(PersistenceHelper.USER_ID_KEY);
 			epref.setSummary(epref.getText());
 			
-			ListPreference ruta = (ListPreference)findPreference("ruta_id");
+			ListPreference ruta = (ListPreference)findPreference(PersistenceHelper.CURRENT_RUTA_ID_KEY);
 			
 			if (ruta != null) {
 				ruta.setSummary(ruta.getValue());

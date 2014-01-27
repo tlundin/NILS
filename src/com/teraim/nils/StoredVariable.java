@@ -19,7 +19,7 @@ public class StoredVariable implements Serializable {
 	}
 	String lag=null,author=null,varId=null,timeStamp=null;
 	Type type=null;
-	enum Type {
+	public enum Type {
 		ruta,provyta,delyta
 	}
 	public String getRutId() {
@@ -77,17 +77,11 @@ public class StoredVariable implements Serializable {
 		this.type = type;
 	}
 	public StoredVariable(String rutId, String provytaId, String delytaId,
-			String value, String lag, String author, String varId,
-			String timeStamp, Type type) {
-		super();
+			String value, String varId, Type type) {
 		this.rutId = rutId;
 		this.provytaId = provytaId;
 		this.delytaId = delytaId;
-		this.value = value;
-		this.lag = lag;
-		this.author = author;
 		this.varId = varId;
-		this.timeStamp = timeStamp;
 		this.type = type;
 	}
 	public void setId(long rId) {
@@ -96,6 +90,9 @@ public class StoredVariable implements Serializable {
 	
 	public long getId() {
 		return rowId;
+	}
+	public boolean existsInDB() {
+		return !(rowId == -1);
 	}
 	
 	

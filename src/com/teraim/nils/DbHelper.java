@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.teraim.nils.CommonVars.PersistenceHelper;
 import com.teraim.nils.StoredVariable.Type;
 import com.teraim.nils.utils.Tools;
  
@@ -71,6 +72,7 @@ public class DbHelper extends SQLiteOpenHelper {
     
     //Create update delete
     
+    //Insert or Update existing value.
     
     public void insertVariable(StoredVariable var){
         //for logging
@@ -81,22 +83,30 @@ public class DbHelper extends SQLiteOpenHelper {
 
     	// 2. create ContentValues to add key "column"/value
     	ContentValues values = new ContentValues();
+    	if (var.existsInDB())
+    		values.put("id", var.getId());
     	values.put("ruta", var.getRutId()); // get ruta
     	values.put("provyta", var.getProvytaId()); // get provyta
     	values.put("delyta", var.getDelytaId()); // get delyta
     	values.put("smayta", var.getSmaytaId());
     	values.put("var", var.getVarId());
     	values.put("value", var.getValue());
-    	values.put("lag",var.getLag());
+    	values.put("lag",CommonVars.ph.get(PersistenceHelper.LAG_ID_KEY));
     	values.put("timestamp", TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
     	values.put("serialized", Tools.serialize(var));
-    	values.put("author", CommonVars.ph.get("username"));
-
+    	values.put("author", CommonVars.ph.get(PersistenceHelper.USER_ID_KEY));
+    	
     	// 3. insert
-    	db.insert(TABLE_VARIABLES, // table
+    	long rId = db.insertWithOnConflict(TABLE_VARIABLES, // table
         null, //nullColumnHack
-        values); // key/value -> keys = column names/ values = column values
-
+        values,
+        SQLiteDatabase.CONFLICT_REPLACE); 
+    	if (rId == var.getId())
+    		Log.d("nils","Updated value for "+var.getVarId()+" to "+var.getValue());
+    	else
+    		var.setId(rId);
+    	
+    	
     	// 4. close
     	db.close(); 
 }
@@ -138,11 +148,12 @@ public class DbHelper extends SQLiteOpenHelper {
     public void deleteVariable(StoredVariable var) {
         // 1. get reference to writable DB
         SQLiteDatabase db = this.getWritableDatabase();
- 
+        long rId = -1;
         // 2. Figure out the row index
-        long rId = var.getId();
-        if (rId==-1)
+       if(!var.existsInDB())
         	rId = findRow(var,db);
+       else
+    	   rId = var.getId();
         if (rId == -1) 
         	Log.e("nils","Attempt to delete variable that does not exist! VAR: "+var.getVarId());
         else {
@@ -159,13 +170,13 @@ public class DbHelper extends SQLiteOpenHelper {
      }
     
     public StoredVariable getRutVariable(String ruta, String varId) {
-    	
+    	return null;
     }
     public StoredVariable getProvyteVariable(String ruta, String varId) {
-    	
+    	return null;
     }
     public StoredVariable getDelyteVariable(String ruta, String varId) {
-    	
+    	return null;
     }
     
     private long findRow(StoredVariable var, SQLiteDatabase db) {
@@ -200,5 +211,35 @@ public class DbHelper extends SQLiteOpenHelper {
         	return -1;
         	
     }
+
+	public StoredVariable getVariable(Type t, String rutId, String provyteId,
+			String delyteId, String varId) {
+	   	String selection = null;
+    	String[] selectionArgs = null;
+ 
+        SQLiteDatabase db = this.getReadableDatabase();
+        
+    	if (t==Type.ruta) {
+    		selection = "ruta = ?";
+    		selectionArgs = new String[]{rutId};
+    	} else if (t==Type.provyta) {
+    		selection = "ruta = ? and provyta = ?";
+    		selectionArgs = new String[]{rutId, provyteId};
+    	} else if (t==Type.delyta) {
+    		selection = "ruta = ? and provyta = ? and delyta = ?";
+    		selectionArgs = new String[]{rutId, provyteId, delyteId};
+    	}	
+    	
+    	Cursor c = db.query(TABLE_VARIABLES,new String[]{"id","serialized"},
+    			selection,selectionArgs,null,null,null,null);
+    	StoredVariable stV=null;
+        if (c != null) {
+            c.moveToFirst();
+            String id = c.getString(0);
+            stV = (StoredVariable)Tools.deSerialize(c.getBlob(1));
+            stV.setId(Long.parseLong(id));
+        }
+        return stV;
+	}
  
 }

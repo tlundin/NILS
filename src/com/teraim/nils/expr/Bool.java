@@ -1,6 +1,5 @@
 package com.teraim.nils.expr;
 
-import com.teraim.nils.Variable;
 
 public class Bool extends Aritmetic {
 
@@ -9,8 +8,8 @@ public class Bool extends Aritmetic {
 	}
 	
 	@Override
-	public String getType() {
-		return Variable.BOOLEAN;
+	public Type getType() {
+		return Type.BOOLEAN;
 	}
 
 	 public void setValue(boolean b) { 

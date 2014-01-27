@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.teraim.nils.CommonVars.PersistenceHelper;
 
 
 public class Main extends Activity {
@@ -147,7 +148,7 @@ public class Main extends Activity {
 		}
 		else {
 			//if Ruta is not known, check.
-			String currentRuta = cv.getG("ruta_id");
+			String currentRuta = cv.ph.get(PersistenceHelper.CURRENT_RUTA_ID_KEY);
 			boolean askForRuta = (currentRuta.equals(CommonVars.UNDEFINED));
 			if (askForRuta) {
 				startActivityForResult(selectRutaIntent,ASK_RUTA_RC);

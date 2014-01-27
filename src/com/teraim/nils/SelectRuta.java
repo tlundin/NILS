@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.teraim.nils.CommonVars.PersistenceHelper;
 import com.teraim.nils.DataTypes.Ruta;
 
 /**
@@ -49,7 +50,7 @@ public class SelectRuta extends ListActivity {
 		  		//CommonVars.cv().setRuta(r);
 		  		//Persist this choice so that next time Ruta will not be queried from user.
 		  		
-		  		CommonVars.cv().ph.putR("ruta_id",values[position]);
+		  		CommonVars.cv().ph.put(PersistenceHelper.CURRENT_RUTA_ID_KEY,values[position]);
 		  	}
 		  	 else
 		  		Log.e("NILS", "Ruta not found in SelectRuta ID: "+values[position]);

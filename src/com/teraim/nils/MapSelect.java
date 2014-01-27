@@ -20,6 +20,7 @@ package com.teraim.nils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -34,6 +35,7 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.animation.BounceInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.Toast;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
@@ -48,6 +50,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.teraim.nils.CommonVars.PersistenceHelper;
 import com.teraim.nils.DataTypes.Provyta;
 import com.teraim.nils.DataTypes.Ruta;
 
@@ -67,7 +70,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMarkerDragListene
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.selectyta);
-		Ruta ruta = CommonVars.cv().getRuta();
+		Ruta ruta = CommonVars.cv().getCurrentRuta();
 		ytor = ruta.getAllProvYtor();
 
 
@@ -117,7 +120,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMarkerDragListene
 			mapView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
 				@Override
 				public void onGlobalLayout() {
-					LatLng[] corners = CommonVars.cv().getRuta().getCorners();
+					LatLng[] corners = CommonVars.cv().getCurrentRuta().getCorners();
 					Log.d("NILS","SW: "+corners[0]+" NE: "+corners[1]);
 					LatLngBounds bounds = new LatLngBounds(corners[0], corners[1]);
 
@@ -274,8 +277,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMarkerDragListene
 
 	//On select provyta, return to main menu.
 	private void onProvytaClick(Provyta yta) {
-		CommonVars cv = CommonVars.cv();
-		cv.setProvyta(yta);
+		CommonVars.cv().ph.put(PersistenceHelper.CURRENT_PROVYTA_ID_KEY, yta.getId());
 		finish();
 	}
 

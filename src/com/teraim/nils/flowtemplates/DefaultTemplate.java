@@ -148,7 +148,7 @@ public class DefaultTemplate extends BaseTemplate {
 				//Create a numeric input field.
 				if (var==null)
 					continue;
-				if (var.getType().equals(Variable.BOOLEAN)) {
+				if (var.getType()==Variable.Type.BOOLEAN) {
 					view = LayoutInflater.from(getBaseContext()).inflate(R.layout.ja_nej_field,null);
 					my_root.addView(view);
 					Log.d("NILS","BOOLEAN");
@@ -164,7 +164,7 @@ public class DefaultTemplate extends BaseTemplate {
 						else
 							nej.setChecked(true);
 					}
-					bindings.put(var, ja);
+					//bindings.put(var, ja);
 
 				}
 				else {
@@ -175,8 +175,8 @@ public class DefaultTemplate extends BaseTemplate {
 					EditText et = (EditText)view.findViewById(R.id.editfieldinput);
 
 					//Bind EditText to Variable and Save it.
-					bindings.put(var, et);
-					if (var.getType().equals(Variable.NUMERIC)) {
+					//bindings.put(var, et);
+					if (var.getType()==Variable.Type.NUMERIC) {
 						Log.d("NILS","NUMERIC");
 						et.setInputType(InputType.TYPE_CLASS_NUMBER);
 						et.setRawInputType(Configuration.KEYBOARD_12KEY);					
@@ -191,7 +191,7 @@ public class DefaultTemplate extends BaseTemplate {
 						else
 							et.setText(String.valueOf(val));					
 					} 
-					else if (var.getType().equals(Variable.LITERAL)) {
+					else if (var.getType()==Variable.Type.LITERAL) {
 						Log.d("NILS","LITERAL");
 						et.setInputType(InputType.TYPE_CLASS_TEXT);
 						LayoutParams params = new LayoutParams();
@@ -200,7 +200,7 @@ public class DefaultTemplate extends BaseTemplate {
 						et.setLayoutParams(params);
 
 					}
-					else if (var.getType().equals(Variable.ARITMETIC)) {
+					else if (var.getType()==Variable.Type.ARITMETIC) {
 						Log.d("NILS","ARITMETIC");
 						et.setInputType(InputType.TYPE_CLASS_NUMBER);
 						LayoutParams params = new LayoutParams();
@@ -262,7 +262,7 @@ public class DefaultTemplate extends BaseTemplate {
 						te.setLayoutParams(p);
 						Log.d("NILS","CreateListEntry Adding textview for "+xv.label);						
 						lv.addView(te);
-						bindings.put(v, te);
+						//bindings.put(v, te);
 					}
 				}
 				lv.setClickable(true);

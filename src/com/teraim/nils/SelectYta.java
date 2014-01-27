@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import com.teraim.nils.CommonVars.PersistenceHelper;
 import com.teraim.nils.DataTypes.Provyta;
 import com.teraim.nils.DataTypes.Ruta;
 
@@ -61,7 +62,7 @@ public class SelectYta extends MenuActivity {
 		//First get the Ruta data.
 		//Bundle bu = getIntent().getExtras();
 		//String rutaId = bu.getString("ruta");
-		Ruta ruta = CommonVars.cv().getRuta();
+		Ruta ruta = CommonVars.cv().getCurrentRuta();
 		Ruta.Sorted s = ruta.sort();
 
 		//long=y 
@@ -152,7 +153,7 @@ public class SelectYta extends MenuActivity {
 	protected void provytaDialog(CharSequence ytID) {
 		Log.d("NILS","clicked button with id "+ytID);
 		if (ytID!=null)
-			cv.setProvyta(cv.getRuta().findProvYta(ytID.toString()));
+			cv.ph.put(PersistenceHelper.CURRENT_PROVYTA_ID_KEY,ytID.toString());
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
 		alert.setTitle("Provyta "+ytID);

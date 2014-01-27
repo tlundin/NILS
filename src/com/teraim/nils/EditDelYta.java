@@ -28,7 +28,7 @@ public class EditDelYta extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		//Get the current provyta
-		p = CommonVars.cv().getProvyta();
+		p = CommonVars.cv().getCurrentProvyta();
 		Intent intent = getIntent();
 		//Get the index selected.
 		index = intent.getIntExtra("com.teraim.nils.addRow", -1);

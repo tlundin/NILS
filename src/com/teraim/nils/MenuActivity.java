@@ -1,5 +1,6 @@
 package com.teraim.nils;
 
+import com.teraim.nils.CommonVars.PersistenceHelper;
 import com.teraim.nils.DataTypes.Provyta;
 
 import android.app.Activity;
@@ -108,11 +109,10 @@ public class MenuActivity extends Activity {
 	protected void refreshStatusRow() {
 		Log.d("NILS","Refreshing status row");
 		if (mnu1!=null) {
-			String p="?";
-			Provyta py = CommonVars.cv().getProvyta();
-			if (py!=null)
-				p=py.getId();
-			mnu1.setTitle("Ruta/Provyta: "+CommonVars.cv().getRuta().getId()+"/"+p);
+			String pid = CommonVars.ph.get(PersistenceHelper.CURRENT_PROVYTA_ID_KEY);
+			if (pid==null)
+				pid = "?";
+			mnu1.setTitle("Ruta/Provyta: "+CommonVars.cv().getCurrentRuta().getId()+"/"+pid);
 		}
 		if (mnu2!=null)
 			mnu2.setTitle("Synkning: "+CommonVars.cv().getSyncStatusS());
