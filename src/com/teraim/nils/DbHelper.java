@@ -1,5 +1,6 @@
 package com.teraim.nils;
 
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import android.content.ContentValues;
@@ -23,6 +24,8 @@ public class DbHelper extends SQLiteOpenHelper {
  // Books table name
     private static final String TABLE_VARIABLES = "variabler";
     private static final String TABLE_AUDIT = "audit";
+    //column indexes.
+    private static final int COLUMN_SERIALIZED = 9;
 
    
     public DbHelper(Context context) {
@@ -72,11 +75,40 @@ public class DbHelper extends SQLiteOpenHelper {
     
     //Create update delete
     
+    public ArrayList<StoredVariable> getAllVariables() {
+    	ArrayList<StoredVariable> ret = new ArrayList<StoredVariable>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        	
+       	Cursor c = db.query(TABLE_VARIABLES,null,
+    			null,null,null,null,null,null);
+       	if (c!=null) {
+       		StoredVariable stV = null;
+       		while (c.moveToNext()) {
+       			Log.d("nils","Found variable "+c.getString(5)+" in database");
+                String id = c.getString(0);
+                stV = (StoredVariable)Tools.deSerialize(c.getBlob(COLUMN_SERIALIZED));
+                if (stV==null) {
+                	Log.d("nils","Deserialize failed.");
+                } else {
+                	stV.setId(Long.parseLong(id));
+                	ret.add(stV);
+                	//delete all
+                	deleteVariable(stV);
+                }
+       		}
+       		
+       		return ret;
+       	}
+       	return null;
+    }
+    
+    
+    
     //Insert or Update existing value.
     
     public void insertVariable(StoredVariable var){
         //for logging
-    	Log.d("nils", var.toString()); 
+    	Log.d("nils", "Inserting variable "+var.toString()+" into database."); 
 
     	// 1. get reference to writable DB
     	SQLiteDatabase db = this.getWritableDatabase();
@@ -158,7 +190,7 @@ public class DbHelper extends SQLiteOpenHelper {
         	Log.e("nils","Attempt to delete variable that does not exist! VAR: "+var.getVarId());
         else {
             db.delete(TABLE_VARIABLES, //table name
-                    "id = ?,",  // selections
+                    "id = ?",  // selections
                     new String[] { String.valueOf(rId) }); //selections args
      
             // 3. close
@@ -169,15 +201,7 @@ public class DbHelper extends SQLiteOpenHelper {
         	
      }
     
-    public StoredVariable getRutVariable(String ruta, String varId) {
-    	return null;
-    }
-    public StoredVariable getProvyteVariable(String ruta, String varId) {
-    	return null;
-    }
-    public StoredVariable getDelyteVariable(String ruta, String varId) {
-    	return null;
-    }
+    
     
     private long findRow(StoredVariable var, SQLiteDatabase db) {
     	String selection = null;
@@ -234,10 +258,17 @@ public class DbHelper extends SQLiteOpenHelper {
     			selection,selectionArgs,null,null,null,null);
     	StoredVariable stV=null;
         if (c != null && c.moveToFirst() ) {
+        	Log.d("nils","Found variable "+varId+" in database");
             String id = c.getString(0);
             stV = (StoredVariable)Tools.deSerialize(c.getBlob(1));
-            stV.setId(Long.parseLong(id));
-        }
+            if (stV==null) {
+            	Log.d("nils","Deserialize failed in getVariable.");
+            } else {
+            	stV.setId(Long.parseLong(id));
+            }
+        } else 
+        	Log.d("nils","Did NOT find variable "+varId+" in database");
+        
         return stV;
 	}
  

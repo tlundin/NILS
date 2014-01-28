@@ -62,6 +62,8 @@ public class MenuActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		if (CommonVars.ph == null) 
+			Log.e("nils","CommonVars object has been thrown away...");
 		refreshStatusRow();
 	}
 
@@ -109,6 +111,7 @@ public class MenuActivity extends Activity {
 	protected void refreshStatusRow() {
 		Log.d("NILS","Refreshing status row");
 		if (mnu1!=null) {
+			
 			String pid = CommonVars.ph.get(PersistenceHelper.CURRENT_PROVYTA_ID_KEY);
 			String rid = CommonVars.ph.get(PersistenceHelper.CURRENT_RUTA_ID_KEY);
 			

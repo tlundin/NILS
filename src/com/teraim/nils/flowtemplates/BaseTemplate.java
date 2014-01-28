@@ -51,7 +51,6 @@ public class BaseTemplate extends Activity {
 
 	protected Workflow wf;
 	//Keep track of input in below arraylist.
-	protected Map<VarIdentifier,View> bindings = new HashMap<VarIdentifier,View>();
 
 	protected final Map<Rule,Boolean>executedRules = new LinkedHashMap<Rule,Boolean>();	
 
@@ -132,7 +131,7 @@ public class BaseTemplate extends Activity {
 				Action action = b.getAction();
 				//ACtion = workflow to execute.
 				//Commence!
-				save();
+				
 				if (action!=null) {
 					//Workflow?
 					if (action.isWorkflow()){
@@ -167,6 +166,7 @@ public class BaseTemplate extends Activity {
 		View myView;
 		TextView myHeader;
 		protected Map<VarIdentifier,TextView> myOutputFields = new HashMap<VarIdentifier,TextView>();
+		protected Map<VarIdentifier,View> myVars = new HashMap<VarIdentifier,View>();
 		final LinearLayout outputContainer, inputContainer;
 
 		public  ClickableField(final String headerT) {
@@ -235,7 +235,7 @@ public class BaseTemplate extends Activity {
 					ja.setChecked(true);
 				}
 				inputContainer.addView(view);
-				bindings.put(varIdentifier,view);
+				myVars.put(varIdentifier,view);
 			}
 			else {
 				Log.d("nils","adding variable "+varId);
@@ -245,7 +245,7 @@ public class BaseTemplate extends Activity {
 				header.setText(varLabel+" ("+unit.name()+")");
 				view.setText(varIdentifier.getPrintedValue());
 				inputContainer.addView(l);
-				bindings.put(varIdentifier,view);
+				myVars.put(varIdentifier,view);
 			}
 			if (displayOut) {
 				TextView o = (TextView)LayoutInflater.from(BaseTemplate.this).inflate(R.layout.output_field,null);
@@ -257,9 +257,11 @@ public class BaseTemplate extends Activity {
 		}
 
 		private void refreshOutPut() {
+			Log.d("nils","refreshoutput called on "+myHeader);
 			Iterator<Map.Entry<VarIdentifier,TextView>> it = myOutputFields.entrySet().iterator();
 			while (it.hasNext()) {
 				Map.Entry<VarIdentifier,TextView> pairs = (Map.Entry<VarIdentifier,TextView>)it.next();
+				Log.d("nils","Iterator has found "+pairs.getKey()+" "+pairs.getValue());
 				VarIdentifier varId = pairs.getKey();
 				TextView out = pairs.getValue();
 				out.setText(varId.label+": "+varId.getPrintedValue()+" ("+varId.unit.name()+")");
@@ -271,6 +273,33 @@ public class BaseTemplate extends Activity {
 			return myView;
 		}
 
+		private void save() {
+			//for now only delytevariabler. 
+			Iterator<Map.Entry<VarIdentifier,View>> it = myVars.entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry<VarIdentifier,View> pairs = (Map.Entry<VarIdentifier,View>)it.next();
+				VarIdentifier varId = pairs.getKey();
+				View view = pairs.getValue();
+				if (varId.numType == Variable.Type.BOOLEAN) {
+					//Get the yes radiobutton.
+					RadioButton rb = (RadioButton)view;
+					//If checked set value to True.
+					if (rb.isChecked())
+						varId.setValue(rb.isChecked()?"1":"0");
+				} else {
+					EditText et = (EditText)view;
+					varId.setValue(et.getText().toString());
+
+					/*} else {
+						TextView tv = (TextView)pairs.getValue();
+						String[] tmp = tv.getText().toString().split("=");
+						pairs.getKey().setValue((tmp.length>1?tmp[1]:""));
+
+					}
+					*/
+				}
+			}
+		}
 	}
 
 	
@@ -303,33 +332,6 @@ public class BaseTemplate extends Activity {
 	 */
 
 
-	private void save() {
-		//for now only delytevariabler. 
-		Iterator<Map.Entry<VarIdentifier,View>> it = bindings.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry<VarIdentifier,View> pairs = (Map.Entry<VarIdentifier,View>)it.next();
-			VarIdentifier varId = pairs.getKey();
-			View view = pairs.getValue();
-			if (varId.numType == Variable.Type.BOOLEAN) {
-				//Get the yes radiobutton.
-				RadioButton rb = (RadioButton)view;
-				//If checked set value to True.
-				if (rb.isChecked())
-					varId.setValue(rb.isChecked()?"1":"0");
-			} else {
-				EditText et = (EditText)view;
-				varId.setValue(et.getText().toString());
-
-				/*} else {
-					TextView tv = (TextView)pairs.getValue();
-					String[] tmp = tv.getText().toString().split("=");
-					pairs.getKey().setValue((tmp.length>1?tmp[1]:""));
-
-				}
-				*/
-			}
-		}
-	}
 
 
 	//Evaluate all rules.
@@ -357,7 +359,8 @@ public class BaseTemplate extends Activity {
 				continue;
 			}
 			Log.d("NILS","Target is "+target.getName());
-			View v = bindings.get(target);
+			//View v = bindings.get(target);
+			View v = null;
 			if (v==null)
 				Log.e("NILS", "TARGET NOT FOUND FROM BINDINGS!!");
 			//Found a broken rule!

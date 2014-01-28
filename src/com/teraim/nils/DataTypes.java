@@ -910,7 +910,7 @@ public class Ruta extends ParameterCache {
 }
 
 public Ruta findRuta(String id) {
-	Log.d("nils","Findruta called with ID> "+id);
+	//Log.d("nils","Findruta called with ID> "+id);
 	if (id == null) {
 		return null;
 	}

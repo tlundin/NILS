@@ -104,8 +104,11 @@ public class CommonVars {
 			}  
     		db = new DbHelper(ctx);
     		  
-
-    	
+    	Log.d("NILS","Printing all database values in init");
+    	ArrayList<StoredVariable> sds = db.getAllVariables();
+    	int i=0;
+    	for(StoredVariable s:sds) 
+    		Log.d("nils",(i++) + ": "+s.getRutId()+","+s.getProvytaId()+","+s.getDelytaId()+","+s.getVarId()+":  "+s.getValue());
 		Log.d("NILS","exit init. singleton is "+singleton);
 	}
 	
