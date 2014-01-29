@@ -81,10 +81,12 @@ public class StoredVariable implements Serializable {
 		this.rutId = rutId;
 		this.provytaId = provytaId;
 		this.delytaId = delytaId;
+		this.value=value;
 		this.varId = varId;
 		this.type = type;
+		
 	}
-	public void setId(long rId) {
+	public void setDatabaseId(long rId) {
 		rowId = rId;
 	}
 	

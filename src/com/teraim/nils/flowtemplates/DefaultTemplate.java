@@ -1,69 +1,25 @@
 package com.teraim.nils.flowtemplates;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.res.Configuration;
-import android.graphics.Color;
-import android.graphics.Point;
 import android.os.Bundle;
-import android.text.InputType;
-import android.util.Log;
-import android.view.Display;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RadioButton;
 import android.widget.RelativeLayout;
-import android.widget.TableLayout.LayoutParams;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.teraim.nils.CommonVars;
+import com.teraim.nils.DataTypes.Rule;
+import com.teraim.nils.DataTypes.WF_Container;
 import com.teraim.nils.DataTypes;
 import com.teraim.nils.R;
 import com.teraim.nils.ValidatorListAdapter;
-import com.teraim.nils.Variable;
-import com.teraim.nils.DataTypes.AddRuleBlock;
-import com.teraim.nils.DataTypes.Block;
-import com.teraim.nils.DataTypes.ButtonBlock;
-import com.teraim.nils.DataTypes.ButtonBlock.Action;
-import com.teraim.nils.DataTypes.CreateFieldBlock;
-import com.teraim.nils.DataTypes.CreateListEntryBlock;
-import com.teraim.nils.DataTypes.LayoutBlock;
-import com.teraim.nils.DataTypes.Rule;
-import com.teraim.nils.DataTypes.SetValueBlock;
-import com.teraim.nils.DataTypes.StartBlock;
-import com.teraim.nils.DataTypes.Workflow;
-import com.teraim.nils.DataTypes.XML_Variable;
-import com.teraim.nils.R.color;
-import com.teraim.nils.R.drawable;
-import com.teraim.nils.R.id;
-import com.teraim.nils.R.layout;
-import com.teraim.nils.R.style;
-import com.teraim.nils.exceptions.EvalException;
-import com.teraim.nils.exceptions.RuleException;
-import com.teraim.nils.expr.Aritmetic;
-import com.teraim.nils.expr.Bool;
-import com.teraim.nils.expr.Numeric;
-import com.teraim.nils.expr.SyntaxException;
 
 /**
  * 
@@ -72,7 +28,7 @@ import com.teraim.nils.expr.SyntaxException;
  * Pressing Back button will return flow to parent workflow.
  */
 
-public class DefaultTemplate extends BaseTemplate {
+public class DefaultTemplate extends Executor {
 
 
 
@@ -81,6 +37,8 @@ public class DefaultTemplate extends BaseTemplate {
 	private ValidatorListAdapter mAdapter;
 	private View validator_layer;
 	private RelativeLayout enter_layer;
+	private LinearLayout my_root;
+
 	private TextView errorView;
 	private Context me;
 	@Override
@@ -91,6 +49,7 @@ public class DefaultTemplate extends BaseTemplate {
 		errorView = (TextView)findViewById(R.id.errortext);
 		validator_layer = findViewById(R.id.validator_layer);
 		enter_layer = (RelativeLayout)findViewById(R.id.enter_layer);
+		my_root = (LinearLayout) findViewById(R.id.myRoot);
 		//The list of all rules currently not ok
 		//mAdapter = new ValidatorListAdapter(this,executedRules);
 		lv = (ListView)findViewById(R.id.validatorlist);
@@ -108,6 +67,13 @@ public class DefaultTemplate extends BaseTemplate {
 			}});
 		execute();
 	}
+	@Override
+	protected List<WF_Container> getContainers() {
+		ArrayList<WF_Container> ret = new ArrayList<WF_Container>();
+		ret.add(DataTypes.getSingleton().new WF_Container("plain",my_root,null));
+		return ret;
+	}
+	
 
 
 
@@ -115,9 +81,9 @@ public class DefaultTemplate extends BaseTemplate {
 	/**
 	 * Execute the workflow.
 	 */
+	/*
 	private void execute() {
 	
-		LinearLayout my_root = (LinearLayout) findViewById(R.id.myRoot);
 
 		List<Block>blocks = wf.getBlocks();
 		for (Block b:blocks) {
@@ -388,12 +354,14 @@ public class DefaultTemplate extends BaseTemplate {
 						enter_layer.setVisibility(View.VISIBLE);
 
 					}});
+			} else if (b instanceof CreateListEntriesBlock) {
+				createVarListFromFile((CreateListEntriesBlock)b, my_root);
 			}
 
 		}
 
 	}
-
+	 */
 
 
 

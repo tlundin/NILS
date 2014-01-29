@@ -90,7 +90,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 if (stV==null) {
                 	Log.d("nils","Deserialize failed.");
                 } else {
-                	stV.setId(Long.parseLong(id));
+                	stV.setDatabaseId(Long.parseLong(id));
                 	ret.add(stV);
                 	//delete all
                 	deleteVariable(stV);
@@ -108,15 +108,18 @@ public class DbHelper extends SQLiteOpenHelper {
     
     public void insertVariable(StoredVariable var){
         //for logging
-    	Log.d("nils", "Inserting variable "+var.toString()+" into database."); 
+    	Log.d("nils", "Inserting variable "+var.toString()+" into database with value "+var.getValue()); 
 
     	// 1. get reference to writable DB
     	SQLiteDatabase db = this.getWritableDatabase();
 
     	// 2. create ContentValues to add key "column"/value
     	ContentValues values = new ContentValues();
-    	if (var.existsInDB())
+    	Log.d("nils","value: "+var.getValue()+" id: "+var.getId());
+    	if (existsInDB(var)) {
+    		Log.d("nils","Variable already exists in database with ID "+var.getId());
     		values.put("id", var.getId());
+    	} 
     	values.put("ruta", var.getRutId()); // get ruta
     	values.put("provyta", var.getProvytaId()); // get provyta
     	values.put("delyta", var.getDelytaId()); // get delyta
@@ -133,17 +136,27 @@ public class DbHelper extends SQLiteOpenHelper {
         null, //nullColumnHack
         values,
         SQLiteDatabase.CONFLICT_REPLACE); 
+    	
     	if (rId == var.getId())
     		Log.d("nils","Updated value for "+var.getVarId()+" to "+var.getValue());
     	else
-    		var.setId(rId);
+    		var.setDatabaseId(rId);
     	
     	
     	// 4. close
     	db.close(); 
 }
     
-    enum ActionType {
+    private boolean existsInDB(StoredVariable var) {
+		//if we know for sure already, return true.
+    	if (var.existsInDB())
+			return true;
+    	//look for it & try again.
+    	var.setDatabaseId(findRow(var));
+    	return var.existsInDB();
+ 	}
+
+	enum ActionType {
     	insert,
     	delete
     }
@@ -170,7 +183,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     	// 4. close
     	db.close(); 
-    	var.setId(rId);
+    	var.setDatabaseId(rId);
     	Log.d("nils","Inserted new variable with ID "+rId);
     } 
     
@@ -183,7 +196,7 @@ public class DbHelper extends SQLiteOpenHelper {
         long rId = -1;
         // 2. Figure out the row index
        if(!var.existsInDB())
-        	rId = findRow(var,db);
+        	rId = findRow(var);
        else
     	   rId = var.getId();
         if (rId == -1) 
@@ -203,19 +216,20 @@ public class DbHelper extends SQLiteOpenHelper {
     
     
     
-    private long findRow(StoredVariable var, SQLiteDatabase db) {
+    private long findRow(StoredVariable var) {
     	String selection = null;
     	String[] selectionArgs = null;
+    	SQLiteDatabase db = this.getReadableDatabase();
     	
     	if (var.getType()==Type.ruta) {
-    		selection = "ruta = ?";
-    		selectionArgs = new String[]{var.getRutId()};
+    		selection = "var = ? and ruta = ?";
+    		selectionArgs = new String[]{var.getVarId(),var.getRutId()};
     	} else if (var.getType()==Type.provyta) {
-    		selection = "ruta = ? and provyta = ?";
-    		selectionArgs = new String[]{var.getRutId(), var.getProvytaId()};
+    		selection = "var = ? and ruta = ? and provyta = ?";
+    		selectionArgs = new String[]{var.getVarId(),var.getRutId(), var.getProvytaId()};
     	} else if (var.getType()==Type.delyta) {
-    		selection = "ruta = ? and provyta = ? and delyta = ?";
-    		selectionArgs = new String[]{var.getRutId(), var.getProvytaId(), var.getDelytaId()};
+    		selection = "var = ? and ruta = ? and provyta = ? and delyta = ?";
+    		selectionArgs = new String[]{var.getVarId(), var.getRutId(), var.getProvytaId(), var.getDelytaId()};
     	}
     	
     	
@@ -224,12 +238,9 @@ public class DbHelper extends SQLiteOpenHelper {
     	
     	 // 3. if we got results get the first one
         if (c != null && c.moveToFirst()) {
-            
             String id = c.getString(0);
-            if (id!=null) {
-            	return Long.parseLong(id);
-            } else
-            	return -1;
+            Log.d("nils","found variable on row with Id "+id);
+            return Long.parseLong(id);
         }
         else
         	return -1;
@@ -244,27 +255,29 @@ public class DbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         
     	if (t==Type.ruta) {
-    		selection = "ruta = ?";
-    		selectionArgs = new String[]{rutId};
+    		selection = "var = ? and ruta = ?";
+    		selectionArgs = new String[]{varId,rutId};
     	} else if (t==Type.provyta) {
-    		selection = "ruta = ? and provyta = ?";
-    		selectionArgs = new String[]{rutId, provyteId};
+    		selection = "var = ? and ruta = ? and provyta = ?";
+    		selectionArgs = new String[]{varId,rutId, provyteId};
     	} else if (t==Type.delyta) {
-    		selection = "ruta = ? and provyta = ? and delyta = ?";
-    		selectionArgs = new String[]{rutId, provyteId, delyteId};
+    		selection = "var = ? and ruta = ? and provyta = ? and delyta = ?";
+    		selectionArgs = new String[]{varId, rutId, provyteId, delyteId};
     	}	
     	
     	Cursor c = db.query(TABLE_VARIABLES,new String[]{"id","serialized"},
     			selection,selectionArgs,null,null,null,null);
     	StoredVariable stV=null;
         if (c != null && c.moveToFirst() ) {
-        	Log.d("nils","Found variable "+varId+" in database");
             String id = c.getString(0);
             stV = (StoredVariable)Tools.deSerialize(c.getBlob(1));
+           
             if (stV==null) {
             	Log.d("nils","Deserialize failed in getVariable.");
             } else {
-            	stV.setId(Long.parseLong(id));
+            	Log.d("nils","Found variable "+stV.getVarId()+" in database with value "+stV.getValue()+" and db ID "+id);
+            	stV.setDatabaseId(Long.parseLong(id));
+            	
             }
         } else 
         	Log.d("nils","Did NOT find variable "+varId+" in database");

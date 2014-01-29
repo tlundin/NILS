@@ -1,7 +1,7 @@
 package com.teraim.nils;
 import android.util.Log;
 
-import com.teraim.nils.DataTypes.Unit;
+import com.teraim.nils.DataTypes.Workflow.Unit;
 import com.teraim.nils.StoredVariable.Type;
 
 //Class used to identify a variable, given that CURRENT Delyta/Provyta/Ruta (the context) is the parent.
@@ -10,8 +10,9 @@ public class VarIdentifier {
 
 	public Variable.Type numType;
 	public StoredVariable.Type varType;
-	public String id,label;
+	private String id,label;
 	public Unit unit;
+	private StoredVariable myStoredVar=null;		
 	ParameterCache pc;
 	
 	public VarIdentifier(String varLabel,String varId, Variable.Type numType, StoredVariable.Type varType, Unit unit) {
@@ -39,15 +40,34 @@ public class VarIdentifier {
 			Log.e("nils","Print: No parametercache identified for variable "+id);
 			return "";
 		}
-		StoredVariable sv;		
-		sv = pc.getVariable(id);
-		if (sv!=null)
-			return sv.getValue();		
+		
+		myStoredVar = pc.getVariable(id);
+		if (myStoredVar!=null)
+			return myStoredVar.getValue();		
 		return "";
 	}
 
 	public void setValue(String value) {
-		pc.storeVariable(id, value);
+		Log.d("nils","setvalue called for "+id+" with value "+value);
+		//if we know the storedvar...
+		if (myStoredVar!=null) {
+			myStoredVar.setValue(value);
+			pc.storeVariable(myStoredVar);
+		}
+		else
+			pc.storeVariable(id,value);
 	}
+
+	public String getLabel() {
+		return this.label;
+	}
+	
+	public String getPrintedUnit() {
+		if (unit == Unit.percentage)
+			return "%";
+		else
+			return unit.name();
+	}
+
 
 }

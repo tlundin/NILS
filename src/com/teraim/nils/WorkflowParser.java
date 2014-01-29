@@ -30,8 +30,8 @@ import com.teraim.nils.DataTypes.PageDefineBlock;
 import com.teraim.nils.DataTypes.SetValueBlock;
 import com.teraim.nils.DataTypes.SortingBlock;
 import com.teraim.nils.DataTypes.StartBlock;
-import com.teraim.nils.DataTypes.Unit;
 import com.teraim.nils.DataTypes.Workflow;
+import com.teraim.nils.DataTypes.Workflow.Unit;
 import com.teraim.nils.DataTypes.XML_Variable;
 import com.teraim.nils.exceptions.EvalException;
 import com.teraim.nils.utils.Tools;
@@ -205,72 +205,80 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 
 		return blocks;
 	}
-	
-	
-	
-	 /**
-	  * Creates a Block for adding a sorting function on Target List. 
-	  * @param parser
-	  * @return
-	  * @throws IOException
-	  * @throws XmlPullParserException
-	  */
-	 private static FilterBlock readBlockCreateFilter(XmlPullParser parser) throws IOException, XmlPullParserException {
-		 Log.d("NILS","Filter block...");
 
-		 parser.require(XmlPullParser.START_TAG, null,"block_create_list_filter");
-		 while (parser.next() != XmlPullParser.END_TAG) {
-			 if (parser.getEventType() != XmlPullParser.START_TAG) {
-				 continue;
-			 }		
-			 skip(parser);
 
-		 }
-		 return new FilterBlock();
-	 }
 
-	 /**
-	  * Creates a Block for adding a sorting function on Target List. 
-	  * @param parser
-	  * @return
-	  * @throws IOException
-	  * @throws XmlPullParserException
-	  */
-	 private static SortingBlock readBlockCreateSorting(XmlPullParser parser) throws IOException, XmlPullParserException {
-		 Log.d("NILS","Sorting block...");
+	/**
+	 * Creates a Block for adding a sorting function on Target List. 
+	 * @param parser
+	 * @return
+	 * @throws IOException
+	 * @throws XmlPullParserException
+	 */
+	private static FilterBlock readBlockCreateFilter(XmlPullParser parser) throws IOException, XmlPullParserException {
+		Log.d("NILS","Filter block...");
 
-		 parser.require(XmlPullParser.START_TAG, null,"block_create_list_sorting_function");
-		 while (parser.next() != XmlPullParser.END_TAG) {
-			 if (parser.getEventType() != XmlPullParser.START_TAG) {
-				 continue;
-			 }		
-			 skip(parser);
+		parser.require(XmlPullParser.START_TAG, null,"block_create_list_filter");
+		while (parser.next() != XmlPullParser.END_TAG) {
+			if (parser.getEventType() != XmlPullParser.START_TAG) {
+				continue;
+			}		
+			skip(parser);
 
-		 }
-		 return new SortingBlock();
-	 }
-	 
-	 /**
-	  * Creates a Block for displaying the number of selected entries currently in a list. 
-	  * @param parser
-	  * @return
-	  * @throws IOException
-	  * @throws XmlPullParserException
-	  */
-	 private static AddDisplayOfSelectionsBlock readBlockAddSelections(XmlPullParser parser) throws IOException, XmlPullParserException {
-		 Log.d("NILS","AddSelections block...");
+		}
+		return DataTypes.getSingleton().new FilterBlock();
+	}
 
-		 parser.require(XmlPullParser.START_TAG, null,"block_add_number_of_selections_display");
-		 while (parser.next() != XmlPullParser.END_TAG) {
-			 if (parser.getEventType() != XmlPullParser.START_TAG) {
-				 continue;
-			 }		
-			 skip(parser);
+	/**
+	 * Creates a Block for adding a sorting function on Target List. 
+	 * @param parser
+	 * @return
+	 * @throws IOException
+	 * @throws XmlPullParserException
+	 */
+	private static SortingBlock readBlockCreateSorting(XmlPullParser parser) throws IOException, XmlPullParserException {
+		Log.d("NILS","Sorting block...");
+		String containerName=null,type=null;
+		parser.require(XmlPullParser.START_TAG, null,"block_create_list_sorting_function");
+		while (parser.next() != XmlPullParser.END_TAG) {
+			if (parser.getEventType() != XmlPullParser.START_TAG) {
+				continue;
+			}
+			String name= parser.getName();
+			
+			if (name.equals("container_name")) {
+				containerName = readText("container_name",parser);
 
-		 }
-		 return new AddDisplayOfSelectionsBlock();
-	 }	
-	
+			} else if (name.equals("type")) {
+				type = readText("type",parser);
+			} else
+				skip(parser);
+
+		}
+		return DataTypes.getSingleton().new SortingBlock(type, containerName,"Field_List");
+	}
+
+	/**
+	 * Creates a Block for displaying the number of selected entries currently in a list. 
+	 * @param parser
+	 * @return
+	 * @throws IOException
+	 * @throws XmlPullParserException
+	 */
+	private static AddDisplayOfSelectionsBlock readBlockAddSelections(XmlPullParser parser) throws IOException, XmlPullParserException {
+		Log.d("NILS","AddSelections block...");
+
+		parser.require(XmlPullParser.START_TAG, null,"block_add_number_of_selections_display");
+		while (parser.next() != XmlPullParser.END_TAG) {
+			if (parser.getEventType() != XmlPullParser.START_TAG) {
+				continue;
+			}		
+			skip(parser);
+
+		}
+		return DataTypes.getSingleton().new AddDisplayOfSelectionsBlock();
+	}	
+
 	/**
 	 *  Creates a CreateListEntryBlock. 
 	 * @param parser
@@ -301,7 +309,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 						Log.d("NILS","Added variable "+Xvar.name);
 						vars.add(Xvar);
 					}
-					Xvar = new XML_Variable();
+					Xvar = DataTypes.getSingleton().new XML_Variable();
 					Xvar.name = readText("varname",parser);
 					Xvar.type = Variable.Type.NUMERIC;
 					Xvar.purpose = "editable";
@@ -310,7 +318,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 				else if (Xvar!=null) {
 					if (name.equals("vartype")) 
 						Xvar.type = Tools.convertToType(readText("vartype",parser));
-					
+
 					else if (name.equals("purpose")) 
 						Xvar.purpose = readText("purpose",parser);
 					else if (name.equals("field_label")) 
@@ -320,16 +328,16 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 				} else
 					skip(parser);
 
-				
+
 			}
 		} if (Xvar !=null) {
 			Log.d("NILS","Added variable "+Xvar.name);
 			vars.add(Xvar);
 		}
-		return new CreateListEntryBlock(vars,listName);
+		return DataTypes.getSingleton().new CreateListEntryBlock(vars,listName);
 	}
 
-	
+
 	/**
 	 *  Creates a CreateListEntriesBlock. 
 	 * @param parser
@@ -340,7 +348,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 	 */	
 	private static CreateListEntriesBlock readBlockCreateListEntries(XmlPullParser parser) throws IOException, XmlPullParserException, EvalException {
 		Log.d("NILS","Create List Entries block...");
-		String fileName="",containerName;
+		String fileName="",containerName=null,namn=null;
 		XML_Variable Xvar=null;
 		parser.require(XmlPullParser.START_TAG, null,"block_create_list_entries");
 		while (parser.next() != XmlPullParser.END_TAG) {
@@ -354,17 +362,20 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 				Log.d("NILS","fileName: "+fileName);
 			} else if (name.equals("container_name")) {
 				containerName = readText("container_name",parser);
-				
+
+			} else if (name.equals("name")) {
+				namn = readText("name",parser);
+
 			} else
 				skip(parser);
 
-				
-			}
 
-		return new CreateListEntriesBlock(fileName);
+		}
+
+		return DataTypes.getSingleton().new CreateListEntriesBlock(fileName,containerName,namn);
 	}
-	
-	
+
+
 	/**
 	 *  Creates a CreateFieldBlock. 
 	 * @param parser
@@ -374,7 +385,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 	 * @throws EvalException 
 	 */	private static CreateFieldBlock readBlockCreateField(XmlPullParser parser) throws IOException, XmlPullParserException, EvalException {
 		 Log.d("NILS","Create Field block...");
-		 XML_Variable var = new XML_Variable();
+		 XML_Variable var = DataTypes.getSingleton().new XML_Variable();
 		 parser.require(XmlPullParser.START_TAG, null,"block_create_field");
 		 while (parser.next() != XmlPullParser.END_TAG) {
 			 if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -400,11 +411,11 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 						 Log.e("nils",Unit.values()[i].name());
 				 }
 			 }
-			 	
+
 			 else
 				 skip(parser);
 		 }
-		 return new CreateFieldBlock(var);
+		 return DataTypes.getSingleton().new CreateFieldBlock(var);
 	 }
 
 	 /**
@@ -417,7 +428,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 	 //For now just create dummy.
 	 private static ButtonBlock readBlockButton(XmlPullParser parser) throws IOException, XmlPullParserException {
 		 Log.d("NILS","Button block...");
-		 String label=null,action=null,myname=null;
+		 String label=null,action=null,myname=null,containerName=null;
 		 parser.require(XmlPullParser.START_TAG, null,"block_button");
 		 while (parser.next() != XmlPullParser.END_TAG) {
 			 if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -430,10 +441,12 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 				 myname = readText("name",parser);
 			 else if (name.equals("label")) 
 				 label = readText("label",parser);
+			 else if (name.equals("container_name")) 
+				 containerName = readText("container_name",parser);			
 			 else
 				 skip(parser);
 		 }
-		 return new ButtonBlock(label,action,myname);
+		 return DataTypes.getSingleton().new ButtonBlock(label,action,myname,containerName);
 	 }
 
 	 /**
@@ -464,7 +477,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 			 Log.e("NILS","Error reading Startblock. Workflowname missing");
 			 throw new XmlPullParserException("Parameter missing");
 		 }
-		 return new StartBlock(args,workflowName);
+		 return DataTypes.getSingleton().new StartBlock(args,workflowName);
 	 }
 
 	 /**
@@ -497,7 +510,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 			 Log.e("NILS","Error reading SetValueblock. Either varRef or Expression is null. Varref: "+varRef);
 			 throw new XmlPullParserException("Parameter missing");
 		 }
-		 return new SetValueBlock(label,varRef,expr);
+		 return DataTypes.getSingleton().new SetValueBlock(label,varRef,expr);
 	 }
 	 /**
 	  * Creates a LayoutBlock. LayoutBlocks are used to set the direction of the layout 
@@ -525,9 +538,9 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 				 skip(parser);
 
 		 }
-		 return new LayoutBlock(label,layout,align);
+		 return DataTypes.getSingleton().new LayoutBlock(label,layout,align);
 	 }
-	 
+
 	 /**
 	  * Creates a PageDefinitionBlock. Pages are the templates for a given page. Defines layout etc. 
 	  * @param parser
@@ -551,10 +564,10 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 			 } else
 				 skip(parser);
 		 }
-		 return new PageDefineBlock("root", pageType,pageLabel);
+		 return DataTypes.getSingleton().new PageDefineBlock("root", pageType,pageLabel);
 	 }
 
-	 
+
 	 /**
 	  * Creates a PageDefinitionBlock. Pages are the templates for a given page. Defines layout etc. 
 	  * @param parser
@@ -578,7 +591,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 			 } else
 				 skip(parser);
 		 }
-		 return new ContainerDefineBlock(containerName, containerType);
+		 return DataTypes.getSingleton().new ContainerDefineBlock(containerName, containerType);
 	 }
 	 /**
 	  * Creates a AddRuleBlock. Adds a rule to a variable or object. 
@@ -613,7 +626,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 				 skip(parser);
 
 		 }
-		 return new AddRuleBlock(label,myname,target,condition,action,errorMsg);
+		 return DataTypes.getSingleton().new AddRuleBlock(label,myname,target,condition,action,errorMsg);
 	 }
 
 	 // Read symbol from tag.
@@ -636,18 +649,18 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 		 parser.require(XmlPullParser.END_TAG, null,tag);
 		 return text;
 	 }
-	 
+
 	 private static String[] readArray(String tag,XmlPullParser parser) throws IOException, XmlPullParserException {
 		 parser.require(XmlPullParser.START_TAG, null,tag);
 		 String temp = readText(parser);
 		 String[] res = null;
 		 if (temp!=null) 
-			res = temp.split(",");			 
-		 
+			 res = temp.split(",");			 
+
 		 parser.require(XmlPullParser.END_TAG, null,tag);
 		 return res;
 	 }
-	 
+
 	 // Extract string values.
 	 private static String readText(XmlPullParser parser) throws IOException, XmlPullParserException {
 		 String result = "";

@@ -7,10 +7,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-import com.teraim.nils.DataTypes.Unit;
-import com.teraim.nils.Variable.Type;
-
 import android.util.Log;
+
+import com.teraim.nils.DataTypes.Workflow.Unit;
+import com.teraim.nils.Variable.Type;
 
 public class Tools {
 
