@@ -24,11 +24,11 @@ import com.teraim.nils.DataTypes.ContainerDefineBlock;
 import com.teraim.nils.DataTypes.CreateFieldBlock;
 import com.teraim.nils.DataTypes.CreateListEntriesBlock;
 import com.teraim.nils.DataTypes.CreateListEntryBlock;
-import com.teraim.nils.DataTypes.FilterBlock;
 import com.teraim.nils.DataTypes.LayoutBlock;
+import com.teraim.nils.DataTypes.ListFilterBlock;
+import com.teraim.nils.DataTypes.ListSortingBlock;
 import com.teraim.nils.DataTypes.PageDefineBlock;
 import com.teraim.nils.DataTypes.SetValueBlock;
-import com.teraim.nils.DataTypes.SortingBlock;
 import com.teraim.nils.DataTypes.StartBlock;
 import com.teraim.nils.DataTypes.Workflow;
 import com.teraim.nils.DataTypes.Workflow.Unit;
@@ -215,18 +215,32 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 	 * @throws IOException
 	 * @throws XmlPullParserException
 	 */
-	private static FilterBlock readBlockCreateFilter(XmlPullParser parser) throws IOException, XmlPullParserException {
-		Log.d("NILS","Filter block...");
-
+	private static ListFilterBlock readBlockCreateFilter(XmlPullParser parser) throws IOException, XmlPullParserException {
+		Log.d("NILS","Block create list filter...");
+		String containerId=null,type=null,target=null,label=null,function=null;
+		
 		parser.require(XmlPullParser.START_TAG, null,"block_create_list_filter");
 		while (parser.next() != XmlPullParser.END_TAG) {
 			if (parser.getEventType() != XmlPullParser.START_TAG) {
 				continue;
-			}		
-			skip(parser);
+			}
+			String name= parser.getName();
+			
+			if (name.equals("label")) {
+				label = readText("label",parser);
+			} else if (name.equals("type")) {
+				type = readText("type",parser);
+			} else if (name.equals("function_name")) {
+				function = readText("function_name",parser);
+			} else if (name.equals("container_name")) {
+				containerId = readText("container_name",parser);
+			} else if (name.equals("target")) {
+			target = readText("target",parser);}
+			else
+				skip(parser);
 
 		}
-		return DataTypes.getSingleton().new FilterBlock();
+		return DataTypes.getSingleton().new ListFilterBlock(containerId, type, target,label, function);
 	}
 
 	/**
@@ -236,9 +250,9 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 	 * @throws IOException
 	 * @throws XmlPullParserException
 	 */
-	private static SortingBlock readBlockCreateSorting(XmlPullParser parser) throws IOException, XmlPullParserException {
+	private static ListSortingBlock readBlockCreateSorting(XmlPullParser parser) throws IOException, XmlPullParserException {
 		Log.d("NILS","Sorting block...");
-		String containerName=null,type=null;
+		String containerName=null,type=null,target=null;
 		parser.require(XmlPullParser.START_TAG, null,"block_create_list_sorting_function");
 		while (parser.next() != XmlPullParser.END_TAG) {
 			if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -251,11 +265,13 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 
 			} else if (name.equals("type")) {
 				type = readText("type",parser);
-			} else
+			} else if (name.equals("target")) {
+				target = readText("target",parser);
+			}else
 				skip(parser);
 
 		}
-		return DataTypes.getSingleton().new SortingBlock(type, containerName,"Field_List");
+		return DataTypes.getSingleton().new ListSortingBlock(type, containerName,target);
 	}
 
 	/**

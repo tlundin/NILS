@@ -112,8 +112,8 @@ public class MenuActivity extends Activity {
 		Log.d("NILS","Refreshing status row");
 		if (mnu1!=null) {
 			
-			String pid = CommonVars.ph.get(PersistenceHelper.CURRENT_PROVYTA_ID_KEY);
-			String rid = CommonVars.ph.get(PersistenceHelper.CURRENT_RUTA_ID_KEY);
+			String pid = CommonVars.ph().get(PersistenceHelper.CURRENT_PROVYTA_ID_KEY);
+			String rid = CommonVars.ph().get(PersistenceHelper.CURRENT_RUTA_ID_KEY);
 			
 			mnu1.setTitle("Ruta/Provyta: "+rid+"/"+pid);
 		}

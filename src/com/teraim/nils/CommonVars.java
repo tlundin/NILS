@@ -114,11 +114,17 @@ public class CommonVars {
 	
 	public static CommonVars cv() {
 		if (singleton == null) {
-			Log.e("NILS","Singleton is null");
+			Log.e("NILS","Singleton cv is null");
 		}
 		return singleton;			 
 	}
 	
+	public static PersistenceHelper ph() {
+		if (ph == null) {
+			Log.e("NILS","Singleton ph is null");
+		}
+		return ph;
+	}
 	
 	
 	private int syncStatus=BluetoothRemoteDevice.SYNK_STOPPED;

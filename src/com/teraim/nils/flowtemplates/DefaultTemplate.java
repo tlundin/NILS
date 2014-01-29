@@ -70,7 +70,7 @@ public class DefaultTemplate extends Executor {
 	@Override
 	protected List<WF_Container> getContainers() {
 		ArrayList<WF_Container> ret = new ArrayList<WF_Container>();
-		ret.add(DataTypes.getSingleton().new WF_Container("plain",my_root,null));
+		ret.add(DataTypes.getSingleton().new WF_Container("root",my_root,null));
 		return ret;
 	}
 	

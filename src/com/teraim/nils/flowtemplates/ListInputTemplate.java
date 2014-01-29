@@ -22,6 +22,10 @@ public class ListInputTemplate extends Executor {
 		myLayouts.add(root);
 		myLayouts.add(DataTypes.getSingleton().new WF_Container("Field_List_panel_1", (LinearLayout)findViewById(R.id.fieldList), root));
 		myLayouts.add(DataTypes.getSingleton().new WF_Container("Sort_Panel_1", (LinearLayout)findViewById(R.id.sortPanel), root));
+		myLayouts.add(DataTypes.getSingleton().new WF_Container("Aggregation_Panel", (LinearLayout)findViewById(R.id.aggregates), root));
+		myLayouts.add(DataTypes.getSingleton().new WF_Container("Filter_Panel_1", (LinearLayout)findViewById(R.id.filterPanel), root));
+		
+		
 		if (wf!=null)
 			execute();
 	}

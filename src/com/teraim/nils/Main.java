@@ -49,9 +49,9 @@ public class Main extends Activity {
 		initIfFirstTime();
 		
 		//TODO: REMOVE
-		CommonVars.ph.put(PersistenceHelper.CURRENT_RUTA_ID_KEY, "262");
-		CommonVars.ph.put(PersistenceHelper.CURRENT_PROVYTA_ID_KEY, "6");
-		CommonVars.ph.put(PersistenceHelper.CURRENT_DELYTA_ID_KEY, "1");
+		CommonVars.ph().put(PersistenceHelper.CURRENT_RUTA_ID_KEY, "262");
+		CommonVars.ph().put(PersistenceHelper.CURRENT_PROVYTA_ID_KEY, "6");
+		CommonVars.ph().put(PersistenceHelper.CURRENT_DELYTA_ID_KEY, "1");
 
 
 		if(GooglePlayServicesUtil.isGooglePlayServicesAvailable(this)

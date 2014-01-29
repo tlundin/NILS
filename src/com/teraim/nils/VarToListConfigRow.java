@@ -80,6 +80,9 @@ public class VarToListConfigRow {
 			Log.e("NILS","Row is either too short or too long: "+row.length);
 			return null;
 		}
+		for(int i=0;i<row.length;i++)
+			if (row[i]!=null)
+				row[i] = row[i].replace("\"", "");
 		String t = row[6];
 		String u = row[7];	
 		Unit unit;

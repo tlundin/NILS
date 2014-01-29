@@ -150,7 +150,7 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
-               CommonVars.ph.put(PersistenceHelper.CURRENT_DELYTA_ID_KEY,ta.getItem(arg2).getId());
+               CommonVars.ph().put(PersistenceHelper.CURRENT_DELYTA_ID_KEY,ta.getItem(arg2).getId());
                 startActivity(intent);
 			}});
 		

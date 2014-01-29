@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -30,8 +31,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
-import android.widget.TextView;
 import android.widget.TableLayout.LayoutParams;
+import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.teraim.nils.DataTypes.Workflow.Unit;
@@ -57,22 +59,23 @@ import com.teraim.nils.flowtemplates.ListInputTemplate;
  */
 public class DataTypes  {
 
-	static Context myC;
-	static DataTypes singleton;
+	private static Context myC;
+	private static DataTypes singleton;
 
 	public static DataTypes getSingleton() {
+		if (singleton == null)
+			singleton = new DataTypes();
+
 		return singleton;
 	}
 
 	public static void parse(Context c) {
 		myC = c;
-		if (singleton == null) {
-			singleton = new DataTypes();
 
-			singleton.scanRutData(c.getResources().openRawResource(R.raw.rutdata_v3));
-			singleton.scanDelningsData(c.getResources().openRawResource(R.raw.delningsdata));
-		}		
-	}
+		getSingleton().scanRutData(c.getResources().openRawResource(R.raw.rutdata_v3));
+		getSingleton().scanDelningsData(c.getResources().openRawResource(R.raw.delningsdata));
+	}		
+
 
 	private ArrayList<Ruta> rutor = new ArrayList<Ruta>();
 
@@ -171,12 +174,13 @@ public class DataTypes  {
 	}
 
 	public interface Filter {
-		public List<Listable> filter(List<Listable> list);
+		public List<? extends Listable> filter(List<? extends Listable> list);
 	}
 
 	public interface Filterable {		
 		public void addFilter(WF_Filter f);
 		public void removeFilter(WF_Filter f);
+		public void runFilters();
 	}
 
 	public interface Drawable {		
@@ -216,9 +220,9 @@ public class DataTypes  {
 
 	public class WF_List extends WF_Widget implements Sortable,Filterable {
 
-		List<WF_ListElement> list;
-		List<WF_Filter> myFilters;
-		//How about using the Container's panel??
+		private final List<WF_ListElement> list; //Instantiated in constructor
+		private final List<WF_Filter> myFilters=new ArrayList<WF_Filter>();
+		//How about using the Container's panel?? TODO
 		public WF_List(String id, List<WF_ListElement> list, Context ctx) {
 			super(new LinearLayout(ctx));
 			myWidget = (LinearLayout)getWidget();
@@ -248,11 +252,22 @@ public class DataTypes  {
 		public String getId() {
 			return myId;
 		}
-		
+
 		public void redraw(List<WF_ListElement> list) {
+			myWidget.removeAllViews();
 			for (WF_ListElement l:list) {
 				myWidget.addView(l.getWidget());
 			}
+		}
+
+
+		@Override
+		public void runFilters() {
+			List<WF_ListElement> listx = new ArrayList<WF_ListElement>(list);
+			for (WF_Filter f:myFilters) {
+				f.filter(listx);
+			}
+			redraw(listx);
 		}
 
 
@@ -262,7 +277,7 @@ public class DataTypes  {
 
 		@Override
 		public abstract String getSortKey(); 
-		
+
 		public WF_ListElement(View v) {
 			super(v);
 		}
@@ -275,8 +290,8 @@ public class DataTypes  {
 		public WF_Widget(View v) {
 			myView = v;
 		}
-		
-		
+
+
 		@Override
 		public View getWidget() {
 			return myView;
@@ -317,6 +332,7 @@ public class DataTypes  {
 
 		@Override
 		public void draw() {
+			Log.d("nils","in WF_Container draw with ID: "+myId+". I have  "+myItems.size()+" widgets.");
 			View v;
 			for(WF_Widget d:myItems) {
 				v = d.getWidget();
@@ -327,20 +343,17 @@ public class DataTypes  {
 
 		@Override
 		public void add(WF_Widget d) {
-			// TODO Auto-generated method stub
-
+			myItems.add(d);
 		}
 
 		@Override
 		public void remove(WF_Widget d) {
-			// TODO Auto-generated method stub
-
+			myItems.remove(d);
 		}
 
 		@Override
 		public List<WF_Widget> getWidgets() {
-			// TODO Auto-generated method stub
-			return null;
+			return myItems;
 		}
 
 
@@ -352,33 +365,60 @@ public class DataTypes  {
 
 	}
 
-	//Specialized filter. Will filter a list on Prefix.
+	//Specialized filter. Will remove elements with a value.
+	public class WF_Kvar_Filter extends WF_Filter {
 
+		@Override
+		public List<? extends Listable> filter(List<? extends Listable> list) {
+			ClickableField cb = ((ClickableField)list.get(0));
+			Set<VarIdentifier> varids = cb.myVars.keySet();
+			Log.d("nils","vars for first: "+varids.size());
+			return list;
+		}
+	
+		
+	}
+	
+	//Specialized filter. Will filter a list on Prefix.
 	public class WF_AlphaNumeric_Filter extends WF_Filter {
 
 		String myPrefix = "";
 
-		@Override
-		public List<Listable> filter(List<Listable> list) {
-			String key;
-			List<Listable> ret = new ArrayList<Listable>();
 
-			for(Listable l:list) {
+		@Override
+		public List<? extends Listable> filter(List<? extends Listable> list) {
+			String key;
+			Iterator<? extends Listable> it = list.iterator();
+			while(it.hasNext()) {
+				Listable l = it.next();
 				key = l.getSortKey();
-				if (key!=null && key.startsWith(myPrefix))
-					ret.add(l);
+				if (key==null || key.length()==0) {
+					Log.e("nils","Key was null or 0 length in filter");
+					continue;
+				}				
+				boolean match = false;
+				for (int i=0;i<myPrefix.length();i++) {
+					if (key.charAt(0)==myPrefix.charAt(i)) {
+						match=true;
+						break;
+					}
+				}
+				if (!match) {
+						it.remove();
+						Log.d("nils","filter removes element "+key+" because "+key.charAt(0)+" doesn't match "+myPrefix);
+				}
+					
 			}
-			return ret;
+			return list;
 		}
 
 		@Override
 		public String getId() {
-			// TODO Auto-generated method stub
-			return null;
+			return myId;
 		}
 
-		public WF_AlphaNumeric_Filter(String filterCh) {
-
+		public WF_AlphaNumeric_Filter(String id,String filterCh) {
+			myId = id;
 			myPrefix = filterCh;
 		}
 
@@ -386,10 +426,10 @@ public class DataTypes  {
 	}
 	public static class WF_Context {
 
-		Context ctx;
-		List<WF_List> lists;
-		List<Drawable> drawables;
-		List<WF_Container> containers;
+		private Context ctx;
+		private final List<WF_List> lists=new ArrayList<WF_List>();
+		private List<Drawable> drawables;
+		private List<WF_Container> containers;
 
 		public WF_Context(Context ctx) {
 			this.ctx=ctx;
@@ -400,11 +440,12 @@ public class DataTypes  {
 
 		//for now it is assumed that all lists implements filterable.
 		public Filterable getFilterable(String id) {
-			if (id==null)
+			if (id==null||lists==null)
 				return null;
 			for (WF_List wfl:lists) {
+				Log.d("nils","filterable list: "+wfl.getId());
 				String myId = wfl.getId();				
-				if(myId!=null && myId.equals(id))
+				if(myId!=null && myId.equalsIgnoreCase(id))
 					return wfl;
 			}
 			return null;
@@ -412,14 +453,24 @@ public class DataTypes  {
 		public void addContainers(List<WF_Container> containers) {
 			this.containers = containers; 
 		}
+
+		public void addList(WF_List l) {
+			lists.add(l);
+		}
+
+
 		public Container getContainer(String id) {
-			if (id==null)
-				return null;
+			Log.d("nils","GetContainer. looking for container "+id);
+			if (id==null || id.length()==0) {
+				Log.d("nils","Container: null. Defaulting to root.");
+				id = "root";
+			}
 			for (WF_Container c:containers) {
 				String myId =c.getId();				
-				if(myId!=null && myId.equals(id))
+				if(myId!=null && myId.equalsIgnoreCase(id))
 					return c;
 			}
+			Log.e("nils","Failed to find container "+id);
 			return null;
 		}
 
@@ -438,8 +489,12 @@ public class DataTypes  {
 		private List<Container> getChildren(Container key) {
 			List<Container>ret = new ArrayList<Container>();
 			if (key!=null) {
+				Container parent;
 				for(Container c:containers) {
-					if (c.getParent().equals(key))
+					parent = c.getParent();
+					if (parent == null) 
+						continue;
+					if (parent.equals(key))
 						ret.add(c);
 				}
 			}
@@ -462,7 +517,7 @@ public class DataTypes  {
 			myKey = headerT;
 			this.myId=id;
 			this.ctx=ctx;
-			
+
 			myHeader = (TextView)getWidget().findViewById(R.id.editfieldtext);
 			outputContainer = (LinearLayout)getWidget().findViewById(R.id.outputContainer);
 			SpannableString content = new SpannableString(headerT);
@@ -628,21 +683,67 @@ public class DataTypes  {
 	 */
 	public  class AddDisplayOfSelectionsBlock extends Block {}
 
+	public class ListFilterBlock extends Block {
+		String containerId,type,target,label,function;
 
-	public class SortingBlock extends Block {
+		public ListFilterBlock(String containerId, String type, String target,
+				String label, String function) {
+			super();
+			this.containerId = containerId;
+			this.type = type;
+			this.target = target;
+			this.label = label;
+			this.function = function;
+		}
+
+		public void create(final WF_Context myContext) {
+			Container myContainer = myContext.getContainer(containerId);
+			if (myContainer == null) 
+				return;
+			final Context ctx = myContext.getContext();
+			ToggleButton toggleB = new ToggleButton(ctx);
+			toggleB.setTextOn(label+" på");
+			toggleB.setTextOff(label+" av");
+			toggleB.setChecked(false);
+			LayoutParams params = new LayoutParams();
+			params.width = LayoutParams.MATCH_PARENT;
+			params.height = LayoutParams.WRAP_CONTENT;
+			toggleB.setTextSize(15);
+			toggleB.setLayoutParams(params);
+			
+			toggleB.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					boolean on = ((ToggleButton) v).isChecked();
+					if (on) {
+						Filterable f = myContext.getFilterable(target);
+						//WF_Kvar_Filter f = ;
+						f.addFilter(new WF_Kvar_Filter());
+					}
+				}
+			});
+			
+			
+			myContainer.add(new WF_Widget(toggleB));
+
+			
+		}
+		
+		
+	}
+	public class ListSortingBlock extends Block {
 
 		String containerId,type,target;
 		Filterable targetList;
 		WF_Filter existing = null;
 
 		private final String[] alfabet = {
-				"*","A","B","C","D","E","F",
-				"G","H","I","J","K","L",
-				"M","N","O","P","Q","R",
-				"S","T","U","V","W","X",
-				"Y","Z","Å","Ä","Ö"};
+				"*","AB","CD","E","F","GH","IJ",
+				"KL","MN","OPQ","RS","T","UV",
+				"WXYZ","Å","Ä","Ö"};
 
-		public SortingBlock(String type,String containerId, String targetId) {
+		public ListSortingBlock(String type,String containerId, String targetId) {
 			this.type = type;
 			this.containerId = containerId;
 			this.target = targetId;
@@ -650,13 +751,20 @@ public class DataTypes  {
 		}
 
 
-		public Drawable createSortWidget(WF_Context ctx) {
+		public void create(WF_Context ctx) {
 
 			//Identify targetList. If no list, no game.
+			Container myContainer = ctx.getContainer(containerId);
+			if (myContainer == null) {
+				Log.e("parser","couldn't create sortwidget - could not find target container");
+				return;
+			}
+
+			Log.d("nils","Sort target is "+target);
 			targetList = ctx.getFilterable(target);
 			if (targetList == null) {
-				Log.e("parser","couldnt create sortwidget - could not find target");
-				return null;
+				Log.e("parser","couldn't create sortwidget - could not find target list");
+				return ;
 			}
 			else {
 				LinearLayout buttonPanel;
@@ -674,9 +782,17 @@ public class DataTypes  {
 							//This shall apply a new Alpha filter on target.
 							//First, remove any existing alpha filter.
 							targetList.removeFilter(existing);
-							existing = new WF_AlphaNumeric_Filter(ch);
-							targetList.addFilter(existing);
-							//how to trigger redraw?
+							
+							//Wildcard? Do not add any filter.
+							if(!ch.equals("*")) {							
+								//Use ch string as unique id.
+								existing = new WF_AlphaNumeric_Filter(ch,ch);
+								targetList.addFilter(existing);
+							}
+							//running the filters will trigger redraw.
+							targetList.runFilters();
+							
+
 						}
 					};
 					Button b;
@@ -689,9 +805,9 @@ public class DataTypes  {
 					}
 				} else {
 					Log.e("parser","Sorry, unknown filtering type");
-					return null;
+					return;
 				}	
-				return new WF_Widget(buttonPanel);
+				myContainer.add(new WF_Widget(buttonPanel));
 			}
 
 		}
@@ -701,9 +817,7 @@ public class DataTypes  {
 		}
 	}
 
-	public  class FilterBlock extends Block {
-
-	}
+	
 	/**
 	 * Startblock.
 	 * @author Terje
@@ -777,7 +891,11 @@ public class DataTypes  {
 			}
 		}
 
-		public void draw(final Context ctx, ViewGroup container) {
+		public void create(WF_Context myContext) {
+			Container myContainer = myContext.getContainer(containerId);
+			if (myContainer == null) 
+				return;
+			final Context ctx = myContext.getContext();
 			Button button = new Button(ctx);
 			button.setBackgroundDrawable(ctx.getResources().getDrawable(R.drawable.button_bg_selector));
 			button.setTextAppearance(ctx, R.style.WF_Text);
@@ -826,7 +944,7 @@ public class DataTypes  {
 				}
 
 			});
-			container.addView(button);
+			myContainer.add(new WF_Widget(button));
 		}
 	}
 
@@ -893,12 +1011,12 @@ public class DataTypes  {
 			this.id=id;
 		}
 
-		public void createListFromFile(WF_Context ctx) {
+		public void create(WF_Context myContext) {
 			Log.d("NILS","Scanning createlistentries with filename "+this.getFileName());
 			InputStream is;
 			List <VarToListConfigRow>rows=null;
 
-			Container myContainer = ctx.getContainer(containerId);
+			Container myContainer = myContext.getContainer(containerId);
 			if (myContainer !=null) {
 
 				List<WF_ListElement> lista = new  ArrayList<WF_ListElement>();
@@ -907,7 +1025,6 @@ public class DataTypes  {
 					is = new FileInputStream(CommonVars.CONFIG_FILES_DIR+this.getFileName());
 					rows = scanListConfigData(is);
 				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				if (rows!=null) {
@@ -919,7 +1036,7 @@ public class DataTypes  {
 							Log.e("nils","found null value in config file row "+index);
 						} else {
 							if (r.getAction().equals("create")) {
-								listRow = new ClickableField(r.getEntryLabel(),ctx.getContext(),"C_F_"+index);
+								listRow = new ClickableField(r.getEntryLabel(),myContext.getContext(),"C_F_"+index);
 								lista.add(listRow);	
 							} 
 							if (!r.getAction().equals("add")&&!r.getAction().equals("create"))
@@ -934,9 +1051,12 @@ public class DataTypes  {
 						}
 						index++;
 					}
-					
-					//Should this be List<WF_Thing> ??
-					myContainer.add(new WF_List(id, lista,ctx.getContext()));
+
+					//Add list to container and to sortable, filterable etc.
+					WF_List myList = new WF_List(id, lista,myContext.getContext());
+
+					myContainer.add(myList);
+					myContext.addList(myList);
 				}
 				else
 					Log.d("nils","failed to scan input file");
@@ -1280,7 +1400,6 @@ public class DataTypes  {
 						try {
 							tr.setAvst(val);
 						} catch (IllegalCallException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 							return false;
 						}
@@ -1288,7 +1407,6 @@ public class DataTypes  {
 						try {
 							tr.setRikt(val);
 						} catch (IllegalCallException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 							return false;
 						}
@@ -1676,6 +1794,8 @@ public class DataTypes  {
 				String[]  r = row.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 				VarToListConfigRow p;
 				if (r!=null) {
+					//Remove any " signs.
+					
 					p=VarToListConfigRow.createRow(r);
 					Log.d("NILS",r[0]);
 					if (p!=null)

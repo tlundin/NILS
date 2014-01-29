@@ -8,6 +8,7 @@ import java.util.Map;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,8 +21,9 @@ import com.teraim.nils.DataTypes.ButtonBlock;
 import com.teraim.nils.DataTypes.Container;
 import com.teraim.nils.DataTypes.ContainerDefineBlock;
 import com.teraim.nils.DataTypes.CreateListEntriesBlock;
+import com.teraim.nils.DataTypes.ListFilterBlock;
+import com.teraim.nils.DataTypes.ListSortingBlock;
 import com.teraim.nils.DataTypes.Rule;
-import com.teraim.nils.DataTypes.SortingBlock;
 import com.teraim.nils.DataTypes.StartBlock;
 import com.teraim.nils.DataTypes.WF_Container;
 import com.teraim.nils.DataTypes.WF_Context;
@@ -53,8 +55,6 @@ public abstract class Executor extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		myContext = new WF_Context(this);
-		myContext.addContainers(getContainers());
 		wf = getFlow();
 		//Execute called from child onCreate.
 	}
@@ -101,10 +101,19 @@ public abstract class Executor extends Activity {
 		//TEST CODE
 		//LinearLayout my_root = (LinearLayout) findViewById(R.id.myRoot);
 
+		WF_Context myContext = new WF_Context(this);
+		myContext.addContainers(getContainers());
+		
 		List<Block>blocks = wf.getBlocks();
+		
+		
+		
+		
 		for (Block b:blocks) {
+			
 			if (b instanceof StartBlock)
 				Log.d("NILS","Startblock found");
+			
 			else if (b instanceof ContainerDefineBlock) {
 				//for now all containers are assumed to be part of template.
 				String id = (((ContainerDefineBlock) b).getContainerName());
@@ -116,23 +125,44 @@ public abstract class Executor extends Activity {
 				}
 			}			
 			else if (b instanceof ButtonBlock) {
-
+				Log.d("NILS","Buttonblock found");
+				ButtonBlock bl = (ButtonBlock) b;
+				bl.create(myContext);
 			}			
-			else if (b instanceof SortingBlock) {
-				
+			else if (b instanceof ListSortingBlock) {
+				Log.d("NILS","Sortingblock found");
+				ListSortingBlock bl = (ListSortingBlock) b;
+				bl.create(myContext);
+			}
+			else if (b instanceof ListFilterBlock) {
+				ListFilterBlock bl = (ListFilterBlock)b;
+				Log.d("NILS","ListFilterBlock found");
+				bl.create(myContext);
 			}
 			else if (b instanceof CreateListEntriesBlock) {
+				Log.d("NILS","CreateListEntriesBlock found");
 				CreateListEntriesBlock bl = (CreateListEntriesBlock)b;
-				bl.createListFromFile(myContext);
+				bl.create(myContext);
 			}
 
 		}
 		
 		//Now all blocks are executed.
 		//Draw the UI.
-		
+		Log.d("nils","Drawing...");
 		Container root = myContext.getContainer("root");
-		root.draw();
+		if (root!=null)
+			myContext.drawRecursively(root);
+		else {
+			new AlertDialog.Builder(this).setTitle("Ups!")
+			.setMessage("Det är något fel på den template som används. Ingen rot-panel har definierats så 'jag' vet inte var alla saker ska ritas. Därför kan detta arbetsflöde inte köras vidare.")
+			.setNeutralButton("Jag förstår!", new OnClickListener() {
+				@Override
+				public void onClick(DialogInterface arg0, int arg1) {
+					
+				}})
+				.show();	
+		}
 
 	}
 	

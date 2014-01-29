@@ -126,10 +126,10 @@ public class DbHelper extends SQLiteOpenHelper {
     	values.put("smayta", var.getSmaytaId());
     	values.put("var", var.getVarId());
     	values.put("value", var.getValue());
-    	values.put("lag",CommonVars.ph.get(PersistenceHelper.LAG_ID_KEY));
+    	values.put("lag",CommonVars.ph().get(PersistenceHelper.LAG_ID_KEY));
     	values.put("timestamp", TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
     	values.put("serialized", Tools.serialize(var));
-    	values.put("author", CommonVars.ph.get(PersistenceHelper.USER_ID_KEY));
+    	values.put("author", CommonVars.ph().get(PersistenceHelper.USER_ID_KEY));
     	
     	// 3. insert
     	long rId = db.insertWithOnConflict(TABLE_VARIABLES, // table
