@@ -18,22 +18,22 @@ import android.widget.ListView;
 
 public class SelectColor extends ListActivity {
 
-	DataTypes rd=null;	
+	GlobalState rd=null;	
 	  public void onCreate(Bundle savedInstanceState) {
 		    super.onCreate(savedInstanceState);
 		    //Get the Singleton instance of RutData.
 		    
 		    //Send Ids ro Adapter. Display.
 		    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-		        R.layout.ruta_list_layout, CommonVars.colors);
+		        R.layout.ruta_list_layout, Constants.colors);
 		    setListAdapter(adapter);
 		    
 		  }
 		
 	  protected void onListItemClick (ListView l, View v, int position, long id) {
-		  Log.d("NILS", "I was clicked "+position+" should be "+CommonVars.colors[position]);
+		  Log.d("NILS", "I was clicked "+position+" should be "+Constants.colors[position]);
 		  	//Persist the Current Color ID in storage.
-			CommonVars.cv().setDeviceColor(CommonVars.colors[position]);
+		  	GlobalState.getInstance(this).setDeviceColor(Constants.colors[position]);
 			Intent intent = getIntent();
 			setResult(Activity.RESULT_OK, intent);  //now you can use Activity.RESULT_OK, its irrelevant whats the resultCode    
 		    finish(); //finish the startNewOne activity

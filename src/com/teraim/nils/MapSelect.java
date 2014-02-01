@@ -21,9 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.os.Bundle;
@@ -50,9 +47,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.teraim.nils.CommonVars.PersistenceHelper;
-import com.teraim.nils.DataTypes.Provyta;
-import com.teraim.nils.DataTypes.Ruta;
+import com.teraim.nils.dynamic.types.Provyta;
+import com.teraim.nils.dynamic.types.Ruta;
+import com.teraim.nils.utils.PersistenceHelper;
+import com.teraim.nils.utils.Tools;
 
 
 /**
@@ -65,14 +63,20 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMarkerDragListene
 	private GoogleMap mMap;
 	private ArrayList<Provyta> ytor;
 	private Map<Marker,Provyta> markers = new HashMap<Marker,Provyta>();
+	private GlobalState gs;
+	private PersistenceHelper ph;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.selectyta);
-		Ruta ruta = CommonVars.cv().getCurrentRuta();
+		
+		gs = GlobalState.getInstance(this);
+		ph = gs.getPersistence();
+		
+		Ruta ruta = gs.getCurrentRuta();
 		ytor = ruta.getAllProvYtor();
-
+		
 
 		setUpMapIfNeeded();
 	}
@@ -120,7 +124,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMarkerDragListene
 			mapView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
 				@Override
 				public void onGlobalLayout() {
-					LatLng[] corners = CommonVars.cv().getCurrentRuta().getCorners();
+					LatLng[] corners = gs.getCurrentRuta().getCorners();
 					Log.d("NILS","SW: "+corners[0]+" NE: "+corners[1]);
 					LatLngBounds bounds = new LatLngBounds(corners[0], corners[1]);
 
@@ -139,7 +143,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMarkerDragListene
         
         Log.d("NILS","image size is w:"+ imageWidth+" h:"+imageHeight);
 		
-		final BitmapDescriptor image = BitmapDescriptorFactory.fromBitmap(CommonVars.decodeSampledBitmapFromResource(getResources(), R.drawable.r262_4, 500,500)); //.fromResource(R.drawable.r262_4);
+		final BitmapDescriptor image = BitmapDescriptorFactory.fromBitmap(Tools.decodeSampledBitmapFromResource(getResources(), R.drawable.r262_4, 500,500)); //.fromResource(R.drawable.r262_4);
 
 		LatLng ne,sw;
 		//Coordinates specifically for RUTA 262
@@ -178,11 +182,13 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMarkerDragListene
 				latlong = new LatLng(latlon[0],latlon[1]);
 				Log.d("NILS","latlong "+latlong.latitude+" "+latlong.longitude);
 				Log.d("NILS","yta id"+yta.getId());
+				double[]en = yta.getSweRef();
+				double N = en[0];
+				double E = en[1];
 				markers.put(mMap.addMarker(new MarkerOptions()
-
 				.position(latlong)
 				.title(getType(yta.getId())+" "+yta.getId())
-				.snippet("E: "+yta.E+" N: "+yta.N)
+				.snippet("E: "+E+" N: "+N)
 				
 				.icon(BitmapDescriptorFactory.defaultMarker(colors[hue]))),yta);
 				//.icon(BitmapDescriptorFactory.fromResource(ids[r++%ids.length]))),yta);
@@ -277,7 +283,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMarkerDragListene
 
 	//On select provyta, return to main menu.
 	private void onProvytaClick(Provyta yta) {
-		CommonVars.cv().ph.put(PersistenceHelper.CURRENT_PROVYTA_ID_KEY, yta.getId());
+		ph.put(PersistenceHelper.CURRENT_PROVYTA_ID_KEY, yta.getId());
 		finish();
 	}
 

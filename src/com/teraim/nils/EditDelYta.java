@@ -2,18 +2,15 @@ package com.teraim.nils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.text.Editable;
 import android.view.View;
 import android.widget.EditText;
 
-import com.teraim.nils.DataTypes.Delyta;
-import com.teraim.nils.DataTypes.Provyta;
+import com.teraim.nils.dynamic.types.Delyta;
+import com.teraim.nils.dynamic.types.Provyta;
 
 public class EditDelYta extends Activity {
 
@@ -28,7 +25,7 @@ public class EditDelYta extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		//Get the current provyta
-		p = CommonVars.cv().getCurrentProvyta();
+		p = GlobalState.getInstance(this).getCurrentProvyta();
 		Intent intent = getIntent();
 		//Get the index selected.
 		index = intent.getIntExtra("com.teraim.nils.addRow", -1);

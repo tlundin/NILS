@@ -1,5 +1,7 @@
 package com.teraim.nils;
 
+import com.teraim.nils.utils.DbHelper;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 

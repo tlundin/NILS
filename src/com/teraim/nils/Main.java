@@ -23,7 +23,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.teraim.nils.CommonVars.PersistenceHelper;
+import com.teraim.nils.dynamic.WorkflowParser;
+import com.teraim.nils.utils.PersistenceHelper;
 
 
 public class Main extends Activity {
@@ -31,27 +32,28 @@ public class Main extends Activity {
 	private static final long INITIAL_DELAY = 2000; //pause for 2 secs to show logo.
 	private String tag = "Lifecycle";
 	//ListView treeList = null;
-	private CommonVars cv;
-
+	private GlobalState gs;
+	private PersistenceHelper ph;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		WorkflowParser wfp = new WorkflowParser();
+		gs = GlobalState.getInstance(this);
+		ph = gs.getPersistence();
+
+		
 		wfp.execute(this);
 		
 		PreferenceManager.setDefaultValues(this,R.xml.myprefs, false);
-		CommonVars.init(this);
-		//Get the instance.
-		cv = CommonVars.cv();
 		
 		//create folders if firsttime.
 		initIfFirstTime();
 		
 		//TODO: REMOVE
-		CommonVars.ph().put(PersistenceHelper.CURRENT_RUTA_ID_KEY, "262");
-		CommonVars.ph().put(PersistenceHelper.CURRENT_PROVYTA_ID_KEY, "6");
-		CommonVars.ph().put(PersistenceHelper.CURRENT_DELYTA_ID_KEY, "1");
+		ph.put(PersistenceHelper.CURRENT_RUTA_ID_KEY, "262");
+		ph.put(PersistenceHelper.CURRENT_PROVYTA_ID_KEY, "6");
+		ph.put(PersistenceHelper.CURRENT_DELYTA_ID_KEY, "1");
 
 
 		if(GooglePlayServicesUtil.isGooglePlayServicesAvailable(this)
@@ -75,14 +77,6 @@ public class Main extends Activity {
 		PreferenceManager.setDefaultValues(this,
 				R.xml.myprefs, false);
 		
-		//Get the instance.
-		cv = CommonVars.cv();
-
-		//Load workflow bundle
-		//cv.setWorkflows(WorkflowParser.parse(this));
-
-		//Parse input data files.
-		DataTypes.parse(this);
 
 		//check bluetooth
 		if (mBluetoothAdapter == null) {
@@ -145,8 +139,8 @@ public class Main extends Activity {
 		final Intent startMenuIntent = new Intent(getBaseContext(),StartMenuActivity.class);
 
 		//If Color not set, check.
-		String deviceColor = cv.getDeviceColor();		
-		boolean askForColor = (deviceColor.equals(CommonVars.UNDEFINED));
+		String deviceColor = gs.getDeviceColor();		
+		boolean askForColor = (deviceColor.equals(Constants.UNDEFINED));
 		//Start the server listening thread..
 
 		if (askForColor) {
@@ -154,8 +148,8 @@ public class Main extends Activity {
 		}
 		else {
 			//if Ruta is not known, check.
-			String currentRuta = cv.ph.get(PersistenceHelper.CURRENT_RUTA_ID_KEY);
-			boolean askForRuta = (currentRuta.equals(CommonVars.UNDEFINED));
+			String currentRuta = ph.get(PersistenceHelper.CURRENT_RUTA_ID_KEY);
+			boolean askForRuta = (currentRuta.equals(Constants.UNDEFINED));
 			if (askForRuta) {
 				startActivityForResult(selectRutaIntent,ASK_RUTA_RC);
 			}
@@ -372,7 +366,7 @@ public class Main extends Activity {
 	
 	private void initIfFirstTime() {
 		//If testFile doesnt exist it will be created and found next time.
-		String t = CommonVars.NILS_ROOT_DIR +
+		String t = Constants.NILS_ROOT_DIR +
 				"ifiexistthenallisfine.txt";
 		File f = new File(t);
 		Log.d("Strand","Checking if this is first time use...");
@@ -396,7 +390,7 @@ public class Main extends Activity {
 
 	private void initialize() {
 		//create data folder. This will also create the ROOT folder for the Strand app.
-		File folder = new File(CommonVars.CONFIG_FILES_DIR);
+		File folder = new File(Constants.CONFIG_FILES_DIR);
 		if(!folder.mkdirs())
 			Log.e("NILS","Failed to create config root folder");
 			
@@ -422,7 +416,7 @@ public class Main extends Activity {
             OutputStream out = null;
             try {
                 in = assetManager.open(files[i]);
-                out = new FileOutputStream(CommonVars.CONFIG_FILES_DIR + files[i]);
+                out = new FileOutputStream(Constants.CONFIG_FILES_DIR + files[i]);
                 copyFile(in, out);
                 in.close();
                 in = null;

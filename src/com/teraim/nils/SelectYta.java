@@ -17,9 +17,9 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
-import com.teraim.nils.CommonVars.PersistenceHelper;
-import com.teraim.nils.DataTypes.Provyta;
-import com.teraim.nils.DataTypes.Ruta;
+import com.teraim.nils.dynamic.types.Provyta;
+import com.teraim.nils.dynamic.types.Ruta;
+import com.teraim.nils.utils.PersistenceHelper;
 
 /**
  * @author Terje
@@ -28,13 +28,13 @@ import com.teraim.nils.DataTypes.Ruta;
 public class SelectYta extends MenuActivity {
 
 
-	DataTypes rd=null;
+	GlobalState gs=null;
 
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.selectyta);
-		rd = DataTypes.getSingleton();
+		gs = GlobalState.getInstance(this);
 
 		FrameLayout main = (FrameLayout) findViewById(R.id.ytselect);
 
@@ -62,7 +62,7 @@ public class SelectYta extends MenuActivity {
 		//First get the Ruta data.
 		//Bundle bu = getIntent().getExtras();
 		//String rutaId = bu.getString("ruta");
-		Ruta ruta = CommonVars.cv().getCurrentRuta();
+		Ruta ruta = gs.getCurrentRuta();
 		Ruta.Sorted s = ruta.sort();
 
 		//long=y 
@@ -103,8 +103,11 @@ public class SelectYta extends MenuActivity {
 		for(final Provyta yta:ytor) {
 
 			//subtract min value from the coordinate to get normalized values
-			double normx = (yta.E-s.getMin_E_sweref_99());
-			double normy = (yta.N-s.getMin_N_sweref_99());
+			double[]en = yta.getSweRef();
+			double N=en[0],E=en[1];
+			
+			double normx = (E-s.getMin_E_sweref_99());
+			double normy = (N-s.getMin_N_sweref_99());
 
 			//multiply with scale factor to get pixel size
 			float cordx = (float)(normx*screenZoom);
@@ -149,11 +152,11 @@ public class SelectYta extends MenuActivity {
 		super.onResume();
 	}
 
-	CommonVars cv = CommonVars.cv();
+	
 	protected void provytaDialog(CharSequence ytID) {
 		Log.d("NILS","clicked button with id "+ytID);
 		if (ytID!=null)
-			cv.ph.put(PersistenceHelper.CURRENT_PROVYTA_ID_KEY,ytID.toString());
+			gs.getPersistence().put(PersistenceHelper.CURRENT_PROVYTA_ID_KEY,ytID.toString());
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
 		alert.setTitle("Provyta "+ytID);
@@ -167,8 +170,8 @@ public class SelectYta extends MenuActivity {
 				final Intent hittaYtaIntent = new Intent(getBaseContext(),HittaYta.class);
 
 
-				if(CommonVars.cv().getDeviceColor().equals(CommonVars.blue())) {
-					Log.d("NILS","dosa blå!"+CommonVars.blue());				
+				if(gs.getDeviceColor().equals(Constants.blue())) {
+					Log.d("NILS","dosa blå!"+Constants.blue());				
 					startActivity(takePictureIntent);
 				}
 				else {

@@ -18,7 +18,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
-import com.teraim.nils.DataTypes.Delyta;
+import com.teraim.nils.dynamic.types.Delyta;
+import com.teraim.nils.utils.Geomatte;
 
 /**
  * @author Terje

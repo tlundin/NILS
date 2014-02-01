@@ -10,7 +10,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -33,8 +32,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.teraim.nils.CommonVars.PersistenceHelper;
-import com.teraim.nils.DataTypes.Delyta;
+import com.teraim.nils.dynamic.types.Delyta;
+import com.teraim.nils.utils.PersistenceHelper;
 
 
 public class HittaYta extends Activity implements GeoUpdaterCb {
@@ -59,7 +58,7 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 
 	//TODO: REPLACE if more than one RUTA...
 	
-	final String picPath = CommonVars.NILS_ROOT_DIR+"/delyta/"+
+	final String picPath = Constants.NILS_ROOT_DIR+"/delyta/"+
 			"1"+"/bilder/gamla/";
 	private TextView userPosTextV;
 	
@@ -69,13 +68,14 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 
 	private ListView tagtabell;
 	
-	
+	private GlobalState gs;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.hittayta);	
 		
 		editDelytaIntent = new Intent(this,EditDelYta.class);
+		gs = GlobalState.getInstance(this);
 		
 		ProvytaView provytaV = (ProvytaView) findViewById(R.id.provyta);
 		GridView gridViewOld = (GridView) findViewById(R.id.picgridview);
@@ -90,12 +90,12 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 					View v, int position, long id)
 			{
 				Toast.makeText(getBaseContext(),
-						CommonVars.compassToPicName(position) + " picture selected",
+						Constants.compassToPicName(position) + " picture selected",
 						Toast.LENGTH_SHORT).show();
 
 				Intent myIntent = new Intent(getBaseContext(),PictureZoom.class);
-				String picName = CommonVars.cv().getCurrentPictureBasePath()+"/gamla/"+
-						CommonVars.compassToPicName(position)+".png";
+				String picName = gs.getCurrentPictureBasePath()+"/gamla/"+
+						Constants.compassToPicName(position)+".png";
 				myIntent.putExtra("picpath", picName);
 				myIntent.putExtra("pos", position);
 				startActivity(myIntent);
@@ -113,7 +113,6 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 	        }
 	    };
 */
-		DataTypes rd = DataTypes.getSingleton();
 
 		pyg = new ProvYtaGeoUpdater(this,provytaV,this);
 
@@ -127,8 +126,8 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 		
 		//Fetch delytor for the current ruta and provyta.
 		
-		ArrayList<Delyta> dy = rd.getDelytor(CommonVars.cv().getCurrentRuta().getId(), 
-				CommonVars.cv().getCurrentProvyta().getId());
+		ArrayList<Delyta> dy = gs.getDelytor(gs.getCurrentRuta().getId(), 
+				gs.getCurrentProvyta().getId());
 		provytaV.setDelytor(dy);
 		
 		startCollectB.setEnabled(isComplete(dy));
@@ -150,7 +149,7 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
-               CommonVars.ph().put(PersistenceHelper.CURRENT_DELYTA_ID_KEY,ta.getItem(arg2).getId());
+               gs.getPersistence().put(PersistenceHelper.CURRENT_DELYTA_ID_KEY,ta.getItem(arg2).getId());
                 startActivity(intent);
 			}});
 		
@@ -430,7 +429,7 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 				imageView = (ImageView) convertView;
 			}
 			//TODO: Get rid of 1 below!!
-			String picPath = CommonVars.cv().getCurrentPictureBasePath();
+			String picPath = gs.getCurrentPictureBasePath();
 
 			final BitmapFactory.Options options = new BitmapFactory.Options();
 			options.inJustDecodeBounds = true;
@@ -441,12 +440,12 @@ public class HittaYta extends Activity implements GeoUpdaterCb {
 		    options.inJustDecodeBounds = false;
 		    
 			Bitmap bm = BitmapFactory.decodeFile(picPath+"/gamla/"+
-					CommonVars.compassToPicName(position)+".png",options);
+					Constants.compassToPicName(position)+".png",options);
 			
 			if (bm==null)
 				try {
 					bm = BitmapFactory.decodeResource(getResources(),
-							R.drawable.class.getField(CommonVars.compassToPicName(position)+"_demo").getInt(null),options);
+							R.drawable.class.getField(Constants.compassToPicName(position)+"_demo").getInt(null),options);
 				} catch (Exception e) {
 					// Will never happen..static naming..
 				}

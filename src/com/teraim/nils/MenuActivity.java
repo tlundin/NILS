@@ -1,11 +1,7 @@
 package com.teraim.nils;
 
-import com.teraim.nils.CommonVars.PersistenceHelper;
-import com.teraim.nils.DataTypes.Provyta;
-
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,8 +11,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
+
+import com.teraim.nils.utils.PersistenceHelper;
 
 /**
  * Parent class for Activities having a menu row.
@@ -27,6 +24,8 @@ public class MenuActivity extends Activity {
 
 	
 	private BroadcastReceiver brr;
+	private GlobalState gs;
+	private PersistenceHelper ph;
 	
 		
 		
@@ -36,6 +35,9 @@ public class MenuActivity extends Activity {
 		super.onCreate(savedInstanceState);	
 		final MenuActivity me = this;
 
+		gs = GlobalState.getInstance(this);
+		ph = gs.getPersistence();
+		
 		brr = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context ctx, Intent intent) {
@@ -62,8 +64,6 @@ public class MenuActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (CommonVars.ph == null) 
-			Log.e("nils","CommonVars object has been thrown away...");
 		refreshStatusRow();
 	}
 
@@ -112,17 +112,17 @@ public class MenuActivity extends Activity {
 		Log.d("NILS","Refreshing status row");
 		if (mnu1!=null) {
 			
-			String pid = CommonVars.ph().get(PersistenceHelper.CURRENT_PROVYTA_ID_KEY);
-			String rid = CommonVars.ph().get(PersistenceHelper.CURRENT_RUTA_ID_KEY);
+			String pid = ph.get(PersistenceHelper.CURRENT_PROVYTA_ID_KEY);
+			String rid = ph.get(PersistenceHelper.CURRENT_RUTA_ID_KEY);
 			
 			mnu1.setTitle("Ruta/Provyta: "+rid+"/"+pid);
 		}
 		if (mnu2!=null)
-			mnu2.setTitle("Synkning: "+CommonVars.cv().getSyncStatusS());
+			mnu2.setTitle("Synkning: "+gs.getSyncStatusS());
 		if (mnu3!=null)
-			mnu3.setTitle("Användare: "+CommonVars.cv().getUserName());
+			mnu3.setTitle("Användare: "+gs.getPersistence().get(PersistenceHelper.USER_ID_KEY));
 		if (mnu4!=null)
-			mnu4.setTitle("Färg: "+CommonVars.cv().getDeviceColor());
+			mnu4.setTitle("Färg: "+gs.getDeviceColor());
 		
 	}
 
@@ -140,7 +140,7 @@ public class MenuActivity extends Activity {
 					//Intent intent = new Intent();
 					//intent.setAction(BluetoothAdapter.ACTION_STATE_CHANGED);
 					Intent intent = new Intent(getBaseContext(),BluetoothRemoteDevice.class);
-					if (CommonVars.cv().getSyncStatus()==BluetoothRemoteDevice.SYNK_STOPPED) {
+					if (gs.getSyncStatus()==BluetoothRemoteDevice.SYNK_STOPPED) {
 						startService(intent);
 						//Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 				        //startActivity(enableBtIntent);
@@ -165,7 +165,7 @@ public class MenuActivity extends Activity {
 		case 1:
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle("Synkronisering")
-			.setMessage("Vill du "+(CommonVars.cv().getSyncStatus()==BluetoothRemoteDevice.SYNK_STOPPED?"slå på ":"stänga av ")+"synkroniseringen?").setPositiveButton("Ja", dialogClickListener)
+			.setMessage("Vill du "+(gs.getSyncStatus()==BluetoothRemoteDevice.SYNK_STOPPED?"slå på ":"stänga av ")+"synkroniseringen?").setPositiveButton("Ja", dialogClickListener)
 			.setNegativeButton("Nej", dialogClickListener).show();
 			break;
 		case 0:

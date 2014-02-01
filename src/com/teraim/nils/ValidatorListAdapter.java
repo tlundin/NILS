@@ -12,7 +12,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.teraim.nils.DataTypes.Rule;
+import com.teraim.nils.dynamic.types.Rule;
 
 public class ValidatorListAdapter extends BaseAdapter {
 

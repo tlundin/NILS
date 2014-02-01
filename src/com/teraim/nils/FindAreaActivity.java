@@ -16,7 +16,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -29,6 +28,8 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.teraim.nils.utils.PersistenceHelper;
 
 /** 
  * 	
@@ -43,7 +44,6 @@ import android.widget.Toast;
  */
 public class FindAreaActivity extends Activity implements LocationListener, SensorEventListener {
 
-	private static final String MITTPUNKT_KEY = "mittpunkt";
 	LocationManager lm;
 	TextView lat,longh, dt=null;
 	Location destination = null;
@@ -107,7 +107,10 @@ public class FindAreaActivity extends Activity implements LocationListener, Sens
 		sensorMagneticField = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
 		mittPunktView = (TextView)findViewById(R.id.txt_mittpunkt);
-		String mp = CommonVars.cv().ph.get(MITTPUNKT_KEY);
+		StoredVariable sv = GlobalState.getInstance(this).getCurrentRuta().getVariable(PersistenceHelper.MITTPUNKT_KEY);
+		String mp = null;
+		if (sv!=null)
+			mp = sv.getValue();
 		if (mp!=null)
 			mittPunktView.setText(mp);
 		
@@ -120,7 +123,7 @@ public class FindAreaActivity extends Activity implements LocationListener, Sens
 					currentLocation.getLatitude()+" (Longitud) "+currentLocation.getLongitude();
 			mittPunktView.setText(txt);
 			//Persist the value
-			CommonVars.cv().ph.put(MITTPUNKT_KEY,txt);
+			GlobalState.getInstance(this).getPersistence().put(PersistenceHelper.MITTPUNKT_KEY,txt);
 		}
 		
 		Toast.makeText(getBaseContext(),txt,Toast.LENGTH_SHORT).show();
@@ -162,11 +165,11 @@ public class FindAreaActivity extends Activity implements LocationListener, Sens
 				imageView = (ImageView) convertView;
 			}
 			//TODO: Get rid of 1 below!!
-			String picPath =CommonVars.NILS_ROOT_DIR+"/delyta/"+
+			String picPath =Constants.NILS_ROOT_DIR+"/delyta/"+
 					"1"+"/bilder";
 			
 			Bitmap bm = BitmapFactory.decodeFile(picPath+"/gamla/"+
-					CommonVars.compassToPicName(position)+".png");
+					Constants.compassToPicName(position)+".png");
 
 			imageView.setImageBitmap(bm);
 			//imageView.setImageBitmap(bm[position]);

@@ -1,19 +1,12 @@
 package com.teraim.nils;
 
 import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.widget.RadioButton;
-import android.widget.Toast;
 
-import com.teraim.nils.DataTypes.Delyta;
-import com.teraim.nils.DataTypes.Provyta;
-import com.teraim.nils.DataTypes.Ruta;
+import com.teraim.nils.dynamic.types.Delyta;
 
 public abstract class RB_Activity extends Activity {
 
@@ -25,7 +18,7 @@ public abstract class RB_Activity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		//Global parameter transfer of delyta.
-		delyta = CommonVars.cv().getCurrentDelyta();
+		delyta = GlobalState.getInstance(this).getCurrentDelyta();
 
 	}
 
@@ -44,7 +37,7 @@ public abstract class RB_Activity extends Activity {
 				//Save the parameter.
 				
 				delyta.storeVariable("markslag", value);   
-				CommonVars.cv().sendParameter(this,"markslag",value,-1);
+				GlobalState.getInstance(this).sendParameter(this,"markslag",value,-1);
 				//BluetoothRemoteDevice.getSingleton().sendParameter("markslag", value,-1);
 				/*ServiceConnection serviceConnection = new ServiceConnection() {
 

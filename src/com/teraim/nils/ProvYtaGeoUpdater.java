@@ -12,9 +12,9 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.teraim.nils.DataTypes.Delyta;
-import com.teraim.nils.DataTypes.Provyta;
-import com.teraim.nils.DataTypes.Ruta;
+import com.teraim.nils.dynamic.types.Delyta;
+import com.teraim.nils.dynamic.types.Provyta;
+import com.teraim.nils.utils.Geomatte;
 
 public class ProvYtaGeoUpdater implements LocationListener
  {
@@ -31,10 +31,12 @@ public class ProvYtaGeoUpdater implements LocationListener
 	private Sensor sensorAccelerometer;
 	private Sensor sensorMagneticField;
 
-
+	private Context ctx;
 
 
 	public ProvYtaGeoUpdater(Context c, ProvytaView w,GeoUpdaterCb cb) {
+		
+		ctx = c;
 
 		lm = (LocationManager)c.getSystemService(Context.LOCATION_SERVICE);
 		
@@ -49,7 +51,7 @@ public class ProvYtaGeoUpdater implements LocationListener
 		}
 		geoCb = cb;
 		//Initialize provyta with center coordinates.
-		Provyta y = CommonVars.cv().getCurrentProvyta();
+		Provyta y = GlobalState.getInstance(c).getCurrentProvyta();
 		double[] cc = y.getLatLong();
 		center = new Location("");
 		//This is in sweref.
@@ -57,8 +59,10 @@ public class ProvYtaGeoUpdater implements LocationListener
 		center.setLongitude(cc[1]);
 		
 		swerefC = new Location("");
-		swerefC.setLatitude(y.N);
-		swerefC.setLongitude(y.E);
+		double[] ne = y.getSweRef();
+		double N = ne[0], E=ne[1];
+		swerefC.setLatitude(N);
+		swerefC.setLongitude(E);
 		myView = w;
 		myView.showWaiting();
 		
@@ -104,7 +108,7 @@ public class ProvYtaGeoUpdater implements LocationListener
 			int wx = (int)(swerefC.getLongitude() - xy[1]);
 			//show user distance from middle point of circle
 			Log.d("NILS","user x y "+wx+" "+wy);
-			myView.showUser(CommonVars.cv().getDeviceColor(), wx,wy,(int)dist);
+			myView.showUser(GlobalState.getInstance(ctx).getDeviceColor(), wx,wy,(int)dist);
 			geoCb.onLocationUpdate(dist,Geomatte.getRikt2(0,0,wy,wx),wx,wy);
 			
 		

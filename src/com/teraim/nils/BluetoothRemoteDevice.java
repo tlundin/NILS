@@ -10,7 +10,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -86,13 +85,16 @@ public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 	private BroadcastReceiver brr=null;
 	//Try pinging five times. Before giving up.
 	private int pingC = 5;
+	private GlobalState global;
 	@Override
 	public void onCreate() {
+		
+		global = GlobalState.getInstance(this);
 		Log.d("NILS","Service on create");
 		me = this;
 		mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 		
-		CommonVars.cv().setSyncStatus(SYNK_SEARCHING);
+		global.setSyncStatus(SYNK_SEARCHING);
 		//showNotification();
 		brr = new BroadcastReceiver() {
 			@Override
@@ -203,7 +205,7 @@ public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 		connected_T=null;
 		if(BluetoothAdapter.getDefaultAdapter().isEnabled())
 			BluetoothAdapter.getDefaultAdapter().disable();
-		CommonVars.cv().setSyncStatus(SYNK_STOPPED);
+		global.setSyncStatus(SYNK_STOPPED);
 		Intent intent = new Intent();
 		intent.setAction(SYNK_SERVICE_STOPPED);
 		this.sendBroadcast(intent);
@@ -332,7 +334,7 @@ public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 			BluetoothServerSocket tmp = null;
 			try {
 				// MY_UUID is the app's UUID string, also used by the client code
-				tmp = mBluetoothAdapter.listenUsingRfcommWithServiceRecord("NILS", CommonVars.cv().getmyUUID());
+				tmp = mBluetoothAdapter.listenUsingRfcommWithServiceRecord("NILS", Constants.getmyUUID());
 			} catch (IOException e) { }
 			mmServerSocket = tmp;
 		}
@@ -394,7 +396,7 @@ public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 			Log.d("NILS","Wrote "+msg+" to socket");
 		}
 		//Send a message that service is now connected.
-		CommonVars.cv().setSyncStatus(SYNK_RUNNING);
+		global.setSyncStatus(SYNK_RUNNING);
 		Intent intent = new Intent();
 		intent.setAction(SYNK_SERVICE_CONNECTED);
 		this.sendBroadcast(intent);
@@ -471,7 +473,7 @@ public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 			// Get a BluetoothSocket to connect with the given BluetoothDevice
 			try {
 				// MY_UUID is the app's UUID string, also used by the server code
-				tmp = device.createRfcommSocketToServiceRecord(CommonVars.cv().getmyUUID());
+				tmp = device.createRfcommSocketToServiceRecord(Constants.getmyUUID());
 			} catch (IOException e) { }
 			mmSocket = tmp;
 			mContext = ctx;

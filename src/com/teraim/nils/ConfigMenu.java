@@ -1,9 +1,5 @@
 package com.teraim.nils;
 
-import java.util.ArrayList;
-
-import com.teraim.nils.CommonVars.PersistenceHelper;
-
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
@@ -12,6 +8,8 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
+
+import com.teraim.nils.utils.PersistenceHelper;
 
 public class ConfigMenu extends PreferenceActivity {
 
@@ -50,7 +48,7 @@ public class ConfigMenu extends PreferenceActivity {
 			
 			if (ruta != null) {
 				ruta.setSummary(ruta.getValue());
-				String[] rutlist = DataTypes.getSingleton().getRutIds();
+				String[] rutlist = GlobalState.getInstance(this.getActivity()).getRutIds();
 			    CharSequence entries[] = rutlist;
 			    CharSequence entryValues[] = rutlist;
 			    ruta.setEntries(entries);

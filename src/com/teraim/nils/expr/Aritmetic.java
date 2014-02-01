@@ -7,7 +7,7 @@ import java.util.Hashtable;
 
 import android.util.Log;
 
-import com.teraim.nils.CommonVars;
+import com.teraim.nils.Constants;
 import com.teraim.nils.Variable;
 
 /**
@@ -39,10 +39,6 @@ public class Aritmetic extends Expr implements Variable {
 	val = Double.NaN; 
  }
  
- 
- public static Aritmetic make(String name) {
-	return CommonVars.cv().makeAritmetic(name,name);
- }
 
  /** Return the name. */
  @Override

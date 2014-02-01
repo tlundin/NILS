@@ -3,9 +3,12 @@ package com.teraim.nils.expr;
 //Operator-precedence parser.
 //Copyright 1996 by Darius Bacon; see the file COPYING.
 
-import java.io.*;
 import java.util.Hashtable;
 import java.util.Vector;
+
+import android.content.Context;
+
+import com.teraim.nils.GlobalState;
 
 
 /** 
@@ -44,18 +47,22 @@ conditional function: if(test, then, else).
 <UL> */
 public class Parser {
 
- // Built-in constants
- static private final Aritmetic pi = Aritmetic.make("pi");
- static {
-	pi.setValue(Math.PI);
+
+ private GlobalState gs;
+ private final Aritmetic pi;
+ public Parser(GlobalState gs) {
+	 this.gs = gs;
+	 pi = gs.makeAritmetic("pi","pi");
+	 pi.setValue(Math.PI);
  }
+ // Built-in constants
 
  /** Return the expression denoted by the input string.
   *
   *       @param input the unparsed expression
   *      @exception SyntaxException if the input is unparsable */
- static public Expr parse(String input) throws SyntaxException {
-	return new Parser().parseString(input);
+ public Expr parse(String input) throws SyntaxException {
+	return parseString(input);
  }
 
  /** Set of Variable's that are allowed to appear in input expressions. 
@@ -216,7 +223,7 @@ public class Parser {
 		return Expr.makeIfThenElse(test, consequent, alternative);
 	    }
 
-	    Expr var = Aritmetic.make(token.sval);
+	    Expr var = gs.makeAritmetic(token.sval,token.sval);
 	    if (null != allowedVariables && null == allowedVariables.get(var))
 		throw error("Unknown variable",
 			    SyntaxException.UNKNOWN_VARIABLE, null);

@@ -1,4 +1,4 @@
-package com.teraim.nils;
+package com.teraim.nils.utils;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -10,9 +10,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.teraim.nils.CommonVars.PersistenceHelper;
+import com.teraim.nils.GlobalState;
+import com.teraim.nils.StoredVariable;
 import com.teraim.nils.StoredVariable.Type;
-import com.teraim.nils.utils.Tools;
  
 public class DbHelper extends SQLiteOpenHelper {
  
@@ -28,8 +28,11 @@ public class DbHelper extends SQLiteOpenHelper {
     private static final int COLUMN_SERIALIZED = 9;
 
    
+    Context ctx;
     public DbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);  
+        ctx = context;
+        
     }
  
     @Override
@@ -107,9 +110,10 @@ public class DbHelper extends SQLiteOpenHelper {
     //Insert or Update existing value.
     
     public void insertVariable(StoredVariable var){
+    	PersistenceHelper ph = GlobalState.getInstance(ctx).getPersistence();
         //for logging
     	Log.d("nils", "Inserting variable "+var.toString()+" into database with value "+var.getValue()); 
-
+    	
     	// 1. get reference to writable DB
     	SQLiteDatabase db = this.getWritableDatabase();
 
@@ -126,10 +130,10 @@ public class DbHelper extends SQLiteOpenHelper {
     	values.put("smayta", var.getSmaytaId());
     	values.put("var", var.getVarId());
     	values.put("value", var.getValue());
-    	values.put("lag",CommonVars.ph().get(PersistenceHelper.LAG_ID_KEY));
+    	values.put("lag",ph.get(PersistenceHelper.LAG_ID_KEY));
     	values.put("timestamp", TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
     	values.put("serialized", Tools.serialize(var));
-    	values.put("author", CommonVars.ph().get(PersistenceHelper.USER_ID_KEY));
+    	values.put("author", ph.get(PersistenceHelper.USER_ID_KEY));
     	
     	// 3. insert
     	long rId = db.insertWithOnConflict(TABLE_VARIABLES, // table

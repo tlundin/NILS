@@ -1,4 +1,4 @@
-package com.teraim.nils.flowtemplates;
+package com.teraim.nils.dynamic.templates;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -15,11 +15,12 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.teraim.nils.DataTypes.Rule;
-import com.teraim.nils.DataTypes.WF_Container;
-import com.teraim.nils.DataTypes;
+import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
 import com.teraim.nils.ValidatorListAdapter;
+import com.teraim.nils.dynamic.Executor;
+import com.teraim.nils.dynamic.types.Rule;
+import com.teraim.nils.dynamic.workflow_realizations.WF_Container;
 
 /**
  * 
@@ -70,7 +71,7 @@ public class DefaultTemplate extends Executor {
 	@Override
 	protected List<WF_Container> getContainers() {
 		ArrayList<WF_Container> ret = new ArrayList<WF_Container>();
-		ret.add(DataTypes.getSingleton().new WF_Container("root",my_root,null));
+		ret.add(new WF_Container("root",my_root,null));
 		return ret;
 	}
 	

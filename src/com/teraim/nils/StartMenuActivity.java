@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,9 +17,9 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
-import com.teraim.nils.DataTypes.Provyta;
-import com.teraim.nils.flowtemplates.DefaultTemplate;
-import com.teraim.nils.flowtemplates.ListInputTemplate;
+import com.teraim.nils.dynamic.templates.DefaultTemplate;
+import com.teraim.nils.dynamic.types.Provyta;
+import com.teraim.nils.utils.Tools;
 
 public class StartMenuActivity extends MenuActivity {
 
@@ -169,7 +168,7 @@ public class StartMenuActivity extends MenuActivity {
 			}
 
 			private boolean provytaSelected() {
-				Provyta py= CommonVars.cv().getCurrentProvyta();
+				Provyta py= GlobalState.getInstance(StartMenuActivity.this).getCurrentProvyta();
 				if (py !=null) {
 					Log.d("NILS","Provyta var inte null");
 				return true;
@@ -286,7 +285,7 @@ public class StartMenuActivity extends MenuActivity {
 	        String imageType = options.outMimeType;
 	        
 	        imageView.setImageBitmap(
-	        	    CommonVars.decodeSampledBitmapFromResource(getResources(), mThumbIds[position], 100,100));
+	        	   Tools.decodeSampledBitmapFromResource(getResources(), mThumbIds[position], 100,100));
 	        //imageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), mThumbIds[position], options));
 	        
 	        

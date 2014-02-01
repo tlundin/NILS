@@ -1,22 +1,11 @@
 package com.teraim.nils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -54,7 +43,7 @@ public class TakePictureActivity extends Activity {
 		//takePhoto(null);
 		newPictureImageView = (ImageView)findViewById(R.id.newPic);
 		//TODO: Replace with getRutaId when more pics.
-		picPath = CommonVars.cv().getCurrentPictureBasePath();
+		picPath =  GlobalState.getInstance(this).getCurrentPictureBasePath();
 
 		String nyBildUrl = picPath+"/nya/"+dir+".png";
 	

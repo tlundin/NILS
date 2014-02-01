@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.widget.ImageView;
 
+import com.teraim.nils.utils.Tools;
+
 
 public class PictureZoom extends Activity {
 	
@@ -21,8 +23,8 @@ public class PictureZoom extends Activity {
 			int position = this.getIntent().getIntExtra("pos", -1);
 			if (position != -1)
 		        tmp.setImageBitmap(
-		        	    CommonVars.decodeSampledBitmapFromResource(getResources(), 
-		        	    		R.drawable.class.getField(CommonVars.compassToPicName(position)+"_demo").getInt(null), 250,250));
+		        	    Tools.decodeSampledBitmapFromResource(getResources(), 
+		        	    		R.drawable.class.getField(Constants.compassToPicName(position)+"_demo").getInt(null), 250,250));
 	
 			} catch (Exception e) {
 				

@@ -1,8 +1,10 @@
 package com.teraim.nils;
+import android.content.Context;
 import android.util.Log;
 
-import com.teraim.nils.DataTypes.Workflow.Unit;
 import com.teraim.nils.StoredVariable.Type;
+import com.teraim.nils.dynamic.types.ParameterCache;
+import com.teraim.nils.dynamic.types.Workflow.Unit;
 
 //Class used to identify a variable, given that CURRENT Delyta/Provyta/Ruta (the context) is the parent.
 
@@ -14,21 +16,23 @@ public class VarIdentifier {
 	public Unit unit;
 	private StoredVariable myStoredVar=null;		
 	ParameterCache pc;
+	private GlobalState gs;
 	
-	public VarIdentifier(String varLabel,String varId, Variable.Type numType, StoredVariable.Type varType, Unit unit) {
+	public VarIdentifier(Context ctx,String varLabel,String varId, Variable.Type numType, StoredVariable.Type varType, Unit unit) {
+		gs = GlobalState.getInstance(ctx);
 		id = varId;
 		label = varLabel;
 		this.numType=numType;
 		this.varType=varType;
 		this.unit=unit;
 		if(varType == Type.ruta) {
-			pc = CommonVars.cv().getCurrentRuta();
+			pc = gs.getCurrentRuta();
 		} else {
 			if(varType == Type.provyta) {
-				pc = CommonVars.cv().getCurrentProvyta();
+				pc = gs.getCurrentProvyta();
 			} else {
 				assert(varType == Type.delyta);
-				pc = CommonVars.cv().getCurrentDelyta();
+				pc = gs.getCurrentDelyta();
 			} 
 		}
 		if (pc==null) 

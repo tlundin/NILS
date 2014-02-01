@@ -8,17 +8,13 @@ import java.io.OutputStream;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
-
-import com.teraim.nils.CommonVars;
 
 
 public class TestPic extends Activity {
@@ -31,7 +27,7 @@ public class TestPic extends Activity {
 		//setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		//intent.putExtra(MediaStore.EXTRA_SCREEN_ORIENTATION,"landscape");
 		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-		File file = new File(CommonVars.NILS_ROOT_DIR, "temp.png");
+		File file = new File(Constants.NILS_ROOT_DIR, "temp.png");
 		Uri outputFileUri = Uri.fromFile(file);
 		intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
 		startActivityForResult(intent, TAKE_PICTURE);
@@ -45,7 +41,7 @@ public class TestPic extends Activity {
 		if (requestCode == TAKE_PICTURE){
 			Toast.makeText(this, "Got back!", Toast.LENGTH_LONG).show();
 			//Save file in temporary storage.
-			Bitmap bip = BitmapFactory.decodeFile(CommonVars.NILS_ROOT_DIR+"/temp.png");		
+			Bitmap bip = BitmapFactory.decodeFile(Constants.NILS_ROOT_DIR+"/temp.png");		
 			int w = bip.getWidth();
 			int h = bip.getHeight();
 			bip = Bitmap.createScaledBitmap(bip, w/6, h/6, false);
@@ -57,10 +53,11 @@ public class TestPic extends Activity {
 			//oldPic.setImageURI(outputFileUri);
 			//newPictureImageView.setImageBitmap(bip);
 			OutputStream fOut = null;
-			String folder = CommonVars.compassToPicName(this.getIntent().getIntExtra("selectedpic", 0))+".png";
-			File file = new File(CommonVars.cv().getCurrentPictureBasePath()+"/nya/", 
+			String folder = Constants.compassToPicName(this.getIntent().getIntExtra("selectedpic", 0))+".png";
+			GlobalState gs = GlobalState.getInstance(this);
+			File file = new File(gs.getCurrentPictureBasePath()+"/nya/", 
 					folder);
-			Log.d("NILS", "trying to save pic as: "+CommonVars.cv().getCurrentPictureBasePath()+"/nya/"+folder+".png");
+			Log.d("NILS", "trying to save pic as: "+gs.getCurrentPictureBasePath()+"/nya/"+folder+".png");
 			try {
 				fOut = new FileOutputStream(file);
 			bip.compress(Bitmap.CompressFormat.PNG, 100, fOut);

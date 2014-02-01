@@ -5,28 +5,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import com.teraim.nils.flowtemplates.DefaultTemplate;
-
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.BitmapFactory.Options;
 import android.graphics.Point;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Display;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -39,6 +31,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.teraim.nils.dynamic.templates.DefaultTemplate;
+import com.teraim.nils.utils.Tools;
+
 /** 
  * 	
  * @author Terje
@@ -50,7 +45,7 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 	private Button mittpunktB;
 	ProvYtaGeoUpdater pyg;
 	final int TAKE_PICTURE = 133;
-	final String oldPicFolder = CommonVars.cv().getCurrentPictureBasePath()+"/gamla/";
+	String oldPicFolder;
 	GridView gridViewNew;
 	int selectedPic;
 	//Broadcastreceiver for messages coming from other device.
@@ -58,13 +53,15 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 	
 	
 	
-	
+	private GlobalState gs;
 	
 	//Standard onCreate
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.takepicture);
 
+		gs = GlobalState.getInstance(this);
+		oldPicFolder = gs.getCurrentPictureBasePath()+"/gamla/";
 		gridViewNew = (GridView) findViewById(R.id.gridview_new);
 		ProvytaView provytaV = (ProvytaView) findViewById(R.id.provytaF);
 		mittpunktB = (Button) findViewById(R.id.mittpunktB);
@@ -93,9 +90,9 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 						Toast.LENGTH_SHORT).show();
 				selectedPic = position;
 				Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-				String tempFolder = CommonVars.NILS_ROOT_DIR;
+				String tempFolder = Constants.NILS_ROOT_DIR;
 				File file = new File(tempFolder, "temp.png");
-				CommonVars.createFoldersIfMissing(file);
+				Tools.createFoldersIfMissing(file);
 				Toast.makeText(getBaseContext(),
 						"Folder: "+tempFolder,
 						Toast.LENGTH_SHORT).show();
@@ -134,13 +131,13 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 					View v, int position, long id)
 			{
 				Toast.makeText(getBaseContext(),
-						CommonVars.compassToPicName(position) + " picture selected",
+						Constants.compassToPicName(position) + " picture selected",
 						Toast.LENGTH_SHORT).show();
 
 				Intent myIntent = new Intent(getBaseContext(),PictureZoom.class);
 
-				String picName = CommonVars.cv().getCurrentPictureBasePath()+"/gamla/"+
-						CommonVars.compassToPicName(position)+".png";
+				String picName = gs.getCurrentPictureBasePath()+"/gamla/"+
+						Constants.compassToPicName(position)+".png";
 				myIntent.putExtra("pos", position);
 				myIntent.putExtra("picpath", picName);
 				startActivity(myIntent);
@@ -165,7 +162,7 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 			    // Calculate inSampleSize
 			    options.inSampleSize = 6;
 				//Save file in temporary storage.
-				Bitmap bip = BitmapFactory.decodeFile(CommonVars.NILS_ROOT_DIR+"/temp.png",options);		
+				Bitmap bip = BitmapFactory.decodeFile(Constants.NILS_ROOT_DIR+"/temp.png",options);		
 				int w = bip.getWidth();
 				int h = bip.getHeight();
 				bip = Bitmap.createScaledBitmap(bip, w/6, h/6, false);
@@ -176,11 +173,11 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 				//oldPic.setImageURI(outputFileUri);
 				//newPictureImageView.setImageBitmap(bip);
 				OutputStream fOut = null;
-				String fileName = CommonVars.compassToPicName(selectedPic)+".png";
-				File file = new File(CommonVars.cv().getCurrentPictureBasePath()+"/nya/", 
+				String fileName = Constants.compassToPicName(selectedPic)+".png";
+				File file = new File(gs.getCurrentPictureBasePath()+"/nya/", 
 						fileName);
-				CommonVars.createFoldersIfMissing(file);
-				Log.d("NILS", "trying to save pic as: "+CommonVars.cv().getCurrentPictureBasePath()+"/nya/"+fileName);
+				Tools.createFoldersIfMissing(file);
+				Log.d("NILS", "trying to save pic as: "+gs.getCurrentPictureBasePath()+"/nya/"+fileName);
 				try {
 					fOut = new FileOutputStream(file);
 					bip.compress(Bitmap.CompressFormat.PNG, 100, fOut);
@@ -246,7 +243,7 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 			for (int i=0;i<empty_pic_names.length;i++) {
 				//picId = getResources().getIdentifier(empty_pic_names[i], "drawable", context.getPackageName());
 				
-				pic[i] = CommonVars.decodeSampledBitmapFromResource(getResources(), 
+				pic[i] = Tools.decodeSampledBitmapFromResource(getResources(), 
 						getResources().getIdentifier(empty_pic_names[i], "drawable", context.getPackageName()), 100,100);
 				//BitmapFactory.decodeResource(context.getResources(),
 				//		picId);
@@ -271,10 +268,10 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 			} else {
 				imageView = (ImageView) convertView;
 			}
-			String picPath = CommonVars.cv().getCurrentPictureBasePath();
+			String picPath = gs.getCurrentPictureBasePath();
 
 			Bitmap bm = BitmapFactory.decodeFile(picPath+"/nya/"+
-					CommonVars.compassToPicName(position)+".png");
+					Constants.compassToPicName(position)+".png");
 
 			if (bm==null)
 				imageView.setImageBitmap(pic[position]);
@@ -322,16 +319,16 @@ public class TakePicture extends Activity implements GeoUpdaterCb {
 				imageView = (ImageView) convertView;
 			}
 			//TODO: Get rid of 1 below!!
-			String picPath = CommonVars.cv().getCurrentPictureBasePath();
+			String picPath = gs.getCurrentPictureBasePath();
 
 			Bitmap bm = BitmapFactory.decodeFile(picPath+"/gamla/"+
-					CommonVars.compassToPicName(position)+".png");
+					Constants.compassToPicName(position)+".png");
 			if (bm==null)
 				try {
 
 			        imageView.setImageBitmap(
-			        	    CommonVars.decodeSampledBitmapFromResource(getResources(), 
-			        	    		R.drawable.class.getField(CommonVars.compassToPicName(position)+"_demo").getInt(null), 200,200));
+			        	    Tools.decodeSampledBitmapFromResource(getResources(), 
+			        	    		R.drawable.class.getField(Constants.compassToPicName(position)+"_demo").getInt(null), 200,200));
 
 //					bm = BitmapFactory.decodeResource(getResources(),
 //							R.drawable.class.getField(CommonVars.compassToPicName(position)+"_demo").getInt(null));

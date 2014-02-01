@@ -1,4 +1,4 @@
-package com.teraim.nils;
+package com.teraim.nils.utils;
 
 import android.util.Log;
 
@@ -9,7 +9,7 @@ public class Geomatte {
 	//calculate haversine distance for linear distance
 
 	
-	static double dist(double lat1, double long1, double lat2, double long2)
+	public static double dist(double lat1, double long1, double lat2, double long2)
 	{
 	    double dlong = (long2 - long1) * d2r;
 	    double dlat = (lat2 - lat1) * d2r;
@@ -21,14 +21,14 @@ public class Geomatte {
 	    return d;
 	}
 	
-	static double sweDist(double myY,double myX,double destY, double destX) {	
+	public static double sweDist(double myY,double myX,double destY, double destX) {	
 		Log.d("NILS","diffX: diffY: "+(myX-destX)+" "+(myY-destY));
 		Log.d("NILS","Values  x1 y1 x2 y2: "+myX+" "+myY+" "+destX+" "+destY);
 		return Math.sqrt(Math.pow((myX-destX),2)+Math.pow(myY-destY, 2));
 		
 	}
 	
-	static double getRikt2(double userY, double userX, double destY, double destX) {
+	public static double getRikt2(double userY, double userX, double destY, double destX) {
 		double alfa=-100;
 		double PI = Math.PI;
 		double dy = destY-userY;

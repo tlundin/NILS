@@ -1,4 +1,4 @@
-package com.teraim.nils.flowtemplates;
+package com.teraim.nils.dynamic;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -15,21 +15,21 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.teraim.nils.CommonVars;
-import com.teraim.nils.DataTypes.Block;
-import com.teraim.nils.DataTypes.ButtonBlock;
-import com.teraim.nils.DataTypes.Container;
-import com.teraim.nils.DataTypes.ContainerDefineBlock;
-import com.teraim.nils.DataTypes.CreateListEntriesBlock;
-import com.teraim.nils.DataTypes.ListFilterBlock;
-import com.teraim.nils.DataTypes.ListSortingBlock;
-import com.teraim.nils.DataTypes.Rule;
-import com.teraim.nils.DataTypes.StartBlock;
-import com.teraim.nils.DataTypes.WF_Container;
-import com.teraim.nils.DataTypes.WF_Context;
-import com.teraim.nils.DataTypes.Workflow;
+import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
 import com.teraim.nils.Variable;
+import com.teraim.nils.dynamic.blocks.Block;
+import com.teraim.nils.dynamic.blocks.ButtonBlock;
+import com.teraim.nils.dynamic.blocks.ContainerDefineBlock;
+import com.teraim.nils.dynamic.blocks.CreateListEntriesBlock;
+import com.teraim.nils.dynamic.blocks.ListFilterBlock;
+import com.teraim.nils.dynamic.blocks.ListSortingBlock;
+import com.teraim.nils.dynamic.blocks.StartBlock;
+import com.teraim.nils.dynamic.types.Rule;
+import com.teraim.nils.dynamic.types.Workflow;
+import com.teraim.nils.dynamic.workflow_abstracts.Container;
+import com.teraim.nils.dynamic.workflow_realizations.WF_Container;
+import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
 import com.teraim.nils.exceptions.RuleException;
 import com.teraim.nils.expr.SyntaxException;
 
@@ -51,10 +51,12 @@ public abstract class Executor extends Activity {
 	
 	protected abstract List<WF_Container> getContainers();
 
+	protected GlobalState gs;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+		gs = GlobalState.getInstance(this);
 		wf = getFlow();
 		//Execute called from child onCreate.
 	}
@@ -69,7 +71,7 @@ public abstract class Executor extends Activity {
 		Bundle b = getIntent().getExtras();
 		String name = b.getString("workflow_name");
 		if (name!=null) 
-			wf = CommonVars.cv().getWorkflow(name);
+			wf = gs.getWorkflow(name);
 
 		if (wf==null||name==null) {
 			Log.e("NILS","Workflow "+name+" NOT found!");
@@ -82,7 +84,7 @@ public abstract class Executor extends Activity {
 				}})
 				.show();				
 
-			String heck[] = CommonVars.cv().getWorkflowNames();
+			String heck[] = gs.getWorkflowNames();
 			for (int i = 0 ; i< heck.length; i++)
 				Log.e("NILS","Workflow "+i+": "+heck[i]);
 			return null;

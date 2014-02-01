@@ -94,9 +94,9 @@
         <activity
             android:name="com.teraim.nils.MarkslagTab_SA_Activity"/>	
         <activity
-            android:name="com.teraim.nils.flowtemplates.DefaultTemplate"/>   
+            android:name="com.teraim.nils.dynamic.templates.DefaultTemplate"/>   
         <activity
-            android:name="com.teraim.nils.flowtemplates.ListInputTemplate"/>        	
+            android:name="com.teraim.nils.dynamic.templates.ListInputTemplate"/>        	
         	
         <activity
             android:name="com.teraim.nils.StartMenuActivity"/>        	

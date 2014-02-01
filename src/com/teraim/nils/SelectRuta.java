@@ -12,8 +12,8 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.teraim.nils.CommonVars.PersistenceHelper;
-import com.teraim.nils.DataTypes.Ruta;
+import com.teraim.nils.dynamic.types.Ruta;
+import com.teraim.nils.utils.PersistenceHelper;
 
 /**
  * @author Terje
@@ -22,13 +22,13 @@ import com.teraim.nils.DataTypes.Ruta;
 
  */
 public class SelectRuta extends ListActivity {
-	DataTypes rd=null;
+	GlobalState rd=null;
 	String[] values;
 	
 	  public void onCreate(Bundle savedInstanceState) {
 		    super.onCreate(savedInstanceState);
 		    //Get the Singleton instance of RutData.
-		    rd = DataTypes.getSingleton();	  
+		    rd = GlobalState.getInstance(this);	  
 		    //Get the IDs
 		    values = rd.getRutIds();
 		    if (values == null) {
@@ -50,7 +50,7 @@ public class SelectRuta extends ListActivity {
 		  		//CommonVars.cv().setRuta(r);
 		  		//Persist this choice so that next time Ruta will not be queried from user.
 		  		
-		  		CommonVars.cv().ph.put(PersistenceHelper.CURRENT_RUTA_ID_KEY,values[position]);
+		  		GlobalState.getInstance(this).getPersistence().put(PersistenceHelper.CURRENT_RUTA_ID_KEY,values[position]);
 		  	}
 		  	 else
 		  		Log.e("NILS", "Ruta not found in SelectRuta ID: "+values[position]);
