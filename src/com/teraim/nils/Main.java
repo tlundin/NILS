@@ -41,75 +41,77 @@ public class Main extends Activity {
 		//create folders if firsttime.
 		initIfFirstTime();
 		//Parse the workflows and cache the blocks as objects.
-		WorkflowParser wfp = new WorkflowParser();
-		wfp.execute(this);	
-		//Setup preferences
-		PreferenceManager.setDefaultValues(this,R.xml.myprefs, false);
-		
 		gs = GlobalState.getInstance(this);
-		ph = gs.getPersistence();	
-	
-		//TODO: REMOVE
-		ph.put(PersistenceHelper.CURRENT_RUTA_ID_KEY, "262");
-		ph.put(PersistenceHelper.CURRENT_PROVYTA_ID_KEY, "6");
-		ph.put(PersistenceHelper.CURRENT_DELYTA_ID_KEY, "1");
+		if (gs!=null) {
+			WorkflowParser wfp = new WorkflowParser();
+			wfp.execute(this);	
+			//Setup preferences
+			PreferenceManager.setDefaultValues(this,R.xml.myprefs, false);
+
+			ph = gs.getPersistence();	
+
+			//TODO: REMOVE
+			ph.put(PersistenceHelper.CURRENT_RUTA_ID_KEY, "262");
+			ph.put(PersistenceHelper.CURRENT_PROVYTA_ID_KEY, "6");
+			ph.put(PersistenceHelper.CURRENT_DELYTA_ID_KEY, "1");
 
 
-		if(GooglePlayServicesUtil.isGooglePlayServicesAvailable(this)
-				== ConnectionResult.SUCCESS)
-			Toast.makeText(this, "Google Services found", Toast.LENGTH_LONG).show();
-		else
-			Toast.makeText(this, "Google Services not found: "+
-					GooglePlayServicesUtil.isGooglePlayServicesAvailable(this)
-		, Toast.LENGTH_LONG).show();
-		
-		
-		//show start picture
-		setContentView(R.layout.loadscreen);
+			if(GooglePlayServicesUtil.isGooglePlayServicesAvailable(this)
+					== ConnectionResult.SUCCESS)
+				Toast.makeText(this, "Google Services found", Toast.LENGTH_LONG).show();
+			else
+				Toast.makeText(this, "Google Services not found: "+
+						GooglePlayServicesUtil.isGooglePlayServicesAvailable(this)
+						, Toast.LENGTH_LONG).show();
 
-		//broadcastreceiver that will listen for bluetooth on/off.
-		//When bluetooth is started, the sync service will be started as well.
 
-		//Layer between application and persistent storage.
-		//The persistent storage used is Shared Preferences
-		//http://developer.android.com/guide/topics/data/data-storage.html#pref
-		PreferenceManager.setDefaultValues(this,
-				R.xml.myprefs, false);
-		
+			//show start picture
+			setContentView(R.layout.loadscreen);
 
-		//check bluetooth
-		if (mBluetoothAdapter == null) {
-			new AlertDialog.Builder(this).setTitle("Ups!")
-			.setMessage("Din platta verkar inte stödja Blåtand. Utan blåtand fungerar inte den här versionen.")
-			.setNeutralButton("Jag förstår!", new OnClickListener() {
-				@Override
-				public void onClick(DialogInterface arg0, int arg1) {
-					checkConditions();
-				}})
-				.show();
-			//check that there is a bonded device 
-		} else {	
-			if (mBluetoothAdapter.isEnabled() && mBluetoothAdapter.getBondedDevices().isEmpty()) {
+			//broadcastreceiver that will listen for bluetooth on/off.
+			//When bluetooth is started, the sync service will be started as well.
+
+			//Layer between application and persistent storage.
+			//The persistent storage used is Shared Preferences
+			//http://developer.android.com/guide/topics/data/data-storage.html#pref
+			PreferenceManager.setDefaultValues(this,
+					R.xml.myprefs, false);
+
+
+			//check bluetooth
+			if (mBluetoothAdapter == null) {
 				new AlertDialog.Builder(this).setTitle("Ups!")
-				.setMessage("Din datainsamlare är inte kopplad (bondad) till en annan datainsamlare! Måste göras i systemets blåtandsmeny. Annars fungerar inte synkroniseringen!")
+				.setMessage("Din platta verkar inte stödja Blåtand. Utan blåtand fungerar inte den här versionen.")
 				.setNeutralButton("Jag förstår!", new OnClickListener() {
 					@Override
 					public void onClick(DialogInterface arg0, int arg1) {
 						checkConditions();
 					}})
-					.show();				
-			} else {
-				//mBluetoothAdapter.getBondedDevices().iterator().next().getBluetoothClass().
-				Intent in = new Intent(this,BluetoothRemoteDevice.class);
-				//If bluetooth supported, start the communication server.
-				startService(in);				
-				//Delay a little while so that the start pic is visible.			
-				Handler mHandler = new Handler();
-				mHandler.postDelayed(new Runnable() {
-					public void run() {
-						checkConditions();
-					}
-				}, INITIAL_DELAY);
+					.show();
+				//check that there is a bonded device 
+			} else {	
+				if (mBluetoothAdapter.isEnabled() && mBluetoothAdapter.getBondedDevices().isEmpty()) {
+					new AlertDialog.Builder(this).setTitle("Ups!")
+					.setMessage("Din datainsamlare är inte kopplad (bondad) till en annan datainsamlare! Måste göras i systemets blåtandsmeny. Annars fungerar inte synkroniseringen!")
+					.setNeutralButton("Jag förstår!", new OnClickListener() {
+						@Override
+						public void onClick(DialogInterface arg0, int arg1) {
+							checkConditions();
+						}})
+						.show();				
+				} else {
+					//mBluetoothAdapter.getBondedDevices().iterator().next().getBluetoothClass().
+					Intent in = new Intent(this,BluetoothRemoteDevice.class);
+					//If bluetooth supported, start the communication server.
+					startService(in);				
+					//Delay a little while so that the start pic is visible.			
+					Handler mHandler = new Handler();
+					mHandler.postDelayed(new Runnable() {
+						public void run() {
+							checkConditions();
+						}
+					}, INITIAL_DELAY);
+				}
 			}
 		}
 	}
@@ -361,8 +363,8 @@ public class Main extends Activity {
 						"Value: " + c.getString(2),
 						Toast.LENGTH_LONG).show();
 	}
-	
-	
+
+
 	private void initIfFirstTime() {
 		//If testFile doesnt exist it will be created and found next time.
 		String t = Constants.NILS_ROOT_DIR +
@@ -392,49 +394,49 @@ public class Main extends Activity {
 		File folder = new File(Constants.CONFIG_FILES_DIR);
 		if(!folder.mkdirs())
 			Log.e("NILS","Failed to create config root folder");
-			
-		
+
+
 		//copy the configuration files into the root dir.
 		copyAssets();
 	}
-	
-	/**
-     * -- Copy the file from the assets folder to the sdCard
-     * ===========================================================
-     **/
-    private void copyAssets() {
-        AssetManager assetManager = getAssets();
-        String[] files = null;
-        try {
-            files = assetManager.list("");
-        } catch (IOException e) {
-            Log.e("tag", e.getMessage());
-        }
-        for (int i = 0; i < files.length; i++) {
-            InputStream in = null;
-            OutputStream out = null;
-            try {
-                in = assetManager.open(files[i]);
-                out = new FileOutputStream(Constants.CONFIG_FILES_DIR + files[i]);
-                copyFile(in, out);
-                in.close();
-                in = null;
-                out.flush();
-                out.close();
-                out = null;
-            } catch (Exception e) {
-                Log.e("tag", e.getMessage());
-            }
-        }
-    }
 
-    private void copyFile(InputStream in, OutputStream out) throws IOException {
-        byte[] buffer = new byte[1024];
-        int read;
-        while ((read = in.read(buffer)) != -1) {
-            out.write(buffer, 0, read);
-        }
-    }
+	/**
+	 * -- Copy the file from the assets folder to the sdCard
+	 * ===========================================================
+	 **/
+	private void copyAssets() {
+		AssetManager assetManager = getAssets();
+		String[] files = null;
+		try {
+			files = assetManager.list("");
+		} catch (IOException e) {
+			Log.e("tag", e.getMessage());
+		}
+		for (int i = 0; i < files.length; i++) {
+			InputStream in = null;
+			OutputStream out = null;
+			try {
+				in = assetManager.open(files[i]);
+				out = new FileOutputStream(Constants.CONFIG_FILES_DIR + files[i]);
+				copyFile(in, out);
+				in.close();
+				in = null;
+				out.flush();
+				out.close();
+				out = null;
+			} catch (Exception e) {
+				Log.e("tag", e.getMessage());
+			}
+		}
+	}
+
+	private void copyFile(InputStream in, OutputStream out) throws IOException {
+		byte[] buffer = new byte[1024];
+		int read;
+		while ((read = in.read(buffer)) != -1) {
+			out.write(buffer, 0, read);
+		}
+	}
 	/*
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

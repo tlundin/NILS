@@ -36,20 +36,14 @@ public class DefaultTemplate extends Executor {
 	View view;
 	private ListView lv; 
 	private ValidatorListAdapter mAdapter;
-	private View validator_layer;
-	private RelativeLayout enter_layer;
 	private LinearLayout my_root;
-
 	private TextView errorView;
-	private Context me;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		me = this;
 		setContentView(R.layout.wf_default);
 		errorView = (TextView)findViewById(R.id.errortext);
-		validator_layer = findViewById(R.id.validator_layer);
-		enter_layer = (RelativeLayout)findViewById(R.id.enter_layer);
 		my_root = (LinearLayout) findViewById(R.id.myRoot);
 		//The list of all rules currently not ok
 		//mAdapter = new ValidatorListAdapter(this,executedRules);
@@ -67,7 +61,8 @@ public class DefaultTemplate extends Executor {
 				errorView.setText(e.getKey().getErrorMessage());
 			}});
 		myContext.addContainers(getContainers());
-		execute();
+		if (wf!=null)
+			run();
 	}
 	@Override
 	protected List<WF_Container> getContainers() {
@@ -77,7 +72,6 @@ public class DefaultTemplate extends Executor {
 	}
 	@Override
 	public void execute(String function) {
-		// TODO Auto-generated method stub
 		
 	}
 	

@@ -30,25 +30,27 @@ public class ListInputTemplate extends Executor {
 		myLayouts.add(new WF_Container("Sort_Panel_1", sortPanel, root));
 		myLayouts.add(new WF_Container("Aggregation_Panel", (LinearLayout)findViewById(R.id.aggregates), root));
 		myLayouts.add(new WF_Container("Filter_Panel_1", (LinearLayout)findViewById(R.id.filterPanel), root));
+		myLayouts.add(new WF_Container("Selected_Panel", (LinearLayout)findViewById(R.id.Selected), root));
 		myContext.addContainers(getContainers());
 
 		//Create blocks for template functions.
 		ListSortingBlock a_o = new ListSortingBlock("alphanumeric_sorting_function","Sort_Panel_1","Field_list_1");
 		ListSortingBlock slakt = new ListSortingBlock("familje_sorting_function","Sort_Panel_1","Field_list_1");
-	
-		if (wf!=null)
-			execute();
-		
-		a_o_widget = a_o.create(myContext);
-		familj_widget = slakt.create(myContext);
+
+		if (wf!=null) {
+			run();
+
+			a_o_widget = a_o.create(myContext);
+			familj_widget = slakt.create(myContext);
+		}
 	}
 	@Override
 	protected List<WF_Container> getContainers() {
 		return myLayouts;
 	}
-	
+
 	public void execute(String name) {
-		
+
 		if (name.equals("template_function_show_sorter"))
 			toggleSorter(true);
 		else if (name.equals("template_function_hide_sorter"))
@@ -62,11 +64,12 @@ public class ListInputTemplate extends Executor {
 		else if (name.equals("template_function_show_edited"))
 			toggleHideEdited(false);
 
+
 	}
-	
+
 	private void toggleHideEdited(boolean b) {
 	}
-	
+
 	private void toggleFamiljer(boolean b) {
 		if (b)
 			sortPanel.addView(familj_widget.getWidget());
@@ -74,8 +77,8 @@ public class ListInputTemplate extends Executor {
 			sortPanel.removeView(familj_widget.getWidget());
 			familj_widget.removeExistingFilter();
 		}
-			
-		
+
+
 	}
 	private void toggleSorter(boolean b) {
 		if (b)
@@ -83,7 +86,7 @@ public class ListInputTemplate extends Executor {
 		else {
 			sortPanel.removeView(a_o_widget.getWidget());
 			a_o_widget.removeExistingFilter();
-			
+
 		}
 	}
 

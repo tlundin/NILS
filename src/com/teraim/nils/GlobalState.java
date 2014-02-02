@@ -75,12 +75,14 @@ public class GlobalState  {
 		   ErrorCode err = singleton.validate();
 		   if (err!=ErrorCode.ok) {
 			   new AlertDialog.Builder(c).setTitle("Ups!")
-				.setMessage("Problem att initialisera Appen. Något gick snett: "+err.name())
+				.setMessage("Kan inte starta eftersom "+(err==ErrorCode.file_not_found?"artlistan saknas.":"artlistan saknar en kolumn som måste finnas."))
 				.setNeutralButton("Vad synd!", new OnClickListener() {
 					@Override
-					public void onClick(DialogInterface arg0, int arg1) {					
+					public void onClick(DialogInterface arg0, int arg1) {
+						
 					}})
 					.show();
+			   return null;
 		   }
 	   }
 	   return singleton;

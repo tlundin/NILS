@@ -103,7 +103,7 @@ public abstract class Executor extends Activity {
 	/**
 	 * Execute the workflow.
 	 */
-	protected void execute() {
+	protected void run() {
 		//TEST CODE
 		//LinearLayout my_root = (LinearLayout) findViewById(R.id.myRoot);		
 		List<Block>blocks = wf.getBlocks();
