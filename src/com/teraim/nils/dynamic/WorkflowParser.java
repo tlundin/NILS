@@ -53,7 +53,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 	GlobalState gs;
 	//Location of bundle.
 	//private final static String serverUrl = "http://83.250.104.137:8080/nilsbundle.xml";
-	private final static String serverUrl = "http://teraim.com/nilsbundle.xml";
+	private final static String serverUrl = "http://teraim.com/nilsbundle2.xml";
 	//Take input file from remote web server and parse it.
 	//Generates a list of workflows from a Bundle.
 	@Override
@@ -379,9 +379,10 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 			//If a unique varname tag found, instantiate a new XML_variable. 
 			if (name.equals("file_name")) {
 				fileName = readText("file_name",parser);
-				Log.d("NILS","fileName: "+fileName);
+				
 			} else if (name.equals("container_name")) {
 				containerName = readText("container_name",parser);
+				Log.d("nils","container name: "+containerName);
 
 			} else if (name.equals("name")) {
 				namn = readText("name",parser);
@@ -448,15 +449,19 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 	 //For now just create dummy.
 	 private static ButtonBlock readBlockButton(XmlPullParser parser) throws IOException, XmlPullParserException {
 		 Log.d("NILS","Button block...");
-		 String label=null,action=null,myname=null,containerName=null,target=null;
+		 String label=null,onClick=null,offClick=null,myname=null,containerName=null,target=null,type=null;
 		 parser.require(XmlPullParser.START_TAG, null,"block_button");
 		 while (parser.next() != XmlPullParser.END_TAG) {
 			 if (parser.getEventType() != XmlPullParser.START_TAG) {
 				 continue;
 			 }	
 			 String name = parser.getName();
-			 if (name.equals("action")) 
-				 action = readText("action",parser);
+			 if (name.equals("onClick")) 
+				 onClick = readText("onClick",parser);
+			 else if (name.equals("offClick")) 
+				 offClick = readText("offClick",parser);
+			 else if (name.equals("type")) 
+				 type = readText("type",parser);
 			 else if (name.equals("name")) 
 				 myname = readText("name",parser);
 			 else if (name.equals("label")) 
@@ -468,7 +473,10 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 			 else
 				 skip(parser);
 		 }
-		 return new ButtonBlock(label,action,myname,containerName,target);
+		 if (type!=null && type.equals("action"))
+			 return new ButtonBlock(label,onClick,myname,containerName,target);
+		 else
+			 return new ButtonBlock(label,onClick,offClick,myname,containerName,target);
 	 }
 
 	 /**

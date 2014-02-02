@@ -38,18 +38,17 @@ public class Main extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		WorkflowParser wfp = new WorkflowParser();
-		gs = GlobalState.getInstance(this);
-		ph = gs.getPersistence();
-
-		
-		wfp.execute(this);
-		
-		PreferenceManager.setDefaultValues(this,R.xml.myprefs, false);
-		
 		//create folders if firsttime.
 		initIfFirstTime();
+		//Parse the workflows and cache the blocks as objects.
+		WorkflowParser wfp = new WorkflowParser();
+		wfp.execute(this);	
+		//Setup preferences
+		PreferenceManager.setDefaultValues(this,R.xml.myprefs, false);
 		
+		gs = GlobalState.getInstance(this);
+		ph = gs.getPersistence();	
+	
 		//TODO: REMOVE
 		ph.put(PersistenceHelper.CURRENT_RUTA_ID_KEY, "262");
 		ph.put(PersistenceHelper.CURRENT_PROVYTA_ID_KEY, "6");

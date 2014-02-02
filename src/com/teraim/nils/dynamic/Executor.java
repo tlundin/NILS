@@ -50,14 +50,18 @@ public abstract class Executor extends Activity {
 	
 	
 	protected abstract List<WF_Container> getContainers();
+	public abstract void execute(String function);
 
 	protected GlobalState gs;
+	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		myContext = new WF_Context(this,this);
 		gs = GlobalState.getInstance(this);
 		wf = getFlow();
+
 		//Execute called from child onCreate.
 	}
 
@@ -101,16 +105,9 @@ public abstract class Executor extends Activity {
 	 */
 	protected void execute() {
 		//TEST CODE
-		//LinearLayout my_root = (LinearLayout) findViewById(R.id.myRoot);
-
-		WF_Context myContext = new WF_Context(this);
-		myContext.addContainers(getContainers());
-		
+		//LinearLayout my_root = (LinearLayout) findViewById(R.id.myRoot);		
 		List<Block>blocks = wf.getBlocks();
-		
-		
-		
-		
+
 		for (Block b:blocks) {
 			
 			if (b instanceof StartBlock)

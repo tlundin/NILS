@@ -58,15 +58,14 @@
         <ScrollView
             android:id="@+id/scrollView2"
             android:layout_width="0dp"
-            
             android:layout_height="match_parent" 
-            android:layout_weight="0.1">
+            android:layout_weight="0.3">
 
             <LinearLayout
                 android:id="@+id/sortPanel"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical" >
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
 
             </LinearLayout>
         </ScrollView>
@@ -75,7 +74,7 @@
             android:id="@+id/scrollView3"          
             android:layout_height="match_parent"
             android:layout_width="0dp"
-            android:layout_weight="0.7" >
+            android:layout_weight="0.5" >
 
             <LinearLayout
                 android:id="@+id/fieldList"

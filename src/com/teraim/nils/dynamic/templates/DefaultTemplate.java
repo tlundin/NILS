@@ -66,6 +66,7 @@ public class DefaultTemplate extends Executor {
 					e = it.next();
 				errorView.setText(e.getKey().getErrorMessage());
 			}});
+		myContext.addContainers(getContainers());
 		execute();
 	}
 	@Override
@@ -73,6 +74,11 @@ public class DefaultTemplate extends Executor {
 		ArrayList<WF_Container> ret = new ArrayList<WF_Container>();
 		ret.add(new WF_Container("root",my_root,null));
 		return ret;
+	}
+	@Override
+	public void execute(String function) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 

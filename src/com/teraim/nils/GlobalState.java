@@ -62,7 +62,8 @@ public class GlobalState  {
 	
 	public enum ErrorCode {
 		ok,
-		missing_required_column
+		missing_required_column,
+		file_not_found
 	}
 	
 	
@@ -97,7 +98,7 @@ public class GlobalState  {
 		//Parser for rules
 		parser = new Parser(this);
 		//Artlista
-		artLista = new ArtLista(Tools.scanListConfigData("artlista.config"));		
+		artLista = new ArtLista(Tools.scanListConfigData("artlista_v1.config.csv"));		
 		//TODO: REMOVE
 		//Cached data from files.		
 		Tools.scanRutData(ctx.getResources().openRawResource(R.raw.rutdata_v3),this);
@@ -110,7 +111,10 @@ public class GlobalState  {
 	 * 
 	 */
 	private ErrorCode validate() {
-		return artLista.validateAndInit();
+		if (artLista == null)
+			return ErrorCode.file_not_found;
+			else
+			return artLista.validateAndInit();
 	}
 	
 	/*Singletons available for all classes

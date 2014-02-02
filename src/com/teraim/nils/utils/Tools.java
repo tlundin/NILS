@@ -184,7 +184,7 @@ public class Tools {
 						if (id>12&&id<17)
 							continue;
 						if (ruta.addProvYta_rutdata(r[1],r[2],r[3],r[7],r[8])!=null)
-							Log.d("NILS","added provyta with ID "+r[1]);
+			;				//Log.d("NILS","added provyta with ID "+r[1]);
 						else
 							Log.d("NILS","discarded provyta with ID "+r[1]);
 
