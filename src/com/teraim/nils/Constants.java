@@ -50,6 +50,8 @@ public class Constants {
 	//Static constants
 	public final static String[] colors = {"Röd","Blå","Ofärgad"};
 
+	public static final float TEXT_LARGE = 25;
+
 	public static String blue() {
 		return colors[1];
 	}

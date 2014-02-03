@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Collections;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -28,8 +29,9 @@ import com.teraim.nils.VarIdentifier;
 import com.teraim.nils.Variable;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 import com.teraim.nils.dynamic.workflow_abstracts.EventGenerator;
+import com.teraim.nils.dynamic.workflow_abstracts.Listable;
 
-public class WF_ClickableField extends WF_VariableEntryField implements EventGenerator {
+public class WF_ClickableField extends WF_ListEntry implements EventGenerator {
 
 	TextView myHeader;
 	String myKey;
@@ -169,8 +171,9 @@ public class WF_ClickableField extends WF_VariableEntryField implements EventGen
 		myContext.registerEvent(new WF_Event_OnSave(this));
 	}
 
-
+	@Override
 	public void refreshInputFields(){
+		Log.d("nils","In refreshinputfields");
 		Set<Entry<VarIdentifier, View>> vars = myVars.entrySet();
 		for(Entry<VarIdentifier, View>entry:vars) {
 			VarIdentifier varId = entry.getKey();
@@ -180,19 +183,22 @@ public class WF_ClickableField extends WF_VariableEntryField implements EventGen
 			else {
 				TextView v = (TextView)entry.getValue();
 				if (v!=null)
-					v.setTex
+					v.setText(value);
+				else
+					Log.d("nils","WF_Clickable:view was null in refreshinput");
 			}
 			
 		}
+		refreshValues();
 	}
 	
 	@Override
 	public void refreshValues() {
-		Log.d("nils","refreshoutput called on "+myHeader);
+		//Log.d("nils","refreshoutput called on "+myHeader);
 		Iterator<Map.Entry<VarIdentifier,TextView>> it = myOutputFields.entrySet().iterator();
 		while (it.hasNext()) {
 			Map.Entry<VarIdentifier,TextView> pairs = (Map.Entry<VarIdentifier,TextView>)it.next();
-			Log.d("nils","Iterator has found "+pairs.getKey()+" "+pairs.getValue());
+			//Log.d("nils","Iterator has found "+pairs.getKey()+" "+pairs.getValue());
 			VarIdentifier varId = pairs.getKey();
 			TextView out = pairs.getValue();
 			String value = varId.getPrintedValue();
@@ -201,6 +207,12 @@ public class WF_ClickableField extends WF_VariableEntryField implements EventGen
 			else
 				out.setText("");
 		}	}
+
+
+
+
+
+
 
 
 	

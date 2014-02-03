@@ -68,7 +68,7 @@ public class Table {
 		List<String> column = colTable.get(columnName);
 		for(int i = 0;i<column.size();i++) 
 			if (column.get(i).equalsIgnoreCase(key)) {
-				Log.d("nils","found master variable "+key+" in Artlista");
+				//Log.d("nils","found master variable "+key+" in Artlista");
 				return rowTable.get(i);
 			}
 		Log.d("nils","Did not find master variable "+key+" in Artlista");
@@ -80,7 +80,7 @@ public class Table {
 		int index = getColumnIndex(columnName);
 		if (index !=-1) {	
 			result = row.get(index);
-			Log.d("nils","found field "+columnName+": "+result+" in class Table");
+			//Log.d("nils","found field "+columnName+": "+result+" in class Table");
 		} else
 			Log.d("nils","Did NOT find field "+columnName+" in class Table");
 		return result;

@@ -30,7 +30,7 @@ import com.teraim.nils.dynamic.workflow_realizations.WF_Widget;
  *
  */
 public  class ButtonBlock extends Block {
-	String text,onClick,offClick,name,containerId,target;
+	String text,onClick,name,containerId,target;
 	Type type;
 	
 	WF_Context myContext;
@@ -149,18 +149,13 @@ public  class ButtonBlock extends Block {
 			LayoutParams params = new LayoutParams();
 			params.width = LayoutParams.MATCH_PARENT;
 			params.height = LayoutParams.WRAP_CONTENT;
-			toggleB.setTextSize(15);
+			toggleB.setTextSize(Constants.TEXT_LARGE);
 			toggleB.setLayoutParams(params);
 			
 			toggleB.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					boolean on = ((ToggleButton) v).isChecked();
-					if (on) {
-						myContext.getTemplate().execute(onClick);
-					} else 
-						myContext.getTemplate().execute(offClick);
-					
+						myContext.getTemplate().execute(onClick);					
 				}
 			});
 

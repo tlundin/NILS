@@ -11,13 +11,13 @@ import com.teraim.nils.R;
 import com.teraim.nils.dynamic.Executor;
 import com.teraim.nils.dynamic.blocks.ListSortingBlock;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Container;
-import com.teraim.nils.dynamic.workflow_realizations.WF_ListSorter;
+import com.teraim.nils.dynamic.workflow_realizations.WF_SorterWidget;
 
 
 public class ListInputTemplate extends Executor {
 	private LinearLayout sortPanel;
 	List<WF_Container> myLayouts = new ArrayList<WF_Container>();
-	private WF_ListSorter a_o_widget,familj_widget;
+	private WF_SorterWidget a_o_widget,familj_widget;
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.template_list_input_wf);

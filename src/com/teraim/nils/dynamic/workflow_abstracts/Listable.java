@@ -4,7 +4,13 @@ package com.teraim.nils.dynamic.workflow_abstracts;
 //TODO: Weaknesses : Cannot sort on value, only columns in Configuration Time data.
 public interface Listable {
 	public String getSortableField(String columnId);
-	//null if no value in database.
-	public String getValue();
 	public String getKey();
+	//TODO: Must separate into Comparable class or similar?
+	public long getTimeStamp();
+	public String getValue();
+	public String getLabel();
+	public void refreshValues();
+	public void refreshInputFields();
+
+
 }

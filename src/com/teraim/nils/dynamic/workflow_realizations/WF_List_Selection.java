@@ -9,12 +9,11 @@ import com.teraim.nils.dynamic.workflow_abstracts.Event.EventType;
 import com.teraim.nils.dynamic.workflow_abstracts.EventListener;
 import com.teraim.nils.dynamic.workflow_abstracts.EventGenerator;
 
-public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,EventGenerator{
+public class WF_List_Selection extends WF_List_UpdateOnSaveEvent implements EventListener,EventGenerator{
 
-	public WF_List_UpdateOnSaveEvent(String id, WF_Context ctx) {
+	public WF_List_Selection(String id, WF_Context ctx) {
 		super(id, ctx);
-		//myContext.addEventProvider(this,EventType.onSave);
-		myContext.addEventListener(this,EventType.onSave);
+		
 	}
 
 	@Override
@@ -48,15 +47,7 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 		}
 	}
 
-	@Override
-	public void onEvent(Event e) {
-		if (e.getProvider().equals(this))
-			Log.d("nils","Throwing event that originated from me");
-		else {
-			Log.d("nils","GOT EVENT!!");
-			draw();
-		}
-	}
+	
 
 	
 

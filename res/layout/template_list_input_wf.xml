@@ -33,8 +33,12 @@
             android:layout_weight="0.5"
             android:orientation="vertical" >
         </LinearLayout>
+     
     </LinearLayout>
-
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dip"
+            android:background="#000000" />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="784dp"
@@ -53,7 +57,7 @@
             android:id="@+id/scrollView2"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.2" >
+            android:layout_weight="0.3" >
 
             <LinearLayout
                 android:id="@+id/sortPanel"

@@ -16,7 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TableLayout.LayoutParams;
 
 
-public class WF_ListSorter extends WF_Widget {
+public class WF_SorterWidget extends WF_Widget {
 	
 	private final String[] alfabet = {
 			"*","ABC","DEF","GHI","JKL",
@@ -27,9 +27,9 @@ public class WF_ListSorter extends WF_Widget {
 
 	
 	WF_Filter existing;
-	Filterable targetList;
+	WF_List targetList;
 	
-	public WF_ListSorter(WF_Context ctx, String type, final Filterable targetList) {
+	public WF_SorterWidget(WF_Context ctx, String type, final WF_List targetList) {
 		super(new LinearLayout(ctx.getContext()));
 		LinearLayout buttonPanel;
 		LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT);
@@ -56,7 +56,7 @@ public class WF_ListSorter extends WF_Widget {
 						targetList.addFilter(existing);
 					}
 					//running the filters will trigger redraw.
-					targetList.runFilters();
+					targetList.draw();
 				}
 			};
 			Button b;
@@ -81,7 +81,7 @@ public class WF_ListSorter extends WF_Widget {
 					targetList.addFilter(existing);
 					
 					//running the filters will trigger redraw.
-					targetList.runFilters();
+					targetList.draw();
 				}
 			};
 			//Generate buttons from artlista. 
@@ -117,7 +117,7 @@ public class WF_ListSorter extends WF_Widget {
 		if (existing!=null)
 			targetList.removeFilter(existing);
 		existing = null;
-		targetList.runFilters();
+		targetList.draw();
 	}
 
 }

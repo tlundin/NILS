@@ -393,7 +393,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 	 */	
 	private static CreateListEntriesBlock readBlockCreateListEntries(XmlPullParser parser) throws IOException, XmlPullParserException, EvalException {
 		Log.d("NILS","Create List Entries block...");
-		String fileName="",containerName=null,namn=null,selectionField=null,selectionPattern=null,filter=null;
+		String type=null,fileName="",containerName=null,namn=null,selectionField=null,selectionPattern=null,filter=null;
 		parser.require(XmlPullParser.START_TAG, null,"block_create_list_entries");
 		while (parser.next() != XmlPullParser.END_TAG) {
 			if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -410,7 +410,8 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 
 			} else if (name.equals("name")) {
 				namn = readText("name",parser);
-
+			} else if (name.equals("type")) {
+				type = readText("type",parser);
 			}  else if (name.equals("selection_pattern")) {
 				selectionPattern = readText("selection_pattern",parser);
 
@@ -426,7 +427,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 
 		}
 
-		return new CreateListEntriesBlock(fileName,containerName,namn,selectionField,selectionPattern,filter);
+		return new CreateListEntriesBlock(type,fileName,containerName,namn,selectionField,selectionPattern,filter);
 	}
 
 

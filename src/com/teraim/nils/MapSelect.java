@@ -136,14 +136,15 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMarkerDragListene
 		
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        BitmapFactory.decodeResource(getResources(), R.drawable.r262_4, options);
+        //TODO:FIX!!!
+        BitmapFactory.decodeResource(getResources(), -1, options);
         int imageHeight = options.outHeight;
         int imageWidth = options.outWidth;
        // String imageType = options.outMimeType;
         
         Log.d("NILS","image size is w:"+ imageWidth+" h:"+imageHeight);
 		
-		final BitmapDescriptor image = BitmapDescriptorFactory.fromBitmap(Tools.decodeSampledBitmapFromResource(getResources(), R.drawable.r262_4, 500,500)); //.fromResource(R.drawable.r262_4);
+		final BitmapDescriptor image = BitmapDescriptorFactory.fromBitmap(Tools.decodeSampledBitmapFromResource(getResources(), -1, 500,500)); //.fromResource(R.drawable.r262_4);
 
 		LatLng ne,sw;
 		//Coordinates specifically for RUTA 262

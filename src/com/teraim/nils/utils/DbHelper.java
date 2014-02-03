@@ -119,9 +119,9 @@ public class DbHelper extends SQLiteOpenHelper {
 
     	// 2. create ContentValues to add key "column"/value
     	ContentValues values = new ContentValues();
-    	Log.d("nils","value: "+var.getValue()+" id: "+var.getId());
+    	//Log.d("nils","value: "+var.getValue()+" id: "+var.getId());
     	if (existsInDB(var,db)) {
-    		Log.d("nils","Variable already exists in database with ID "+var.getId());
+    		//Log.d("nils","Variable already exists in database with ID "+var.getId());
     		values.put("id", var.getId());
     	} 
     	values.put("ruta", var.getRutId()); // get ruta
@@ -239,12 +239,12 @@ public class DbHelper extends SQLiteOpenHelper {
     	long id = -1;
         if (c != null && c.moveToFirst()) {
         	String sid = c.getString(0);
-            Log.d("nils","DBHelper: found variable on row with Id "+sid);
+            //Log.d("nils","DBHelper: found variable on row with Id "+sid);
             id = Long.parseLong(sid);
 
         }
         else 
-        	Log.e("nils","DBHelper: Did not find variable on row with name "+var.getVarId());
+        	;//Log.e("nils","DBHelper: Did not find variable on row with name "+var.getVarId());
          c.close();
         return id;
     }
@@ -255,7 +255,7 @@ public class DbHelper extends SQLiteOpenHelper {
     	String[] selectionArgs = null;
  
         SQLiteDatabase db = this.getReadableDatabase();
-        Log.e("nils","GetVar: R:"+rutId+" P:"+provyteId+" D:"+delyteId+" V:"+varId);
+        //Log.e("nils","GetVar: R:"+rutId+" P:"+provyteId+" D:"+delyteId+" V:"+varId);
     	if (t==Type.ruta) {
     		selection = "var = ? and ruta = ?";
     		selectionArgs = new String[]{varId,rutId};
@@ -267,7 +267,7 @@ public class DbHelper extends SQLiteOpenHelper {
     		selectionArgs = new String[]{varId, rutId, provyteId, delyteId};
     	}	
     	
-    	Cursor c = db.query(TABLE_VARIABLES,new String[]{"id","serialized"},
+    	Cursor c = db.query(TABLE_VARIABLES,new String[]{"id","serialized","timestamp"},
     			selection,selectionArgs,null,null,null,null);
     	StoredVariable stV=null;
         if (c != null && c.moveToFirst() ) {
@@ -277,12 +277,13 @@ public class DbHelper extends SQLiteOpenHelper {
             if (stV==null) {
             	Log.d("nils","Deserialize failed in getVariable.");
             } else {
-            	Log.d("nils","Found variable "+stV.getVarId()+" in database with value "+stV.getValue()+" and db ID "+id);
-            	stV.setDatabaseId(Long.parseLong(id));
+            	//Log.d("nils","Found variable "+stV.getVarId()+" in database with value "+stV.getValue()+" and db ID "+id);
             	
+            	stV.setDatabaseId(Long.parseLong(id));
+            	stV.setTimeStamp(c.getString(2));
             }
         } else 
-        	Log.d("nils","Did NOT find variable "+varId+" in database");
+        	;//Log.d("nils","Did NOT find variable "+varId+" in database");
         
         return stV;
 	}
