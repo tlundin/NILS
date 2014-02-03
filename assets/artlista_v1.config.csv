@@ -1,0 +1,25 @@
+List Entry Name,Variable Name,Entry Label,Action,Variable Label,Num Type,Displayed,Unit,Variable Scope,Show Historical,Description,Familj,Funktionell grupp,Fältskiktsnamn,internetLink,distribution_region,distribution_text
+A00010,BuskarData.00.TackDiff,Döda lövbuskar,create,Täckning (D),number,TRUE,%,delyta,FALSE,Endast helt döda lövbuskar. Inga gröna blad får förekomma.,Döda,buskar,,http://simpsons.wikia.com/wiki/Grim_Reaper,1-10,Hela landet
+A00010,BuskarData.00.Tathet,,add,Täthet,number,FALSE,%,delyta,FALSE,,,buskar,,,,
+A00010,BuskarData.00.Hojd,,add,Höjd högsta individ,number,FALSE,dm,delyta,FALSE,,,buskar,,,,
+A00020,BuskarData.01.TackDiff,"En, levande",create,Täckning (D),number,TRUE,%,delyta,FALSE,"""Bland stickbarren sitta bären svärmvis som uppfångade hagelskott. På honom biter ingenting.""/ Harry Martinsson",Cypressväxter,buskar,,http://linnaeus.nrm.se/flora/barr/cupressa/junip/junicom.html,1-10,Hela landet.
+A00020,BuskarData.01.Tathet,,add,Täthet,number,FALSE,%,delyta,FALSE,,,buskar,,,,
+A00020,BuskarData.01.Hojd,,add,Höjd högsta individ,number,FALSE,dm,delyta,FALSE,,,buskar,,,,
+A00030,BuskarData.02.TackDiff,"En, död",create,Täckning (D),number,TRUE,%,delyta,FALSE,Helt bruna enar med finkvisten kvar.,Döda,buskar,,http://simpsons.wikia.com/wiki/Grim_Reaper,1-10,
+A00030,BuskarData.02.Tathet,,add,Täthet,number,FALSE,%,delyta,FALSE,,,buskar,,,,
+A00030,BuskarData.02.Hojd,,add,Höjd högsta individ,number,FALSE,dm,delyta,FALSE,,,buskar,,,,
+A00040,BuskarData.10.TackDiff,"Viden, delvis",create,Täckning (D),number,TRUE,%,delyta,FALSE,Tvåbyggare. Oftast välutvecklade stipler. Hybrider vanliga.,Videväxter,buskar,,http://linnaeus.nrm.se/flora/di/salica/salix/welcome.html,1-10,Hela landet
+A00040,BuskarData.10.Tathet,,add,Täthet,number,FALSE,%,delyta,FALSE,,,buskar,,,,
+A00040,BuskarData.10.Hojd,,add,Höjd högsta individ,number,FALSE,dm,delyta,FALSE,,,buskar,,,,
+A00050,BuskarData.11.TackDiff,Glansvide,create,Täckning (D),number,TRUE,%,delyta,FALSE,De vissna fjolårsbladen sitter kvar länge på kvistarna under de nya bladen.,Videväxter,buskar,,http://linnaeus.nrm.se/flora/di/salica/salix/salimyr.html,5-10,"Sällsynt ner till Dalarna, Hälsingland. Vanlig på kalkrik mark i fjällen."
+A00050,BuskarData.11.Tathet,,add,Täthet,number,FALSE,%,delyta,FALSE,,,buskar,,,,
+A00050,BuskarData.11.Hojd,,add,Höjd högsta individ,number,FALSE,dm,delyta,FALSE,,,buskar,,,,
+A00060,BuskarData.12.TackDiff,Rip/Ull/Lappvide,create,Täckning (D),number,TRUE,%,delyta,FALSE,Alla dessa är nordliga arter och har håriga blad. Dessa kan dock senare på säsongen falla bort.,Videväxter,buskar,,http://linnaeus.nrm.se/flora/di/salica/salix/salilap.html,5-10,Dalarna till Torne Lappmark
+A00060,BuskarData.12.Tathet,,add,Täthet,number,FALSE,%,delyta,FALSE,,,buskar,,,,
+A00060,BuskarData.12.Hojd,,add,Höjd högsta individ,number,FALSE,dm,delyta,FALSE,,,buskar,,,,
+A00070,BuskarData.13.TackDiff,Pors,create,Täckning (D),number,TRUE,%,delyta,FALSE,Kraftigt doftande blad med körtlar. Grovtandade framtill. Växer på kalkrik mark med rörligt vatten.,Porsväxter,buskar,,http://linnaeus.nrm.se/flora/di/myrica/myric/myrigal.html,1-8,Allmän i södra Sverige. Även längs kusten upp till Norrbotten.
+A00070,BuskarData.13.Tathet,,add,Täthet,number,FALSE,%,delyta,FALSE,,,buskar,,,,
+A00070,BuskarData.13.Hojd,,add,Höjd högsta individ,number,FALSE,dm,delyta,FALSE,,,buskar,,,,
+A00080,BuskarData.14.TackDiff,Dvärgbjörk,create,Täckning (D),number,TRUE,%,delyta,FALSE,Gles buske. Hybrider med fjällbjörk ganska vanliga.,Björkväxter,buskar,,http://linnaeus.nrm.se/flora/di/betula/betul/betunan.html,1-10,Vanlig norrut men förekommer i nästan hela landet på myrar. Sällsynt söderut.
+A00080,BuskarData.14.Tathet,,add,Täthet,number,FALSE,%,delyta,FALSE,,,buskar,,,,
+A00080,BuskarData.14.Hojd,,add,Höjd högsta individ,number,FALSE,dm,delyta,FALSE,,,buskar,,,,

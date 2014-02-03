@@ -1,0 +1,71 @@
+package com.teraim.nils.dynamic.blocks;
+
+import java.util.List;
+
+import android.util.Log;
+
+import com.teraim.nils.GlobalState;
+import com.teraim.nils.dynamic.types.VariableConfiguration;
+import com.teraim.nils.dynamic.workflow_abstracts.Container;
+import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
+import com.teraim.nils.dynamic.workflow_realizations.WF_List;
+import com.teraim.nils.dynamic.workflow_realizations.WF_List_UpdateOnSaveEvent;
+import com.teraim.nils.dynamic.workflow_realizations.WF_OnlyWithValue_Filter;
+
+public  class CreateListEntriesBlock extends Block {
+	String fileName=null;
+	String containerId;
+	String id;
+	private String selectionField;
+	private String selectionPattern;
+	private String filterName;
+	
+	public String getFileName() {
+		return fileName;
+	}
+	public String getContainerId() {
+		return containerId;
+	}
+	public CreateListEntriesBlock(String fileName, String containerId, String id, String selectionField, String selectionPattern,
+			String filterName) {
+		this.fileName =fileName;
+		this.containerId = containerId;
+		this.id=id;
+		this.selectionField=selectionField;
+		this.selectionPattern=selectionPattern;
+		this.filterName=filterName;
+	}
+
+	public void create(WF_Context myContext) {
+		
+		WF_List myList = new WF_List_UpdateOnSaveEvent(id,myContext);
+		List<List<String>> rows = runSelector(selectionField, selectionPattern, myContext);
+		Log.d("nils","about to add filter with name: "+filterName);
+		
+		if (filterName!=null) {
+			if (filterName.equals("only_instantiated")) {
+				Log.d("nils","Adding filter: only instantiated");
+				myList.addFilter(new WF_OnlyWithValue_Filter());
+			} else {
+				Log.e("parser","filter of type: "+filterName+"is not yet supported");
+			}
+		}
+		myList.createEntriesFromRows(rows);
+		myList.runFilters();
+		
+		Container myContainer = myContext.getContainer(containerId);
+		if (myContainer !=null) {
+				myContainer.add(myList);
+				myContext.addList(myList);		
+		} else
+			Log.e("nils","failed to parse listEntriesblock - could not find the container");
+			
+	}
+
+public List<List<String>> runSelector(String selectionField, String selectionPattern, WF_Context myContext) {
+	VariableConfiguration al = GlobalState.getInstance(myContext.getContext()).getArtLista();
+	List<List<String>>rows = al.getTable().getRowsContaining(selectionField, selectionPattern);
+	return rows;
+}
+
+}
