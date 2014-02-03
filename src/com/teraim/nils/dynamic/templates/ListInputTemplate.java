@@ -28,9 +28,9 @@ public class ListInputTemplate extends Executor {
 		myLayouts.add(root);
 		myLayouts.add(new WF_Container("Field_List_panel_1", (LinearLayout)findViewById(R.id.fieldList), root));
 		myLayouts.add(new WF_Container("Sort_Panel_1", sortPanel, root));
-		myLayouts.add(new WF_Container("Aggregation_Panel", (LinearLayout)findViewById(R.id.aggregates), root));
-		myLayouts.add(new WF_Container("Filter_Panel_1", (LinearLayout)findViewById(R.id.filterPanel), root));
-		myLayouts.add(new WF_Container("Selected_Panel", (LinearLayout)findViewById(R.id.Selected), root));
+		myLayouts.add(new WF_Container("Aggregation_panel_3", (LinearLayout)findViewById(R.id.aggregates), root));
+		myLayouts.add(new WF_Container("Filter_panel_4", (LinearLayout)findViewById(R.id.filterPanel), root));
+		myLayouts.add(new WF_Container("Field_List_panel_2", (LinearLayout)findViewById(R.id.Selected), root));
 		myContext.addContainers(getContainers());
 
 		//Create blocks for template functions.
@@ -52,42 +52,33 @@ public class ListInputTemplate extends Executor {
 	public void execute(String name) {
 
 		if (name.equals("template_function_show_sorter"))
-			toggleSorter(true);
-		else if (name.equals("template_function_hide_sorter"))
-			toggleSorter(false);
+			toggleSorter();
 		else if (name.equals("template_function_show_familjer"))
-			toggleFamiljer(true);
-		else if (name.equals("template_function_hide_familjer"))
-			toggleFamiljer(false);
-		else if (name.equals("template_function_hide_edited"))
-			toggleHideEdited(true);
-		else if (name.equals("template_function_show_edited"))
-			toggleHideEdited(false);
-
+			toggleFamiljer();
 
 	}
 
-	private void toggleHideEdited(boolean b) {
-	}
-
-	private void toggleFamiljer(boolean b) {
-		if (b)
+	private boolean toggleStateF = true;
+	private void toggleFamiljer() {
+		if (toggleStateF)
 			sortPanel.addView(familj_widget.getWidget());
 		else {
 			sortPanel.removeView(familj_widget.getWidget());
 			familj_widget.removeExistingFilter();
 		}
-
+		toggleStateF = !toggleStateF;
 
 	}
-	private void toggleSorter(boolean b) {
-		if (b)
+	boolean toggleStateS = true;
+	private void toggleSorter() {
+		if (toggleStateS) 
 			sortPanel.addView(a_o_widget.getWidget());
+			
 		else {
 			sortPanel.removeView(a_o_widget.getWidget());
 			a_o_widget.removeExistingFilter();
-
 		}
+		toggleStateS=!toggleStateS;
 	}
 
 

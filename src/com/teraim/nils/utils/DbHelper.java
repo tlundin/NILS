@@ -96,7 +96,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 	stV.setDatabaseId(Long.parseLong(id));
                 	ret.add(stV);
                 	//delete all
-                	deleteVariable(stV);
+                	//deleteVariable(stV);
                 }
        		}
        		
@@ -120,7 +120,7 @@ public class DbHelper extends SQLiteOpenHelper {
     	// 2. create ContentValues to add key "column"/value
     	ContentValues values = new ContentValues();
     	Log.d("nils","value: "+var.getValue()+" id: "+var.getId());
-    	if (existsInDB(var)) {
+    	if (existsInDB(var,db)) {
     		Log.d("nils","Variable already exists in database with ID "+var.getId());
     		values.put("id", var.getId());
     	} 
@@ -144,19 +144,16 @@ public class DbHelper extends SQLiteOpenHelper {
     	if (rId == var.getId())
     		Log.d("nils","Updated value for "+var.getVarId()+" to "+var.getValue());
     	else
-    		var.setDatabaseId(rId);
-    	
-    	
-    	// 4. close
-    	db.close(); 
+    		var.setDatabaseId(rId);  	
+    	db.close();
 }
     
-    private boolean existsInDB(StoredVariable var) {
+    private boolean existsInDB(StoredVariable var,SQLiteDatabase db) {
 		//if we know for sure already, return true.
     	if (var.existsInDB())
 			return true;
     	//look for it & try again.
-    	var.setDatabaseId(findRow(var));
+    	var.setDatabaseId(findRow(var,db));
     	return var.existsInDB();
  	}
 
@@ -200,7 +197,7 @@ public class DbHelper extends SQLiteOpenHelper {
         long rId = -1;
         // 2. Figure out the row index
        if(!var.existsInDB())
-        	rId = findRow(var);
+        	rId = findRow(var,db);
        else
     	   rId = var.getId();
         if (rId == -1) 
@@ -220,10 +217,9 @@ public class DbHelper extends SQLiteOpenHelper {
     
     
     
-    private long findRow(StoredVariable var) {
+    private long findRow(StoredVariable var,SQLiteDatabase db) {
     	String selection = null;
     	String[] selectionArgs = null;
-    	SQLiteDatabase db = this.getReadableDatabase();
     	
     	if (var.getType()==Type.ruta) {
     		selection = "var = ? and ruta = ?";
@@ -239,16 +235,18 @@ public class DbHelper extends SQLiteOpenHelper {
     	
     	Cursor c = db.query(TABLE_VARIABLES,new String[]{"id"},
     			selection,selectionArgs,null,null,null,null);
-    	
     	 // 3. if we got results get the first one
+    	long id = -1;
         if (c != null && c.moveToFirst()) {
-            String id = c.getString(0);
-            Log.d("nils","found variable on row with Id "+id);
-            return Long.parseLong(id);
+        	String sid = c.getString(0);
+            Log.d("nils","DBHelper: found variable on row with Id "+sid);
+            id = Long.parseLong(sid);
+
         }
-        else
-        	return -1;
-        	
+        else 
+        	Log.e("nils","DBHelper: Did not find variable on row with name "+var.getVarId());
+         c.close();
+        return id;
     }
 
 	public StoredVariable getVariable(Type t, String rutId, String provyteId,
@@ -257,7 +255,7 @@ public class DbHelper extends SQLiteOpenHelper {
     	String[] selectionArgs = null;
  
         SQLiteDatabase db = this.getReadableDatabase();
-        
+        Log.e("nils","GetVar: R:"+rutId+" P:"+provyteId+" D:"+delyteId+" V:"+varId);
     	if (t==Type.ruta) {
     		selection = "var = ? and ruta = ?";
     		selectionArgs = new String[]{varId,rutId};

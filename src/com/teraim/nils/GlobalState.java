@@ -15,7 +15,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.teraim.nils.dynamic.types.ArtLista;
+import com.teraim.nils.dynamic.types.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Delyta;
 import com.teraim.nils.dynamic.types.Provyta;
 import com.teraim.nils.dynamic.types.Ruta;
@@ -48,10 +48,10 @@ public class GlobalState  {
 	private PersistenceHelper ph = null;	
 	private DbHelper db = null;
 	private Parser parser=null;
-	private ArtLista artLista=null;
+	private VariableConfiguration artLista=null;
 	
 	//Cash for variables.
-	private Hashtable<String,Variable> myVars = new Hashtable<String,Variable>();
+	//private Hashtable<String,Variable> myVars = new Hashtable<String,Variable>();
 	//Cash for ruta/Provyta/Delyta..
 	private ArrayList<Ruta> rutor = new ArrayList<Ruta>();
 	//Map workflows into a hash with name as key.
@@ -100,7 +100,7 @@ public class GlobalState  {
 		//Parser for rules
 		parser = new Parser(this);
 		//Artlista
-		artLista = new ArtLista(Tools.scanListConfigData("artlista_v1.config.csv"));		
+		artLista = new VariableConfiguration(Tools.scanListConfigData("artlista_v1.config.csv"));		
 		//TODO: REMOVE
 		//Cached data from files.		
 		Tools.scanRutData(ctx.getResources().openRawResource(R.raw.rutdata_v3),this);
@@ -142,7 +142,7 @@ public class GlobalState  {
 		return rutor;
 	}
 	
-	public ArtLista getArtLista() {
+	public VariableConfiguration getArtLista() {
 		return artLista;
 	}
 
@@ -301,12 +301,26 @@ public class GlobalState  {
 			
 	}
 	
+	
+	public synchronized Aritmetic makeAritmetic(String name, String label) {
+		/*Variable result = myVars.get(name);
+		if (result == null) {
+		    myVars.put(name, result = new Aritmetic(name,label));
+		    return (Aritmetic)result;
+		}
+		else {
+			return (Aritmetic)result;
+		}
+		*/
+		return new Aritmetic(name,label);
+	}
+	
 	/*************************************
 	 * 
 	 * Variable Generators.
 	 * 
 	 */
-		
+	/*
 	public synchronized Bool makeBoolean(String name, String label) {
 		Variable result = myVars.get(name);
 		if (result == null) {
@@ -328,16 +342,7 @@ public class GlobalState  {
 			return (Numeric)result;
 		}
 	}
-	public synchronized Aritmetic makeAritmetic(String name, String label) {
-		Variable result = myVars.get(name);
-		if (result == null) {
-		    myVars.put(name, result = new Aritmetic(name,label));
-		    return (Aritmetic)result;
-		}
-		else {
-			return (Aritmetic)result;
-		}
-	}
+	
 	public synchronized Literal makeLiteral(String name, String label) {
 		Variable result = myVars.get(name);
 		if (result == null) {
@@ -352,6 +357,7 @@ public class GlobalState  {
 	public Variable getVariable(String name) {
 		return myVars.get(name);
 	}
+	*/
 	
 	
 /********************************************************
