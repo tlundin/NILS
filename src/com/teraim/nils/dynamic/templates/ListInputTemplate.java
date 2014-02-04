@@ -4,17 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.LinearLayout;
 
 import com.teraim.nils.R;
 import com.teraim.nils.dynamic.Executor;
 import com.teraim.nils.dynamic.blocks.ListSortingBlock;
+import com.teraim.nils.dynamic.workflow_abstracts.Filter;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Container;
+import com.teraim.nils.dynamic.workflow_realizations.WF_OnlyWithoutValue_Filter;
+import com.teraim.nils.dynamic.workflow_realizations.WF_List;
 import com.teraim.nils.dynamic.workflow_realizations.WF_SorterWidget;
 
 
 public class ListInputTemplate extends Executor {
+	public static String FIELD_LIST = "Field_list_1";
 	private LinearLayout sortPanel;
 	List<WF_Container> myLayouts = new ArrayList<WF_Container>();
 	private WF_SorterWidget a_o_widget,familj_widget;
@@ -34,8 +37,8 @@ public class ListInputTemplate extends Executor {
 		myContext.addContainers(getContainers());
 
 		//Create blocks for template functions.
-		ListSortingBlock a_o = new ListSortingBlock("alphanumeric_sorting_function","Sort_Panel_1","Field_list_1");
-		ListSortingBlock slakt = new ListSortingBlock("familje_sorting_function","Sort_Panel_1","Field_list_1");
+		ListSortingBlock a_o = new ListSortingBlock("alphanumeric_sorting_function","Sort_Panel_1",FIELD_LIST);
+		ListSortingBlock slakt = new ListSortingBlock("familje_sorting_function","Sort_Panel_1",FIELD_LIST);
 
 		if (wf!=null) {
 			run();
@@ -55,7 +58,21 @@ public class ListInputTemplate extends Executor {
 			toggleSorter();
 		else if (name.equals("template_function_show_familjer"))
 			toggleFamiljer();
+		else if (name.equals("template_function_hide_edited"))
+			hideEdited();
 
+	}
+
+	Filter f = new WF_OnlyWithoutValue_Filter();
+	private boolean toggleStateH = true;
+	private void hideEdited() {
+		final WF_List fieldList = (WF_List)myContext.getFilterable(FIELD_LIST);
+		if (toggleStateH) {
+			fieldList.addFilter(f);
+		} else
+			fieldList.removeFilter(f);
+		fieldList.draw();
+		toggleStateH = !toggleStateH;
 	}
 
 	private boolean toggleStateF = true;

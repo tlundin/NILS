@@ -100,12 +100,13 @@ public  class ButtonBlock extends Block {
 			params.width = LayoutParams.WRAP_CONTENT;
 			params.height = LayoutParams.MATCH_PARENT;
 			params.gravity = Gravity.CENTER_HORIZONTAL;
-			params.leftMargin = 100;
-			params.rightMargin = 100;
+			params.leftMargin = 50;
+			params.rightMargin = 50;
 			//Not sure about these..
 			params.bottomMargin = 10;
 			params.topMargin = 10;
 			button.setLayoutParams(params);
+			button.setTextSize(Constants.TEXT_LARGE);
 
 			button.setOnClickListener(new View.OnClickListener() {
 				@Override

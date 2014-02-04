@@ -32,7 +32,8 @@ public class WF_Context {
 	public Context getContext() {
 		return ctx;
 	}
-
+	
+	
 	//for now it is assumed that all lists implements filterable.
 	public Filterable getFilterable(String id) {
 		Log.d("nils","Getfilterable called with id "+id);

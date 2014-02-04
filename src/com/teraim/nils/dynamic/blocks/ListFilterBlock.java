@@ -9,7 +9,7 @@ import android.widget.ToggleButton;
 import com.teraim.nils.dynamic.workflow_abstracts.Container;
 import com.teraim.nils.dynamic.workflow_abstracts.Filterable;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
-import com.teraim.nils.dynamic.workflow_realizations.WF_Kvar_Filter;
+import com.teraim.nils.dynamic.workflow_realizations.WF_OnlyWithoutValue_Filter;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Widget;
 
 public class ListFilterBlock extends Block {
@@ -48,7 +48,7 @@ public class ListFilterBlock extends Block {
 				if (on) {
 					Filterable f = myContext.getFilterable(target);
 					//WF_Kvar_Filter f = ;
-					f.addFilter(new WF_Kvar_Filter());
+					f.addFilter(new WF_OnlyWithoutValue_Filter());
 				}
 			}
 		});

@@ -22,7 +22,7 @@ public  class CreateListEntriesBlock extends Block {
 	private String selectionField;
 	private String selectionPattern;
 	private String filterName;
-	
+
 	public String getFileName() {
 		return fileName;
 	}
@@ -41,7 +41,7 @@ public  class CreateListEntriesBlock extends Block {
 	}
 
 	public void create(WF_Context myContext) {
-		
+
 		WF_List myList; 
 		List<List<String>> rows = runSelector(selectionField, selectionPattern, myContext);
 
@@ -49,9 +49,16 @@ public  class CreateListEntriesBlock extends Block {
 			myList =  new WF_List_UpdateOnSaveEvent(id,myContext);
 			myList.addSorter(new WF_TimeOrder_Sorter());	
 		}
-		if (type.equals("selection_list")) {
-			myList = new WF_List_Selection(id,myContext);
-			myList.addSorter(new WF_Alphanumeric_Sorter());
+		else { 
+			if (type.equals("selection_list")) {
+				myList = new WF_List_UpdateOnSaveEvent(id,myContext);
+				myList.addSorter(new WF_Alphanumeric_Sorter());
+			} else
+			{
+				//TODO: Find other solution
+				myList = new WF_List_UpdateOnSaveEvent(id,myContext);
+				myList.addSorter(new WF_Alphanumeric_Sorter());
+			}
 		}
 
 		Log.d("nils","about to add filter with name: "+filterName);
@@ -65,20 +72,20 @@ public  class CreateListEntriesBlock extends Block {
 		}
 		myList.createEntriesFromRows(rows);
 		myList.draw();
-		
+
 		Container myContainer = myContext.getContainer(containerId);
 		if (myContainer !=null) {
-				myContainer.add(myList);
-				myContext.addList(myList);		
+			myContainer.add(myList);
+			myContext.addList(myList);		
 		} else
 			Log.e("nils","failed to parse listEntriesblock - could not find the container");
-			
+
 	}
 
-public List<List<String>> runSelector(String selectionField, String selectionPattern, WF_Context myContext) {
-	VariableConfiguration al = GlobalState.getInstance(myContext.getContext()).getArtLista();
-	List<List<String>>rows = al.getTable().getRowsContaining(selectionField, selectionPattern);
-	return rows;
-}
+	public List<List<String>> runSelector(String selectionField, String selectionPattern, WF_Context myContext) {
+		VariableConfiguration al = GlobalState.getInstance(myContext.getContext()).getArtLista();
+		List<List<String>>rows = al.getTable().getRowsContaining(selectionField, selectionPattern);
+		return rows;
+	}
 
 }

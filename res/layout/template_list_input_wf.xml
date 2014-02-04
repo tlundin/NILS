@@ -26,6 +26,11 @@
             </LinearLayout>
         </ScrollView>
 
+        <View
+            android:layout_width="1dip"
+            android:layout_height="fill_parent"
+            android:background="#000000" />
+
         <LinearLayout
             android:id="@+id/aggregates"
             android:layout_width="0dp"
@@ -33,12 +38,13 @@
             android:layout_weight="0.5"
             android:orientation="vertical" >
         </LinearLayout>
-     
     </LinearLayout>
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="1dip"
-            android:background="#000000" />
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:background="#000000" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="784dp"
@@ -66,6 +72,11 @@
                 android:orientation="horizontal" >
             </LinearLayout>
         </ScrollView>
+
+        <View
+            android:layout_width="1dip"
+            android:layout_height="fill_parent"
+            android:background="#000000" />
 
         <ScrollView
             android:id="@+id/scrollView3"

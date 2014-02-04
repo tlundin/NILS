@@ -30,7 +30,7 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 					if (al.getAction(r).equals("create")) {
 						//C_F_+index is the ID for the element.
 
-						listRow = new WF_ClickableField(al.getEntryLabel(r),al.getDescription(r),myContext,"C_F_"+index);
+						listRow = new WF_ClickableField_Selection(al.getEntryLabel(r),al.getDescription(r),myContext,"C_F_"+index);
 						list.add(listRow);	
 					} 
 					if (!al.getAction(r).equals("add")&&!al.getAction(r).equals("create"))

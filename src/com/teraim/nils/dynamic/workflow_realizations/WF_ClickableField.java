@@ -31,28 +31,30 @@ import com.teraim.nils.dynamic.types.Workflow.Unit;
 import com.teraim.nils.dynamic.workflow_abstracts.EventGenerator;
 import com.teraim.nils.dynamic.workflow_abstracts.Listable;
 
-public class WF_ClickableField extends WF_ListEntry implements EventGenerator {
+public abstract class WF_ClickableField extends WF_ListEntry implements EventGenerator {
+
 
 	TextView myHeader;
 	String myKey;
-	protected Map<VarIdentifier,TextView> myOutputFields = new HashMap<VarIdentifier,TextView>();
+	protected Map<VarIdentifier,LinearLayout> myOutputFields = new HashMap<VarIdentifier,LinearLayout>();
 	protected Map<VarIdentifier,View> myVars = new HashMap<VarIdentifier,View>();
+	
 	final LinearLayout outputContainer, inputContainer;
 	//Hack! Used to determine what is the master key for this type of element.
 	//If DisplayOut & Virgin --> This is master key.
 	boolean virgin=true;
 	private WF_Context myContext;
-	
-	public  WF_ClickableField(final String headerT,final String descriptionT, WF_Context context,String id) {
-		super(LayoutInflater.from(context.getContext()).inflate(R.layout.clickable_field_normal,null),context.getContext());			
+
+	public  WF_ClickableField(final String headerT,final String descriptionT, WF_Context context,String id, View view) {
+		super(view,context.getContext());			
 		myKey = headerT;
 		this.myId=id;
 		myContext = context;
 		myHeader = (TextView)getWidget().findViewById(R.id.editfieldtext);
 		outputContainer = (LinearLayout)getWidget().findViewById(R.id.outputContainer);
-		SpannableString content = new SpannableString(headerT);
-		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-		myHeader.setText(content);
+		//SpannableString content = new SpannableString(headerT);
+		//content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+		myHeader.setText(headerT);
 		inputContainer = new LinearLayout(ctx);
 		inputContainer.setOrientation(LinearLayout.VERTICAL);
 		inputContainer.setLayoutParams(new LinearLayout.LayoutParams(
@@ -102,7 +104,7 @@ public class WF_ClickableField extends WF_ListEntry implements EventGenerator {
 			virgin = false;
 			super.setKeyRow(varId);
 		}
-			
+
 		// Set an EditText view to get user input 
 		VarIdentifier varIdentifier = new VarIdentifier(ctx,varLabel,varId,numType,varType,unit);
 		if (numType == Variable.Type.BOOLEAN) {
@@ -131,15 +133,24 @@ public class WF_ClickableField extends WF_ListEntry implements EventGenerator {
 			myVars.put(varIdentifier,view);
 		}
 		if (displayOut) {
-			TextView o = (TextView)LayoutInflater.from(ctx).inflate(R.layout.output_field,null);
+			LinearLayout ll = getClickableFieldLayout();
+
+			/*
+			 TextView o = (TextView)ll.findViewById(R.id.outputValueField);
+			TextView u = (TextView)ll.findViewById(R.id.outputUnitField);
+
 			String value = varIdentifier.getPrintedValue();
-			if (!value.isEmpty()) 
-				o.setText(varLabel+": "+value+" ("+varIdentifier.getPrintedUnit()+")");			
-			myOutputFields.put(varIdentifier,o);
-			outputContainer.addView(o);
+			if (!value.isEmpty()) {
+				o.setText(varLabel+": "+value);	
+				u.setText(" ("+varIdentifier.getPrintedUnit()+")");
+			}
+			 */
+			myOutputFields.put(varIdentifier,ll);
+			outputContainer.addView(ll);
 		}
 
 	}
+
 
 
 	private void save() {
@@ -187,35 +198,44 @@ public class WF_ClickableField extends WF_ListEntry implements EventGenerator {
 				else
 					Log.d("nils","WF_Clickable:view was null in refreshinput");
 			}
-			
+
 		}
 		refreshValues();
 	}
-	
+
 	@Override
 	public void refreshValues() {
 		//Log.d("nils","refreshoutput called on "+myHeader);
-		Iterator<Map.Entry<VarIdentifier,TextView>> it = myOutputFields.entrySet().iterator();
+		Iterator<Map.Entry<VarIdentifier,LinearLayout>> it = myOutputFields.entrySet().iterator();
 		while (it.hasNext()) {
-			Map.Entry<VarIdentifier,TextView> pairs = (Map.Entry<VarIdentifier,TextView>)it.next();
+			Map.Entry<VarIdentifier,LinearLayout> pairs = (Map.Entry<VarIdentifier,LinearLayout>)it.next();
 			//Log.d("nils","Iterator has found "+pairs.getKey()+" "+pairs.getValue());
 			VarIdentifier varId = pairs.getKey();
-			TextView out = pairs.getValue();
+			LinearLayout ll = pairs.getValue();
+			TextView o = (TextView)ll.findViewById(R.id.outputValueField);
+			TextView u = (TextView)ll.findViewById(R.id.outputUnitField);			
 			String value = varId.getPrintedValue();
-			if (!value.isEmpty())
-				out.setText(varId.getLabel()+": "+value+" ("+varId.getPrintedUnit()+")");
-			else
-				out.setText("");
+			if (!value.isEmpty()) {
+				o.setText(getFormattedText(varId,value));	
+				u.setText(getFormattedUnit(varId));
+			}
+			else {
+				o.setText("");
+				u.setText("");
+			}
 		}	}
 
 
+	public abstract LinearLayout getClickableFieldLayout();
+	public abstract String getFormattedText(VarIdentifier varId, String value);
+	public abstract String getFormattedUnit(VarIdentifier varId);
 
 
 
 
 
 
-	
+
 
 
 }
