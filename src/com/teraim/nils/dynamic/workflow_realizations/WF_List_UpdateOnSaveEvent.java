@@ -6,15 +6,15 @@ import android.util.Log;
 
 import com.teraim.nils.dynamic.workflow_abstracts.Event;
 import com.teraim.nils.dynamic.workflow_abstracts.Event.EventType;
-import com.teraim.nils.dynamic.workflow_abstracts.EventListener;
 import com.teraim.nils.dynamic.workflow_abstracts.EventGenerator;
+import com.teraim.nils.dynamic.workflow_abstracts.EventListener;
 
 public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,EventGenerator{
 
 	public WF_List_UpdateOnSaveEvent(String id, WF_Context ctx) {
 		super(id, ctx);
-		//myContext.addEventProvider(this,EventType.onSave);
-		myContext.addEventListener(this,EventType.onSave);
+		ctx.addEventListener(this, EventType.onSave);
+		
 	}
 
 	@Override
@@ -29,7 +29,7 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 				} else {
 					if (al.getAction(r).equals("create")) {
 						//C_F_+index is the ID for the element.
-
+						//TODO: ID is a bit hacked here..
 						listRow = new WF_ClickableField_Selection(al.getEntryLabel(r),al.getDescription(r),myContext,"C_F_"+index);
 						list.add(listRow);	
 					} 
@@ -56,6 +56,7 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 			Log.d("nils","GOT EVENT!!");
 			draw();
 		}
+		myContext.registerEvent(new WF_Event_OnRedraw(this.getId()));
 	}
 
 	

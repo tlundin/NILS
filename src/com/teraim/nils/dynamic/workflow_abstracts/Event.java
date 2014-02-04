@@ -3,23 +3,25 @@ package com.teraim.nils.dynamic.workflow_abstracts;
 public abstract class Event {
 
 	public enum EventType {
-		onSave,onClick
+		onSave,
+		onClick,
+		onRedraw
 	}
 	
-	private  EventGenerator ep;
+	private  String generatorId;
 	private  EventType myType;
 	
 
-	public Event (EventGenerator ep, EventType et) {
-		this.ep = ep;
+	public Event (String fromId, EventType et) {
+		this.generatorId = fromId;
 		myType = et;
 	}
 	public EventType getType() {
 		return myType;
 	}
 	
-	public EventGenerator getProvider() {
-		return ep;
+	public String getProvider() {
+		return generatorId;
 	}
 	
 	

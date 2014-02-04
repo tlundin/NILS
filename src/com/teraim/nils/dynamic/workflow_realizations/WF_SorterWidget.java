@@ -30,7 +30,7 @@ public class WF_SorterWidget extends WF_Widget {
 	WF_List targetList;
 	
 	public WF_SorterWidget(WF_Context ctx, String type, final WF_List targetList) {
-		super(new LinearLayout(ctx.getContext()));
+		super("SorterWidget",new LinearLayout(ctx.getContext()));
 		LinearLayout buttonPanel;
 		LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT);
 		buttonPanel = (LinearLayout) getWidget();

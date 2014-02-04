@@ -4,6 +4,10 @@ import com.teraim.nils.dynamic.workflow_abstracts.Filter;
 
 public abstract class WF_Filter extends WF_Thing implements Filter {
 
+	public WF_Filter() {
+		super("Filter_ID");
+	}
 
+	
 }
 

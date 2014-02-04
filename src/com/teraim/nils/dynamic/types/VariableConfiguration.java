@@ -8,9 +8,12 @@ import java.util.Map;
 import android.util.Log;
 
 import com.teraim.nils.GlobalState.ErrorCode;
+import com.teraim.nils.GlobalState;
 import com.teraim.nils.StoredVariable;
 import com.teraim.nils.Variable;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
+import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
+import com.teraim.nils.utils.Tools;
 
 
 public class VariableConfiguration {
@@ -95,17 +98,9 @@ public class VariableConfiguration {
 	}
 
 	public Unit getUnit(List<String> row) {
-		Unit unit;
-		String u = row.get(fromNameToColumn.get(requiredColumns.get(UNIT)));
-		if (u.equals("dm"))
-			unit = Unit.dm;
-		else if(u.equals("%"))
-			unit = Unit.percentage;
-		else {
-			unit = Unit.undefined;
-			Log.d("nils","Could not recognize unit: "+u+". Supported: % and dm");
-		}
-		return unit;
+		return Tools.convertToUnit(row.get(fromNameToColumn.get(requiredColumns.get(UNIT))));
 	}
+	
+	
 }
 

@@ -26,7 +26,7 @@ public abstract class WF_ListEntry extends WF_Widget implements Listable,Compara
 	public abstract void refreshInputFields();
 
 	public WF_ListEntry(View v,Context ctx) {
-		super(v);
+		super("LIST_ID",v);
 		this.ctx=ctx;
 		al = GlobalState.getInstance(ctx).getArtLista();
 	}

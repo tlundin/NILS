@@ -85,15 +85,19 @@ public class Tools {
 	}
 
 	public static Unit convertToUnit(String unit) {
-		if (unit == null ||unit.length()==0)
-			return Unit.undefined;
+		Log.d("unit","unit is "+unit+" with length "+unit.length());
+		if (unit == null ||unit.length()==0) {
+			Log.d("unit","translates to undefined");
+			return Unit.nd;
+		}
 		Unit[] units = Unit.values();
+		if (unit.equals("%"))
+			return Unit.percentage;
 		for (int i =0;i<units.length;i++) {
 			if (unit.equalsIgnoreCase(units[i].name()))
 				return units[i];
-
 		}
-		return null;				
+		return Unit.nd;				
 	}
 
 	public static void createFoldersIfMissing(File file) {
@@ -232,10 +236,13 @@ public class Tools {
 					for(int i=0;i<r.length;i++)
 						if (r[i]!=null)
 							r[i] = r[i].replace("\"", "");
+					
 					t.addRow(Arrays.asList(r));		
 				}
 			}
 			}
+			t.addRow(Arrays.asList("EE0020,AntalArter,Antal Arter,,,,TRUE,st,delyta,,,,,,,,".split(",")));
+			t.addRow(Arrays.asList("EE0030,SumTackning,Summa Täckning,,,,TRUE,%,delyta,,,,,,,,".split(",")));
 			br.close();
 			is.close();
 			

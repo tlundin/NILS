@@ -23,7 +23,7 @@ public class Workflow {
 	public enum Unit {
 		percentage,
 		dm,
-		undefined
+		nd
 
 	};
 

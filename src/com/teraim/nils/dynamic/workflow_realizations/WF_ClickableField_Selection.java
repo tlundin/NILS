@@ -1,7 +1,7 @@
 package com.teraim.nils.dynamic.workflow_realizations;
 
 import com.teraim.nils.R;
-import com.teraim.nils.VarIdentifier;
+import com.teraim.nils.dynamic.types.VarIdentifier;
 
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
@@ -15,7 +15,7 @@ public class WF_ClickableField_Selection extends WF_ClickableField {
 	}
 
 	@Override
-	public LinearLayout getClickableFieldLayout() {
+	public LinearLayout getFieldLayout() {
 		//LayoutInflater.from(context.getContext()).inflate(R.layout.clickable_field_normal,null)
 		//return 	(LinearLayout)LayoutInflater.from(ctx).inflate(R.layout.output_field,null);
 		//o.setText(varId.getLabel()+": "+value);	

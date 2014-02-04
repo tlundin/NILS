@@ -54,7 +54,7 @@ public class ListFilterBlock extends Block {
 		});
 		
 		
-		myContainer.add(new WF_Widget(toggleB));
+		myContainer.add(new WF_Widget(label,toggleB));
 
 		
 	}

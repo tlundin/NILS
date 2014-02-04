@@ -43,8 +43,9 @@ public  class CreateListEntriesBlock extends Block {
 	public void create(WF_Context myContext) {
 
 		WF_List myList; 
-		List<List<String>> rows = runSelector(selectionField, selectionPattern, myContext);
-
+		VariableConfiguration al = GlobalState.getInstance(myContext.getContext()).getArtLista();
+		List<List<String>>rows = al.getTable().getRowsContaining(selectionField, selectionPattern);
+		
 		if (type.equals("selected_values_list")) {
 			myList =  new WF_List_UpdateOnSaveEvent(id,myContext);
 			myList.addSorter(new WF_TimeOrder_Sorter());	
@@ -82,10 +83,5 @@ public  class CreateListEntriesBlock extends Block {
 
 	}
 
-	public List<List<String>> runSelector(String selectionField, String selectionPattern, WF_Context myContext) {
-		VariableConfiguration al = GlobalState.getInstance(myContext.getContext()).getArtLista();
-		List<List<String>>rows = al.getTable().getRowsContaining(selectionField, selectionPattern);
-		return rows;
-	}
 
 }

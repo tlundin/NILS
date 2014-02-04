@@ -30,9 +30,13 @@ public class Table {
 	public void addRow(List<String> rowEntries) {
 		assert(rowEntries.size()==columnCount);
 		int index=0;
-		for(String entry:rowEntries) 
+		String entrs="";
+		for(String entry:rowEntries) {
+			entrs+="["+entry+":["+myColumns[index]+"]]";
 			colTable.get(myColumns[index++]).add(entry);
+		}
 		rowTable.put(rowCount++, rowEntries);
+		Log.d("nils","ZZZ: "+entrs);
 	}
 
 
@@ -45,14 +49,17 @@ public class Table {
 	}
 
 	public List<List<String>> getRowsContaining(String columnName, String pattern) {
-		List<List<String>> ret = new ArrayList<List<String>>();
+		List<List<String>> ret = null;
 		List<String> column = colTable.get(columnName);
 		if(column!=null) {
 			for(int i = 0;i<column.size();i++) 
-				if (column.get(i).equalsIgnoreCase(pattern)||column.get(i).matches(pattern))
+				if (column.get(i).equalsIgnoreCase(pattern)||column.get(i).matches(pattern)) {
+					if (ret == null)
+						ret = new ArrayList<List<String>>();
 					ret.add(rowTable.get(i));
+				}
 			Log.d("nils","Returning "+ret.size()+" rows in getRows(Table)");
-		}
+		} 
 		return ret;
 	}
 
@@ -71,7 +78,7 @@ public class Table {
 				//Log.d("nils","found master variable "+key+" in Artlista");
 				return rowTable.get(i);
 			}
-		Log.d("nils","Did not find master variable "+key+" in Artlista");
+		Log.d("nils","Did not find master variable "+key+" in Artlista column: "+columnName);
 		return null;
 	}
 

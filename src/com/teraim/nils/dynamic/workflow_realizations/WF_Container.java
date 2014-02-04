@@ -16,7 +16,7 @@ public class WF_Container extends WF_Thing implements Container {
 	List<WF_Widget> myItems;
 
 	public WF_Container(String id, ViewGroup container, Container parent) {
-		this.myId = id;
+		super(id);
 		this.parent=parent;
 		me = container;
 		myItems = new ArrayList<WF_Widget>();
@@ -41,7 +41,7 @@ public class WF_Container extends WF_Thing implements Container {
 
 	@Override
 	public void draw() {
-		Log.d("nils","in WF_Container draw with ID: "+myId+". I have  "+myItems.size()+" widgets.");
+		Log.d("nils","in WF_Container draw with ID: "+this.getId()+". I have  "+myItems.size()+" widgets.");
 		View v;
 		for(WF_Widget d:myItems) {
 			v = d.getWidget();

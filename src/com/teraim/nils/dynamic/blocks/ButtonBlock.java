@@ -87,8 +87,6 @@ public  class ButtonBlock extends Block {
 
 	public void create(final WF_Context myContext) {
 		Container myContainer = myContext.getContainer(containerId);
-		if (myContainer == null) 
-			return;
 		final Context ctx = myContext.getContext();
 		if (type == Type.action) {
 			Button button = new Button(ctx);
@@ -141,7 +139,7 @@ public  class ButtonBlock extends Block {
 				}
 
 			});
-			myContainer.add(new WF_Widget(button));
+			myContainer.add(new WF_Widget(text,button));
 		} else if (type == Type.toggle) {
 			ToggleButton toggleB = new ToggleButton(ctx);
 			toggleB.setTextOn(text);
@@ -161,7 +159,7 @@ public  class ButtonBlock extends Block {
 			});
 
 
-			myContainer.add(new WF_Widget(toggleB));
+			myContainer.add(new WF_Widget(text,toggleB));
 		}
 	}
 }

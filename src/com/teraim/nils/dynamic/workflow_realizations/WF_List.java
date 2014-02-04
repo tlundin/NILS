@@ -16,7 +16,7 @@ import com.teraim.nils.dynamic.workflow_abstracts.Sorter;
 
 public abstract class WF_List extends WF_Widget implements Sortable,Filterable {
 
-	protected final List<WF_ListEntry> list = new  ArrayList<WF_ListEntry>(); //Instantiated in constructor
+	protected final List<Listable> list = new  ArrayList<Listable>(); //Instantiated in constructor
 	protected final List<Filter> myFilters=new ArrayList<Filter>();
 	protected final List<Sorter> mySorters=new ArrayList<Sorter>();
 	protected WF_Context myContext;
@@ -24,10 +24,9 @@ public abstract class WF_List extends WF_Widget implements Sortable,Filterable {
 	private List<? extends Listable> filteredList;
 	//How about using the Container's panel?? TODO
 	public WF_List(String id, WF_Context ctx) {
-		super(new LinearLayout(ctx.getContext()));	
+		super(id,new LinearLayout(ctx.getContext()));	
 		myWidget = (LinearLayout)getWidget();
 		myWidget.setOrientation(LinearLayout.VERTICAL);
-		myId = id;
 		myContext = ctx;
 		al = GlobalState.getInstance(ctx.getContext()).getArtLista();
 	}
@@ -49,10 +48,9 @@ public abstract class WF_List extends WF_Widget implements Sortable,Filterable {
 	public void removeFilter(Filter f) {
 		myFilters.remove(f);
 	}
-
-	@Override
-	public String getId() {
-		return myId;
+	
+	public List<Listable> getList() {
+		return list;
 	}
 
 	public void createEntriesFromRows(List<List<String>> rows) {

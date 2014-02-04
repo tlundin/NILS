@@ -1,7 +1,9 @@
 package com.teraim.nils.dynamic.workflow_realizations;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -25,36 +27,34 @@ import android.widget.TextView;
 
 import com.teraim.nils.R;
 import com.teraim.nils.StoredVariable;
-import com.teraim.nils.VarIdentifier;
 import com.teraim.nils.Variable;
+import com.teraim.nils.dynamic.types.VarIdentifier;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 import com.teraim.nils.dynamic.workflow_abstracts.EventGenerator;
 import com.teraim.nils.dynamic.workflow_abstracts.Listable;
 
-public abstract class WF_ClickableField extends WF_ListEntry implements EventGenerator {
+public abstract class WF_ClickableField extends WF_Not_ClickableField implements  EventGenerator {
 
 
-	TextView myHeader;
-	String myKey;
-	protected Map<VarIdentifier,LinearLayout> myOutputFields = new HashMap<VarIdentifier,LinearLayout>();
-	protected Map<VarIdentifier,View> myVars = new HashMap<VarIdentifier,View>();
 	
-	final LinearLayout outputContainer, inputContainer;
-	//Hack! Used to determine what is the master key for this type of element.
-	//If DisplayOut & Virgin --> This is master key.
-	boolean virgin=true;
-	private WF_Context myContext;
+	final LinearLayout inputContainer;
 
-	public  WF_ClickableField(final String headerT,final String descriptionT, WF_Context context,String id, View view) {
-		super(view,context.getContext());			
-		myKey = headerT;
-		this.myId=id;
-		myContext = context;
-		myHeader = (TextView)getWidget().findViewById(R.id.editfieldtext);
-		outputContainer = (LinearLayout)getWidget().findViewById(R.id.outputContainer);
+	protected Map<VarIdentifier,View> myVars = new HashMap<VarIdentifier,View>();
+
+	
+	public abstract LinearLayout getFieldLayout();
+	public abstract String getFormattedText(VarIdentifier varId, String value);
+	public abstract String getFormattedUnit(VarIdentifier varId);
+
+	@Override
+	public Set<VarIdentifier> getAssociatedVariables() {
+		return myVars.keySet();
+	}
+	
+	public  WF_ClickableField(final String myId,final String descriptionT, WF_Context context,String id, View view) {
+		super(myId,descriptionT,context,view);		
 		//SpannableString content = new SpannableString(headerT);
 		//content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-		myHeader.setText(headerT);
 		inputContainer = new LinearLayout(ctx);
 		inputContainer.setOrientation(LinearLayout.VERTICAL);
 		inputContainer.setLayoutParams(new LinearLayout.LayoutParams(
@@ -70,9 +70,9 @@ public abstract class WF_ClickableField extends WF_ListEntry implements EventGen
 
 				//On click, create dialog 			
 				AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
-				alert.setTitle(myKey);
+				alert.setTitle(myId);
 				alert.setMessage(descriptionT);
-
+				
 				alert.setPositiveButton("Spara", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {				  
 						save();
@@ -85,7 +85,10 @@ public abstract class WF_ClickableField extends WF_ListEntry implements EventGen
 						((ViewGroup)inputContainer.getParent()).removeView(inputContainer);
 					}
 				});	
+				if (inputContainer.getParent()!=null)
+					((ViewGroup)inputContainer.getParent()).removeView(inputContainer);
 				Dialog d = alert.setView(inputContainer).create();
+				d.setCancelable(false);
 				//WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
 				//lp.copyFrom(d.getWindow().getAttributes());
 				//lp.height = WindowManager.LayoutParams.FILL_PARENT;
@@ -98,8 +101,9 @@ public abstract class WF_ClickableField extends WF_ListEntry implements EventGen
 		});	
 	}
 
-
+	@Override
 	public void addVariable(String varLabel, String varId, Unit unit, Variable.Type numType, StoredVariable.Type varType, boolean displayOut) {
+		
 		if (displayOut && virgin) {
 			virgin = false;
 			super.setKeyRow(varId);
@@ -107,6 +111,10 @@ public abstract class WF_ClickableField extends WF_ListEntry implements EventGen
 
 		// Set an EditText view to get user input 
 		VarIdentifier varIdentifier = new VarIdentifier(ctx,varLabel,varId,numType,varType,unit);
+		
+		
+		
+		
 		if (numType == Variable.Type.BOOLEAN) {
 			View view = LayoutInflater.from(ctx).inflate(R.layout.ja_nej_radiogroup,null);
 			RadioButton ja = (RadioButton)view.findViewById(R.id.ja);
@@ -127,13 +135,13 @@ public abstract class WF_ClickableField extends WF_ListEntry implements EventGen
 			View l = LayoutInflater.from(ctx).inflate(R.layout.edit_field,null);
 			TextView header = (TextView)l.findViewById(R.id.header);
 			EditText view = (EditText)l.findViewById(R.id.edit);
-			header.setText(varLabel+" ("+unit.name()+")");
+			header.setText(varLabel+" ("+varIdentifier.getPrintedUnit()+")");
 			view.setText(varIdentifier.getPrintedValue());
 			inputContainer.addView(l);
 			myVars.put(varIdentifier,view);
 		}
 		if (displayOut) {
-			LinearLayout ll = getClickableFieldLayout();
+			LinearLayout ll = getFieldLayout();
 
 			/*
 			 TextView o = (TextView)ll.findViewById(R.id.outputValueField);
@@ -179,7 +187,7 @@ public abstract class WF_ClickableField extends WF_ListEntry implements EventGen
 				 */
 			}
 		}
-		myContext.registerEvent(new WF_Event_OnSave(this));
+		myContext.registerEvent(new WF_Event_OnSave(this.getId()));
 	}
 
 	@Override
@@ -203,32 +211,8 @@ public abstract class WF_ClickableField extends WF_ListEntry implements EventGen
 		refreshValues();
 	}
 
-	@Override
-	public void refreshValues() {
-		//Log.d("nils","refreshoutput called on "+myHeader);
-		Iterator<Map.Entry<VarIdentifier,LinearLayout>> it = myOutputFields.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry<VarIdentifier,LinearLayout> pairs = (Map.Entry<VarIdentifier,LinearLayout>)it.next();
-			//Log.d("nils","Iterator has found "+pairs.getKey()+" "+pairs.getValue());
-			VarIdentifier varId = pairs.getKey();
-			LinearLayout ll = pairs.getValue();
-			TextView o = (TextView)ll.findViewById(R.id.outputValueField);
-			TextView u = (TextView)ll.findViewById(R.id.outputUnitField);			
-			String value = varId.getPrintedValue();
-			if (!value.isEmpty()) {
-				o.setText(getFormattedText(varId,value));	
-				u.setText(getFormattedUnit(varId));
-			}
-			else {
-				o.setText("");
-				u.setText("");
-			}
-		}	}
 
 
-	public abstract LinearLayout getClickableFieldLayout();
-	public abstract String getFormattedText(VarIdentifier varId, String value);
-	public abstract String getFormattedUnit(VarIdentifier varId);
 
 
 

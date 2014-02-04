@@ -58,9 +58,9 @@ public class Main extends Activity {
 
 			if(GooglePlayServicesUtil.isGooglePlayServicesAvailable(this)
 					== ConnectionResult.SUCCESS)
-				Toast.makeText(this, "Google Services found", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, "Google Services found, APP VERSION Alpha 0.02", Toast.LENGTH_LONG).show();
 			else
-				Toast.makeText(this, "Google Services not found: "+
+				Toast.makeText(this, "Google Services not found APP VERSION Alpha 0.02 :"+
 						GooglePlayServicesUtil.isGooglePlayServicesAvailable(this)
 						, Toast.LENGTH_LONG).show();
 
@@ -366,6 +366,7 @@ public class Main extends Activity {
 
 
 	private void initIfFirstTime() {
+		copyAssets();
 		//If testFile doesnt exist it will be created and found next time.
 		String t = Constants.NILS_ROOT_DIR +
 				"ifiexistthenallisfine.txt";
@@ -397,7 +398,7 @@ public class Main extends Activity {
 
 
 		//copy the configuration files into the root dir.
-		copyAssets();
+		//Moved for now.
 	}
 
 	/**

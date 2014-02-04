@@ -41,13 +41,8 @@ public class WF_Column_Name_Filter extends WF_Filter {
 		return list;
 	}
 
-	@Override
-	public String getId() {
-		return myId;
-	}
 
 	public WF_Column_Name_Filter(String id,String filterCh,String columnToMatch) {
-		myId = id;
 		myPrefix = filterCh;
 		this.columnToMatch=columnToMatch;
 	}

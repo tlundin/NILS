@@ -1,9 +1,11 @@
-package com.teraim.nils;
+package com.teraim.nils.dynamic.types;
 import android.content.Context;
 import android.util.Log;
 
+import com.teraim.nils.GlobalState;
+import com.teraim.nils.StoredVariable;
 import com.teraim.nils.StoredVariable.Type;
-import com.teraim.nils.dynamic.types.ParameterCache;
+import com.teraim.nils.Variable;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 
 //Class used to identify a variable, given that CURRENT Delyta/Provyta/Ruta (the context) is the parent.
@@ -66,11 +68,30 @@ public class VarIdentifier {
 		return this.label;
 	}
 	
+	public String getId() {
+		return this.id;
+	}
 	public String getPrintedUnit() {
 		if (unit == Unit.percentage)
 			return "%";
+		if (unit == Unit.nd)
+			return "";
 		else
 			return unit.name();
+	}
+
+	public Long getValue() {
+		Long ret=null;
+		String sval = getPrintedValue();
+		if (!sval.isEmpty()) {
+			try {
+				ret = Long.parseLong(sval);
+			} catch (NumberFormatException e) {
+				Log.e("nils","Not a number "+id+" had value "+sval);
+				return null;
+			}
+		}
+		return ret;
 	}
 
 

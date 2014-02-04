@@ -18,9 +18,11 @@ import android.widget.Toast;
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
 import com.teraim.nils.Variable;
+import com.teraim.nils.dynamic.blocks.AddSumOrCountBlock;
 import com.teraim.nils.dynamic.blocks.Block;
 import com.teraim.nils.dynamic.blocks.ButtonBlock;
 import com.teraim.nils.dynamic.blocks.ContainerDefineBlock;
+import com.teraim.nils.dynamic.blocks.CreateEntryFieldBlock;
 import com.teraim.nils.dynamic.blocks.CreateListEntriesBlock;
 import com.teraim.nils.dynamic.blocks.ListFilterBlock;
 import com.teraim.nils.dynamic.blocks.ListSortingBlock;
@@ -143,6 +145,17 @@ public abstract class Executor extends Activity {
 				CreateListEntriesBlock bl = (CreateListEntriesBlock)b;
 				bl.create(myContext);
 			}
+			else if (b instanceof CreateEntryFieldBlock) {
+				CreateEntryFieldBlock bl = (CreateEntryFieldBlock)b;
+				Log.d("NILS","CreateEntryFieldBlock found");
+				bl.create(myContext);
+			}
+			else if (b instanceof AddSumOrCountBlock) {
+				AddSumOrCountBlock bl = (AddSumOrCountBlock)b;
+				Log.d("NILS","AddDisplayOfSelectionsBlock found");
+				bl.create(myContext);
+			}
+			
 
 		}
 		

@@ -17,7 +17,7 @@ import android.util.Log;
 import android.util.Xml;
 
 import com.teraim.nils.GlobalState;
-import com.teraim.nils.dynamic.blocks.AddDisplayOfSelectionsBlock;
+import com.teraim.nils.dynamic.blocks.AddSumOrCountBlock;
 import com.teraim.nils.dynamic.blocks.AddRuleBlock;
 import com.teraim.nils.dynamic.blocks.Block;
 import com.teraim.nils.dynamic.blocks.ButtonBlock;
@@ -31,6 +31,7 @@ import com.teraim.nils.dynamic.blocks.PageDefineBlock;
 import com.teraim.nils.dynamic.blocks.StartBlock;
 import com.teraim.nils.dynamic.types.Workflow;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
+import com.teraim.nils.dynamic.workflow_realizations.WF_Not_ClickableField_SumAndCountOfVariables;
 import com.teraim.nils.exceptions.EvalException;
 import com.teraim.nils.utils.Tools;
 
@@ -98,6 +99,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+			
 		} 
 		if (myFlow !=null)
 			Log.d("NILS","Found "+myFlow.size()+" workflows");
@@ -160,6 +162,9 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 	 * @throws IOException
 	 * @throws XmlPullParserException
 	 */
+	private static boolean isSum = false;
+	private static boolean isCount = true;
+	
 	private List<Block> readBlocks(XmlPullParser parser) throws IOException, XmlPullParserException {
 		List<Block> blocks=new ArrayList<Block>();
 		parser.require(XmlPullParser.START_TAG, null,"blocks");
@@ -183,10 +188,10 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 //					blocks.add(readBlockSetValue(parser));
 				else if (name.equals("block_add_rule")) 
 					blocks.add(readBlockAddRule(parser));
-//				else if (name.equals("block_create_list_entry")) 
-//					blocks.add(readBlockCreateListEntry(parser));
+				else if (name.equals("block_add_sum_of_selected_variables_display")) 
+					blocks.add(readBlockAddSelectionOrSum(parser,isSum));
 				else if (name.equals("block_add_number_of_selections_display")) 
-					blocks.add(readBlockAddSelections(parser));
+					blocks.add(readBlockAddSelectionOrSum(parser,isCount));
 				else if (name.equals("block_create_list_sorting_function")) 
 					blocks.add(readBlockCreateSorting(parser));
 				else if (name.equals("block_create_list_filter")) 
@@ -208,10 +213,13 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 
 
 
+
+
+
 	private Block readBlockCreateEntryField(XmlPullParser parser)throws IOException, XmlPullParserException {
 		Log.d("NILS","Block create entry field...");
 		String namn=null, type=null, label=null,purpose=null,containerId=null;
-		Unit unit = Unit.undefined;		
+		Unit unit = Unit.nd;		
 		parser.require(XmlPullParser.START_TAG, null,"block_create_entry_field");
 		while (parser.next() != XmlPullParser.END_TAG) {
 			if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -230,8 +238,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 			} else if (name.equals("purpose")) {
 				purpose = readText("purpose",parser); 
 			} else if (name.equals("unit")) {
-				String u = readText("unit",parser);
-				unit = Tools.convertToUnit(u);
+				unit = Tools.convertToUnit(readText("unit",parser));
 			}
 			else
 				skip(parser);
@@ -314,18 +321,44 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 	 * @throws IOException
 	 * @throws XmlPullParserException
 	 */
-	private static AddDisplayOfSelectionsBlock readBlockAddSelections(XmlPullParser parser) throws IOException, XmlPullParserException {
-		Log.d("NILS","AddSelections block...");
-
-		parser.require(XmlPullParser.START_TAG, null,"block_add_number_of_selections_display");
+	private static AddSumOrCountBlock readBlockAddSelectionOrSum(XmlPullParser parser,boolean isCount) throws IOException, XmlPullParserException {
+		Log.d("NILS","AddSelectionOrSum block...");
+		String containerName=null,label=null,filter=null,target=null;
+		WF_Not_ClickableField_SumAndCountOfVariables.Type type;
+		
+		if (isCount)
+			type = WF_Not_ClickableField_SumAndCountOfVariables.Type.count;
+		else
+			type = WF_Not_ClickableField_SumAndCountOfVariables.Type.sum;
+		
+		if (isCount)
+			parser.require(XmlPullParser.START_TAG, null,"block_add_number_of_selections_display");
+		else
+			parser.require(XmlPullParser.START_TAG, null,"block_add_sum_of_selected_variables_display");
+			
 		while (parser.next() != XmlPullParser.END_TAG) {
 			if (parser.getEventType() != XmlPullParser.START_TAG) {
 				continue;
-			}		
-			skip(parser);
+			}	
+			String name= parser.getName();
+			
+			if (name.equals("container_name")) {
+				containerName = readText("container_name",parser);
+			} 
+			else if (name.equals("label")) {
+				label = readText("label",parser);
+			}
+			else if (name.equals("filter")) {
+				filter = readText("filter",parser);
+			}
+			else if (name.equals("target")) {
+				target = readText("target",parser);
+			}	
+			else
+				skip(parser);
 
 		}
-		return new AddDisplayOfSelectionsBlock();
+		return new AddSumOrCountBlock(containerName,label,filter,target,type);
 	}	
 
 	/*

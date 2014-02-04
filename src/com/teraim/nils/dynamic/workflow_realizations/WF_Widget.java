@@ -8,7 +8,8 @@ public class WF_Widget extends WF_Thing implements Drawable {
 
 	private View myView;
 	
-	public WF_Widget(View v) {
+	public WF_Widget(String id,View v) {
+		super(id);
 		myView = v;
 	}
 

@@ -5,9 +5,13 @@ import android.widget.LinearLayout;
 
 public abstract class WF_Thing {
 
-	String myId;
+	private String myId;
 	LinearLayout myWidget;
 
+	public WF_Thing(String id) {
+		myId = id;
+	}
+	
 	public String getId() {
 		return myId;
 	}

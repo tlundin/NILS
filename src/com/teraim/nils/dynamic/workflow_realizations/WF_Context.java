@@ -14,6 +14,7 @@ import com.teraim.nils.dynamic.workflow_abstracts.Event;
 import com.teraim.nils.dynamic.workflow_abstracts.Event.EventType;
 import com.teraim.nils.dynamic.workflow_abstracts.EventListener;
 import com.teraim.nils.dynamic.workflow_abstracts.Filterable;
+import com.teraim.nils.dynamic.workflow_abstracts.Listable;
 
 public class WF_Context {
 
@@ -33,6 +34,27 @@ public class WF_Context {
 		return ctx;
 	}
 	
+	
+	public  WF_List getList(String id) {
+		for (WF_List wfl:lists) {
+			Log.d("nils","filterable list: "+wfl.getId());
+			String myId = wfl.getId();				
+			if(myId!=null && myId.equalsIgnoreCase(id))
+				return wfl;
+		}
+		return null;
+	}	
+	
+	
+	public List<Listable> getListable(String id) {
+		for (WF_List wfl:lists) {
+			Log.d("nils","filterable list: "+wfl.getId());
+			String myId = wfl.getId();				
+			if(myId!=null && myId.equalsIgnoreCase(id))
+				return wfl.getList();
+		}
+		return null;
+	}	
 	
 	//for now it is assumed that all lists implements filterable.
 	public Filterable getFilterable(String id) {
@@ -113,5 +135,6 @@ public class WF_Context {
 	public void registerEvent(Event event) {
 		eventBroker.onEvent(event);
 	}
+
 	
 }
