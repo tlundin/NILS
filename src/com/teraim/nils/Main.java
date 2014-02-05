@@ -29,6 +29,7 @@ import com.teraim.nils.utils.PersistenceHelper;
 
 public class Main extends Activity {
 
+	private static final String VERSION = "VERSION Alpha 0.04";
 	private static final long INITIAL_DELAY = 2000; //pause for 2 secs to show logo.
 	private String tag = "Lifecycle";
 	//ListView treeList = null;
@@ -58,9 +59,9 @@ public class Main extends Activity {
 
 			if(GooglePlayServicesUtil.isGooglePlayServicesAvailable(this)
 					== ConnectionResult.SUCCESS)
-				Toast.makeText(this, "Google Services found, APP VERSION Alpha 0.02", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, "Google Services found, APP "+VERSION, Toast.LENGTH_LONG).show();
 			else
-				Toast.makeText(this, "Google Services not found APP VERSION Alpha 0.02 :"+
+				Toast.makeText(this, "Google Services not found APP "+VERSION+" :"+
 						GooglePlayServicesUtil.isGooglePlayServicesAvailable(this)
 						, Toast.LENGTH_LONG).show();
 

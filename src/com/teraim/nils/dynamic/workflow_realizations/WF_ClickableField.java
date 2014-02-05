@@ -1,24 +1,19 @@
 package com.teraim.nils.dynamic.workflow_realizations;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.Collections;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.text.SpannableString;
-import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -31,7 +26,6 @@ import com.teraim.nils.Variable;
 import com.teraim.nils.dynamic.types.VarIdentifier;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 import com.teraim.nils.dynamic.workflow_abstracts.EventGenerator;
-import com.teraim.nils.dynamic.workflow_abstracts.Listable;
 
 public abstract class WF_ClickableField extends WF_Not_ClickableField implements  EventGenerator {
 
@@ -63,7 +57,23 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 				1));
 
 
+		//TODO: SUPPORT FOR OTHER THAN EDITTEXT!!!
+		
+		//Empty all inputs and save.
 		getWidget().setClickable(true);	
+		getWidget().setOnLongClickListener(new OnLongClickListener(){
+		    @Override
+		    public boolean onLongClick(View v) {
+		       for (View inf:myVars.values()) {
+		    	   if (inf!=null)
+		    		   ((EditText)inf).setText("");
+		       }
+		       save();
+		        return true;
+		    }
+		});
+		
+		
 		getWidget().setOnClickListener(new OnClickListener() {			
 			@Override
 			public void onClick(View v) {

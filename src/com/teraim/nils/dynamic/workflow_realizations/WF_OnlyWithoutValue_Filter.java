@@ -16,7 +16,10 @@ public class WF_OnlyWithoutValue_Filter extends WF_Filter {
 		while(it.hasNext()) {
 			Listable l = it.next();
 			String value = l.getValue();
-			if (value != null) {
+			//TODO use only NULL!!!
+			if (value == null||value.length()==0)
+				continue;
+			else {
 				it.remove();
 				Log.d("nils","filter removes element "+l.getKey()+" because its value is null");
 			}

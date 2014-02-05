@@ -2,7 +2,6 @@ package com.teraim.nils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -13,17 +12,15 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
-import com.teraim.nils.dynamic.types.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Delyta;
 import com.teraim.nils.dynamic.types.Provyta;
 import com.teraim.nils.dynamic.types.Ruta;
+import com.teraim.nils.dynamic.types.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Workflow;
 import com.teraim.nils.expr.Aritmetic;
-import com.teraim.nils.expr.Bool;
-import com.teraim.nils.expr.Literal;
-import com.teraim.nils.expr.Numeric;
 import com.teraim.nils.expr.Parser;
 import com.teraim.nils.utils.DbHelper;
 import com.teraim.nils.utils.PersistenceHelper;
@@ -66,7 +63,7 @@ public class GlobalState  {
 		file_not_found
 	}
 	
-	
+	public String TEXT_LARGE;
 	
 	public static GlobalState getInstance(Context c) {
 	   if (singleton == null) {
@@ -106,6 +103,9 @@ public class GlobalState  {
 		Tools.scanRutData(ctx.getResources().openRawResource(R.raw.rutdata_v3),this);
 		Tools.scanDelningsData(ctx.getResources().openRawResource(R.raw.delningsdata),this);	
 		Tools.printDatabase(db);
+		
+		////Set text size depending on device sreen.
+		
 	}
 	
 	

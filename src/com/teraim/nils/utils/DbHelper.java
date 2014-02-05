@@ -27,16 +27,19 @@ public class DbHelper extends SQLiteOpenHelper {
     //column indexes.
     private static final int COLUMN_SERIALIZED = 9;
 
-   
+    private final SQLiteDatabase db;
+    
     Context ctx;
     public DbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);  
         ctx = context;
+        db = this.getWritableDatabase();
         
     }
  
     @Override
     public void onCreate(SQLiteDatabase db) {
+    	
         // create variable table
         String CREATE_VARIABLE_TABLE = "CREATE TABLE variabler ( " +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " + 
@@ -80,7 +83,7 @@ public class DbHelper extends SQLiteOpenHelper {
     
     public ArrayList<StoredVariable> getAllVariables() {
     	ArrayList<StoredVariable> ret = new ArrayList<StoredVariable>();
-        SQLiteDatabase db = this.getReadableDatabase();
+        //SQLiteDatabase db = this.getReadableDatabase();
         	
        	Cursor c = db.query(TABLE_VARIABLES,null,
     			null,null,null,null,null,null);
@@ -115,7 +118,7 @@ public class DbHelper extends SQLiteOpenHelper {
     	Log.d("nils", "Inserting variable "+var.toString()+" into database with value "+var.getValue()); 
     	
     	// 1. get reference to writable DB
-    	SQLiteDatabase db = this.getWritableDatabase();
+    	//SQLiteDatabase db = this.getWritableDatabase();
 
     	// 2. create ContentValues to add key "column"/value
     	ContentValues values = new ContentValues();
@@ -145,7 +148,7 @@ public class DbHelper extends SQLiteOpenHelper {
     		Log.d("nils","Updated value for "+var.getVarId()+" to "+var.getValue());
     	else
     		var.setDatabaseId(rId);  	
-    	db.close();
+    	//db.close();
 }
     
     private boolean existsInDB(StoredVariable var,SQLiteDatabase db) {
@@ -165,7 +168,7 @@ public class DbHelper extends SQLiteOpenHelper {
         //for logging
     	Log.d("nils", "Audit"); 
     	// 1. get reference to writable DB
-    	SQLiteDatabase db = this.getWritableDatabase();
+    	//SQLiteDatabase db = this.getWritableDatabase();
 
     	// 2. create ContentValues to add key "column"/value
     	ContentValues values = new ContentValues();
@@ -183,7 +186,7 @@ public class DbHelper extends SQLiteOpenHelper {
         values); // key/value -> keys = column names/ values = column values
 
     	// 4. close
-    	db.close(); 
+    	//db.close(); 
     	var.setDatabaseId(rId);
     	Log.d("nils","Inserted new variable with ID "+rId);
     } 
@@ -193,7 +196,7 @@ public class DbHelper extends SQLiteOpenHelper {
     
     public void deleteVariable(StoredVariable var) {
         // 1. get reference to writable DB
-        SQLiteDatabase db = this.getWritableDatabase();
+        //SQLiteDatabase db = this.getWritableDatabase();
         long rId = -1;
         // 2. Figure out the row index
        if(!var.existsInDB())
@@ -208,7 +211,7 @@ public class DbHelper extends SQLiteOpenHelper {
                     new String[] { String.valueOf(rId) }); //selections args
      
             // 3. close
-            db.close();
+            //db.close();
             //log
             Log.d("deleted", var.getVarId());
         }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -86,6 +87,7 @@ public  class ButtonBlock extends Block {
 	}
 
 	public void create(final WF_Context myContext) {
+		GlobalState gs = GlobalState.getInstance(myContext.getContext());
 		Container myContainer = myContext.getContainer(containerId);
 		final Context ctx = myContext.getContext();
 		if (type == Type.action) {
@@ -104,7 +106,7 @@ public  class ButtonBlock extends Block {
 			params.bottomMargin = 10;
 			params.topMargin = 10;
 			button.setLayoutParams(params);
-			button.setTextSize(Constants.TEXT_LARGE);
+			button.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30);
 
 			button.setOnClickListener(new View.OnClickListener() {
 				@Override
@@ -148,7 +150,8 @@ public  class ButtonBlock extends Block {
 			LayoutParams params = new LayoutParams();
 			params.width = LayoutParams.MATCH_PARENT;
 			params.height = LayoutParams.WRAP_CONTENT;
-			toggleB.setTextSize(Constants.TEXT_LARGE);
+			
+			toggleB.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30);
 			toggleB.setLayoutParams(params);
 			
 			toggleB.setOnClickListener(new OnClickListener() {
