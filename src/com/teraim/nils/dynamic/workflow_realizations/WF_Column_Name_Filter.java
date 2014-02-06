@@ -13,6 +13,12 @@ public class WF_Column_Name_Filter extends WF_Filter {
 	String myPrefix = "";
 	String filterColumn;
 	private String columnToMatch;
+	private FilterType filterType;
+
+	enum FilterType{
+		exact,
+		prefix
+	}
 
 	@Override
 	public List<? extends Listable> filter(List<? extends Listable> list) {
@@ -26,25 +32,44 @@ public class WF_Column_Name_Filter extends WF_Filter {
 				continue;
 			}				
 			boolean match = false;
-			for (int i=0;i<myPrefix.length();i++) {
-				if (key.charAt(0)==myPrefix.charAt(i)) {
-					match=true;
-					break;
+
+			if (filterType == FilterType.prefix) {
+				for (int i=0;i<myPrefix.length();i++) {
+					if (Character.toLowerCase(key.charAt(0))==Character.toLowerCase(myPrefix.charAt(i))) {
+						match = true;
+						break;					
+					}
+				}
+			} else {
+				if (filterType == FilterType.exact) {
+					match = true;
+					if (myPrefix.length()!=key.length())
+						match = false;
+					else {
+						for (int i=0;i<myPrefix.length();i++) {
+							if (Character.toLowerCase(key.charAt(i))!=Character.toLowerCase(myPrefix.charAt(i))) {
+								match = false;
+								break;
+							}
+						}
+					}
 				}
 			}
+
 			if (!match) {
-					it.remove();
-					Log.d("nils","filter removes element "+key+" because "+key.charAt(0)+" doesn't match "+myPrefix);
+				it.remove();
+				Log.d("nils","filter removes element "+key+" because "+key.charAt(0)+" doesn't match "+myPrefix);
 			}
-				
+
 		}
 		return list;
 	}
 
 
-	public WF_Column_Name_Filter(String id,String filterCh,String columnToMatch) {
+	public WF_Column_Name_Filter(String id,String filterCh,String columnToMatch,FilterType type) {
 		myPrefix = filterCh;
 		this.columnToMatch=columnToMatch;
+		filterType = type;
 	}
 
 

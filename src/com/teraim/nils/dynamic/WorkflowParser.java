@@ -50,7 +50,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,List<Workflow>>{
 	GlobalState gs;
 	//Location of bundle.
 	//private final static String serverUrl = "http://83.250.104.137:8080/nilsbundle.xml";
-	private final static String serverUrl = "http://teraim.com/nilsbundle2.xml";
+	private final static String serverUrl = "https://docs.google.com/uc?export=download&id=0B7zErZobtn9KalZYaUlJbXBqR3M";
 	//Take input file from remote web server and parse it.
 	//Generates a list of workflows from a Bundle.
 	@Override

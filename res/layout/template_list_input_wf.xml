@@ -14,14 +14,14 @@
         <ScrollView
             android:id="@+id/scrollView1"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="0.5"
             android:scrollbars="none" >
 
             <LinearLayout
                 android:id="@+id/Selected"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical" >
             </LinearLayout>
         </ScrollView>
@@ -42,19 +42,19 @@
 
     <View
         android:layout_width="fill_parent"
-        android:layout_height="1dip"
+        android:layout_height="5dip"
         android:background="#000000" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="784dp"
+        android:layout_height="match_parent"
         android:baselineAligned="false"
         android:orientation="horizontal" >
 
         <LinearLayout
             android:id="@+id/filterPanel"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="0.2"
             android:orientation="vertical" >
         </LinearLayout>
@@ -62,14 +62,15 @@
         <ScrollView
             android:id="@+id/scrollView2"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.3" >
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:fillViewport="true" >
 
             <LinearLayout
                 android:id="@+id/sortPanel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+                android:orientation="vertical" >
             </LinearLayout>
         </ScrollView>
 
@@ -81,13 +82,15 @@
         <ScrollView
             android:id="@+id/scrollView3"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.5" >
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:fillViewport="true"
+            android:scrollbars="none" >
 
             <LinearLayout
                 android:id="@+id/fieldList"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical" >
             </LinearLayout>
         </ScrollView>

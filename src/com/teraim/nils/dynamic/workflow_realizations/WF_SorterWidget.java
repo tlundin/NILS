@@ -4,16 +4,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.teraim.nils.GlobalState;
-import com.teraim.nils.dynamic.types.VariableConfiguration;
-import com.teraim.nils.dynamic.workflow_abstracts.Filterable;
-
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TableLayout.LayoutParams;
+
+import com.teraim.nils.GlobalState;
+import com.teraim.nils.dynamic.types.VariableConfiguration;
+import com.teraim.nils.dynamic.workflow_realizations.WF_Column_Name_Filter.FilterType;
 
 
 public class WF_SorterWidget extends WF_Widget {
@@ -52,7 +52,7 @@ public class WF_SorterWidget extends WF_Widget {
 					//Wildcard? Do not add any filter.
 					if(!ch.equals("*")) {							
 						//Use ch string as unique id.
-						existing = new WF_Column_Name_Filter(ch,ch,VariableConfiguration.Col_Entry_Label);
+						existing = new WF_Column_Name_Filter(ch,ch,VariableConfiguration.Col_Entry_Label,FilterType.prefix);
 						targetList.addFilter(existing);
 					}
 					//running the filters will trigger redraw.
@@ -77,7 +77,8 @@ public class WF_SorterWidget extends WF_Widget {
 					//This shall apply a new Alpha filter on target.
 					//First, remove any existing alpha filter.
 					targetList.removeFilter(existing);
-						existing = new WF_Column_Name_Filter(ch,ch,Col_Familj);
+						existing = new WF_Column_Name_Filter(ch,ch,Col_Familj,FilterType.exact);
+						//existing = new WF_Column_Name_Filter(ch,ch,Col_Art)
 					targetList.addFilter(existing);
 					
 					//running the filters will trigger redraw.

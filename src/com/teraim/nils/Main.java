@@ -29,7 +29,7 @@ import com.teraim.nils.utils.PersistenceHelper;
 
 public class Main extends Activity {
 
-	private static final String VERSION = "VERSION Alpha 0.04";
+	private static final String VERSION = "VERSION 0.06";
 	private static final long INITIAL_DELAY = 2000; //pause for 2 secs to show logo.
 	private String tag = "Lifecycle";
 	//ListView treeList = null;
@@ -83,17 +83,20 @@ public class Main extends Activity {
 			if (mBluetoothAdapter == null) {
 				new AlertDialog.Builder(this).setTitle("Ups!")
 				.setMessage("Din platta verkar inte stödja Blåtand. Utan blåtand fungerar inte den här versionen.")
+				.setCancelable(false)
 				.setNeutralButton("Jag förstår!", new OnClickListener() {
 					@Override
 					public void onClick(DialogInterface arg0, int arg1) {
 						checkConditions();
 					}})
+					
 					.show();
 				//check that there is a bonded device 
 			} else {	
 				if (mBluetoothAdapter.isEnabled() && mBluetoothAdapter.getBondedDevices().isEmpty()) {
 					new AlertDialog.Builder(this).setTitle("Ups!")
 					.setMessage("Din datainsamlare är inte kopplad (bondad) till en annan datainsamlare! Måste göras i systemets blåtandsmeny. Annars fungerar inte synkroniseringen!")
+					.setCancelable(false)
 					.setNeutralButton("Jag förstår!", new OnClickListener() {
 						@Override
 						public void onClick(DialogInterface arg0, int arg1) {

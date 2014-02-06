@@ -6,9 +6,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ToggleButton;
 import android.widget.TableLayout.LayoutParams;
 
@@ -143,7 +145,8 @@ public  class ButtonBlock extends Block {
 			});
 			myContainer.add(new WF_Widget(text,button));
 		} else if (type == Type.toggle) {
-			ToggleButton toggleB = new ToggleButton(ctx);
+			ToggleButton toggleB = (ToggleButton)LayoutInflater.from(ctx).inflate(R.layout.toggle_button,null);
+			//ToggleButton toggleB = new ToggleButton(ctx);
 			toggleB.setTextOn(text);
 			toggleB.setTextOff(text);
 			toggleB.setChecked(false);
