@@ -10,8 +10,7 @@ public abstract class ParameterCache  {
 	
 	DbHelper db;
 	
-	public ParameterCache(GlobalState gs){
-		
+	public ParameterCache(GlobalState gs){		
 		db = gs.getDb();
 	}
 

@@ -3,6 +3,7 @@ package com.teraim.nils.dynamic.workflow_realizations;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
@@ -24,17 +25,23 @@ public class WF_Context {
 	private List<WF_Container> containers;
 	private final Executor myTemplate;
 	private final EventBroker eventBroker;
-	
-	public WF_Context(Context ctx,Executor e) {
+	//ID for the container containing the template itself
+	private final int rootContainerId;
+
+	public WF_Context(Context ctx,Executor e,int rootContainerId) {
 		this.ctx=ctx;
 		myTemplate = e;
 		eventBroker = new EventBroker();
+		this.rootContainerId=rootContainerId;
 	}
 	public Context getContext() {
 		return ctx;
 	}
-	
-	
+
+	public Activity getActivity() {
+		return (Activity)ctx;
+	}
+
 	public  WF_List getList(String id) {
 		for (WF_List wfl:lists) {
 			Log.d("nils","filterable list: "+wfl.getId());
@@ -44,8 +51,8 @@ public class WF_Context {
 		}
 		return null;
 	}	
-	
-	
+
+
 	public List<Listable> getListable(String id) {
 		for (WF_List wfl:lists) {
 			Log.d("nils","filterable list: "+wfl.getId());
@@ -55,7 +62,7 @@ public class WF_Context {
 		}
 		return null;
 	}	
-	
+
 	//for now it is assumed that all lists implements filterable.
 	public Filterable getFilterable(String id) {
 		Log.d("nils","Getfilterable called with id "+id);
@@ -93,12 +100,21 @@ public class WF_Context {
 		return null;
 	}
 
+	public void onResume() {
+		if (containers!=null)
+			for (Container c:containers) {
+				if (c!=null)
+					c.removeAll();
+			}
+	}
+
 	//draws all containers traversing the tree.
 	public void drawRecursively(Container c) {
 		if (c==null) {
 			Log.e("nils","This container has no elements.");
 			return;
 		}
+
 		c.draw();
 		List<Container> cs = getChildren(c);
 		for(Container child:cs)
@@ -119,22 +135,25 @@ public class WF_Context {
 		}
 		return ret;
 	}
-	
+
 	public Executor getTemplate() {
 		return myTemplate;
 	}
-	
+
 	public void addEventListener(EventListener el,
 			EventType et) {
 		eventBroker.registerEventListener(et, el);
 	}
-	
+
 	public void onEvent(Event ev) {
 		eventBroker.onEvent(ev);
 	}
 	public void registerEvent(Event event) {
 		eventBroker.onEvent(event);
 	}
+	public int getRootContainer() {
+		return rootContainerId;
+	}
 
-	
+
 }

@@ -1,7 +1,8 @@
 package com.teraim.nils.dynamic.blocks;
 
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -10,16 +11,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ToggleButton;
 import android.widget.TableLayout.LayoutParams;
+import android.widget.ToggleButton;
 
-import com.teraim.nils.Constants;
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
 import com.teraim.nils.dynamic.types.Workflow;
 import com.teraim.nils.dynamic.workflow_abstracts.Container;
-import com.teraim.nils.dynamic.workflow_abstracts.Filterable;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Widget;
 
@@ -33,6 +31,10 @@ import com.teraim.nils.dynamic.workflow_realizations.WF_Widget;
  *
  */
 public  class ButtonBlock extends Block {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6454431627090793558L;
 	String text,onClick,name,containerId,target;
 	Type type;
 	
@@ -127,13 +129,15 @@ public  class ButtonBlock extends Block {
 
 							} else {
 
-								Intent intent = new Intent(ctx,wf.getWfClass());
+								Fragment f = wf.createFragment();
 								Bundle b = new Bundle();
 								b.putString("workflow_name", action.wfName); //Your id
-								intent.putExtras(b); //Put your id to your next Intent
+								f.setArguments(b); //Put your id to your next Intent
 								//save all changes
-
-								ctx.startActivity(intent);
+								final FragmentTransaction ft = myContext.getActivity().getFragmentManager().beginTransaction(); 
+								ft.replace(myContext.getRootContainer(), f);
+								ft.addToBackStack(null);
+								ft.commit(); 
 								//Validation?
 							}
 						} //else

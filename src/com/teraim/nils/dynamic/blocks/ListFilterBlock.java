@@ -13,6 +13,10 @@ import com.teraim.nils.dynamic.workflow_realizations.WF_OnlyWithoutValue_Filter;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Widget;
 
 public class ListFilterBlock extends Block {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6044282434929671356L;
 	String containerId,type,target,label,function;
 
 	public ListFilterBlock(String containerId, String type, String target,

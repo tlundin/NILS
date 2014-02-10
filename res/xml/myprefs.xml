@@ -5,15 +5,15 @@ xmlns:android="http://schemas.android.com/apk/res/android" >
     android:title="Allmänt" 
  <ListPreference 
      android:key="deviceColor"
-     android:entryValues="@array/deviceColors" 
-     android:title="Dosans färg" 
-     android:entries="@array/deviceColors" />
+     android:entryValues="@array/deviceTypes" 
+     android:title="Dosans Typ" 
+     android:entries="@array/deviceTypes" />
   <ListPreference 
      android:key="ruta_id"
      android:title="Vald ruta" 
       />   
 <EditTextPreference
-            android:key="lagNr"
+            android:key="lag_id"
             android:title="Lag" 
             android:summary="Lagets benämning"
             android:dialogTitle="Lag"
@@ -25,12 +25,40 @@ xmlns:android="http://schemas.android.com/apk/res/android" >
     android:dialogMessage="Skriv in ditt namn här!" 
     android:negativeButtonText="Cancel" 
     android:positiveButtonText="Ok" 
-    android:key="username" 
+    android:key="user_id" 
     /> 
  </PreferenceCategory>
 
-<PreferenceCategory android:title="Annat" >    
+<PreferenceCategory android:title="Developer Options" >    
+
+<EditTextPreference
+            android:key="server_location"
+            android:title="Server URL" 
+            android:summary="URL till Server"
+            android:dialogTitle="URL"
+            android:dialogMessage="Ange Url till server som har konfigurationsfilerna"    
+            android:defaultValue="http://www.teraim.com/" />
+    
+<EditTextPreference
+            android:key="bundle_name"
+            android:title="Stuprör" 
+            android:summary="URL till definition av stuprör"
+            android:dialogTitle="Stuprör"
+            android:dialogMessage="Ange Url till stuprör (workflow)"    
+            android:defaultValue="nilsbundle2.xml" />
+
+<EditTextPreference
+            android:key="config_name"
+            android:title="Artlista" 
+            android:summary="URL till definition av artlista"
+            android:dialogTitle="Artlista"
+            android:dialogMessage="Ange Url till artlistan!"    
+            android:defaultValue="artlista.csv" />
 
 </PreferenceCategory>
+
+	public static final String ARTLISTA_LOCATION = "config_name";
+	public static final String BUNDLE_LOCATION = "bundle_name";
+	public static final CharSequence SERVER_URL = "server_location";
 
 </PreferenceScreen>

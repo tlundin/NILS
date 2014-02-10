@@ -5,7 +5,6 @@ import android.util.Log;
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.StoredVariable;
 import com.teraim.nils.StoredVariable.Type;
-import com.teraim.nils.Variable;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 
 //Class used to identify a variable, given that CURRENT Delyta/Provyta/Ruta (the context) is the parent.

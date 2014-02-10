@@ -11,5 +11,6 @@ public interface Container {
 	public Container getRoot();
 	public List<WF_Widget> getWidgets();
 	public void draw();
+	public void removeAll();
 
 }

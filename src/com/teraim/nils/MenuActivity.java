@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.teraim.nils.bluetooth.BluetoothRemoteDevice;
 import com.teraim.nils.utils.PersistenceHelper;
 
 /**
@@ -99,9 +100,9 @@ public class MenuActivity extends Activity {
 		mnu2 = menu.add(0, 1, 1, "");
 		mnu2.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		mnu3 = menu.add(0, 2, 2, "");
-		mnu3.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		mnu3.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		mnu4 = menu.add(0, 3, 3,"");
-		mnu4.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		mnu4.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		MenuItem mnu5 = menu.add(0, 4, 4, "Item 5");
 		mnu5.setIcon(android.R.drawable.ic_menu_preferences);
 		mnu5.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -122,7 +123,7 @@ public class MenuActivity extends Activity {
 		if (mnu3!=null)
 			mnu3.setTitle("Användare: "+gs.getPersistence().get(PersistenceHelper.USER_ID_KEY));
 		if (mnu4!=null)
-			mnu4.setTitle("Färg: "+gs.getDeviceColor());
+			mnu4.setTitle("Typ: "+gs.getDeviceType());
 		
 	}
 

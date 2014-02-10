@@ -1,7 +1,9 @@
 package com.teraim.nils.dynamic.types;
 
+import java.io.Serializable;
 import java.util.List;
 
+import android.app.Fragment;
 import android.util.Log;
 
 import com.teraim.nils.dynamic.blocks.Block;
@@ -9,9 +11,14 @@ import com.teraim.nils.dynamic.blocks.PageDefineBlock;
 import com.teraim.nils.dynamic.blocks.StartBlock;
 import com.teraim.nils.dynamic.templates.DefaultTemplate;
 import com.teraim.nils.dynamic.templates.ListInputTemplate;
+import com.teraim.nils.dynamic.types.Workflow.Type;
 
 //Workflow
-public class Workflow {
+public class Workflow implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8806673639097744371L;
 	private List<Block> blocks;
 	private String name=null;
 
@@ -43,14 +50,14 @@ public class Workflow {
 		return name;
 	}
 
-	public Class getWfClass() {
-		Class ret = null;
+	public Fragment createFragment(){
+		Fragment ret = null;
 		switch (getType()) {
 		case plain:
-			ret = DefaultTemplate.class;
+			ret = new DefaultTemplate();
 			break;
 		case variable_selection:
-			ret = ListInputTemplate.class;
+			ret = new ListInputTemplate();
 			break;
 
 		}
@@ -77,5 +84,9 @@ public class Workflow {
 		Log.e("NILS","Could not find PageDefineBlock for workflow "+this.getName()+" Will default to plain type");
 		return Type.plain;
 	}
+	public Type getTemplateType() {
+		return getType();
+	}
+
 
 }

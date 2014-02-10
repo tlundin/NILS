@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -13,19 +14,17 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
-import com.teraim.nils.Constants;
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.StoredVariable;
-import com.teraim.nils.Variable.Type;
 import com.teraim.nils.dynamic.types.Ruta;
-import com.teraim.nils.dynamic.types.Table;
+import com.teraim.nils.dynamic.types.Variable.Type;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 
 public class Tools {
@@ -68,6 +67,68 @@ public class Tools {
 		} 
 		return result; 
 	}
+	
+	
+	   public static boolean witeObjectToFile(Context context, Object object, String filename) {
+
+	        ObjectOutputStream objectOut = null;
+	        try {
+	            FileOutputStream fileOut = new FileOutputStream(filename);
+	            objectOut = new ObjectOutputStream(fileOut);
+	            objectOut.writeObject(object);
+	            fileOut.getFD().sync();
+
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        } finally {
+	            if (objectOut != null) {
+	                try {
+	                    objectOut.close();
+	                    return true;
+	                } catch (IOException e) {
+	                    // do nowt
+	                }
+	            }
+	        }
+	        return false;
+	    }
+
+
+	    /**
+	     * 
+	     * @param context
+	     * @param filename
+	     * @return
+	     */
+	    public static Object readObjectFromFile(Context context, String filename) {
+
+	    	Object object = null;
+	    	ObjectInputStream objectIn = null;
+	        try {
+	            FileInputStream fileIn = new FileInputStream(filename);
+	            objectIn = new ObjectInputStream(fileIn);
+	            object = objectIn.readObject();
+
+	        } catch (FileNotFoundException e) {
+	            // Do nothing
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        } catch (ClassNotFoundException e) {
+	            e.printStackTrace();
+	        } finally {
+	            if (objectIn != null) {
+	                try {
+	                    objectIn.close();
+	                } catch (IOException e) {
+	                    // do nowt
+	                }
+	            }
+	        }
+
+	        return object;
+	    }
+	
+	
 
 	//This cannot be part of Variable, since Variable is an interface.
 
@@ -177,7 +238,7 @@ public class Tools {
 				while((row = br.readLine())!=null) {
 					String  r[] = row.split(",");
 					if (r!=null&&r.length>3) {
-						Log.d("NILS",r[0]);
+//						Log.d("NILS",r[0]);
 						Ruta ruta=gs.findRuta(r[0]);
 						if (ruta ==null) {
 							ruta = new Ruta(gs,r[0]);
@@ -207,50 +268,7 @@ public class Tools {
 			}
 		}
 
-	//Creates the ArtLista arteface from a configuration file.
-		
-	public static Table scanListConfigData(String fileName) {
-		BufferedReader br=null;
-		InputStream is = null;
-		Table t=null;
-		try {
-			is = new FileInputStream(Constants.CONFIG_FILES_DIR+fileName);
-			InputStreamReader isr = new InputStreamReader(is);
-			br = new BufferedReader(isr);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return null;
-		}
-		String header;
-		try {
-			String row;
-			header = br.readLine();
-			Log.d("NILS","Scanning listdatafile with header "+header);
-			if (header != null) {
-				
-			t = new Table(header.split(","));
-			//Find all RutIDs from csv. Create Ruta Class for each.
-			while((row = br.readLine())!=null) {
-				String[]  r = row.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");				
-				if (r!=null) {
-					for(int i=0;i<r.length;i++)
-						if (r[i]!=null)
-							r[i] = r[i].replace("\"", "");
-					
-					t.addRow(Arrays.asList(r));		
-				}
-			}
-			}
-			t.addRow(Arrays.asList("EE0020,AntalArter,Antal Arter,,,,TRUE,st,delyta,,,,,,,,".split(",")));
-			t.addRow(Arrays.asList("EE0030,SumTackning,Summa Täckning,,,,TRUE,%,delyta,,,,,,,,".split(",")));
-			br.close();
-			is.close();
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return t;
-	}
+
 	
 	//scan csv file for Rutor. Create if needed.
 	public static void scanDelningsData(InputStream csvFile, GlobalState gs) {

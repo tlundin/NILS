@@ -7,6 +7,10 @@ package com.teraim.nils.dynamic.blocks;
  */
 public  class PageDefineBlock extends Block {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5680503647867451264L;
 	private String pageName="",pageType=null,pageLabel="";
 
 	public String getPageName() {

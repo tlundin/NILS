@@ -8,6 +8,10 @@ package com.teraim.nils.dynamic.blocks;
  */
 public  class LayoutBlock extends Block {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5739546668415459049L;
 	private String layoutDirection="", alignment="";
 
 	public String getLayoutDirection() {

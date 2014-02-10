@@ -1,25 +1,19 @@
 package com.teraim.nils.dynamic.templates;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 
-import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
-import com.teraim.nils.ValidatorListAdapter;
 import com.teraim.nils.dynamic.Executor;
-import com.teraim.nils.dynamic.types.Rule;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Container;
 
 /**
@@ -35,19 +29,17 @@ public class DefaultTemplate extends Executor {
 
 	View view;
 	private ListView lv; 
-	private ValidatorListAdapter mAdapter;
+	//private ValidatorListAdapter mAdapter;
 	private LinearLayout my_root;
 	private TextView errorView;
 	
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.wf_default);
-		errorView = (TextView)findViewById(R.id.errortext);
-		my_root = (LinearLayout) findViewById(R.id.myRoot);
+		Log.d("nils","In onCreate");
 		//The list of all rules currently not ok
 		//mAdapter = new ValidatorListAdapter(this,executedRules);
-		lv = (ListView)findViewById(R.id.validatorlist);
+/*		lv = (ListView)findViewById(R.id.validatorlist);
 		lv.setAdapter(mAdapter);		
 		lv.setOnItemClickListener(new OnItemClickListener(){
 
@@ -60,10 +52,37 @@ public class DefaultTemplate extends Executor {
 					e = it.next();
 				errorView.setText(e.getKey().getErrorMessage());
 			}});
-		myContext.addContainers(getContainers());
-		if (wf!=null)
-			run();
+			
+*/
+
 	}
+	
+	
+	
+	/* (non-Javadoc)
+	 * @see android.app.Fragment#onPause()
+	 */
+	@Override
+	public void onPause() {
+		super.onPause();
+		Log.d("nils","I'm in the onPause method");
+	}
+
+
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		Log.d("nils","I'm in the onCreateView method");
+
+		View v = inflater.inflate(R.layout.template_wf_default, container, false);	
+		errorView = (TextView)v.findViewById(R.id.errortext);
+		my_root = (LinearLayout)v.findViewById(R.id.myRoot);
+		myContext.addContainers(getContainers());
+
+		return v;
+	}
+	
 	@Override
 	protected List<WF_Container> getContainers() {
 		ArrayList<WF_Container> ret = new ArrayList<WF_Container>();
@@ -75,8 +94,16 @@ public class DefaultTemplate extends Executor {
 		
 	}
 	
+	
 
+	@Override
+	public void onStart() {
+		Log.d("nils","I'm in the onStart method");
 
+		super.onStart();
+		if (wf!=null)
+			run();
+	}
 
 
 	/**

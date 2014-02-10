@@ -15,6 +15,10 @@ import com.teraim.nils.dynamic.workflow_realizations.WF_OnlyWithValue_Filter;
 import com.teraim.nils.dynamic.workflow_realizations.WF_TimeOrder_Sorter;
 
 public  class CreateListEntriesBlock extends Block {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6745006895748449015L;
 	String fileName=null;
 	String containerId;
 	String id;

@@ -7,17 +7,20 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Fragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
-import com.teraim.nils.Variable;
 import com.teraim.nils.dynamic.blocks.AddSumOrCountBlock;
 import com.teraim.nils.dynamic.blocks.Block;
 import com.teraim.nils.dynamic.blocks.ButtonBlock;
@@ -28,6 +31,7 @@ import com.teraim.nils.dynamic.blocks.ListFilterBlock;
 import com.teraim.nils.dynamic.blocks.ListSortingBlock;
 import com.teraim.nils.dynamic.blocks.StartBlock;
 import com.teraim.nils.dynamic.types.Rule;
+import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.types.Workflow;
 import com.teraim.nils.dynamic.workflow_abstracts.Container;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Container;
@@ -38,12 +42,15 @@ import com.teraim.nils.expr.SyntaxException;
 /*
  * Executes workflow blocks. Child classes define layouts and other specialized behavior
  */
-public abstract class Executor extends Activity {
+public abstract class Executor extends Fragment {
 
 	protected Workflow wf;
 	
 	//Extended context.
 	protected WF_Context myContext;
+	
+	//Normal context
+	protected Activity activity;
 	//Keep track of input in below arraylist.
 
 	protected final Map<Rule,Boolean>executedRules = new LinkedHashMap<Rule,Boolean>();	
@@ -58,10 +65,11 @@ public abstract class Executor extends Activity {
 	
 	
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		myContext = new WF_Context(this,this);
-		gs = GlobalState.getInstance(this);
+		activity = this.getActivity();
+		myContext = new WF_Context((Context)activity,this,R.id.content_frame);
+		gs = GlobalState.getInstance((Context)activity);
 		wf = getFlow();
 
 		//Execute called from child onCreate.
@@ -74,14 +82,14 @@ public abstract class Executor extends Activity {
 		Workflow wf=null;
 
 		//Find out the name of the workflow to execute.
-		Bundle b = getIntent().getExtras();
+		Bundle b = this.getArguments();
 		String name = b.getString("workflow_name");
 		if (name!=null) 
 			wf = gs.getWorkflow(name);
 
 		if (wf==null||name==null) {
 			Log.e("NILS","Workflow "+name+" NOT found!");
-			new AlertDialog.Builder(this).setTitle("Ups!")
+			new AlertDialog.Builder((Context)activity).setTitle("Ups!")
 			.setMessage("Kan tyvärr inte hitta workflow med namn: '"+name+"'. Kan det vara en felstavning?")
 			.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
 				@Override
@@ -106,7 +114,7 @@ public abstract class Executor extends Activity {
 	 * Execute the workflow.
 	 */
 	protected void run() {
-		//TEST CODE
+		
 		//LinearLayout my_root = (LinearLayout) findViewById(R.id.myRoot);		
 		List<Block>blocks = wf.getBlocks();
 
@@ -166,7 +174,7 @@ public abstract class Executor extends Activity {
 		if (root!=null)
 			myContext.drawRecursively(root);
 		else {
-			new AlertDialog.Builder(this).setTitle("Ups!")
+			new AlertDialog.Builder((Context)activity).setTitle("Ups!")
 			.setMessage("Det är något fel på den template som används. Ingen rot-panel har definierats så 'jag' vet inte var alla saker ska ritas. Därför kan detta arbetsflöde inte köras vidare.")
 			.setNeutralButton("Jag förstår!", new OnClickListener() {
 				@Override
@@ -176,6 +184,8 @@ public abstract class Executor extends Activity {
 				.show();	
 		}
 
+		
+		
 	}
 	
 	
@@ -249,9 +259,8 @@ public abstract class Executor extends Activity {
 	}
 	 */
 
-
-
-
+	
+	
 	//Evaluate all rules.
 	//Show the rules that were broken in the UI.
 	private void validate() {
@@ -285,7 +294,7 @@ public abstract class Executor extends Activity {
 			if(result==false) {
 				v.setBackgroundColor(Color.RED);
 
-				Toast.makeText(this, rule.getErrorMessage(), Toast.LENGTH_LONG).show();
+				Toast.makeText((Context)activity, rule.getErrorMessage(), Toast.LENGTH_LONG).show();
 			}
 			else 
 				v.setBackgroundColor(getResources().getColor(R.color.background));
@@ -309,6 +318,14 @@ public abstract class Executor extends Activity {
 		} //else
 		//validator_layer.setVisibility(View.GONE);
 	}
+	/* (non-Javadoc)
+	 * @see android.app.Fragment#onViewCreated(android.view.View, android.os.Bundle)
+	 */
+	/* (non-Javadoc)
+	 * @see android.app.Fragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
+	 */
+
+
 
 	
 

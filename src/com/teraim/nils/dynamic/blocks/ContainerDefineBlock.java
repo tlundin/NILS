@@ -7,6 +7,10 @@ package com.teraim.nils.dynamic.blocks;
  */
 public  class ContainerDefineBlock extends Block {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5110181631546326249L;
 	private String containerName="",containerType=null;
 
 	public String getContainerName() {

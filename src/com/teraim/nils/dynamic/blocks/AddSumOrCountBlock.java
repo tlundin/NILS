@@ -1,17 +1,10 @@
 package com.teraim.nils.dynamic.blocks;
 
-import java.util.Arrays;
-import java.util.List;
-
-import android.util.Log;
 import android.view.LayoutInflater;
 
-import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
 import com.teraim.nils.StoredVariable;
-import com.teraim.nils.Variable.Type;
-import com.teraim.nils.dynamic.types.Table;
-import com.teraim.nils.dynamic.types.VariableConfiguration;
+import com.teraim.nils.dynamic.types.Variable.Type;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 import com.teraim.nils.dynamic.workflow_abstracts.Container;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
@@ -23,6 +16,10 @@ import com.teraim.nils.dynamic.workflow_realizations.WF_Not_ClickableField_SumAn
  *
  */
 public  class AddSumOrCountBlock extends Block {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4139158043307360229L;
 	String containerId, label, myPattern, target;
 	WF_Not_ClickableField_SumAndCountOfVariables.Type type;
 	

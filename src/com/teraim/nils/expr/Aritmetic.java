@@ -8,7 +8,7 @@ import java.util.Hashtable;
 import android.util.Log;
 
 import com.teraim.nils.Constants;
-import com.teraim.nils.Variable;
+import com.teraim.nils.dynamic.types.Variable;
 
 /**
 * A variable is a simple expression with a name (like "x") and a

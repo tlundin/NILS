@@ -6,7 +6,7 @@ import android.util.Log;
 
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.StoredVariable;
-import com.teraim.nils.Variable;
+import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.types.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 import com.teraim.nils.dynamic.workflow_abstracts.Container;
@@ -16,6 +16,10 @@ import com.teraim.nils.dynamic.workflow_realizations.WF_List_UpdateOnSaveEvent;
 
 public class CreateEntryFieldBlock extends Block {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2013870148670474248L;
 	private static final String selectionField = VariableConfiguration.Col_Variable_Name;
 	String name,type,label,purpose,containerId;
 	Unit unit;

@@ -10,7 +10,6 @@ import android.util.Log;
 import com.teraim.nils.GlobalState.ErrorCode;
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.StoredVariable;
-import com.teraim.nils.Variable;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
 import com.teraim.nils.utils.Tools;

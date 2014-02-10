@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<string-array name="deviceColors">
-    <item>Röd</item>
-    <item>Blå</item>
-    <item>Ofärgad</item>
+<string-array name="deviceTypes">
+    <item>Mästare</item>
+    <item>Slav</item>
 </string-array>    
 </resources>

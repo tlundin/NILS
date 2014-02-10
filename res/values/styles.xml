@@ -1,5 +1,22 @@
 <resources>
+<style name="AppTheme" parent="@android:style/Theme.Holo.Light">
+    
+    
+</style>
 
-    <style name="AppTheme" parent="android:Theme.Light" />
+<style name="ConsoleStyle" parent="@android:style/Widget.TextView">
+    <item name="android:textSize">@dimen/text_size_medium</item>
+    <item name="android:textColor">@color/white</item>
+    <item name="android:textStyle">bold</item>
+</style>
 
+<style name="GreenStyle" parent="@android:style/Widget.TextView">
+<item name="android:textColor">@color/green</item>
+</style>
+<style name="RedStyle" parent="@android:style/Widget.TextView">
+<item name="android:textColor">@color/red</item>
+</style>    
+<style name="WhiteStyle" parent="@android:style/Widget.TextView">
+<item name="android:textColor">@color/white</item>
+</style>  
 </resources>

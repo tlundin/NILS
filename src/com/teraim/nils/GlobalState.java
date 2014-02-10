@@ -5,19 +5,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.DisplayMetrics;
 import android.util.Log;
 
+import com.teraim.nils.bluetooth.BluetoothRemoteDevice;
 import com.teraim.nils.dynamic.types.Delyta;
 import com.teraim.nils.dynamic.types.Provyta;
 import com.teraim.nils.dynamic.types.Ruta;
+import com.teraim.nils.dynamic.types.Table;
 import com.teraim.nils.dynamic.types.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Workflow;
 import com.teraim.nils.expr.Aritmetic;
@@ -40,54 +38,38 @@ public class GlobalState  {
 	//This is because of the Activity lifecycle. This object might need to be re-instantiated any time.
 	private static GlobalState singleton;
 
-	
+
 	private Context myC;
 	private PersistenceHelper ph = null;	
 	private DbHelper db = null;
 	private Parser parser=null;
 	private VariableConfiguration artLista=null;
-	
-	//Cash for variables.
-	//private Hashtable<String,Variable> myVars = new Hashtable<String,Variable>();
+	//Map workflows into a hash with name as key.
+	private Map<String,Workflow> myWfs; 
 	//Cash for ruta/Provyta/Delyta..
 	private ArrayList<Ruta> rutor = new ArrayList<Ruta>();
-	//Map workflows into a hash with name as key.
-	private Map<String,Workflow> myWfs = new HashMap<String,Workflow>();
 
 	//Global state for sync.
 	private int syncStatus=BluetoothRemoteDevice.SYNK_STOPPED;	
-	
+
 	public enum ErrorCode {
 		ok,
 		missing_required_column,
-		file_not_found
+		file_not_found, workflows_not_found
 	}
-	
+
 	public String TEXT_LARGE;
-	
+
 	public static GlobalState getInstance(Context c) {
-	   if (singleton == null) {
-		   singleton = new GlobalState(c.getApplicationContext());
-		   //Make sure that Initialization went fine
-		   ErrorCode err = singleton.validate();
-		   if (err!=ErrorCode.ok) {
-			   new AlertDialog.Builder(c).setTitle("Ups!")
-				.setMessage("Kan inte starta eftersom "+(err==ErrorCode.file_not_found?"artlistan saknas.":"artlistan saknar en kolumn som måste finnas."))
-				.setNeutralButton("Vad synd!", new OnClickListener() {
-					@Override
-					public void onClick(DialogInterface arg0, int arg1) {
-						
-					}})
-					.show();
-			   return null;
-		   }
-	   }
-	   return singleton;
-	   
+		if (singleton == null) {			
+			singleton = new GlobalState(c.getApplicationContext());
+		}
+		return singleton;
+
 	}
 
 	private GlobalState(Context ctx)  {
-		
+
 		myC = ctx;
 		//Database Helper
 		db = new DbHelper(ctx);
@@ -97,28 +79,33 @@ public class GlobalState  {
 		//Parser for rules
 		parser = new Parser(this);
 		//Artlista
-		artLista = new VariableConfiguration(Tools.scanListConfigData("artlista_v1.config.csv"));		
-		//TODO: REMOVE
-		//Cached data from files.		
+		artLista = new VariableConfiguration(this.thawConfigFile());	
+		myWfs = thawWorkflows();		
+		Tools.printDatabase(db);
 		Tools.scanRutData(ctx.getResources().openRawResource(R.raw.rutdata_v3),this);
 		Tools.scanDelningsData(ctx.getResources().openRawResource(R.raw.delningsdata),this);	
-		Tools.printDatabase(db);
-		
-		////Set text size depending on device sreen.
-		
+
 	}
-	
-	
+
+
 	/*Validation
 	 * 
 	 */
-	private ErrorCode validate() {
-		if (artLista == null)
+	public ErrorCode validateFrozenObjects() {
+		if (artLista == null||myWfs==null)
 			return ErrorCode.file_not_found;
+		else {
+			ErrorCode artL = artLista.validateAndInit();
+			if (artL != ErrorCode.ok)
+				return artL;
 			else
-			return artLista.validateAndInit();
+				if(myWfs.size()==0)
+					return ErrorCode.workflows_not_found;
+				else
+					return ErrorCode.ok;
+		}
 	}
-	
+
 	/*Singletons available for all classes
 	 * 
 	 */
@@ -127,86 +114,96 @@ public class GlobalState  {
 	}
 
 	public DbHelper getDb() {
+		Log.d("nils"," returning ZYZ DB: "+db);
 		return db;
 	}
-	
+
 	public Parser getParser() {
 		return parser;
 	}
-	
+
 	public Context getContext() {
 		return myC;
 	}
-	
+
 	public ArrayList<Ruta> getRutor() {
 		return rutor;
 	}
-	
+
 	public VariableConfiguration getArtLista() {
 		return artLista;
 	}
 
 	/**************************************************
 	 * 
-	 * Getter & Setter for Workflow.
+	 * Thawing of files to objects.
 	 */
-	public void setWorkflows(List<Workflow> l) {
-		if (l==null)
+	
+	public Map<String,Workflow> thawWorkflows() {
+		Map<String,Workflow> ret = new HashMap<String,Workflow>();
+		List<Workflow> l = ((ArrayList<Workflow>)Tools.readObjectFromFile(myC,Constants.CONFIG_FILES_DIR+Constants.WF_FROZEN_FILE_ID));		
+		if (l==null) 
 			Log.e("NILS","Parse Error: Workflowlist is null in SetWorkFlows");
-		else 
+		else {
 			for (Workflow wf:l)
 				if (wf!=null) {
 					if (wf.getName()!=null) {
 						Log.d("NILS","Adding wf with id "+wf.getName()+" and length "+wf.getName().length());
-						myWfs.put(wf.getName(), wf);
+						ret.put(wf.getName(), wf);
 					} else
 						Log.d("NILS","Workflow name was null in setWorkflows");
 				} else
 					Log.d("NILS","Workflow was null in setWorkflows");
+		}
+		return ret;
 	}
 	
+	public Table thawConfigFile() {
+		return ((Table)Tools.readObjectFromFile(myC,Constants.CONFIG_FILES_DIR+Constants.CONFIG_FROZEN_FILE_ID));
+		
+	}
+
 	public Workflow getWorkflow(String id) {
-		//String o = myWfs.keySet().iterator().next();
 		return myWfs.get(id);
 	}
-	
+
 	public String[] getWorkflowNames() {
 		if (myWfs==null)
 			return null;
 		String[] array = new String[myWfs.keySet().size()];
 		myWfs.keySet().toArray(array);
 		return array;
-		 
+
 	}
-	
-	
-	
+
+
+
 
 	/*************************************************
 	 * 
 	 * Getter/Setter for Ruta/Provyta/Delyta
 	 * 
 	 */
-	
+
 	public String getCurrentPictureBasePath() {
 		return Constants.NILS_ROOT_DIR+"/ruta/"+
-		getCurrentRuta().getId()+"/bilder";
+				getCurrentRuta().getId()+"/bilder";
 	} 
-	
+
 	public Ruta getCurrentRuta() {
 		return findRuta(ph.get(PersistenceHelper.CURRENT_RUTA_ID_KEY));
-			
+
 	}
-	
+
 	public Provyta getCurrentProvyta() {
 		Ruta r = getCurrentRuta();
 		if (r!=null) 
 			return r.findProvYta(ph.get(PersistenceHelper.CURRENT_PROVYTA_ID_KEY));
 		else
 			Log.e("nils","getCurrentprovyta returns null, since getCurrentRuta failed");
-			return null;
+		return null;
 	}
-		
+
 	public Delyta getCurrentDelyta() {
 		Provyta p = getCurrentProvyta();
 		if (p!=null) 
@@ -217,7 +214,7 @@ public class GlobalState  {
 			return null;
 		}
 	}
-	
+
 	public Ruta findRuta(String id) {
 		//Log.d("nils","Findruta called with ID> "+id);
 		if (id == null) {
@@ -262,16 +259,16 @@ public class GlobalState  {
 			Log.e("NILS","DID NOT FIND RUTA "+ rutId);
 		return null;
 	}
-	
-	
+
+
 	/**************************************
 	 * Getter/Setter for sync status and Globally accessible method for sending data asynchronously to twin device.
 	 */
-	
+
 	public int getSyncStatus() {
 		return syncStatus;
 	}
-	
+
 	public String getSyncStatusS() {
 		switch (syncStatus) {
 		case BluetoothRemoteDevice.SYNK_STOPPED:
@@ -284,11 +281,11 @@ public class GlobalState  {
 			return "?";
 		}
 	}
-	
+
 	public void setSyncStatus(int status) {
 		syncStatus = status;
 	}
-	
+
 	public void sendParameter(Context ctx,String key,String value,int scope) {
 		if (syncStatus == BluetoothRemoteDevice.SYNK_RUNNING)
 			BluetoothRemoteDevice.getSingleton().sendParameter(key, value, scope);
@@ -298,10 +295,10 @@ public class GlobalState  {
 			ctx.startService(intent);
 		}
 		//Otherwise ongoing sync. just wait?
-			
+
 	}
-	
-	
+
+
 	public synchronized Aritmetic makeAritmetic(String name, String label) {
 		/*Variable result = myVars.get(name);
 		if (result == null) {
@@ -311,10 +308,10 @@ public class GlobalState  {
 		else {
 			return (Aritmetic)result;
 		}
-		*/
+		 */
 		return new Aritmetic(name,label);
 	}
-	
+
 	/*************************************
 	 * 
 	 * Variable Generators.
@@ -331,7 +328,7 @@ public class GlobalState  {
 			return (Bool)result;
 		}
 	}
-	
+
 	public synchronized Numeric makeNumeric(String name, String label) {
 		Variable result = myVars.get(name);
 		if (result == null) {
@@ -342,7 +339,7 @@ public class GlobalState  {
 			return (Numeric)result;
 		}
 	}
-	
+
 	public synchronized Literal makeLiteral(String name, String label) {
 		Variable result = myVars.get(name);
 		if (result == null) {
@@ -357,37 +354,32 @@ public class GlobalState  {
 	public Variable getVariable(String name) {
 		return myVars.get(name);
 	}
-	*/
-	
-	
-/********************************************************
- * Color
- */
+	 */
+
+
+	/********************************************************
+	 * Color
+	 */
 
 	public void setDeviceColor(String color) {
 		ph.put("deviceColor", color);
-		
+
 	}
-	
-	public String getDeviceColor() {
+
+	public String getDeviceType() {
 		return ph.get(PersistenceHelper.DEVICE_COLOR_KEY);		
 	}
-	public String getRemoteDeviceColor() {
-		String myC = getDeviceColor();
-		return (myC==null||myC.equals(Constants.UNDEFINED)||myC.equals(Constants.nocolor())?null:
-			myC.equals(Constants.red())?Constants.blue():Constants.red());
+
+	//IF new configuration files have been loaded, replace existing instances.
+	public void refresh() {
+		artLista = new VariableConfiguration(this.thawConfigFile());	
+		myWfs = thawWorkflows();		
 	}
 
-
-	
-
-	
 	
 
 
-
-
-
+	
 
 
 }

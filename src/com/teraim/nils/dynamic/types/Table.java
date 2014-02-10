@@ -1,5 +1,6 @@
 package com.teraim.nils.dynamic.types;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,8 +8,12 @@ import java.util.Map;
 
 import android.util.Log;
 
-public class Table {
+public class Table implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1183209171210448313L;
 	//The table is a Map of key=Header,value=List of Data.
 	private final Map<String,List<String>> colTable=new HashMap<String,List<String>>();
 	private final Map<Integer,List<String>> rowTable=new HashMap<Integer,List<String>>();
@@ -30,13 +35,16 @@ public class Table {
 	public void addRow(List<String> rowEntries) {
 		assert(rowEntries.size()==columnCount);
 		int index=0;
-		String entrs="";
+//		String entrs="";
 		for(String entry:rowEntries) {
-			entrs+="["+entry+":["+myColumns[index]+"]]";
-			colTable.get(myColumns[index++]).add(entry);
+//			entrs+="["+entry+":["+myColumns[index]+"]]";
+			if (index<myColumns.length)
+				colTable.get(myColumns[index++]).add(entry);
+			else 
+				Log.e("nils","Too many columns in row!!");
 		}
 		rowTable.put(rowCount++, rowEntries);
-		Log.d("nils","ZZZ: "+entrs);
+//		Log.d("nils","ZZZ: "+entrs);
 	}
 
 

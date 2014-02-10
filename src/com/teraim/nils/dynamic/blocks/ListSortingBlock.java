@@ -27,6 +27,10 @@ import com.teraim.nils.dynamic.workflow_realizations.WF_Widget;
 public class ListSortingBlock extends Block {
 
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4728236327056430480L;
 	String containerId,type,target;
 	Filterable targetList;
 	

@@ -48,18 +48,10 @@ public class Constants {
 	public static final String FALSE= "false";
 
 	//Static constants
-	public final static String[] colors = {"Röd","Blå","Ofärgad"};
 
+	public static final String WF_FROZEN_FILE_ID = "workflows";
+	public static final String CONFIG_FROZEN_FILE_ID = "artlista";
 
-	public static String blue() {
-		return colors[1];
-	}
-	public static String red() {
-		return colors[0];
-	}
-	public static String nocolor() {
-		return colors[2];
-	}
 	
 	public static UUID getmyUUID() {
 		/*

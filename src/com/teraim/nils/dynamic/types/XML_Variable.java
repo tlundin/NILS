@@ -1,6 +1,5 @@
 package com.teraim.nils.dynamic.types;
 
-import com.teraim.nils.Variable;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 
 /**

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.Log;
 
 import com.teraim.nils.GlobalState;
-import com.teraim.nils.Variable;
 import com.teraim.nils.exceptions.RuleException;
 import com.teraim.nils.expr.Expr;
 import com.teraim.nils.expr.Parser;

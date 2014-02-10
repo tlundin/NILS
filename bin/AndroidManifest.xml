@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.teraim.nils"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.0" xmlns:tools="http://schemas.android.com/tools">
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -17,7 +17,8 @@
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    
     
  	<uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
 
@@ -27,9 +28,10 @@
         <uses-permission android:name="com.example.mapdemo.permission.MAPS_RECEIVE"/>
         
     <application
-        android:icon="@drawable/logo_moth"
+        android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@android:style/Theme.Holo.Light" 
+        tools:ignore="AllowBackup">
         
          <meta-data
         android:name="com.google.android.gms.version"
@@ -37,7 +39,7 @@
         
         
         <activity
-            android:name=".Main"
+            android:name=".Start"
             android:label="@string/title_activity_nils" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -47,7 +49,7 @@
         </activity>
             
             <activity
-            android:name=".SelectRuta"
+            android:name="com.teraim.nils.alea.SelectRuta"
             android:exported="false"
             android:label="@string/title_select_ruta" >
             <intent-filter>
@@ -57,7 +59,7 @@
         </activity>
             
             <activity
-            android:name=".SelectColor"
+            android:name="com.teraim.nils.alea.SelectColor"
             android:exported="false"
             android:label="@string/title_select_color" >
             <intent-filter>
@@ -67,7 +69,7 @@
         </activity>
             
         <activity
-            android:name=".SelectYta"
+            android:name="com.teraim.nils.alea.SelectYta"
             android:exported="false"
             android:label="@string/title_select_yta" >
             <intent-filter>
@@ -76,7 +78,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MarkslagsActivity"
+            android:name="com.teraim.nils.alea.MarkslagsActivity"
             android:exported="false"
             android:label="Välj markslag" >
             <intent-filter>
@@ -86,22 +88,22 @@
         </activity>
 
         <activity
-            android:name="com.teraim.nils.MarkslagTab_Glaciar_Activity"/>
+            android:name="com.teraim.nils.alea.MarkslagTab_Glaciar_Activity"/>
         <activity
-            android:name="com.teraim.nils.MarkslagTab_Akvatisk_Activity"/>		
+            android:name="com.teraim.nils.alea.MarkslagTab_Akvatisk_Activity"/>		
         <activity
-            android:name="com.teraim.nils.MarkslagTab_Anlagd_Activity"/>
+            android:name="com.teraim.nils.alea.MarkslagTab_Anlagd_Activity"/>
         <activity
-            android:name="com.teraim.nils.MarkslagTab_SA_Activity"/>	
+            android:name="com.teraim.nils.alea.MarkslagTab_SA_Activity"/>	
         <activity
-            android:name="com.teraim.nils.flowtemplates.DefaultTemplate"/>   
+            android:name="com.teraim.nils.dynamic.templates.DefaultTemplate"/>   
         <activity
-            android:name="com.teraim.nils.flowtemplates.ListInputTemplate"/>        	
+            android:name="com.teraim.nils.dynamic.templates.ListInputTemplate"/>        	
         	
         <activity
-            android:name="com.teraim.nils.StartMenuActivity"/>        	
+            android:name="com.teraim.nils.alea.StartMenuActivity"/>        	
         <activity
-            android:name="com.teraim.nils.MapSelect"/>        	
+            android:name="com.teraim.nils.alea.MapSelect"/>        	
  
         
         <activity
@@ -114,7 +116,7 @@
             </intent-filter>
         </activity>
          <activity
-            android:name=".PictureZoom"
+            android:name="com.teraim.nils.alea.PictureZoom"
             android:exported="false"
             android:theme="@android:style/Theme.Dialog"
             android:label="ZOOM" >
@@ -124,7 +126,7 @@
             </intent-filter>
         </activity>
                 <activity
-            android:name=".TestPic"
+            android:name="com.teraim.nils.alea.TestPic"
             android:exported="false"
             android:label="TestPic" >
             <intent-filter>
@@ -133,7 +135,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".EditDelYta"
+            android:name="com.teraim.nils.alea.EditDelYta"
             android:exported="false"
             android:theme="@android:style/Theme.Dialog"
             android:label="Delyte-definition" >
@@ -143,7 +145,7 @@
             </intent-filter>
         </activity>
                 <activity
-            android:name=".RiktpunktActivity"
+            android:name="com.teraim.nils.alea.RiktpunktActivity"
             android:exported="false"
             android:label="Sätt riktpunkter" >
             <intent-filter>
@@ -152,7 +154,7 @@
             </intent-filter>
         </activity>
           <activity
-            android:name=".RiktpunktListViewActivity"
+            android:name="com.teraim.nils.alea.RiktpunktListViewActivity"
             android:exported="false"
             android:theme="@android:style/Theme.Dialog"
             android:label="Välj objekt" >
@@ -162,7 +164,7 @@
             </intent-filter>
         </activity>           
               <activity
-            android:name=".TestGpsActivity"
+            android:name="com.teraim.nils.alea.TestGpsActivity"
             android:exported="false"
             android:label="@string/title_find_area" >
             <intent-filter>
@@ -172,7 +174,7 @@
             </intent-filter>
         </activity>
                 <activity
-            android:name=".FindAreaActivity"
+            android:name="com.teraim.nils.alea.FindAreaActivity"
             android:exported="false"
             android:label="@string/title_find_area" >
             <intent-filter>
@@ -182,7 +184,7 @@
             </intent-filter>
         </activity>
                 <activity
-            android:name=".HittaYta"
+            android:name="com.teraim.nils.alea.HittaYta"
             android:exported="false"
             android:label="@string/title_find_area" >
             <intent-filter>
@@ -192,7 +194,7 @@
             </intent-filter>
         </activity>
                 <activity
-            android:name=".TakePicture"
+            android:name="com.teraim.nils.alea.TakePicture"
             android:exported="false"
             android:label="@string/title_take_picture" >
             <intent-filter>
@@ -201,7 +203,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".TakePictureActivity"
+            android:name="com.teraim.nils.alea.TakePictureActivity"
             android:exported="false"
             android:label="@string/title_take_picture" >
             <intent-filter>
@@ -222,7 +224,7 @@
         </activity>
         
        <service
-        android:name=".BluetoothRemoteDevice"
+        android:name="com.teraim.nils.alea.BluetoothRemoteDevice"
         android:label="BluetoothRemoteDevice" >
             <intent-filter>
            <action android:name="com.teraim.nils.StartService" /> 

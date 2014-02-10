@@ -9,7 +9,7 @@ package com.teraim.nils;
 
 public final class R {
     public static final class array {
-        public static final int deviceColors=0x7f0a0000;
+        public static final int deviceTypes=0x7f0a0000;
     }
     public static final class attr {
         /** 
@@ -167,10 +167,10 @@ containing a value of this type.
         public static final int zOrderOnTop=0x7f010010;
     }
     public static final class color {
-        public static final int background=0x7f060010;
-        public static final int black=0x7f06000b;
-        public static final int blue_background=0x7f06000f;
-        public static final int brown=0x7f06000c;
+        public static final int background=0x7f060013;
+        public static final int black=0x7f06000c;
+        public static final int blue_background=0x7f060012;
+        public static final int brown=0x7f06000d;
         public static final int common_action_bar_splitter=0x7f060009;
         /**  Sign-in Button Colors 
          */
@@ -183,276 +183,118 @@ containing a value of this type.
         public static final int common_signin_btn_light_text_disabled=0x7f060006;
         public static final int common_signin_btn_light_text_focused=0x7f060007;
         public static final int common_signin_btn_light_text_pressed=0x7f060005;
-        public static final int common_signin_btn_text_dark=0x7f060012;
-        public static final int common_signin_btn_text_light=0x7f060013;
-        public static final int grey=0x7f06000d;
-        public static final int inputfieldColor=0x7f060011;
-        public static final int red=0x7f06000e;
-        public static final int white=0x7f06000a;
+        public static final int common_signin_btn_text_dark=0x7f060015;
+        public static final int common_signin_btn_text_light=0x7f060016;
+        public static final int green=0x7f060010;
+        public static final int grey=0x7f06000e;
+        public static final int grey2=0x7f060011;
+        public static final int inputfieldColor=0x7f060014;
+        public static final int red=0x7f06000f;
+        public static final int toggle_color=0x7f060017;
+        public static final int toogleblue=0x7f06000a;
+        public static final int white=0x7f06000b;
     }
     public static final class dimen {
         public static final int padding_large=0x7f0b0002;
         public static final int padding_medium=0x7f0b0001;
         public static final int padding_small=0x7f0b0000;
+        public static final int text_size_huge=0x7f0b0007;
+        public static final int text_size_medium=0x7f0b0008;
         public static final int ui_elem_margin_bottom=0x7f0b0004;
         public static final int ui_elem_margin_left=0x7f0b0005;
         public static final int ui_elem_margin_right=0x7f0b0006;
         public static final int ui_elem_margin_top=0x7f0b0003;
     }
     public static final class drawable {
-        public static final int adellov=0x7f020000;
-        public static final int arrow=0x7f020001;
-        public static final int asp=0x7f020002;
-        public static final int bjork=0x7f020003;
-        public static final int button_bg_selector=0x7f020004;
-        public static final int common_signin_btn_icon_dark=0x7f020005;
-        public static final int common_signin_btn_icon_disabled_dark=0x7f020006;
-        public static final int common_signin_btn_icon_disabled_focus_dark=0x7f020007;
-        public static final int common_signin_btn_icon_disabled_focus_light=0x7f020008;
-        public static final int common_signin_btn_icon_disabled_light=0x7f020009;
-        public static final int common_signin_btn_icon_focus_dark=0x7f02000a;
-        public static final int common_signin_btn_icon_focus_light=0x7f02000b;
-        public static final int common_signin_btn_icon_light=0x7f02000c;
-        public static final int common_signin_btn_icon_normal_dark=0x7f02000d;
-        public static final int common_signin_btn_icon_normal_light=0x7f02000e;
-        public static final int common_signin_btn_icon_pressed_dark=0x7f02000f;
-        public static final int common_signin_btn_icon_pressed_light=0x7f020010;
-        public static final int common_signin_btn_text_dark=0x7f020011;
-        public static final int common_signin_btn_text_disabled_dark=0x7f020012;
-        public static final int common_signin_btn_text_disabled_focus_dark=0x7f020013;
-        public static final int common_signin_btn_text_disabled_focus_light=0x7f020014;
-        public static final int common_signin_btn_text_disabled_light=0x7f020015;
-        public static final int common_signin_btn_text_focus_dark=0x7f020016;
-        public static final int common_signin_btn_text_focus_light=0x7f020017;
-        public static final int common_signin_btn_text_light=0x7f020018;
-        public static final int common_signin_btn_text_normal_dark=0x7f020019;
-        public static final int common_signin_btn_text_normal_light=0x7f02001a;
-        public static final int common_signin_btn_text_pressed_dark=0x7f02001b;
-        public static final int common_signin_btn_text_pressed_light=0x7f02001c;
-        public static final int delyta=0x7f02001d;
-        public static final int editview_bg=0x7f02001e;
-        public static final int empty_east=0x7f02001f;
-        public static final int empty_north=0x7f020020;
-        public static final int empty_south=0x7f020021;
-        public static final int empty_west=0x7f020022;
-        public static final int field=0x7f020023;
-        public static final int field_bg_selector=0x7f020024;
-        public static final int field_selected=0x7f020025;
-        public static final int fixpunkter=0x7f020026;
-        public static final int glaciar=0x7f020027;
-        public static final int glaciar_d=0x7f020028;
-        public static final int gps_pil=0x7f020029;
-        public static final int gradient_bg=0x7f02002a;
-        public static final int gradient_bg_hover=0x7f02002b;
-        public static final int gran=0x7f02002c;
-        public static final int green=0x7f02002d;
-        public static final int ic_action_search=0x7f02002e;
-        public static final int ic_launcher=0x7f02002f;
-        public static final int ic_menu_preferences=0x7f020030;
-        public static final int ic_plusone_medium_off_client=0x7f020031;
-        public static final int ic_plusone_small_off_client=0x7f020032;
-        public static final int ic_plusone_standard_off_client=0x7f020033;
-        public static final int ic_plusone_tall_off_client=0x7f020034;
-        public static final int icon=0x7f020035;
-        public static final int kamera=0x7f020036;
-        public static final int karta=0x7f020037;
-        public static final int life=0x7f020038;
-        public static final int list=0x7f020039;
-        public static final int list_selector=0x7f02003a;
-        public static final int logo_moth=0x7f02003b;
-        public static final int markslag_tab1=0x7f02003c;
-        public static final int menuitem_1=0x7f02003d;
-        public static final int noimg=0x7f02003e;
-        public static final int norr_demo=0x7f02003f;
-        public static final int orientera=0x7f020040;
-        public static final int ost_demo=0x7f020041;
-        public static final int pencil=0x7f020042;
-        public static final int questionmark=0x7f020043;
-        public static final int r262_4=0x7f020044;
-        public static final int red=0x7f020045;
-        public static final int roundshape=0x7f020046;
-        public static final int stub=0x7f020047;
-        public static final int syd_demo=0x7f020048;
-        public static final int tall=0x7f020049;
-        public static final int threelines=0x7f02004a;
-        public static final int validate_list_selector=0x7f02004b;
-        public static final int vast_demo=0x7f02004c;
-        public static final int white_cursor=0x7f02004d;
-        public static final int yellow=0x7f02004e;
-        public static final int ytcirklar_aktiv=0x7f02004f;
-        public static final int ytcirklar_init=0x7f020050;
-        public static final int ytcirklar_problem=0x7f020051;
-        public static final int ytcirklar_ready=0x7f020052;
-        public static final int ytcirklar_s_aktiv=0x7f020053;
-        public static final int ytcirklar_s_init=0x7f020054;
-        public static final int ytcirklar_s_problem=0x7f020055;
-        public static final int ytcirklar_s_ready=0x7f020056;
+        public static final int common_signin_btn_icon_dark=0x7f020000;
+        public static final int common_signin_btn_icon_disabled_dark=0x7f020001;
+        public static final int common_signin_btn_icon_disabled_focus_dark=0x7f020002;
+        public static final int common_signin_btn_icon_disabled_focus_light=0x7f020003;
+        public static final int common_signin_btn_icon_disabled_light=0x7f020004;
+        public static final int common_signin_btn_icon_focus_dark=0x7f020005;
+        public static final int common_signin_btn_icon_focus_light=0x7f020006;
+        public static final int common_signin_btn_icon_light=0x7f020007;
+        public static final int common_signin_btn_icon_normal_dark=0x7f020008;
+        public static final int common_signin_btn_icon_normal_light=0x7f020009;
+        public static final int common_signin_btn_icon_pressed_dark=0x7f02000a;
+        public static final int common_signin_btn_icon_pressed_light=0x7f02000b;
+        public static final int common_signin_btn_text_dark=0x7f02000c;
+        public static final int common_signin_btn_text_disabled_dark=0x7f02000d;
+        public static final int common_signin_btn_text_disabled_focus_dark=0x7f02000e;
+        public static final int common_signin_btn_text_disabled_focus_light=0x7f02000f;
+        public static final int common_signin_btn_text_disabled_light=0x7f020010;
+        public static final int common_signin_btn_text_focus_dark=0x7f020011;
+        public static final int common_signin_btn_text_focus_light=0x7f020012;
+        public static final int common_signin_btn_text_light=0x7f020013;
+        public static final int common_signin_btn_text_normal_dark=0x7f020014;
+        public static final int common_signin_btn_text_normal_light=0x7f020015;
+        public static final int common_signin_btn_text_pressed_dark=0x7f020016;
+        public static final int common_signin_btn_text_pressed_light=0x7f020017;
+        public static final int drawer_shadow=0x7f020018;
+        public static final int ic_drawer=0x7f020019;
+        public static final int ic_launcher=0x7f02001a;
+        public static final int ic_plusone_medium_off_client=0x7f02001b;
+        public static final int ic_plusone_small_off_client=0x7f02001c;
+        public static final int ic_plusone_standard_off_client=0x7f02001d;
+        public static final int ic_plusone_tall_off_client=0x7f02001e;
+        public static final int inset_toggle=0x7f02001f;
+        public static final int validate_list_selector=0x7f020020;
     }
     public static final class id {
-        public static final int Distance_h=0x7f07006f;
-        public static final int Long_h=0x7f07006e;
-        public static final int aggregates=0x7f070066;
-        public static final int akvatikRadio=0x7f07003a;
-        public static final int anlagdRadio=0x7f07003d;
-        public static final int arrow=0x7f070021;
-        public static final int button1=0x7f070024;
-        public static final int buttonPanel=0x7f070069;
-        public static final int column_header1=0x7f070029;
-        public static final int column_header2=0x7f07002a;
-        public static final int column_header3=0x7f07002b;
-        public static final int distance=0x7f07001b;
-        public static final int distanceh=0x7f070070;
-        public static final int dy_e1=0x7f070009;
-        public static final int dy_e10=0x7f07000f;
-        public static final int dy_e11=0x7f070013;
-        public static final int dy_e12=0x7f070017;
-        public static final int dy_e13=0x7f07000c;
-        public static final int dy_e14=0x7f070010;
-        public static final int dy_e15=0x7f070014;
-        public static final int dy_e16=0x7f070018;
-        public static final int dy_e2=0x7f07000d;
-        public static final int dy_e3=0x7f070011;
-        public static final int dy_e4=0x7f070015;
-        public static final int dy_e5=0x7f07000a;
-        public static final int dy_e6=0x7f07000e;
-        public static final int dy_e7=0x7f070012;
-        public static final int dy_e8=0x7f070016;
-        public static final int dy_e9=0x7f07000b;
-        public static final int dy_saveB=0x7f070019;
+        public static final int Selected=0x7f070017;
+        public static final int aggregates=0x7f070018;
+        public static final int content_frame=0x7f07000f;
+        public static final int drawer_layout=0x7f07000e;
         public static final int edit=0x7f070008;
-        public static final int edit_txt1_1=0x7f07004f;
-        public static final int edit_txt1_2=0x7f070050;
-        public static final int editfield=0x7f070005;
-        public static final int editfieldinput=0x7f070007;
-        public static final int editfieldtext=0x7f070006;
-        public static final int enter_layer=0x7f070077;
-        public static final int errortext=0x7f070075;
-        public static final int fieldBearing=0x7f070020;
-        public static final int fieldList=0x7f07006b;
-        public static final int filterPanel=0x7f070067;
-        public static final int gamlabilder=0x7f07005a;
-        public static final int glaciarRadio=0x7f070043;
-        public static final int gridview=0x7f070023;
-        public static final int gridview_new=0x7f070059;
-        public static final int gridview_old=0x7f07005b;
-        public static final int header_line2=0x7f070028;
+        public static final int editfieldtext=0x7f070013;
+        public static final int enter_layer=0x7f070022;
+        public static final int errortext=0x7f070020;
+        public static final int fieldList=0x7f07001d;
+        public static final int filterPanel=0x7f070019;
+        public static final int header=0x7f070007;
         public static final int hybrid=0x7f070004;
-        public static final int imageView1=0x7f070039;
-        public static final int ja=0x7f070032;
-        public static final int label_text=0x7f070030;
-        public static final int lat=0x7f07001d;
-        public static final int lat_h=0x7f07006c;
-        public static final int lath=0x7f07006d;
-        public static final int list_entry_var_layout=0x7f070034;
-        public static final int list_image=0x7f070038;
-        public static final int list_name=0x7f070035;
-        public static final int listview=0x7f07004d;
-        public static final int longh=0x7f07001e;
-        public static final int map=0x7f070053;
-        public static final int menu_settings=0x7f070078;
-        public static final int mittText=0x7f07005e;
-        public static final int mittpunktB=0x7f07005c;
-        public static final int myRoot=0x7f070076;
-        public static final int nej=0x7f070033;
-        public static final int newPic=0x7f070063;
+        public static final int ja=0x7f07000c;
+        public static final int left_drawer=0x7f070010;
+        public static final int list_content1=0x7f070006;
+        public static final int logger=0x7f07000a;
+        public static final int menu_settings=0x7f070023;
+        public static final int myRoot=0x7f070021;
+        public static final int nej=0x7f07000d;
         public static final int none=0x7f070000;
         public static final int normal=0x7f070001;
-        public static final int nyabilder=0x7f070058;
-        public static final int oldPic=0x7f070062;
-        public static final int oldpichead=0x7f070022;
-        public static final int pic=0x7f07004a;
-        public static final int picgridview=0x7f07002f;
-        public static final int provyta=0x7f070027;
-        public static final int provytaF=0x7f07005f;
-        public static final int radioG=0x7f070031;
-        public static final int radioGlaciar=0x7f070044;
-        public static final int radioPermaSnow=0x7f070045;
-        public static final int radio_anlagd1=0x7f07003e;
-        public static final int radio_anlagd2=0x7f07003f;
-        public static final int radio_anlagd3=0x7f070040;
-        public static final int radio_anlagd4=0x7f070041;
-        public static final int radio_anlagd5=0x7f070042;
-        public static final int radio_mosaik=0x7f07003c;
-        public static final int radio_sa1=0x7f070046;
-        public static final int radio_sa2=0x7f070047;
-        public static final int radio_sa3=0x7f070048;
-        public static final int radio_sa4=0x7f070049;
-        public static final int radio_utom_mosaik=0x7f07003b;
-        public static final int rikt1_button=0x7f070051;
-        public static final int riktningstxt=0x7f070060;
-        public static final int riktpunktB=0x7f07005d;
-        public static final int riktpunkttable=0x7f07004e;
+        public static final int outputContainer=0x7f070014;
+        public static final int outputUnitField=0x7f070012;
+        public static final int outputValueField=0x7f070011;
+        public static final int radioG=0x7f07000b;
+        public static final int root=0x7f070015;
         public static final int satellite=0x7f070002;
-        public static final int scrollView1=0x7f070064;
-        public static final int scrollView2=0x7f070068;
-        public static final int scrollView3=0x7f07006a;
-        public static final int selected=0x7f070065;
-        public static final int startCollectB=0x7f07002e;
-        public static final int startmenu_grid=0x7f070054;
-        public static final int tag_content=0x7f070057;
-        public static final int tag_markslag=0x7f070056;
-        public static final int tag_pop_delete=0x7f07007a;
-        public static final int tag_pop_edit=0x7f070079;
-        public static final int tag_title=0x7f070055;
-        public static final int tagknapp=0x7f07002d;
-        public static final int tagtabell=0x7f07002c;
+        public static final int scrollView1=0x7f070016;
+        public static final int scrollView2=0x7f07001a;
+        public static final int scrollView3=0x7f07001c;
+        public static final int separator=0x7f070005;
+        public static final int sortPanel=0x7f07001b;
+        public static final int tag_pop_delete=0x7f070025;
+        public static final int tag_pop_edit=0x7f070024;
         public static final int terrain=0x7f070003;
-        public static final int textExisting=0x7f070061;
-        public static final int textView1=0x7f07001a;
-        public static final int textView2=0x7f07001c;
-        public static final int textview=0x7f07004c;
-        public static final int thumbnail=0x7f070037;
-        public static final int title=0x7f070036;
-        public static final int txt=0x7f07004b;
-        public static final int txt_mittpunkt=0x7f070025;
-        public static final int userPosText=0x7f070026;
-        public static final int validator_layer=0x7f070073;
-        public static final int validator_list_image=0x7f070071;
-        public static final int validator_text=0x7f070072;
-        public static final int validatorlist=0x7f070074;
-        public static final int watevar=0x7f07001f;
-        public static final int ytselect=0x7f070052;
+        public static final int textView1=0x7f070009;
+        public static final int validator_layer=0x7f07001e;
+        public static final int validatorlist=0x7f07001f;
     }
     public static final class integer {
         public static final int google_play_services_version=0x7f090000;
     }
     public static final class layout {
-        public static final int clickable_field=0x7f030000;
-        public static final int clickable_field_list=0x7f030001;
-        public static final int clickable_field_normal=0x7f030002;
-        public static final int clickable_field_yes_no=0x7f030003;
-        public static final int edit_field=0x7f030004;
-        public static final int edit_field_komma=0x7f030005;
-        public static final int edit_field_spinner=0x7f030006;
-        public static final int editdelyta=0x7f030007;
-        public static final int editfield=0x7f030008;
-        public static final int findarea=0x7f030009;
-        public static final int hittayta=0x7f03000a;
-        public static final int ja_nej_field=0x7f03000b;
-        public static final int list_entry=0x7f03000c;
-        public static final int list_row=0x7f03000d;
-        public static final int loadscreen=0x7f03000e;
-        public static final int markslag=0x7f03000f;
-        public static final int markslag_akvatisk_tab=0x7f030010;
-        public static final int markslag_anlagd_tab=0x7f030011;
-        public static final int markslag_glaciar_tab=0x7f030012;
-        public static final int markslag_sa_utom_skog_tab=0x7f030013;
-        public static final int provyta_layout=0x7f030014;
-        public static final int riktpunklist=0x7f030015;
-        public static final int riktpunktlistview=0x7f030016;
-        public static final int riktpunktscreen=0x7f030017;
-        public static final int ruta_list_layout=0x7f030018;
-        public static final int selectruta=0x7f030019;
-        public static final int selectyta=0x7f03001a;
-        public static final int spinneritem=0x7f03001b;
-        public static final int startmenu=0x7f03001c;
-        public static final int tag_row=0x7f03001d;
-        public static final int takepicture=0x7f03001e;
-        public static final int takepicture_singular=0x7f03001f;
-        public static final int template_list_input_wf=0x7f030020;
-        public static final int testgps=0x7f030021;
-        public static final int validator_list_row=0x7f030022;
-        public static final int wf_default=0x7f030023;
+        public static final int drawer_menu_header=0x7f030000;
+        public static final int drawer_menu_selectable=0x7f030001;
+        public static final int edit_field=0x7f030002;
+        public static final int fragment_login_console=0x7f030003;
+        public static final int ja_nej_radiogroup=0x7f030004;
+        public static final int naviframe=0x7f030005;
+        public static final int output_field_selection_element=0x7f030006;
+        public static final int selection_field_normal=0x7f030007;
+        public static final int template_list_input_wf=0x7f030008;
+        public static final int template_wf_default=0x7f030009;
+        public static final int toggle_button=0x7f03000a;
     }
     public static final class menu {
         public static final int activity_nils=0x7f0d0000;
@@ -466,12 +308,7 @@ containing a value of this type.
         public static final int rutdata_v3=0x7f050004;
     }
     public static final class string {
-        public static final int akvatisk_header=0x7f080028;
-        public static final int akvatisktext=0x7f080029;
-        public static final int anlagd_header=0x7f080034;
-        public static final int anlagd_text=0x7f080035;
         public static final int app_name=0x7f08001a;
-        public static final int arkivbilder_st_v_st_nord_syd_=0x7f08003b;
         /**   Title for notification shown when GooglePlayServices needs to be
         enabled for a application to work. [CHAR LIMIT=70] 
          */
@@ -566,40 +403,25 @@ containing a value of this type.
         /**  Long form sign-in button text [CHAR LIMIT=30] 
          */
         public static final int common_signin_button_text_long=0x7f080013;
-        public static final int glaciar_detail=0x7f080024;
-        public static final int glaciar_header=0x7f080022;
-        public static final int glaciartext=0x7f080023;
-        public static final int local_service_started=0x7f08003c;
+        public static final int drawer_close=0x7f080023;
+        public static final int drawer_open=0x7f080022;
+        public static final int local_service_started=0x7f080024;
         public static final int menu_settings=0x7f08001b;
-        public static final int mosaik_detail=0x7f08002c;
-        public static final int permasnow_detail=0x7f080026;
-        public static final int radio_anlagd1=0x7f080036;
-        public static final int radio_anlagd2=0x7f080037;
-        public static final int radio_anlagd3=0x7f080038;
-        public static final int radio_anlagd4=0x7f080039;
-        public static final int radio_anlagd5=0x7f08003a;
-        public static final int radio_glaciar=0x7f080025;
-        public static final int radio_mosaik=0x7f08002d;
-        public static final int radio_permasnow=0x7f080027;
-        public static final int radio_sa1=0x7f080030;
-        public static final int radio_sa2=0x7f080031;
-        public static final int radio_sa3=0x7f080032;
-        public static final int radio_sa4=0x7f080033;
-        public static final int radio_utom_mosaik=0x7f08002b;
-        public static final int sa_header=0x7f08002e;
-        public static final int sa_text=0x7f08002f;
         public static final int title_activity_nils=0x7f08001c;
         public static final int title_find_area=0x7f08001e;
         public static final int title_select_color=0x7f080021;
         public static final int title_select_ruta=0x7f08001f;
         public static final int title_select_yta=0x7f080020;
         public static final int title_take_picture=0x7f08001d;
-        public static final int utom_mosaik_detail=0x7f08002a;
     }
     public static final class style {
         public static final int AppTheme=0x7f0c0002;
+        public static final int ConsoleStyle=0x7f0c0003;
         public static final int Field_Style=0x7f0c0000;
+        public static final int GreenStyle=0x7f0c0004;
+        public static final int RedStyle=0x7f0c0005;
         public static final int WF_Text=0x7f0c0001;
+        public static final int WhiteStyle=0x7f0c0006;
     }
     public static final class xml {
         public static final int myprefs=0x7f040000;
@@ -641,7 +463,7 @@ theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
           <p>This is a private symbol.
-          @attr name com.teraim.nils:adSize
+          @attr name android:adSize
         */
         public static final int AdsAttrs_adSize = 0;
         /**
@@ -661,7 +483,7 @@ theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
           <p>This is a private symbol.
-          @attr name com.teraim.nils:adSizes
+          @attr name android:adSizes
         */
         public static final int AdsAttrs_adSizes = 1;
         /**
@@ -677,7 +499,7 @@ theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
           <p>This is a private symbol.
-          @attr name com.teraim.nils:adUnitId
+          @attr name android:adUnitId
         */
         public static final int AdsAttrs_adUnitId = 2;
         /** Attributes that can be used with a Gallery1.
@@ -686,7 +508,7 @@ containing a value of this type.
            <colgroup align="left" />
            <colgroup align="left" />
            <tr><th>Attribute</th><th>Description</th></tr>
-           <tr><td><code>{@link #Gallery1_android_galleryItemBackground android:galleryItemBackground}</code></td><td></td></tr>
+           <tr><td><code>{@link #Gallery1_android_galleryItemBackground com.teraim.nils:android_galleryItemBackground}</code></td><td></td></tr>
            </table>
            @see #Gallery1_android_galleryItemBackground
          */
@@ -694,9 +516,9 @@ containing a value of this type.
             0x0101004c
         };
         /**
-          <p>This symbol is the offset where the {@link android.R.attr#galleryItemBackground}
+          <p>This symbol is the offset where the {@link com.teraim.nils.R.attr#android_galleryItemBackground}
           attribute's value can be found in the {@link #Gallery1} array.
-          @attr name android:galleryItemBackground
+          @attr name android:android_galleryItemBackground
         */
         public static final int Gallery1_android_galleryItemBackground = 0;
         /** Attributes that can be used with a MapAttrs.
@@ -752,7 +574,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name com.teraim.nils:cameraBearing
+          @attr name android:cameraBearing
         */
         public static final int MapAttrs_cameraBearing = 1;
         /**
@@ -766,7 +588,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name com.teraim.nils:cameraTargetLat
+          @attr name android:cameraTargetLat
         */
         public static final int MapAttrs_cameraTargetLat = 2;
         /**
@@ -780,7 +602,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name com.teraim.nils:cameraTargetLng
+          @attr name android:cameraTargetLng
         */
         public static final int MapAttrs_cameraTargetLng = 3;
         /**
@@ -794,7 +616,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name com.teraim.nils:cameraTilt
+          @attr name android:cameraTilt
         */
         public static final int MapAttrs_cameraTilt = 4;
         /**
@@ -808,7 +630,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name com.teraim.nils:cameraZoom
+          @attr name android:cameraZoom
         */
         public static final int MapAttrs_cameraZoom = 5;
         /**
@@ -828,7 +650,7 @@ containing a value of this type.
 <tr><td><code>terrain</code></td><td>3</td><td></td></tr>
 <tr><td><code>hybrid</code></td><td>4</td><td></td></tr>
 </table>
-          @attr name com.teraim.nils:mapType
+          @attr name android:mapType
         */
         public static final int MapAttrs_mapType = 0;
         /**
@@ -842,7 +664,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name com.teraim.nils:uiCompass
+          @attr name android:uiCompass
         */
         public static final int MapAttrs_uiCompass = 6;
         /**
@@ -856,7 +678,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name com.teraim.nils:uiRotateGestures
+          @attr name android:uiRotateGestures
         */
         public static final int MapAttrs_uiRotateGestures = 7;
         /**
@@ -870,7 +692,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name com.teraim.nils:uiScrollGestures
+          @attr name android:uiScrollGestures
         */
         public static final int MapAttrs_uiScrollGestures = 8;
         /**
@@ -884,7 +706,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name com.teraim.nils:uiTiltGestures
+          @attr name android:uiTiltGestures
         */
         public static final int MapAttrs_uiTiltGestures = 9;
         /**
@@ -898,7 +720,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name com.teraim.nils:uiZoomControls
+          @attr name android:uiZoomControls
         */
         public static final int MapAttrs_uiZoomControls = 10;
         /**
@@ -912,7 +734,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name com.teraim.nils:uiZoomGestures
+          @attr name android:uiZoomGestures
         */
         public static final int MapAttrs_uiZoomGestures = 11;
         /**
@@ -926,7 +748,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name com.teraim.nils:useViewLifecycle
+          @attr name android:useViewLifecycle
         */
         public static final int MapAttrs_useViewLifecycle = 12;
         /**
@@ -940,7 +762,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name com.teraim.nils:zOrderOnTop
+          @attr name android:zOrderOnTop
         */
         public static final int MapAttrs_zOrderOnTop = 13;
     };

@@ -1,7 +1,7 @@
 package com.teraim.nils.expr;
 
-import com.teraim.nils.Variable;
-import com.teraim.nils.Variable.Type;
+import com.teraim.nils.dynamic.types.Variable;
+import com.teraim.nils.dynamic.types.Variable.Type;
 
 public class Literal implements Variable {
 

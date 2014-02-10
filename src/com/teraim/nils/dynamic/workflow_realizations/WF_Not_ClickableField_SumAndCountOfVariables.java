@@ -78,9 +78,8 @@ WF_Not_ClickableField implements EventListener {
 			Set<VarIdentifier> vars = l.getAssociatedVariables();
 			if (vars!=null && !vars.isEmpty()) {
 				for (VarIdentifier v:vars) {
-					Log.d("nils","WWWW Comparing "+v.getId()+" to "+myPattern);
 					if (v.getId().matches(myPattern)) {
-						Log.d("nils","ADD_NUMBER_OF_SELECTION: Found match! "+v.getId());				
+//						Log.d("nils","ADD_NUMBER_OF_SELECTION: Found match! "+v.getId());				
 						if (v.getValue()!=null) {
 							if (myType == Type.count)
 								sum++;

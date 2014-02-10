@@ -13,6 +13,11 @@ public class PersistenceHelper {
 	public static final String LAG_ID_KEY = "lag_id";
 	public static final String MITTPUNKT_KEY = "mittpunkt";
 	public static final String DEVICE_COLOR_KEY = "deviceColor";
+	public static final String CONFIG_LOCATION = "config_name";
+	public static final String BUNDLE_LOCATION = "bundle_name";
+	public static final String SERVER_URL = "server_location";
+	public static final String CURRENT_VERSION_OF_WF_BUNDLE = "current_version_wf";
+	public static final String CURRENT_VERSION_OF_CONFIG_FILE = "current_version_config";
 
 	SharedPreferences sp;
 	
@@ -32,63 +37,5 @@ public class PersistenceHelper {
 	}
 	
 
-	/*
-	public void setR(String varId, String value) {
-		assert(currentRuta!=null);
-		String fullId = currentRuta+"|"+varId;
-		put(fullId,value);
-		delta.add(fullId);
-	}
 
-	public void setP(String varId, String value) {
-		assert(currentRuta!=null);
-		assert(currentProvyta!=null);
-		String fullId = currentRuta+"|"+currentProvyta+"|"+varId;
-		put(fullId,value);
-		delta.add(fullId);
-	}
-	public void setD(String varId, String value) {
-		assert(currentRuta!=null);
-		assert(currentProvyta!=null);
-		assert(currentDelyta!=null);
-		String fullId = currentRuta+"|"+currentProvyta+"|"+currentDelyta+varId;
-		put(fullId,value);
-		delta.add(fullId);
-	}
-	
-	*/
-	/*
-	public StoredVariable getVar(String varId) {
-		if (varId == null)
-			return null;
-		String[] s = varId.split("|");
-		if (s==null || s.length==1) {
-			Log.e("nils","This does not seem to be a Variable: "+varId);
-			return null;
-		}
-		StoredVariable sv = new StoredVariable();
-		//Ruta
-		if (s.length==2) {
-			sv.rutId = s[0];
-			sv.value = s[1];
-			sv.type = Type.ruta;
-		} else if (s.length==3) {
-			sv.rutId = s[0];
-			sv.provytaId = s[1];
-			sv.value = s[2];
-			sv.type = Type.provyta;
-		} else if (s.length==4) {
-			sv.rutId = s[0];
-			sv.provytaId = s[1];
-			sv.delytaId = s[3];
-			sv.value = s[4];
-			sv.type = Type.delyta;
-		} else {
-			Log.e("nils","This Variable has too many parts: "+varId);
-			return null;		
-		}
-		return sv;
-	
-	}
-	*/
 }

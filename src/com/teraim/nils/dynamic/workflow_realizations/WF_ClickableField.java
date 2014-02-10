@@ -22,8 +22,8 @@ import android.widget.TextView;
 
 import com.teraim.nils.R;
 import com.teraim.nils.StoredVariable;
-import com.teraim.nils.Variable;
 import com.teraim.nils.dynamic.types.VarIdentifier;
+import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 import com.teraim.nils.dynamic.workflow_abstracts.EventGenerator;
 

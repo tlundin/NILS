@@ -54,8 +54,18 @@ public class ConfigMenu extends PreferenceActivity {
 			    ruta.setEntries(entries);
 			    ruta.setEntryValues(entryValues);
 			}
+
+			epref = (EditTextPreference) findPreference(PersistenceHelper.SERVER_URL);
+			epref.setSummary(epref.getText());
 			
 			
+			epref = (EditTextPreference) findPreference(PersistenceHelper.BUNDLE_LOCATION);
+			epref.setSummary(epref.getText());
+			
+			epref = (EditTextPreference) findPreference(PersistenceHelper.CONFIG_LOCATION);
+			epref.setSummary(epref.getText());
+
+		
 		}
 
 		public void onSharedPreferenceChanged(
