@@ -1,18 +1,26 @@
-package com.teraim.nils;
+package com.teraim.nils.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.TextView;
 
+import com.teraim.nils.GlobalState;
+import com.teraim.nils.Logger;
+import com.teraim.nils.R;
 import com.teraim.nils.bluetooth.BluetoothRemoteDevice;
 import com.teraim.nils.utils.PersistenceHelper;
 
@@ -62,12 +70,7 @@ public class MenuActivity extends Activity {
 
 	
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-		refreshStatusRow();
-	}
-
+	
 	public void onDestroy()
 	{
 		super.onDestroy();
@@ -86,45 +89,50 @@ public class MenuActivity extends Activity {
 		CreateMenu(menu);
 		return true;
 	}
+	
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+	    super.onPrepareOptionsMenu(menu);
+	   refreshStatusRow();
+	    return true;
+	}
+	
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		return MenuChoice(item);
 	}
 
-	MenuItem mnu1 = null,mnu2 = null,mnu3=null,mnu4=null;
+	private final static int NO_OF_MENU_ITEMS = 6;
+	MenuItem mnu[] = new MenuItem[NO_OF_MENU_ITEMS];
 	private void CreateMenu(Menu menu)
 	{
-		mnu1 = menu.add(0, 0, 0, "");
-		mnu1.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		mnu2 = menu.add(0, 1, 1, "");
-		mnu2.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		mnu3 = menu.add(0, 2, 2, "");
-		mnu3.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-		mnu4 = menu.add(0, 3, 3,"");
-		mnu4.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-		MenuItem mnu5 = menu.add(0, 4, 4, "Item 5");
-		mnu5.setIcon(android.R.drawable.ic_menu_preferences);
-		mnu5.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+		for(int c=0;c<mnu.length;c++) {
+			mnu[c]=menu.add(0,c,c,"");
+			mnu[c].setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);	
+
+		}
+		//mnu5.setIcon(android.R.drawable.ic_menu_preferences);
+		//mnu5.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		refreshStatusRow();
 	}
 
 	protected void refreshStatusRow() {
-		Log.d("NILS","Refreshing status row");
-		if (mnu1!=null) {
-			
-			String pid = ph.get(PersistenceHelper.CURRENT_PROVYTA_ID_KEY);
-			String rid = ph.get(PersistenceHelper.CURRENT_RUTA_ID_KEY);
-			
-			mnu1.setTitle("Ruta/Provyta: "+rid+"/"+pid);
-		}
-		if (mnu2!=null)
-			mnu2.setTitle("Synkning: "+gs.getSyncStatusS());
-		if (mnu3!=null)
-			mnu3.setTitle("Användare: "+gs.getPersistence().get(PersistenceHelper.USER_ID_KEY));
-		if (mnu4!=null)
-			mnu4.setTitle("Typ: "+gs.getDeviceType());
+		Log.d("NILS","Refreshing status row ");
+		int c=0;
+		String pid = ph.get(PersistenceHelper.CURRENT_PROVYTA_ID_KEY);
+		String rid = ph.get(PersistenceHelper.CURRENT_RUTA_ID_KEY);
+		mnu[c++].setTitle("Ruta/Provyta: "+rid+"/"+pid);
+		mnu[c++].setTitle("LOG");
+		mnu[c++].setTitle("Synkning: "+gs.getSyncStatusS());
+		mnu[c++].setTitle("Användare: "+gs.getPersistence().get(PersistenceHelper.USER_ID_KEY));
+		mnu[c++].setTitle("Typ: "+gs.getDeviceType());
+		if(!ph.get(PersistenceHelper.POWER_USER_KEY).equals(PersistenceHelper.UNDEFINED))
+			mnu[1].setVisible(false);
 		
+
 	}
 
 	
@@ -163,20 +171,45 @@ public class MenuActivity extends Activity {
 		
 		switch (item.getItemId()) {
 			
+		
 		case 1:
+			final Dialog dialog = new Dialog(this);
+            dialog.setContentView(R.layout.log_dialog_popup);
+            dialog.setTitle("Session Log");
+            final TextView tv=(TextView)dialog.findViewById(R.id.logger);
+            Typeface type=Typeface.createFromAsset(getAssets(),
+    		        "clacon.ttf");
+    		tv.setTypeface(type);
+            final Logger log = gs.getLogger();
+            log.setOutputView(tv);
+            //trigger redraw.
+            log.draw();
+            Button close=(Button)dialog.findViewById(R.id.log_close);
+            dialog.show();
+            close.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					dialog.dismiss();
+				}
+			});
+            Button clear = (Button)dialog.findViewById(R.id.log_clear);
+            clear.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					log.clear();
+				}
+			});
+			
+		break;
+		case 2:
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle("Synkronisering")
 			.setMessage("Vill du "+(gs.getSyncStatus()==BluetoothRemoteDevice.SYNK_STOPPED?"slå på ":"stänga av ")+"synkroniseringen?").setPositiveButton("Ja", dialogClickListener)
 			.setNegativeButton("Nej", dialogClickListener).show();
 			break;
+
 		case 0:
-			Toast.makeText(this,"ändra ruta eller provyta",Toast.LENGTH_LONG).show();
-		case 2:
-			Toast.makeText(this, "Ändra användare",
-					Toast.LENGTH_LONG).show();
 		case 3:
-			Toast.makeText(this, "Ändra färg",
-					Toast.LENGTH_LONG).show();
 		case 4:
 			Intent intent = new Intent(getBaseContext(),ConfigMenu.class);
 			startActivity(intent);

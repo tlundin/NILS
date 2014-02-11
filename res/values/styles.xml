@@ -18,5 +18,8 @@
 </style>    
 <style name="WhiteStyle" parent="@android:style/Widget.TextView">
 <item name="android:textColor">@color/white</item>
-</style>  
+</style>     
+<style name="YellowStyle" parent="@android:style/Widget.TextView">
+<item name="android:textColor">@color/yellow</item>
+</style> 
 </resources>

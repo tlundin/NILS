@@ -40,6 +40,7 @@ public class GlobalState  {
 
 
 	private Context myC;
+	private Logger log;
 	private PersistenceHelper ph = null;	
 	private DbHelper db = null;
 	private Parser parser=null;
@@ -76,6 +77,8 @@ public class GlobalState  {
 		//Shared PreferenceHelper 
 		SharedPreferences sp=PreferenceManager.getDefaultSharedPreferences(ctx);
 		ph = new PersistenceHelper(sp);
+		//Logger. Note that logger must be initialized with a TextView when used! 
+		log = new Logger(ctx);
 		//Parser for rules
 		parser = new Parser(this);
 		//Artlista
@@ -114,7 +117,6 @@ public class GlobalState  {
 	}
 
 	public DbHelper getDb() {
-		Log.d("nils"," returning ZYZ DB: "+db);
 		return db;
 	}
 
@@ -374,6 +376,10 @@ public class GlobalState  {
 	public void refresh() {
 		artLista = new VariableConfiguration(this.thawConfigFile());	
 		myWfs = thawWorkflows();		
+	}
+
+	public Logger getLogger() {
+		return log;
 	}
 
 	

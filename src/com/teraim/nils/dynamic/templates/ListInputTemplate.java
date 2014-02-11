@@ -36,6 +36,7 @@ public class ListInputTemplate extends Executor {
 	 * @see android.app.Fragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
 	 */
 	ViewGroup myContainer = null;
+	ListSortingBlock a_o,slakt;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -54,10 +55,8 @@ public class ListInputTemplate extends Executor {
 		myLayouts.add(new WF_Container("Filter_panel_4", (LinearLayout)v.findViewById(R.id.filterPanel), root));
 		myLayouts.add(new WF_Container("Field_List_panel_2", (LinearLayout)v.findViewById(R.id.Selected), root));
 		myContext.addContainers(getContainers());
-		ListSortingBlock a_o = new ListSortingBlock("alphanumeric_sorting_function","Sort_Panel_1",FIELD_LIST);
-		ListSortingBlock slakt = new ListSortingBlock("familje_sorting_function","Sort_Panel_1",FIELD_LIST);
-		a_o_widget = a_o.create(myContext);
-		familj_widget = slakt.create(myContext);
+		a_o = new ListSortingBlock("alphanumeric_sorting_function","Sort_Panel_1",FIELD_LIST);
+		slakt = new ListSortingBlock("familje_sorting_function","Sort_Panel_1",FIELD_LIST);
 
 		
 		return v;
@@ -75,6 +74,9 @@ public class ListInputTemplate extends Executor {
 		if (wf!=null) {
 			run();
 		}
+		a_o_widget = a_o.create(myContext);
+		familj_widget = slakt.create(myContext);
+
 		Log.d("nils","in onStart");
 		//myContainer.removeAllViews();
 		//Create blocks for template functions.

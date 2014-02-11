@@ -1,47 +1,26 @@
 package com.teraim.nils.utils;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.Context;
-import android.content.res.Resources.NotFoundException;
 import android.os.AsyncTask;
-import android.util.Log;
-import android.util.Xml;
 
 import com.teraim.nils.Constants;
 import com.teraim.nils.FileLoadedCb;
 import com.teraim.nils.FileLoadedCb.ErrorCode;
-import com.teraim.nils.dynamic.blocks.AddRuleBlock;
-import com.teraim.nils.dynamic.blocks.AddSumOrCountBlock;
-import com.teraim.nils.dynamic.blocks.Block;
-import com.teraim.nils.dynamic.blocks.ButtonBlock;
-import com.teraim.nils.dynamic.blocks.ContainerDefineBlock;
-import com.teraim.nils.dynamic.blocks.CreateEntryFieldBlock;
-import com.teraim.nils.dynamic.blocks.CreateListEntriesBlock;
-import com.teraim.nils.dynamic.blocks.LayoutBlock;
-import com.teraim.nils.dynamic.blocks.ListFilterBlock;
-import com.teraim.nils.dynamic.blocks.ListSortingBlock;
-import com.teraim.nils.dynamic.blocks.PageDefineBlock;
-import com.teraim.nils.dynamic.blocks.StartBlock;
+import com.teraim.nils.GlobalState;
+import com.teraim.nils.Logger;
 import com.teraim.nils.dynamic.types.Table;
-import com.teraim.nils.dynamic.types.Workflow;
-import com.teraim.nils.dynamic.types.Workflow.Unit;
-import com.teraim.nils.dynamic.workflow_realizations.WF_Not_ClickableField_SumAndCountOfVariables;
-import com.teraim.nils.exceptions.EvalException;
-import com.teraim.nils.exceptions.SameOldException;
+import com.teraim.nils.dynamic.types.Table.ErrCode;
 
 /**
  * 
@@ -60,6 +39,7 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 	FileLoadedCb cb;
 	String myVersion = null;
 	Table myTable=null;
+	Logger o;
 
 
 
@@ -76,13 +56,24 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 	@Override
 	protected ErrorCode doInBackground(Context... params) {
 		ctx = params[0];
-		return parse(ph.get(PersistenceHelper.SERVER_URL)+ph.get(PersistenceHelper.CONFIG_LOCATION));
+		o = GlobalState.getInstance(ctx).getLogger();
+		String serverUrl = ph.get(PersistenceHelper.SERVER_URL);
+
+		if (serverUrl ==null || serverUrl.equals(PersistenceHelper.UNDEFINED) || serverUrl.length()==0)
+			return ErrorCode.configurationError;
+		//Add / if missing.
+		if (!serverUrl.endsWith("/"))
+			serverUrl+="/";
+		if (!serverUrl.startsWith("http://")) {
+			serverUrl = "http://"+serverUrl;
+			o.addRow("server url name missing http header...adding");		
+		}
+		return parse(serverUrl+ph.get(PersistenceHelper.CONFIG_LOCATION));
 	}
 
 	@Override
 	protected void onPostExecute(ErrorCode code) {
 
-		Log.d("nils","Confdir: "+Constants.CONFIG_FILES_DIR+" "+"frozen "+Constants.CONFIG_FROZEN_FILE_ID);
 		if (code == ErrorCode.newVersionLoaded) {
 			boolean ok= Tools.witeObjectToFile(ctx, myTable, Constants.CONFIG_FILES_DIR+Constants.CONFIG_FROZEN_FILE_ID);
 			if (!ok)
@@ -90,19 +81,22 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 			else {
 				ph.put(PersistenceHelper.CURRENT_VERSION_OF_CONFIG_FILE,myVersion);
 				code = ErrorCode.newVersionLoaded;
+				o.addRow("");
+				o.addYellowText("New Configuration file loaded. Version: "+myVersion);
 			}
 		}
 		cb.onFileLoaded(code);	
 	}
-	
-	
+
+
 	//Creates the ArtLista arteface from a configuration file.
-	
+
 	public ErrorCode parse(String fileUrl) {
-		Log.d("nils","File url: "+fileUrl);
+		o.addRow("");
+		o.addYellowText("Now parsing variable configuration file. ");
+		o.addRow("File URL: "+fileUrl);
 		try {	
 			URL url = new URL(fileUrl);
-			Log.d("NILS", "downloading page "+fileUrl);
 			/* Open a connection to that URL. */
 			URLConnection ucon = url.openConnection();
 			InputStream in = ucon.getInputStream();
@@ -112,45 +106,63 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 			String versionR = br.readLine();
 			if (versionR !=null) {
 				String vers[] = versionR.split(",");
-				if (vers.length<2)
-					Log.e("nils","Unable to read version row...corrupt? "+versionR);
+				if (vers.length<2) {
+					o.addRow("");
+					o.addRedText("Unable to read version row...corrupt? "+versionR);
+				}
 				else {
 					myVersion = vers[1];
 					if (myVersion.equals(ph.get(PersistenceHelper.CURRENT_VERSION_OF_CONFIG_FILE))) {
-						Log.d("nils","No need to parse...no changes ");
+						o.addRow("No need to parse...no changes ");
 						br.close();
 						return ErrorCode.sameold;
 					}
-					
+
 				}				
 			}
 			header = br.readLine();
-			Log.d("NILS","Scanning listdatafile with header "+header);
-			if (header != null) {
-				
-			myTable = new Table(header.split(","));
-			//Find all RutIDs from csv. Create Ruta Class for each.
-			while((row = br.readLine())!=null) {
-				String[]  r = row.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");				
-				if (r!=null) {
-					for(int i=0;i<r.length;i++)
-						if (r[i]!=null)
-							r[i] = r[i].replace("\"", "");
-					
-					myTable.addRow(Arrays.asList(r));		
+			
+			o.addRow("File header reads:["+header+"]");
+			if (header != null) {			
+				myTable = new Table(header.split(","));
+				//Find all RutIDs from csv. Create Ruta Class for each.
+				int rowC=1;
+				while((row = br.readLine())!=null) {
+					String[]  r = row.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");				
+					if (r!=null) {
+						for(int i=0;i<r.length;i++)
+							if (r[i]!=null)
+								r[i] = r[i].replace("\"", "");
+						Table.ErrCode e = myTable.addRow(Arrays.asList(r));	
+						if (e!=ErrCode.ok) {
+							o.addRow("");
+							if (e==ErrCode.tooFewColumns) 
+								o.addRedText("Too few columns on line: "+rowC);
+							else
+								o.addRedText("Too many columns on line: "+rowC);	
+						}
+					}
+					rowC++;
 				}
-			}
 			} else {
 				return ErrorCode.parseError;
 			}
+			o.addText("Adding additional Variables to Table: AntalArter, SumTackning");
 			myTable.addRow(Arrays.asList("EE0020,AntalArter,Antal Arter,,,,TRUE,st,delyta,,,,,,,,".split(",")));
 			myTable.addRow(Arrays.asList("EE0030,SumTackning,Summa Täckning,,,,TRUE,%,delyta,,,,,,,,".split(",")));
 			br.close();			
 		} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				return ErrorCode.notFound;			
+			e.printStackTrace();
+			o.addRow("");
+			o.addRedText("Could not find the file at the specified location");
+			return ErrorCode.notFound;			
 		} catch (IOException e) {
 			e.printStackTrace();
+			o.addRow("IO ERROR!");
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);		
+			o.addRedText(sw.toString());
 			return ErrorCode.ioError;			
 		}
 		return ErrorCode.newVersionLoaded;

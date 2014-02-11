@@ -2,6 +2,7 @@ package com.teraim.nils.dynamic.blocks;
 
 import android.view.LayoutInflater;
 
+import com.teraim.nils.Logger;
 import com.teraim.nils.R;
 import com.teraim.nils.StoredVariable;
 import com.teraim.nils.dynamic.types.Variable.Type;
@@ -44,7 +45,7 @@ public  class AddSumOrCountBlock extends Block {
 		else
 			field.addVariable(label, "SumTackning", Unit.percentage, Type.NUMERIC, StoredVariable.Type.delyta, true);
 			
-		//refresh value.
+		//TODO: This is too specific.
 		field.matchAndRecalculateMe();
 		field.refreshValues();
 		myContainer.add(field);

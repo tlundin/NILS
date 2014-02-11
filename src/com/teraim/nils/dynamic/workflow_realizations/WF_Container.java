@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.teraim.nils.Logger;
 import com.teraim.nils.dynamic.workflow_abstracts.Container;
 
 public class WF_Container extends WF_Thing implements Container {
@@ -20,6 +21,7 @@ public class WF_Container extends WF_Thing implements Container {
 		this.parent=parent;
 		me = container;
 		myItems = new ArrayList<WF_Widget>();
+		
 	}
 
 	@Override

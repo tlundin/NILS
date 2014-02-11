@@ -1,12 +1,13 @@
 package com.teraim.nils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -23,18 +24,19 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.teraim.nils.FileLoadedCb.ErrorCode;
-import com.teraim.nils.dynamic.Executor;
 import com.teraim.nils.dynamic.types.Workflow;
 import com.teraim.nils.ui.DrawerMenuAdapter;
 import com.teraim.nils.ui.DrawerMenuHeader;
 import com.teraim.nils.ui.DrawerMenuItem;
 import com.teraim.nils.ui.DrawerMenuSelectable;
+import com.teraim.nils.ui.MenuActivity;
 import com.teraim.nils.utils.ConfigFileParser;
 import com.teraim.nils.utils.PersistenceHelper;
 import com.teraim.nils.utils.WorkflowParser;
 
 public class Start extends MenuActivity {
 
+	private final String NILS_VERSION = "0.10";
 
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
@@ -47,7 +49,11 @@ public class Start extends MenuActivity {
 	private SparseArray<String>mapItemsToName;
 //	private ArrayList<String> rutItems;
 //	private ArrayList<String> wfItems;
-	private enum State {INITIAL, WF_LOADED, CONF_LOADED};
+	private enum State {INITIAL, WF_LOADED, CONF_LOADED, VALIDATE};
+	private LoginConsoleFragment loginFragment;
+	private Logger loginConsole;
+
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -122,26 +128,38 @@ public class Start extends MenuActivity {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		getActionBar().setHomeButtonEnabled(true);
 
-		loginConsole = new LoginConsoleFragment();
+		loginFragment = new LoginConsoleFragment();
 		FragmentManager fragmentManager = getFragmentManager();
 		fragmentManager.beginTransaction()
-		.replace(R.id.content_frame, loginConsole)
+		.replace(R.id.content_frame, loginFragment)
 		.commit();
 
 		//Executon continues in onStart() since we have to wait for fragment to load.
 
 	}
 
-	LoginConsoleFragment loginConsole;
-
 
 
 
 	@Override
 	protected void onStart() {
+		loginConsole = new Logger(this);
+		loginConsole.setOutputView(loginFragment.getTextWindow());
 		loginConsole.clear();
 		super.onStart();
-
+		loginConsole.addRow("NILS VERSION ");
+		loginConsole.addYellowText("["+NILS_VERSION+"]");
+		loginConsole.addRow("New features: Developer Log in Actionbar.");
+		
+		
+		//create subfolders. Copy assets..
+		if (this.initIfFirstTime()) {		
+			loginConsole.addRow("First time use...creating folders");
+			loginConsole.addRow("");
+			loginConsole.addYellowText("To change defaults, go to the config (wrench) menu");
+		
+		}
+		
 		//If network, go and check for new files.
 		if (this.isNetworkAvailable()) {
 
@@ -149,6 +167,9 @@ public class Start extends MenuActivity {
 			loginConsole.addRow("Server URL: "+ph.get(PersistenceHelper.SERVER_URL));
 
 			loader(State.INITIAL,null);
+		} else {
+			loginConsole.addRow("No network available...will use existing configuration");
+			loader(State.VALIDATE,null);
 		}
 
 	}
@@ -180,7 +201,6 @@ public class Start extends MenuActivity {
 				loginConsole.addRow("Couldn't load "+(state==State.WF_LOADED?"workflow":"artlista") +" config.\nWrong server url? :"+ph.get(PersistenceHelper.SERVER_URL)+
 						"\nWrong filename? : "+(state==State.WF_LOADED?ph.get(PersistenceHelper.BUNDLE_LOCATION):ph.get(PersistenceHelper.CONFIG_LOCATION)));
 				break;
-
 			case sameold:
 				loginConsole.addGreenText("[Latest version already installed]");
 				break;
@@ -195,6 +215,11 @@ public class Start extends MenuActivity {
 				loginConsole.addRedText("[Not found]");
 				loginConsole.addRow("(Existing configuration will be used if found)");
 				break;
+			case configurationError:
+				loginConsole.addRedText("[Configuration error]");
+				loginConsole.addRow("");
+				loginConsole.addRedText("Please check the name of your configuration files under the Wrench menu.");
+				break;
 
 			}	
 			if (state==State.WF_LOADED) {
@@ -207,7 +232,11 @@ public class Start extends MenuActivity {
 					}
 				}
 						).execute(this);
-			} else {
+			} else
+				loader(State.VALIDATE,ErrorCode.whatever);
+			break;
+			
+		case VALIDATE:
 				//If a new version has been loaded and frozen, refresh global state.
 				if (doRefresh) {
 					loginConsole.addRow("Refreshing frozen objects with new configuration: ");
@@ -237,6 +266,8 @@ public class Start extends MenuActivity {
 					String[] wfs = gs.getWorkflowNames();
 					loginConsole.addRow("Found "+wfs.length+" workflows.");
 					loginConsole.addRow("Start program in Drawer menu to the left.");
+					gs.getLogger().addRow("Initialization done");
+					gs.getLogger().addRow("************************************************");
 					new Handler().postDelayed(new Runnable() {
 
 						@Override
@@ -253,13 +284,13 @@ public class Start extends MenuActivity {
 					loginConsole.addRedText("Program cannot start because of previous errors. Please correct your configuration");					
 				}
 
-			}
+				loginConsole.draw();
 
 			break;
 
 
 		}
-
+		//TODO: Potentially add logtext to global logtext...
 	}
 
 
@@ -269,8 +300,7 @@ public class Start extends MenuActivity {
 		
 		final String[] mainItems = {"Välj ruta","Hitta yta","Ta bilder och geo"};
 	
-		if (items.size()>0)
-			return;
+		items.clear();
 		//Add "static" headers to menu.
 		items.add(new DrawerMenuHeader("Rutor och Provyta"));
 		for(int i=0;i<mainItems.length;i++)
@@ -333,13 +363,14 @@ public class Start extends MenuActivity {
 		// Highlight the selected item, update the title, and close the drawer
 		mDrawerList.setItemChecked(position, true);
 		String wfId = mapItemsToName.get(position);
-		setTitle(wfId);
+		
 		
 		Workflow wf = gs.getWorkflow(wfId);
 		// Create a new fragment and specify the  to show based on position
 		Fragment fragment=null;
 		if (wf!=null) 
 			fragment = wf.createFragment();
+		
 		else
 			fragment = new Fragment();
 		Bundle args = new Bundle();
@@ -352,7 +383,9 @@ public class Start extends MenuActivity {
 		.replace(R.id.content_frame, fragment)
 		.addToBackStack(null)
 		.commit();
+		setTitle("Ändra inställningar");
 		mDrawerLayout.closeDrawer(mDrawerList);
+		setTitle(wfId);
 	}
 
 	@Override
@@ -371,6 +404,50 @@ public class Start extends MenuActivity {
 		NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
 		return activeNetworkInfo != null && activeNetworkInfo.isConnected();
 	}
+	
+	/******************************
+	 * First time? If so, create subfolders.
+	 */
+	private boolean initIfFirstTime() {
+		//If testFile doesnt exist it will be created and found next time.
+		
+		Log.d("Strand","Checking if this is first time use...");
+		boolean first = (ph.get(PersistenceHelper.FIRST_TIME_KEY).equals(PersistenceHelper.UNDEFINED));
+			
+
+		if (first) {
+			ph.put(PersistenceHelper.FIRST_TIME_KEY,"NotEmpty");
+			Log.d("Strand","Yes..executing  first time init");
+			initialize();   
+			return true;
+		}
+		else {
+			Log.d("Strand","..Not first time");
+			return false;
+		}
+
+	}
+
+	private void initialize() {
+		//create data folder. This will also create the ROOT folder for the Strand app.
+		File folder = new File(Constants.CONFIG_FILES_DIR);
+		if(!folder.mkdirs())
+			Log.e("NILS","Failed to create config root folder");
+		ph.put(PersistenceHelper.CURRENT_VERSION_OF_CONFIG_FILE, PersistenceHelper.UNDEFINED);
+		ph.put(PersistenceHelper.CURRENT_VERSION_OF_WF_BUNDLE, PersistenceHelper.UNDEFINED);
+		//Set defaults if none.
+		if (ph.get(PersistenceHelper.SERVER_URL).equals(PersistenceHelper.UNDEFINED))
+			ph.put(PersistenceHelper.SERVER_URL, "www.teraim.com");
+		if (ph.get(PersistenceHelper.BUNDLE_LOCATION).equals(PersistenceHelper.UNDEFINED))
+			ph.put(PersistenceHelper.BUNDLE_LOCATION, "nilsbundle2.xml");
+		if (ph.get(PersistenceHelper.CONFIG_LOCATION).equals(PersistenceHelper.UNDEFINED))
+			ph.put(PersistenceHelper.CONFIG_LOCATION, "config.csv");
+	
+
+		//copy the configuration files into the root dir.
+		//copyAssets();
+	}
+
 
 
 

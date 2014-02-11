@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.teraim.nils.GlobalState;
+import com.teraim.nils.Logger;
 import com.teraim.nils.R;
 import com.teraim.nils.dynamic.blocks.AddSumOrCountBlock;
 import com.teraim.nils.dynamic.blocks.Block;
@@ -27,7 +28,6 @@ import com.teraim.nils.dynamic.blocks.ButtonBlock;
 import com.teraim.nils.dynamic.blocks.ContainerDefineBlock;
 import com.teraim.nils.dynamic.blocks.CreateEntryFieldBlock;
 import com.teraim.nils.dynamic.blocks.CreateListEntriesBlock;
-import com.teraim.nils.dynamic.blocks.ListFilterBlock;
 import com.teraim.nils.dynamic.blocks.ListSortingBlock;
 import com.teraim.nils.dynamic.blocks.StartBlock;
 import com.teraim.nils.dynamic.types.Rule;
@@ -63,6 +63,8 @@ public abstract class Executor extends Fragment {
 
 	protected GlobalState gs;
 	
+	protected Logger o;
+	
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -70,6 +72,7 @@ public abstract class Executor extends Fragment {
 		activity = this.getActivity();
 		myContext = new WF_Context((Context)activity,this,R.id.content_frame);
 		gs = GlobalState.getInstance((Context)activity);
+		o = gs.getLogger();
 		wf = getFlow();
 
 		//Execute called from child onCreate.
@@ -88,7 +91,8 @@ public abstract class Executor extends Fragment {
 			wf = gs.getWorkflow(name);
 
 		if (wf==null||name==null) {
-			Log.e("NILS","Workflow "+name+" NOT found!");
+			o.addRow("");
+			o.addRedText("Workflow "+name+" NOT found!");
 			new AlertDialog.Builder((Context)activity).setTitle("Ups!")
 			.setMessage("Kan tyvärr inte hitta workflow med namn: '"+name+"'. Kan det vara en felstavning?")
 			.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
@@ -99,11 +103,12 @@ public abstract class Executor extends Fragment {
 				.show();				
 
 			String heck[] = gs.getWorkflowNames();
+			o.addRow("Following workflows found: ");
 			for (int i = 0 ; i< heck.length; i++)
-				Log.e("NILS","Workflow "+i+": "+heck[i]);
+				o.addRow("Workflow "+i+": "+heck[i]);
 			return null;
 		} else {
-			Log.d("NILS","Now executing workflow "+name);
+			o.addRow("*******EXECUTING: "+name);
 
 		}
 		return wf;
@@ -120,47 +125,62 @@ public abstract class Executor extends Fragment {
 
 		for (Block b:blocks) {
 			
-			if (b instanceof StartBlock)
-				Log.d("NILS","Startblock found");
+			if (b instanceof StartBlock) {
+				o.addRow("");
+				o.addYellowText("Startblock found");
+			}
 			
 			else if (b instanceof ContainerDefineBlock) {
-				//for now all containers are assumed to be part of template.
+				o.addRow("");
+				o.addYellowText("ContainerDefineBlock found");
 				String id = (((ContainerDefineBlock) b).getContainerName());
 				if (id!=null) {
-					if (myContext.getContainer(id)!=null)
-						Log.d("nils","found hardcoded templatecontainer for "+id);
-					else
-						Log.e("nils","Could not find container "+id+". Will default to root");
+					if (myContext.getContainer(id)!=null) {
+						o.addRow("");
+						o.addGreenText("found hardcoded templatecontainer for "+id);
+					}
+					else {
+						o.addRow("");
+						o.addRedText("Could not find container "+id+" in template! Will default to root");
+					}
+						
 				}
 			}			
 			else if (b instanceof ButtonBlock) {
-				Log.d("NILS","Buttonblock found");
+				o.addRow("");
+				o.addYellowText("ButtonBlock found");
 				ButtonBlock bl = (ButtonBlock) b;
 				bl.create(myContext);
 			}			
 			else if (b instanceof ListSortingBlock) {
-				Log.d("NILS","Sortingblock found");
+				o.addRow("");
+				o.addYellowText("ListSortingBlock found");
 				ListSortingBlock bl = (ListSortingBlock) b;
 				bl.create(myContext);
-			}
+			}/*
 			else if (b instanceof ListFilterBlock) {
+				o.addRow("");
+				o.addYellowText("ListFilterBlock found");
 				ListFilterBlock bl = (ListFilterBlock)b;
-				Log.d("NILS","ListFilterBlock found");
 				bl.create(myContext);
-			}
+			}*/
 			else if (b instanceof CreateListEntriesBlock) {
-				Log.d("NILS","CreateListEntriesBlock found");
+				o.addRow("");
+				o.addYellowText("CreateListEntriesBlock found");
 				CreateListEntriesBlock bl = (CreateListEntriesBlock)b;
 				bl.create(myContext);
 			}
 			else if (b instanceof CreateEntryFieldBlock) {
+				o.addRow("");
+				o.addYellowText("CreateEntryFieldBlock found");
 				CreateEntryFieldBlock bl = (CreateEntryFieldBlock)b;
 				Log.d("NILS","CreateEntryFieldBlock found");
 				bl.create(myContext);
 			}
 			else if (b instanceof AddSumOrCountBlock) {
+				o.addRow("");
+				o.addYellowText("AddSumOrCountBlock found");
 				AddSumOrCountBlock bl = (AddSumOrCountBlock)b;
-				Log.d("NILS","AddDisplayOfSelectionsBlock found");
 				bl.create(myContext);
 			}
 			
@@ -169,19 +189,14 @@ public abstract class Executor extends Fragment {
 		
 		//Now all blocks are executed.
 		//Draw the UI.
-		Log.d("nils","Drawing...");
+		o.addRow("");
+		o.addYellowText("Now Drawing components recursively");
 		Container root = myContext.getContainer("root");
 		if (root!=null)
 			myContext.drawRecursively(root);
 		else {
-			new AlertDialog.Builder((Context)activity).setTitle("Ups!")
-			.setMessage("Det är något fel på den template som används. Ingen rot-panel har definierats så 'jag' vet inte var alla saker ska ritas. Därför kan detta arbetsflöde inte köras vidare.")
-			.setNeutralButton("Jag förstår!", new OnClickListener() {
-				@Override
-				public void onClick(DialogInterface arg0, int arg1) {
-					
-				}})
-				.show();	
+			o.addRow("");
+			o.addRedText("TEMPLATE ERROR: Cannot find the root container. \nEach template must have a root! Execution aborted.");				
 		}
 
 		

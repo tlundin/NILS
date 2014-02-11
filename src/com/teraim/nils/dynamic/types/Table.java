@@ -29,22 +29,27 @@ public class Table implements Serializable {
 			colTable.put(key, new ArrayList<String>());		
 		columnCount = columnNames.length;
 		myColumns = columnNames;
-
 	}
 
-	public void addRow(List<String> rowEntries) {
-		assert(rowEntries.size()==columnCount);
+	public enum ErrCode {
+		tooManyColumns,
+		tooFewColumns,
+		ok
+	};
+	
+	public ErrCode addRow(List<String> rowEntries) {
 		int index=0;
-//		String entrs="";
-		for(String entry:rowEntries) {
-//			entrs+="["+entry+":["+myColumns[index]+"]]";
-			if (index<myColumns.length)
-				colTable.get(myColumns[index++]).add(entry);
-			else 
-				Log.e("nils","Too many columns in row!!");
-		}
+		int size = rowEntries.size();
+
+		if (size > myColumns.length)
+			return ErrCode.tooManyColumns;
+		for(String entry:rowEntries) 
+			colTable.get(myColumns[index++]).add(entry);
 		rowTable.put(rowCount++, rowEntries);
-//		Log.d("nils","ZZZ: "+entrs);
+//		if (size < myColumns.length) {
+//			Log.d("nils","Number of columns: "+size+" Required number: "+myColumns.length);
+//			return ErrCode.tooFewColumns;
+		return ErrCode.ok;
 	}
 
 

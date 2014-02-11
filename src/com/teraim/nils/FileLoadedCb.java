@@ -7,7 +7,9 @@ public interface FileLoadedCb {
 		notFound,
 		parseError,
 		ioError,
-		sameold
+		sameold, 
+		whatever, 
+		configurationError
 	}
 	
 	

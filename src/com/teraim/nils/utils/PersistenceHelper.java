@@ -18,6 +18,8 @@ public class PersistenceHelper {
 	public static final String SERVER_URL = "server_location";
 	public static final String CURRENT_VERSION_OF_WF_BUNDLE = "current_version_wf";
 	public static final String CURRENT_VERSION_OF_CONFIG_FILE = "current_version_config";
+	public static final String POWER_USER_KEY = "Powar Uzaarrr";
+	public static final String FIRST_TIME_KEY = "firzzt";
 
 	SharedPreferences sp;
 	

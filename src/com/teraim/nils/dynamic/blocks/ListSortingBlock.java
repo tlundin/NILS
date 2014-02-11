@@ -45,20 +45,23 @@ public class ListSortingBlock extends Block {
 
 	public WF_SorterWidget create(WF_Context ctx) {
 
-		
+		o = GlobalState.getInstance(ctx.getContext()).getLogger();
 		//Identify targetList. If no list, no game.
 		Container myContainer = ctx.getContainer(containerId);
-		if (myContainer == null) 
-			Log.e("parser","Warning: No container defined for component ListSortingBlock");
+		if (myContainer == null)  {
+			o.addRow("");
+			o.addRedText("Warning: No container defined for component ListSortingBlock: "+containerId);
+		}
 		
 		Log.d("nils","Sort target is "+target);
 		targetList = ctx.getFilterable(target);
 		if (targetList == null) {
-			Log.e("parser","couldn't create sortwidget - could not find target list");
+			o.addRow("");
+			o.addRedText("couldn't create sortwidget - could not find target list: "+target);
 			return null;
 		}
 		else {
-			
+			o.addRow("Adding new SorterWidget of type "+type);
 			return new WF_SorterWidget(ctx,type,((WF_List)targetList));
 			//myContainer.add(new WF_Widget(buttonPanel));
 		}

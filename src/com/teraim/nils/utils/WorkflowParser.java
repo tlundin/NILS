@@ -19,6 +19,8 @@ import android.util.Xml;
 import com.teraim.nils.Constants;
 import com.teraim.nils.FileLoadedCb;
 import com.teraim.nils.FileLoadedCb.ErrorCode;
+import com.teraim.nils.GlobalState;
+import com.teraim.nils.Logger;
 import com.teraim.nils.dynamic.blocks.AddRuleBlock;
 import com.teraim.nils.dynamic.blocks.AddSumOrCountBlock;
 import com.teraim.nils.dynamic.blocks.Block;
@@ -27,7 +29,6 @@ import com.teraim.nils.dynamic.blocks.ContainerDefineBlock;
 import com.teraim.nils.dynamic.blocks.CreateEntryFieldBlock;
 import com.teraim.nils.dynamic.blocks.CreateListEntriesBlock;
 import com.teraim.nils.dynamic.blocks.LayoutBlock;
-import com.teraim.nils.dynamic.blocks.ListFilterBlock;
 import com.teraim.nils.dynamic.blocks.ListSortingBlock;
 import com.teraim.nils.dynamic.blocks.PageDefineBlock;
 import com.teraim.nils.dynamic.blocks.StartBlock;
@@ -54,6 +55,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 	FileLoadedCb cb;
 	String myVersion = null;
 	List<Workflow> myFlow = null;
+	Logger o;
 
 
 	public WorkflowParser(PersistenceHelper ph, FileLoadedCb fileLoadedCb) {
@@ -68,20 +70,32 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 	@Override
 	protected ErrorCode doInBackground(Context... params) {
 		ctx = params[0];
-		return parse(ph.get(PersistenceHelper.SERVER_URL)+ph.get(PersistenceHelper.BUNDLE_LOCATION));
+		o = GlobalState.getInstance(ctx).getLogger();
+		String serverUrl = ph.get(PersistenceHelper.SERVER_URL);
+		if (serverUrl ==null || serverUrl.equals(PersistenceHelper.UNDEFINED) || serverUrl.length()==0)
+			return ErrorCode.configurationError;
+		//Add / if missing.
+		if (!serverUrl.endsWith("/")) {
+			serverUrl+="/";
+		}
+		if (!serverUrl.startsWith("http://")) {
+			serverUrl = "http://"+serverUrl;
+			o.addRow("server url name missing http header...adding");		
+		}
+		return parse(serverUrl+ph.get(PersistenceHelper.BUNDLE_LOCATION));
 	}
 
 	@Override
 	protected void onPostExecute(ErrorCode code) {
-		Log.d("nils","Confdir: "+Constants.CONFIG_FILES_DIR+" "+"frozen "+Constants.WF_FROZEN_FILE_ID);
 		if (code == ErrorCode.newVersionLoaded) {
 			boolean ok= Tools.witeObjectToFile(ctx, myFlow, Constants.CONFIG_FILES_DIR+Constants.WF_FROZEN_FILE_ID);
 			if (!ok)
 				code = ErrorCode.ioError;
 			else {
-				Log.d("fabel","now setting current version to "+myVersion);
+				o.addRow("Setting current version of workflow bundle to "+myVersion);
 				ph.put(PersistenceHelper.CURRENT_VERSION_OF_WF_BUNDLE,myVersion);
 				code = ErrorCode.newVersionLoaded;
+
 			}
 		}
 		cb.onFileLoaded(code);	
@@ -91,7 +105,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 		Log.d("nils","File url: "+fileUrl);
 		try {	
 			URL url = new URL(fileUrl);
-			Log.d("NILS", "downloading page "+fileUrl);
+			o.addRow("Fetching workflow bundle "+fileUrl);
 
 			/* Open a connection to that URL. */
 			URLConnection ucon = url.openConnection();
@@ -121,7 +135,8 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 			return FileLoadedCb.ErrorCode.sameold;
 		} 
 		if (myFlow !=null) {
-			Log.d("NILS","Found "+myFlow.size()+" workflows");			
+			o.addRow("");
+			o.addYellowText("Parsed in total: "+myFlow.size()+" workflows");			
 			return ErrorCode.newVersionLoaded;
 		}
 		//This should never happen.
@@ -135,11 +150,10 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 		parser.require(XmlPullParser.START_TAG, null, "bundle");
 		String version = parser.getAttributeValue(null, "version");
 		if(version.equals(ph.get(PersistenceHelper.CURRENT_VERSION_OF_WF_BUNDLE))) {
-			Log.d("NILS","This is the same version...no need to update");
+			o.addRow("This is the same version...no need to update");
 			throw new SameOldException();
 		} else {
-			Log.d("nils","NEW Workflow bundle version: "+version);
-			Log.d("fabel","CURRENT VEERSION"+ph.get(PersistenceHelper.CURRENT_VERSION_OF_WF_BUNDLE));
+			o.addRedText("Current workflow bundle version"+ph.get(PersistenceHelper.CURRENT_VERSION_OF_WF_BUNDLE));
 			myVersion = version;
 		}
 		while (parser.next() != XmlPullParser.END_TAG) {
@@ -151,13 +165,14 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 			Log.d("NILS","Doing: "+name);
 			// Starts by looking for the entry tag
 			if (name.equals("workflow")) {
-				Log.d("NILS","Adding workflow");
+				o.addRow("");
+				o.addYellowText("Adding workflow");
 				bundle.add(readWorkflow(parser));
 			} else {
 				skip(parser);
-				Log.d("NILS","Skip "+name);
+				o.addRow("Skip "+name);
 			}
-			Log.d("NILS","Loopstep..");
+			o.addRow("Loopstep..");
 		}  
 		return bundle;
 	}
@@ -171,14 +186,16 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 			if (parser.getEventType() != XmlPullParser.START_TAG) {
 				continue;
 			}
+			o.addRow("TAG: WORKFLOW");
 			String name = parser.getName();
 			if (name.equals("blocks")) {
+				o.addRow("TAG: BLOCKS");
 				wf.addBlocks(readBlocks(parser));
 			} else {
 				skip(parser);
 			}
 		}
-		Log.d("NILS","wf read");
+		
 		return wf;
 
 
@@ -225,8 +242,9 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 					blocks.add(readBlockAddSelectionOrSum(parser,isCount));
 				else if (name.equals("block_create_list_sorting_function")) 
 					blocks.add(readBlockCreateSorting(parser));
+				//This is a dummy call. Not supported block.
 				else if (name.equals("block_create_list_filter")) 
-					blocks.add(readBlockCreateFilter(parser));
+					readBlockCreateFilter(parser);					
 				else if (name.equals("block_create_list_entries")) 
 					blocks.add(readBlockCreateListEntries(parser));
 				else if (name.equals("block_create_entry_field")) 
@@ -248,7 +266,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 
 
 	private Block readBlockCreateEntryField(XmlPullParser parser)throws IOException, XmlPullParserException {
-		Log.d("NILS","Block create entry field...");
+		o.addRow("Parsing block: block_create_entry_field...");
 		String namn=null, type=null, label=null,purpose=null,containerId=null;
 		Unit unit = Unit.nd;		
 		parser.require(XmlPullParser.START_TAG, null,"block_create_entry_field");
@@ -260,16 +278,22 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 
 			if (name.equals("label")) {
 				label = readText("label",parser);
+				o.addRow("LABEL: "+label);
 			} else if (name.equals("type")) {
 				type = readText("type",parser);
+				o.addRow("TYPE: "+type);
 			} else if (name.equals("name")) {
 				namn = readText("name",parser);
+				o.addRow("NAME: "+namn);			
 			} else if (name.equals("container_name")) {
 				containerId = readText("container_name",parser);
+				o.addRow("CONTAINER_NAME: "+containerId);
 			} else if (name.equals("purpose")) {
 				purpose = readText("purpose",parser); 
+				o.addRow("PURPOSE: "+purpose);
 			} else if (name.equals("unit")) {
 				unit = Tools.convertToUnit(readText("unit",parser));
+				o.addRow("UNIT: "+unit.name());
 			}
 			else
 				skip(parser);
@@ -286,9 +310,13 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 	 * @throws IOException
 	 * @throws XmlPullParserException
 	 */
-	private static ListFilterBlock readBlockCreateFilter(XmlPullParser parser) throws IOException, XmlPullParserException {
-		Log.d("NILS","Block create list filter...");
-		String containerId=null,type=null,target=null,label=null,function=null;
+	
+	private void readBlockCreateFilter(XmlPullParser parser) throws IOException, XmlPullParserException {
+		o.addRow("Parsing block: block_create_list_filter...");
+		o.addRow("");
+		o.addRedText("This type of block is not supported");
+	}
+/*		String containerId=null,type=null,target=null,label=null,function=null;
 
 		parser.require(XmlPullParser.START_TAG, null,"block_create_list_filter");
 		while (parser.next() != XmlPullParser.END_TAG) {
@@ -299,20 +327,26 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 
 			if (name.equals("label")) {
 				label = readText("label",parser);
+				o.addRow("LABEL: "+label);
 			} else if (name.equals("type")) {
 				type = readText("type",parser);
+				o.addRow("TYPE: "+type);
 			} else if (name.equals("function_name")) {
 				function = readText("function_name",parser);
 			} else if (name.equals("container_name")) {
 				containerId = readText("container_name",parser);
+				o.addRow("CONTAINER_NAME: "+containerId);
 			} else if (name.equals("target")) {
-				target = readText("target",parser);}
+				target = readText("target",parser);
+				o.addRow("TARGET: "+target);
+			}
 			else
 				skip(parser);
 
 		}
 		return new ListFilterBlock(containerId, type, target,label, function);
 	}
+	*/
 
 	/**
 	 * Creates a Block for adding a sorting function on Target List. 
@@ -321,8 +355,8 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 	 * @throws IOException
 	 * @throws XmlPullParserException
 	 */
-	private static ListSortingBlock readBlockCreateSorting(XmlPullParser parser) throws IOException, XmlPullParserException {
-		Log.d("NILS","Sorting block...");
+	private ListSortingBlock readBlockCreateSorting(XmlPullParser parser) throws IOException, XmlPullParserException {
+		o.addRow("Parsing block: block_create_list_sorting_function...");
 		String containerName=null,type=null,target=null;
 		parser.require(XmlPullParser.START_TAG, null,"block_create_list_sorting_function");
 		while (parser.next() != XmlPullParser.END_TAG) {
@@ -333,12 +367,14 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 
 			if (name.equals("container_name")) {
 				containerName = readText("container_name",parser);
-
+				o.addRow("CONTAINER_NAME: "+containerName);
 			} else if (name.equals("type")) {
 				type = readText("type",parser);
+				o.addRow("TYPE: "+type);
 			} else if (name.equals("target")) {
 				target = readText("target",parser);
-			}else
+				o.addRow("TARGET: "+target);
+			}else 
 				skip(parser);
 
 		}
@@ -352,8 +388,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 	 * @throws IOException
 	 * @throws XmlPullParserException
 	 */
-	private static AddSumOrCountBlock readBlockAddSelectionOrSum(XmlPullParser parser,boolean isCount) throws IOException, XmlPullParserException {
-		Log.d("NILS","AddSelectionOrSum block...");
+	private AddSumOrCountBlock readBlockAddSelectionOrSum(XmlPullParser parser,boolean isCount) throws IOException, XmlPullParserException {
 		String containerName=null,label=null,filter=null,target=null;
 		WF_Not_ClickableField_SumAndCountOfVariables.Type type;
 
@@ -362,11 +397,14 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 		else
 			type = WF_Not_ClickableField_SumAndCountOfVariables.Type.sum;
 
-		if (isCount)
+		if (isCount) {
+			o.addRow("Parsing block: block_add_number_of_selections_display...");
 			parser.require(XmlPullParser.START_TAG, null,"block_add_number_of_selections_display");
-		else
+		}
+		else {
+			o.addRow("Parsing block: block_add_sum_of_selected_variables_display...");
 			parser.require(XmlPullParser.START_TAG, null,"block_add_sum_of_selected_variables_display");
-
+		}
 		while (parser.next() != XmlPullParser.END_TAG) {
 			if (parser.getEventType() != XmlPullParser.START_TAG) {
 				continue;
@@ -375,15 +413,19 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 
 			if (name.equals("container_name")) {
 				containerName = readText("container_name",parser);
+				o.addRow("CONTAINER_NAME: "+containerName);
 			} 
 			else if (name.equals("label")) {
 				label = readText("label",parser);
+				o.addRow("LABEL: "+label);
 			}
 			else if (name.equals("filter")) {
 				filter = readText("filter",parser);
+				o.addRow("FILTER: "+filter);
 			}
 			else if (name.equals("target")) {
 				target = readText("target",parser);
+				o.addRow("TARGET: "+target);
 			}	
 			else
 				skip(parser);
@@ -455,8 +497,8 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 	 * @throws XmlPullParserException
 	 * @throws EvalException 
 	 */	
-	private static CreateListEntriesBlock readBlockCreateListEntries(XmlPullParser parser) throws IOException, XmlPullParserException, EvalException {
-		Log.d("NILS","Create List Entries block...");
+	private CreateListEntriesBlock readBlockCreateListEntries(XmlPullParser parser) throws IOException, XmlPullParserException, EvalException {
+		o.addRow("Parsing block: block_create_list_entries...");
 		String type=null,fileName="",containerName=null,namn=null,selectionField=null,selectionPattern=null,filter=null;
 		parser.require(XmlPullParser.START_TAG, null,"block_create_list_entries");
 		while (parser.next() != XmlPullParser.END_TAG) {
@@ -467,24 +509,25 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 			//If a unique varname tag found, instantiate a new XML_variable. 
 			if (name.equals("file_name")) {
 				fileName = readText("file_name",parser);
-
+				o.addRow("FILE_NAME: "+fileName);
 			} else if (name.equals("container_name")) {
 				containerName = readText("container_name",parser);
-				Log.d("nils","container name: "+containerName);
-
+				o.addRow("CONTAINER_NAME: "+containerName);
 			} else if (name.equals("name")) {
 				namn = readText("name",parser);
+				o.addRow("NAME: "+namn);
 			} else if (name.equals("type")) {
 				type = readText("type",parser);
+				o.addRow("TYPE: "+type);
 			}  else if (name.equals("selection_pattern")) {
 				selectionPattern = readText("selection_pattern",parser);
-
+				o.addRow("SELECTION_PATTERN: "+selectionPattern);
 			} else if (name.equals("selection_field")) {
 				selectionField = readText("selection_field",parser);
-
+				o.addRow("SELECTION_FIELD: "+selectionField);
 			} else if (name.equals("filter")) {
 				filter = readText("filter",parser);
-
+				o.addRow("FILTER: "+filter);
 			} else
 				skip(parser);
 
@@ -539,8 +582,8 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 	 * @throws XmlPullParserException
 	 */
 	//For now just create dummy.
-	private static ButtonBlock readBlockButton(XmlPullParser parser) throws IOException, XmlPullParserException {
-		Log.d("NILS","Button block...");
+	private ButtonBlock readBlockButton(XmlPullParser parser) throws IOException, XmlPullParserException {
+		o.addRow("Parsing block: block_button...");
 		String label=null,onClick=null,myname=null,containerName=null,target=null,type=null;
 		parser.require(XmlPullParser.START_TAG, null,"block_button");
 		while (parser.next() != XmlPullParser.END_TAG) {
@@ -548,18 +591,30 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 				continue;
 			}	
 			String name = parser.getName();
-			if (name.equals("onClick")) 
+			if (name.equals("onClick")) {
 				onClick = readText("onClick",parser);
-			else if (name.equals("type")) 
+				o.addRow("onClick: "+onClick);
+			}
+			else if (name.equals("type")) {
 				type = readText("type",parser);
-			else if (name.equals("name")) 
+				o.addRow("TYPE: "+type);
+			}
+			else if (name.equals("name")) {
 				myname = readText("name",parser);
-			else if (name.equals("label")) 
+				o.addRow("NAME: "+myname);
+			}
+			else if (name.equals("label")) {
 				label = readText("label",parser);
-			else if (name.equals("container_name")) 
+				o.addRow("LABEL: "+label);
+			}
+			else if (name.equals("container_name")) {
 				containerName = readText("container_name",parser);		
-			else if (name.equals("target")) 
+				o.addRow("CONTAINER_NAME: "+containerName);
+			}
+			else if (name.equals("target")) {
 				target = readText("target",parser);
+				o.addRow("TARGET: "+target);
+			}
 			else
 				skip(parser);
 		}
@@ -575,8 +630,8 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 	 * @throws XmlPullParserException
 	 */
 	//Block Start contains the name of the worklfow and the Arguments.
-	private static StartBlock readBlockStart(XmlPullParser parser) throws IOException, XmlPullParserException {
-		Log.d("NILS","Startblock...");
+	private StartBlock readBlockStart(XmlPullParser parser) throws IOException, XmlPullParserException {
+		o.addRow("Parsing block: block_start...");
 		String workflowName=null; String args[]=null;
 		parser.require(XmlPullParser.START_TAG, null,"block_start");
 		while (parser.next() != XmlPullParser.END_TAG) {
@@ -584,15 +639,22 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 				continue;
 			}
 			String name= parser.getName();
-			if (name.equals("workflowname"))  
+			if (name.equals("workflowname"))  {
 				workflowName = readSymbol("workflowname",parser);
-			else if (name.equals("inputvar")) 
+				o.addRow("WORKFLOWNAME: "+workflowName);
+			}
+			else if (name.equals("inputvar")) {
 				args = readArray("inputvar",parser);
+				o.addRow("input variables: ");
+				for(int i=0;i<args.length;i++)
+					o.addYellowText(args[i]+",");
+			}
 			else
 				skip(parser);
 		}
 		if (workflowName == null)  {
-			Log.e("NILS","Error reading Startblock. Workflowname missing");
+			o.addRow("");
+			o.addRedText("Error reading startblock. Workflowname missing");
 			throw new XmlPullParserException("Parameter missing");
 		}
 		return new StartBlock(args,workflowName);
@@ -633,8 +695,8 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 	 * @throws IOException
 	 * @throws XmlPullParserException
 	 */
-	private static LayoutBlock readBlockLayout(XmlPullParser parser) throws IOException, XmlPullParserException {
-		Log.d("NILS","Layout block...");
+	private LayoutBlock readBlockLayout(XmlPullParser parser) throws IOException, XmlPullParserException {
+		o.addRow("Parsing block: block_layout...");
 		String layout=null,align=null,label=null;
 		parser.require(XmlPullParser.START_TAG, null,"block_layout");
 		while (parser.next() != XmlPullParser.END_TAG) {
@@ -644,10 +706,14 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 			String name= parser.getName();
 			if (name.equals("layout")) {
 				layout = readText("layout",parser);
+				o.addRow("LAYOUT: "+layout);
 			} else if (name.equals("align")) {
 				align = readText("align",parser);
+				o.addRow("ALIGN: "+align);
 			} else if (name.equals("label")) {
 				label = readText("label",parser);
+				o.addRow("LABEL: "+label);
+
 			} else 
 				skip(parser);
 
@@ -662,9 +728,9 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 	 * @throws IOException
 	 * @throws XmlPullParserException
 	 */
-	private static PageDefineBlock readPageDefineBlock(XmlPullParser parser) throws IOException, XmlPullParserException {
-		Log.d("NILS","Page define block...");
-		String pageType=null,pageLabel="";
+	private PageDefineBlock readPageDefineBlock(XmlPullParser parser) throws IOException, XmlPullParserException {
+		o.addRow("Parsing block: block_define_page...");
+		String pageType=null,label="";
 		parser.require(XmlPullParser.START_TAG, null,"block_define_page");
 		while (parser.next() != XmlPullParser.END_TAG) {
 			if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -673,12 +739,14 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 			String name= parser.getName();
 			if (name.equals("type")) {
 				pageType = readText("type",parser);
+				o.addRow("TYPE: "+pageType);
 			} else if (name.equals("label")) {
-				pageLabel = readText("label",parser);
+				label = readText("label",parser);
+				o.addRow("LABEL: "+label);
 			} else
 				skip(parser);
 		}
-		return new PageDefineBlock("root", pageType,pageLabel);
+		return new PageDefineBlock("root", pageType,label);
 	}
 
 
@@ -689,8 +757,8 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 	 * @throws IOException
 	 * @throws XmlPullParserException
 	 */
-	private static ContainerDefineBlock readContainerDefineBlock(XmlPullParser parser) throws IOException, XmlPullParserException {
-		Log.d("NILS","Container define block...");
+	private ContainerDefineBlock readContainerDefineBlock(XmlPullParser parser) throws IOException, XmlPullParserException {
+		o.addRow("Parsing block: block_define_container...");
 		String containerType=null,containerName="";
 		parser.require(XmlPullParser.START_TAG, null,"block_define_container");
 		while (parser.next() != XmlPullParser.END_TAG) {
@@ -700,8 +768,10 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 			String name= parser.getName();
 			if (name.equals("name")) {
 				containerName = readText("name",parser);
+				o.addRow("NAME: "+containerName);
 			} else if (name.equals("container_type")) {
 				containerType = readText("container_type",parser);
+				o.addRow("CONTAINER_TYPE: "+containerType);
 			} else
 				skip(parser);
 		}
@@ -715,8 +785,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 	 * @throws XmlPullParserException
 	 */
 	private AddRuleBlock readBlockAddRule(XmlPullParser parser) throws IOException, XmlPullParserException {
-
-		Log.d("NILS","Add rule block...");		
+		o.addRow("Parsing block: block_add_rule...");
 		String label=null, target=null, condition=null, action=null, errorMsg=null,myname=null;
 		parser.require(XmlPullParser.START_TAG, null,"block_add_rule");
 		while (parser.next() != XmlPullParser.END_TAG) {
@@ -726,16 +795,22 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 			String name= parser.getName();
 			if (name.equals("target")) {
 				target = readText("target",parser);
+				o.addRow("TARGET: "+target);
 			} else if (name.equals("condition")) {
 				condition = readText("condition",parser);
+				o.addRow("CONDITION: "+condition);
 			} else if (name.equals("action")) {
 				action = readText("action",parser);
+				o.addRow("ACTION: "+action);
 			} else if (name.equals("errorMsg")) {
 				errorMsg = readText("errorMsg",parser);
+				o.addRow("ERRORMSG: "+errorMsg);
 			} else if (name.equals("name")) {
 				myname = readText("name",parser);
+				o.addRow("NAME: "+myname);
 			}else if (name.equals("label")) {
 				label = readText("label",parser);
+				o.addRow("LABEL: "+label);
 			} else 
 				skip(parser);
 
@@ -744,16 +819,22 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 	}
 
 	// Read symbol from tag.
-	private static String readSymbol(String tag,XmlPullParser parser) throws IOException, XmlPullParserException {
+	private String readSymbol(String tag,XmlPullParser parser) throws IOException, XmlPullParserException {
 		parser.require(XmlPullParser.START_TAG, null,tag);
 		String text = readText(parser);
 		parser.require(XmlPullParser.END_TAG, null,tag);
 		//Check that it does not start with a number.
 		if (text!=null) {
-			if (text.length()>0 && Character.isDigit(text.charAt(0)))
+			if (text.length()>0 && Character.isDigit(text.charAt(0))) {
+				o.addRow("");
+				o.addRedText("XML: EXCEPTION - Symbol started with integer");
 				throw new XmlPullParserException("Symbol cannot start with integer");	
-		} else
+			} 
+		} else {
+			o.addRow("");
+			o.addRedText("XML: EXCEPTION - Symbol was NULL");
 			throw new XmlPullParserException("Symbol cannot be null");
+		}
 		return text;
 	}
 	// Read string from tag.

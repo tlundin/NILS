@@ -13,16 +13,14 @@
         android:textColor="@color/white"
         android:text="Login console"
         android:textAppearance="?android:attr/textAppearanceLarge" />
-
+    
     <TextView
         android:id="@+id/logger"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingLeft="16dip"
-   	    style="@style/ConsoleStyle" />  
-        
-        
-        
-        />
+   	    style="@style/ConsoleStyle" />
+
+
 
 </LinearLayout>

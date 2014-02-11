@@ -1,4 +1,4 @@
-package com.teraim.nils;
+package com.teraim.nils.ui;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -8,7 +8,10 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
+import android.util.Log;
 
+import com.teraim.nils.GlobalState;
+import com.teraim.nils.R;
 import com.teraim.nils.utils.PersistenceHelper;
 
 public class ConfigMenu extends PreferenceActivity {
@@ -74,6 +77,17 @@ public class ConfigMenu extends PreferenceActivity {
 			if (pref instanceof EditTextPreference) {
 				EditTextPreference etp = (EditTextPreference) pref;
 				pref.setSummary(etp.getText());
+				if (key.equals(PersistenceHelper.BUNDLE_LOCATION)) {
+					Log.d("nils","Bundle file changed. Removing version check");
+					GlobalState.getInstance(this.getActivity()).getPersistence().put(PersistenceHelper.CURRENT_VERSION_OF_WF_BUNDLE, PersistenceHelper.UNDEFINED);
+					
+				} else
+					if (key.equals(PersistenceHelper.CONFIG_LOCATION)) {
+						Log.d("nils","Bundle file changed. Removing version check");
+						GlobalState.getInstance(this.getActivity()).getPersistence().put(PersistenceHelper.CURRENT_VERSION_OF_CONFIG_FILE, PersistenceHelper.UNDEFINED);					
+					}
+
+					
 			}
 			else if (pref instanceof ListPreference) {
 				ListPreference letp = (ListPreference) pref;

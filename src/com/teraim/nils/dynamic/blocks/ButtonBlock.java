@@ -91,10 +91,12 @@ public  class ButtonBlock extends Block {
 	}
 
 	public void create(final WF_Context myContext) {
-		GlobalState gs = GlobalState.getInstance(myContext.getContext());
+		o=GlobalState.getInstance(myContext.getContext()).getLogger();
 		Container myContainer = myContext.getContainer(containerId);
 		final Context ctx = myContext.getContext();
+		
 		if (type == Type.action) {
+			o.addRow("Creating Action Button.");
 			Button button = new Button(ctx);
 			//button.setBackgroundDrawable(ctx.getResources().getDrawable(R.drawable.button_bg_selector));
 			//button.setTextAppearance(ctx, R.style.WF_Text);
@@ -128,7 +130,8 @@ public  class ButtonBlock extends Block {
 								Log.e("NILS","Cannot find wf referenced by button "+getName());
 
 							} else {
-
+								o.addRow("");
+								o.addRow("Action button pressed. Executing wf: "+action.wfName);
 								Fragment f = wf.createFragment();
 								Bundle b = new Bundle();
 								b.putString("workflow_name", action.wfName); //Your id
@@ -142,13 +145,16 @@ public  class ButtonBlock extends Block {
 							}
 						} //else
 						//validate();
-					} else
-						Log.e("NILS","Action was null for "+getName());
+					} else {
+						o.addRow("");
+						o.addRedText("Action button had no associated action!");
+					}
 				}
 
 			});
 			myContainer.add(new WF_Widget(text,button));
 		} else if (type == Type.toggle) {
+			o.addRow("Creating Toggle Button with text: "+text);
 			ToggleButton toggleB = (ToggleButton)LayoutInflater.from(ctx).inflate(R.layout.toggle_button,null);
 			//ToggleButton toggleB = new ToggleButton(ctx);
 			toggleB.setTextOn(text);
@@ -164,11 +170,10 @@ public  class ButtonBlock extends Block {
 			toggleB.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
+						o.addRow("Togglebutton "+text+" pressed. Executing function "+onClick);
 						myContext.getTemplate().execute(onClick);					
 				}
 			});
-
-
 			myContainer.add(new WF_Widget(text,toggleB));
 		}
 	}

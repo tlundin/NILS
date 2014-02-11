@@ -75,10 +75,12 @@ public class CreateEntryFieldBlock extends Block {
 	
 
 	public void create(WF_Context myContext) {
+		o = GlobalState.getInstance(myContext.getContext()).getLogger();
 		boolean success = false;
 		VariableConfiguration al = GlobalState.getInstance(myContext.getContext()).getArtLista();
 		List<List<String>>rows = al.getTable().getRowsContaining(selectionField, name);
 		if (rows!=null) {
+			o.addRow("Found row in table for selectionField: "+selectionField+" and name: "+name);
 			Container myContainer = myContext.getContainer(containerId);
 
 /*
@@ -107,8 +109,16 @@ public class CreateEntryFieldBlock extends Block {
 						success = true;
 					}
 				}
+			} else {
+				o.addRow("");
+				o.addRedText("Strangely enough the row turns out to be empty?");				
 			}
+				
+		} else {
+			o.addRow("");
+			o.addRedText("Could not create EntryField for selectionfield: "+selectionField+" and name: "+name+".\nNo row matches in variable table");
 		}
+			
 		if (!success)
 			Log.e("nils","CreateEntryFieldBlock: Could not add EntryInputField "+name+".");
 	}

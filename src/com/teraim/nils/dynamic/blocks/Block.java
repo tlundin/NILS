@@ -2,6 +2,8 @@ package com.teraim.nils.dynamic.blocks;
 
 import java.io.Serializable;
 
+import com.teraim.nils.Logger;
+
 /**
  * Abstract base class Block
  * Marker class.
@@ -9,10 +11,6 @@ import java.io.Serializable;
  *
  */
 public abstract  class Block implements Serializable {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -8275181338935274930L;
-
+	protected Logger o;
 }

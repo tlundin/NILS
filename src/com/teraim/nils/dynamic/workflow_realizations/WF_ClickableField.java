@@ -20,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
+import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
 import com.teraim.nils.StoredVariable;
 import com.teraim.nils.dynamic.types.VarIdentifier;
@@ -32,9 +33,10 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 
 	
 	final LinearLayout inputContainer;
-
+	
 	protected Map<VarIdentifier,View> myVars = new HashMap<VarIdentifier,View>();
 
+	private GlobalState gs;
 	
 	public abstract LinearLayout getFieldLayout();
 	public abstract String getFormattedText(VarIdentifier varId, String value);
@@ -46,7 +48,8 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 	}
 	
 	public  WF_ClickableField(final String myId,final String descriptionT, WF_Context context,String id, View view) {
-		super(myId,descriptionT,context,view);		
+		super(myId,descriptionT,context,view);	
+		o = GlobalState.getInstance(context.getContext()).getLogger();
 		//SpannableString content = new SpannableString(headerT);
 		//content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
 		inputContainer = new LinearLayout(ctx);
@@ -126,6 +129,8 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 		
 		
 		if (numType == Variable.Type.BOOLEAN) {
+			//o.addRow("");
+			//o.addGreenText("Adding boolean dy-variable with label "+label+", name "+varId+", type "+numType.name()+" and unit "+unit.name());
 			View view = LayoutInflater.from(ctx).inflate(R.layout.ja_nej_radiogroup,null);
 			RadioButton ja = (RadioButton)view.findViewById(R.id.ja);
 			RadioButton nej = (RadioButton)view.findViewById(R.id.nej);
@@ -141,7 +146,8 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 			myVars.put(varIdentifier,view);
 		}
 		else {
-			Log.d("nils","adding variable "+varId);
+			//o.addRow("");
+			//o.addGreenText("Adding edit field for dy-variable with label "+label+", name "+varId+", type "+numType.name()+" and unit "+unit.name());
 			View l = LayoutInflater.from(ctx).inflate(R.layout.edit_field,null);
 			TextView header = (TextView)l.findViewById(R.id.header);
 			EditText view = (EditText)l.findViewById(R.id.edit);

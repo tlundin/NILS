@@ -45,17 +45,19 @@ public  class CreateListEntriesBlock extends Block {
 	}
 
 	public void create(WF_Context myContext) {
-
+		o = GlobalState.getInstance(myContext.getContext()).getLogger();
 		WF_List myList; 
 		VariableConfiguration al = GlobalState.getInstance(myContext.getContext()).getArtLista();
 		List<List<String>>rows = al.getTable().getRowsContaining(selectionField, selectionPattern);
 		
 		if (type.equals("selected_values_list")) {
+			o.addRow("This is a selected values type list. Adding Time Order sorter.");
 			myList =  new WF_List_UpdateOnSaveEvent(id,myContext);
 			myList.addSorter(new WF_TimeOrder_Sorter());	
 		}
 		else { 
 			if (type.equals("selection_list")) {
+				o.addRow("This is a selection list. Adding Alphanumeric sorter.");
 				myList = new WF_List_UpdateOnSaveEvent(id,myContext);
 				myList.addSorter(new WF_Alphanumeric_Sorter());
 			} else
@@ -66,14 +68,16 @@ public  class CreateListEntriesBlock extends Block {
 			}
 		}
 
-		Log.d("nils","about to add filter with name: "+filterName);
+		o.addRow("Adding filter with name: "+filterName);
 		if (filterName!=null) {
 			if (filterName.equals("only_instantiated")) {
-				Log.d("nils","Adding filter: only instantiated");
+				o.addRow("Filter Type: only instantiated");
 				myList.addFilter(new WF_OnlyWithValue_Filter());
 			} else {
-				Log.e("parser","filter of type: "+filterName+"is not yet supported");
+				o.addRow("");
+				o.addRedText("Filter Type: "+filterName+" is not yet supported");
 			}
+			
 		}
 		myList.createEntriesFromRows(rows);
 		myList.draw();
@@ -82,8 +86,10 @@ public  class CreateListEntriesBlock extends Block {
 		if (myContainer !=null) {
 			myContainer.add(myList);
 			myContext.addList(myList);		
-		} else
-			Log.e("nils","failed to parse listEntriesblock - could not find the container");
+		} else {
+			o.addRow("");
+			o.addRedText("Failed to add listEntriesblock - could not find the container "+containerId);
+		}
 
 	}
 
