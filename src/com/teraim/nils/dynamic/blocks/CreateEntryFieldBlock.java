@@ -5,8 +5,8 @@ import java.util.List;
 import android.util.Log;
 
 import com.teraim.nils.GlobalState;
-import com.teraim.nils.StoredVariable;
 import com.teraim.nils.dynamic.types.Variable;
+import com.teraim.nils.dynamic.types.Numerable;
 import com.teraim.nils.dynamic.types.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 import com.teraim.nils.dynamic.workflow_abstracts.Container;
@@ -95,6 +95,7 @@ public class CreateEntryFieldBlock extends Block {
 					Log.e("nils","failed to parse listEntriesblock - could not find the container");
 */
 				
+			//TODO: ONly supports numeric!!
 			List<String> r = rows.get(0);
 
 			if (r!=null) {
@@ -102,7 +103,7 @@ public class CreateEntryFieldBlock extends Block {
 				WF_ClickableField_Selection myField = new WF_ClickableField_Selection(al.getEntryLabel(r),al.getDescription(r),myContext,name);
 				
 				if (myField !=null) {
-					myField.addVariable(label,name, unit, Variable.Type.NUMERIC, StoredVariable.Type.delyta, true);
+					myField.addVariable(label,name, unit,Variable.DataType.numeric, Variable.StorageType.delyta, true);
 					if(myContainer !=null) {
 						myContainer.add(myField);
 						myField.refreshInputFields();

@@ -24,7 +24,7 @@ public class EventBroker {
 			els = new LinkedList<EventListener>();
 			eventListeners.put(et, els);
 		}
-		
+		Log.d("nils","Added eventlistener for event "+et.name());
 		els.add(el);
 	
 	}
@@ -34,6 +34,7 @@ public class EventBroker {
 		if (els==null) {
 			Log.d("nils","No eventlistener exists for event "+e.getType().name());
 		} else {
+			Log.d("nils","sending event to "+els.size()+" listeners");
 		for(EventListener el:els)
 			el.onEvent(e);
 		}

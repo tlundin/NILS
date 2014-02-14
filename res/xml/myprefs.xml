@@ -54,6 +54,13 @@ xmlns:android="http://schemas.android.com/apk/res/android" >
             android:dialogTitle="Artlista"
             android:dialogMessage="Ange Url till artlistan!"    
             android:defaultValue="artlista.csv" />
+<CheckBoxPreference
+    		android:key="dev_switch"
+    		android:title="Utvecklar funktioner."
+    		android:summary="Slår på avancerad loggning etc"
+    		android:dialogTitle="Utvecklarfunktion"
+    		android:dialogMessage="Slå på eller av utvecklarfunktionen"
+    		android:defaultValue="false" />
 
 </PreferenceCategory>
 

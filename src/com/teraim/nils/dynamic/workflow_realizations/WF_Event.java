@@ -2,7 +2,6 @@ package com.teraim.nils.dynamic.workflow_realizations;
 
 import java.util.List;
 
-import com.teraim.nils.dynamic.types.Workflow.Type;
 import com.teraim.nils.dynamic.workflow_abstracts.Event.EventType;
 
 public class WF_Event {

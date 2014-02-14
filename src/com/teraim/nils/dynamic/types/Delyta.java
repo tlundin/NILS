@@ -3,8 +3,7 @@ package com.teraim.nils.dynamic.types;
 import android.content.Context;
 import android.util.Log;
 
-import com.teraim.nils.StoredVariable;
-import com.teraim.nils.StoredVariable.Type;
+import com.teraim.nils.dynamic.types.Variable.StorageType;
 import com.teraim.nils.exceptions.IllegalCallException;
 
 public class Delyta extends ParameterCache {
@@ -76,7 +75,7 @@ public class Delyta extends ParameterCache {
 		return true;
 	}
 
-	public StoredVariable getVariable(String varId) {
+	public Variable getVariable(String varId) {
 		if (myParent == null) {
 			Log.e("nils","Getvariable called on delyta without parent..?");
 			return null;
@@ -85,10 +84,10 @@ public class Delyta extends ParameterCache {
 	}
 
 	@Override
-	public StoredVariable storeVariable(String varId, String value) {
-		return this.storeVariable(new StoredVariable(myParent.getParent().getId(), myParent.getId(), this.getId(),
+	public Variable storeVariable(String varId, String value) {
+		return this.storeVariable(new Variable(myParent.getParent().getId(), myParent.getId(), this.getId(),
 				value, 	varId,
-				Type.delyta));		
+				StorageType.delyta));		
 	}
 
 

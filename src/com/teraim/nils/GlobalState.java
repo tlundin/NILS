@@ -78,7 +78,7 @@ public class GlobalState  {
 		SharedPreferences sp=PreferenceManager.getDefaultSharedPreferences(ctx);
 		ph = new PersistenceHelper(sp);
 		//Logger. Note that logger must be initialized with a TextView when used! 
-		log = new Logger(ctx);
+		log = new Logger(ctx,ph.getB(PersistenceHelper.DEVELOPER_SWITCH));
 		//Parser for rules
 		parser = new Parser(this);
 		//Artlista

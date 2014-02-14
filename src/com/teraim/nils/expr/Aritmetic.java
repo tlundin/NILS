@@ -8,13 +8,13 @@ import java.util.Hashtable;
 import android.util.Log;
 
 import com.teraim.nils.Constants;
-import com.teraim.nils.dynamic.types.Variable;
+import com.teraim.nils.dynamic.types.Numerable;
 
 /**
 * A variable is a simple expression with a name (like "x") and a
 * settable value.
 */
-public class Aritmetic extends Expr implements Variable {
+public class Aritmetic extends Expr implements Numerable {
  
  /**
   * Return a unique variable named `name'.  There can be only one

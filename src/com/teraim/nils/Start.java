@@ -13,6 +13,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
@@ -45,13 +46,15 @@ public class Start extends MenuActivity {
 	private List<DrawerMenuItem> items;
 	private PersistenceHelper ph;
 	private DrawerMenuAdapter adapter;
-//	private Map<String,List<String>> menuStructure;
+	//	private Map<String,List<String>> menuStructure;
 	private SparseArray<String>mapItemsToName;
-//	private ArrayList<String> rutItems;
-//	private ArrayList<String> wfItems;
-	private enum State {INITIAL, WF_LOADED, CONF_LOADED, VALIDATE};
+	//	private ArrayList<String> rutItems;
+	//	private ArrayList<String> wfItems;
+	private enum State {INITIAL, WF_LOADED, CONF_LOADED, VALIDATE,POST_INIT};
 	private LoginConsoleFragment loginFragment;
 	private Logger loginConsole;
+	private State myState=null;
+
 
 
 
@@ -62,37 +65,46 @@ public class Start extends MenuActivity {
 		//This is the frame for all pages, defining the Action bar and Navigation menu.
 		setContentView(R.layout.naviframe);
 
+		
+		loginConsole = new Logger(this,true);
+
+		//create subfolders. Copy assets..
+		if (this.initIfFirstTime()) {		
+			loginConsole.addRow("First time use...creating folders");
+			loginConsole.addRow("");
+			loginConsole.addYellowText("To change defaults, go to the config (wrench) menu");
+
+		}
+
 		//GlobalState
 		gs = GlobalState.getInstance(this.getApplicationContext());
 		ph = gs.getPersistence();
+		gs.getLogger().setDev(ph.getB(PersistenceHelper.DEVELOPER_SWITCH));
 		//TODO: REMOVE
-		ph.put(PersistenceHelper.CURRENT_RUTA_ID_KEY, "262");
-		ph.put(PersistenceHelper.CURRENT_PROVYTA_ID_KEY, "6");
-		ph.put(PersistenceHelper.CURRENT_DELYTA_ID_KEY, "1");
 
 
 		//drawer items
 		items = new ArrayList<DrawerMenuItem>();
-		
+
 		//Maps itemheaders to items.
-//		menuStructure = new HashMap<String,List<String>>();
-//		rutItems = new ArrayList<String>();
-//		wfItems = new ArrayList<String>();
+		//		menuStructure = new HashMap<String,List<String>>();
+		//		rutItems = new ArrayList<String>();
+		//		wfItems = new ArrayList<String>();
 		//Maps item numbers to Fragments.
 		mapItemsToName = new SparseArray<String>();
-		
-//		menuStructure.put("Ruta och Provyta",rutItems);
-//		menuStructure.put("Delyta",wfItems);
-		
-		
+
+		//		menuStructure.put("Ruta och Provyta",rutItems);
+		//		menuStructure.put("Delyta",wfItems);
+
+
 		adapter = new DrawerMenuAdapter(this, items);
 
 
-		
+
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
-		
+
 		// Set the adapter for the list view
 		mDrawerList.setAdapter(adapter);
 		// Set the list's click listener
@@ -122,7 +134,7 @@ public class Start extends MenuActivity {
 		};
 
 
-		
+
 		// Set the drawer toggle as the DrawerListener
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -143,38 +155,32 @@ public class Start extends MenuActivity {
 
 	@Override
 	protected void onStart() {
-		loginConsole = new Logger(this);
-		loginConsole.setOutputView(loginFragment.getTextWindow());
-		loginConsole.clear();
 		super.onStart();
-		loginConsole.addRow("NILS VERSION ");
-		loginConsole.addYellowText("["+NILS_VERSION+"]");
-		loginConsole.addRow("New features: Developer Log in Actionbar.");
-		
-		
-		//create subfolders. Copy assets..
-		if (this.initIfFirstTime()) {		
-			loginConsole.addRow("First time use...creating folders");
-			loginConsole.addRow("");
-			loginConsole.addYellowText("To change defaults, go to the config (wrench) menu");
-		
+		this.invalidateOptionsMenu();
+		if (myState != State.POST_INIT) {
+			loginConsole.setOutputView(loginFragment.getTextWindow());
+			loginConsole.clear();
+			loginConsole.addRow("NILS VERSION ");
+			loginConsole.addYellowText("["+NILS_VERSION+"]");
+			loginConsole.addRow("New features: Developer Log in Actionbar.");
+
+
+			//If network, go and check for new files.
+			if (this.isNetworkAvailable()) {
+
+				loginConsole.addRow("Loading configuration");
+				loginConsole.addRow("Server URL: "+ph.get(PersistenceHelper.SERVER_URL));
+
+				loader(State.INITIAL,null);
+			} else {
+				loginConsole.addRow("No network available...will use existing configuration");
+				loader(State.VALIDATE,null);
+			}
 		}
-		
-		//If network, go and check for new files.
-		if (this.isNetworkAvailable()) {
-
-			loginConsole.addRow("Loading configuration");
-			loginConsole.addRow("Server URL: "+ph.get(PersistenceHelper.SERVER_URL));
-
-			loader(State.INITIAL,null);
-		} else {
-			loginConsole.addRow("No network available...will use existing configuration");
-			loader(State.VALIDATE,null);
-		}
-
 	}
 
 	private boolean doRefresh=false;
+
 
 	private void loader(State state,ErrorCode errCode) {
 
@@ -235,56 +241,57 @@ public class Start extends MenuActivity {
 			} else
 				loader(State.VALIDATE,ErrorCode.whatever);
 			break;
-			
+
 		case VALIDATE:
-				//If a new version has been loaded and frozen, refresh global state.
-				if (doRefresh) {
-					loginConsole.addRow("Refreshing frozen objects with new configuration: ");
-					loginConsole.addGreenText("[OK]");
-					gs.refresh();
-				}
-				loginConsole.addRow("Validating frozen objects: ");
-				GlobalState.ErrorCode ec = gs.validateFrozenObjects();
-				switch (ec) {
-				case file_not_found:
-					loginConsole.addRedText("[Frozen object missing]");
-					break;
-				case workflows_not_found:
-					loginConsole.addRedText("[Could not find any workflows]");
-					break;
-				case missing_required_column:
-					loginConsole.addRedText("[A required column is missing from "+ph.get(PersistenceHelper.CONFIG_LOCATION)+"]");
-					break;
-				case ok:
-					loginConsole.addGreenText("[OK]");					
-					break;
+			//If a new version has been loaded and frozen, refresh global state.
+			if (doRefresh) {
+				loginConsole.addRow("Refreshing frozen objects with new configuration: ");
+				loginConsole.addGreenText("[OK]");
+				gs.refresh();
+			}
+			loginConsole.addRow("Validating frozen objects: ");
+			GlobalState.ErrorCode ec = gs.validateFrozenObjects();
+			switch (ec) {
+			case file_not_found:
+				loginConsole.addRedText("[Frozen object missing]");
+				break;
+			case workflows_not_found:
+				loginConsole.addRedText("[Could not find any workflows]");
+				break;
+			case missing_required_column:
+				loginConsole.addRedText("[A required column is missing from "+ph.get(PersistenceHelper.CONFIG_LOCATION)+"]");
+				break;
+			case ok:
+				loginConsole.addGreenText("[OK]");					
+				break;
 
-				}
-				//Get workflows
-				if (ec == GlobalState.ErrorCode.ok) {
+			}
+			//Get workflows
+			if (ec == GlobalState.ErrorCode.ok) {
 
-					String[] wfs = gs.getWorkflowNames();
-					loginConsole.addRow("Found "+wfs.length+" workflows.");
-					loginConsole.addRow("Start program in Drawer menu to the left.");
-					gs.getLogger().addRow("Initialization done");
-					gs.getLogger().addRow("************************************************");
-					new Handler().postDelayed(new Runnable() {
+				String[] wfs = gs.getWorkflowNames();
+				loginConsole.addRow("Found "+wfs.length+" workflows.");
+				loginConsole.addRow("Start program in Drawer menu to the left.");
+				gs.getLogger().addRow("Initialization done");
+				gs.getLogger().addRow("************************************************");
+				new Handler().postDelayed(new Runnable() {
 
-						@Override
-						public void run() {
-							mDrawerLayout.openDrawer(Gravity.LEFT);
-						}}, 1000);
+					@Override
+					public void run() {
+						mDrawerLayout.openDrawer(Gravity.LEFT);
+					}}, 1000);
 
 
-					//We know the workflows. We can create the menu.
-					createDrawerMenu(wfs);
-					adapter.notifyDataSetChanged();
-				} else {
-					loginConsole.addRow("");
-					loginConsole.addRedText("Program cannot start because of previous errors. Please correct your configuration");					
-				}
+				//We know the workflows. We can create the menu.
+				createDrawerMenu(wfs);
+				adapter.notifyDataSetChanged();
+				myState = State.POST_INIT;
+			} else {
+				loginConsole.addRow("");
+				loginConsole.addRedText("Program cannot start because of previous errors. Please correct your configuration");					
+			}
 
-				loginConsole.draw();
+			loginConsole.draw();
 
 			break;
 
@@ -297,9 +304,9 @@ public class Start extends MenuActivity {
 
 
 	private void createDrawerMenu(String[] wfs) {
-		
+
 		final String[] mainItems = {"Välj ruta","Hitta yta","Ta bilder och geo"};
-	
+
 		items.clear();
 		//Add "static" headers to menu.
 		items.add(new DrawerMenuHeader("Rutor och Provyta"));
@@ -308,7 +315,7 @@ public class Start extends MenuActivity {
 		items.add(new DrawerMenuHeader("Delyta"));
 		for (int i=0;i<wfs.length;i++) 
 			addItem(i+2+mainItems.length,wfs[i]);
-		
+
 	}
 
 
@@ -332,6 +339,7 @@ public class Start extends MenuActivity {
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
+		Log.d("nils","In oncofigChanged");
 		mDrawerToggle.onConfigurationChanged(newConfig);
 	}
 
@@ -353,9 +361,9 @@ public class Start extends MenuActivity {
 			selectItem(position);
 		}
 	}
-	
+
 	//
-	
+
 
 	/** Swaps fragments in the main content view */
 	private void selectItem(int position) {
@@ -363,14 +371,14 @@ public class Start extends MenuActivity {
 		// Highlight the selected item, update the title, and close the drawer
 		mDrawerList.setItemChecked(position, true);
 		String wfId = mapItemsToName.get(position);
-		
-		
+
+
 		Workflow wf = gs.getWorkflow(wfId);
 		// Create a new fragment and specify the  to show based on position
 		Fragment fragment=null;
 		if (wf!=null) 
 			fragment = wf.createFragment();
-		
+
 		else
 			fragment = new Fragment();
 		Bundle args = new Bundle();
@@ -404,21 +412,21 @@ public class Start extends MenuActivity {
 		NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
 		return activeNetworkInfo != null && activeNetworkInfo.isConnected();
 	}
-	
+
 	/******************************
 	 * First time? If so, create subfolders.
 	 */
 	private boolean initIfFirstTime() {
 		//If testFile doesnt exist it will be created and found next time.
-		
+		PersistenceHelper ph = new PersistenceHelper(PreferenceManager.getDefaultSharedPreferences(this));
 		Log.d("Strand","Checking if this is first time use...");
 		boolean first = (ph.get(PersistenceHelper.FIRST_TIME_KEY).equals(PersistenceHelper.UNDEFINED));
-			
+
 
 		if (first) {
 			ph.put(PersistenceHelper.FIRST_TIME_KEY,"NotEmpty");
 			Log.d("Strand","Yes..executing  first time init");
-			initialize();   
+			initialize(ph);   
 			return true;
 		}
 		else {
@@ -428,7 +436,7 @@ public class Start extends MenuActivity {
 
 	}
 
-	private void initialize() {
+	private void initialize(PersistenceHelper ph) {
 		//create data folder. This will also create the ROOT folder for the Strand app.
 		File folder = new File(Constants.CONFIG_FILES_DIR);
 		if(!folder.mkdirs())
@@ -439,10 +447,15 @@ public class Start extends MenuActivity {
 		if (ph.get(PersistenceHelper.SERVER_URL).equals(PersistenceHelper.UNDEFINED))
 			ph.put(PersistenceHelper.SERVER_URL, "www.teraim.com");
 		if (ph.get(PersistenceHelper.BUNDLE_LOCATION).equals(PersistenceHelper.UNDEFINED))
-			ph.put(PersistenceHelper.BUNDLE_LOCATION, "nilsbundle2.xml");
+			ph.put(PersistenceHelper.BUNDLE_LOCATION, "nb_terje.xml");
 		if (ph.get(PersistenceHelper.CONFIG_LOCATION).equals(PersistenceHelper.UNDEFINED))
 			ph.put(PersistenceHelper.CONFIG_LOCATION, "config.csv");
-	
+		ph.put(PersistenceHelper.DEVELOPER_SWITCH,true);
+		ph.put(PersistenceHelper.CURRENT_RUTA_ID_KEY, "262");
+		ph.put(PersistenceHelper.CURRENT_PROVYTA_ID_KEY, "6");
+		ph.put(PersistenceHelper.CURRENT_DELYTA_ID_KEY, "1");
+
+
 
 		//copy the configuration files into the root dir.
 		//copyAssets();

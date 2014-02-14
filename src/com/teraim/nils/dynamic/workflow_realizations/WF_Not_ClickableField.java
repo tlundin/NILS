@@ -11,9 +11,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.teraim.nils.R;
-import com.teraim.nils.StoredVariable;
-import com.teraim.nils.dynamic.types.VarIdentifier;
 import com.teraim.nils.dynamic.types.Variable;
+import com.teraim.nils.dynamic.types.VarIdentifier;
+import com.teraim.nils.dynamic.types.Numerable;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 
 public abstract class WF_Not_ClickableField extends WF_ListEntry {
@@ -51,7 +51,7 @@ public abstract class WF_Not_ClickableField extends WF_ListEntry {
 	
 	}
 	
-	public void addVariable(String varLabel, String varId, Unit unit, Variable.Type numType, StoredVariable.Type varType, boolean displayOut) {
+	public void addVariable(String varLabel, String varId, Unit unit, Variable.DataType numType, Variable.StorageType varType, boolean displayOut) {
 		
 		if (displayOut && virgin) {
 			virgin = false;

@@ -4,8 +4,8 @@ import android.view.LayoutInflater;
 
 import com.teraim.nils.Logger;
 import com.teraim.nils.R;
-import com.teraim.nils.StoredVariable;
-import com.teraim.nils.dynamic.types.Variable.Type;
+import com.teraim.nils.dynamic.types.Variable;
+import com.teraim.nils.dynamic.types.Numerable.Type;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 import com.teraim.nils.dynamic.workflow_abstracts.Container;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
@@ -41,9 +41,9 @@ public  class AddSumOrCountBlock extends Block {
 				target, myPattern,
 				type);
 		if (type==WF_Not_ClickableField_SumAndCountOfVariables.Type.count)
-			field.addVariable(label, "AntalArter", Unit.nd, Type.NUMERIC, StoredVariable.Type.delyta, true);
+			field.addVariable(label, "AntalArter", Unit.nd, Variable.DataType.numeric, Variable.StorageType.delyta, true);
 		else
-			field.addVariable(label, "SumTackning", Unit.percentage, Type.NUMERIC, StoredVariable.Type.delyta, true);
+			field.addVariable(label, "SumTackning", Unit.percentage, Variable.DataType.numeric, Variable.StorageType.delyta, true);
 			
 		//TODO: This is too specific.
 		field.matchAndRecalculateMe();

@@ -25,10 +25,7 @@ public class ListInputTemplate extends Executor {
 	private LinearLayout sortPanel;
 	List<WF_Container> myLayouts;
 	private WF_SorterWidget a_o_widget,familj_widget;
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
 
-	}
 	
 	
 	
@@ -58,6 +55,11 @@ public class ListInputTemplate extends Executor {
 		a_o = new ListSortingBlock("alphanumeric_sorting_function","Sort_Panel_1",FIELD_LIST);
 		slakt = new ListSortingBlock("familje_sorting_function","Sort_Panel_1",FIELD_LIST);
 
+		if (wf!=null) {
+			run();
+		}
+		a_o_widget = a_o.create(myContext);
+		familj_widget = slakt.create(myContext);
 		
 		return v;
 
@@ -71,11 +73,6 @@ public class ListInputTemplate extends Executor {
 	@Override
 	public void onStart() {
 		super.onStart();
-		if (wf!=null) {
-			run();
-		}
-		a_o_widget = a_o.create(myContext);
-		familj_widget = slakt.create(myContext);
 
 		Log.d("nils","in onStart");
 		//myContainer.removeAllViews();

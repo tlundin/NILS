@@ -5,8 +5,7 @@ import java.util.ArrayList;
 import android.util.Log;
 
 import com.teraim.nils.GlobalState;
-import com.teraim.nils.StoredVariable;
-import com.teraim.nils.StoredVariable.Type;
+import com.teraim.nils.dynamic.types.Variable.StorageType;
 
 public class Provyta extends ParameterCache {
 
@@ -78,7 +77,7 @@ public class Provyta extends ParameterCache {
 	}
 
 	@Override
-	public StoredVariable getVariable(String varId) {
+	public Variable getVariable(String varId) {
 		if (myParent == null) {
 			Log.e("nils","Getvariable called on provyta without parent..?");
 			return null;
@@ -87,10 +86,10 @@ public class Provyta extends ParameterCache {
 	}
 
 	@Override
-	public StoredVariable storeVariable(String varId, String value) {
-		return this.storeVariable(new StoredVariable(myParent.getId(), this.getId(), null,
+	public Variable storeVariable(String varId, String value) {
+		return this.storeVariable(new Variable(myParent.getId(), this.getId(), null,
 				value, 	varId,
-				Type.provyta));
+				StorageType.provyta));
 
 	}
 

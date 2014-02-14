@@ -3,36 +3,37 @@ import android.content.Context;
 import android.util.Log;
 
 import com.teraim.nils.GlobalState;
-import com.teraim.nils.StoredVariable;
-import com.teraim.nils.StoredVariable.Type;
+import com.teraim.nils.dynamic.types.Variable.StorageType;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 
 //Class used to identify a variable, given that CURRENT Delyta/Provyta/Ruta (the context) is the parent.
 
 public class VarIdentifier {
 
-	public Variable.Type numType;
-	public StoredVariable.Type varType;
+	public Variable.DataType numType;
+	public Variable.StorageType varType;
 	private String id,label;
 	public Unit unit;
-	private StoredVariable myStoredVar=null;		
+	private Variable myStoredVar=null;		
 	ParameterCache pc;
 	private GlobalState gs;
 	
-	public VarIdentifier(Context ctx,String varLabel,String varId, Variable.Type numType, StoredVariable.Type varType, Unit unit) {
+	
+	
+	public VarIdentifier(Context ctx,String varLabel,String varId, Variable.DataType numType, Variable.StorageType varType, Unit unit) {
 		gs = GlobalState.getInstance(ctx);
 		id = varId;
 		label = varLabel;
 		this.numType=numType;
 		this.varType=varType;
 		this.unit=unit;
-		if(varType == Type.ruta) {
+		if(varType == StorageType.ruta) {
 			pc = gs.getCurrentRuta();
 		} else {
-			if(varType == Type.provyta) {
+			if(varType == StorageType.provyta) {
 				pc = gs.getCurrentProvyta();
 			} else {
-				assert(varType == Type.delyta);
+				assert(varType == StorageType.delyta);
 				pc = gs.getCurrentDelyta();
 			} 
 		}

@@ -28,6 +28,7 @@ import com.teraim.nils.dynamic.blocks.ButtonBlock;
 import com.teraim.nils.dynamic.blocks.ContainerDefineBlock;
 import com.teraim.nils.dynamic.blocks.CreateEntryFieldBlock;
 import com.teraim.nils.dynamic.blocks.CreateListEntriesBlock;
+import com.teraim.nils.dynamic.blocks.DisplayValueBlock;
 import com.teraim.nils.dynamic.blocks.LayoutBlock;
 import com.teraim.nils.dynamic.blocks.ListSortingBlock;
 import com.teraim.nils.dynamic.blocks.PageDefineBlock;
@@ -248,7 +249,9 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 				else if (name.equals("block_create_list_entries")) 
 					blocks.add(readBlockCreateListEntries(parser));
 				else if (name.equals("block_create_entry_field")) 
-					blocks.add(this.readBlockCreateEntryField(parser));
+					blocks.add(readBlockCreateEntryField(parser));
+				else if (name.equals("block_display_value"))
+					blocks.add(readBlockDisplayValue(parser));
 				else
 					skip(parser);
 			} catch (EvalException e) {
@@ -261,11 +264,43 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 	}
 
 
+	private DisplayValueBlock readBlockDisplayValue(XmlPullParser parser)throws IOException, XmlPullParserException {
+		o.addRow("Parsing block: block_display_value...");
+		String namn=null, type=null, label=null,variable=null,containerId=null;	
+		parser.require(XmlPullParser.START_TAG, null,"block_display_value");
+		while (parser.next() != XmlPullParser.END_TAG) {
+			if (parser.getEventType() != XmlPullParser.START_TAG) {
+				continue;
+			}
+			String name= parser.getName();
+
+			if (name.equals("label")) {
+				label = readText("label",parser);
+				o.addRow("LABEL: "+label);
+			} else if (name.equals("type")) {
+				type = readText("type",parser);
+				o.addRow("TYPE: "+type);							
+			} else if (name.equals("name")) {
+				namn = readText("name",parser);
+				o.addRow("NAME: "+namn);			
+			} else if (name.equals("container_name")) {
+				containerId = readText("container_name",parser);
+				o.addRow("CONTAINER_NAME: "+containerId);
+			} else if (name.equals("variable")) {
+				variable = readText("variable",parser); 
+				o.addRow("VARIABLE: "+variable);
+			} 
+			else
+				skip(parser);
+
+		}
+		return new DisplayValueBlock(namn, type, label,
+				variable,containerId);
+	}
 
 
 
-
-	private Block readBlockCreateEntryField(XmlPullParser parser)throws IOException, XmlPullParserException {
+	private CreateEntryFieldBlock readBlockCreateEntryField(XmlPullParser parser)throws IOException, XmlPullParserException {
 		o.addRow("Parsing block: block_create_entry_field...");
 		String namn=null, type=null, label=null,purpose=null,containerId=null;
 		Unit unit = Unit.nd;		
@@ -282,6 +317,10 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 			} else if (name.equals("type")) {
 				type = readText("type",parser);
 				o.addRow("TYPE: "+type);
+				if (!type.equals("numeric")) {
+					o.addRow("");
+					o.addRedText("EntryField ONLY supports NUMERIC!");
+				}				
 			} else if (name.equals("name")) {
 				namn = readText("name",parser);
 				o.addRow("NAME: "+namn);			

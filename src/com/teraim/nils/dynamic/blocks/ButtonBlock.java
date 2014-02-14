@@ -133,6 +133,10 @@ public  class ButtonBlock extends Block {
 								o.addRow("");
 								o.addRow("Action button pressed. Executing wf: "+action.wfName);
 								Fragment f = wf.createFragment();
+								if (f == null) {
+									o.addRow("");
+									o.addRedText("Couldn't create new fragment...Template was named"+wf.getName());
+								}
 								Bundle b = new Bundle();
 								b.putString("workflow_name", action.wfName); //Your id
 								f.setArguments(b); //Put your id to your next Intent

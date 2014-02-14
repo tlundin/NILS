@@ -22,9 +22,9 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.teraim.nils.GlobalState;
-import com.teraim.nils.StoredVariable;
 import com.teraim.nils.dynamic.types.Ruta;
-import com.teraim.nils.dynamic.types.Variable.Type;
+import com.teraim.nils.dynamic.types.Variable;
+import com.teraim.nils.dynamic.types.Numerable.Type;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 
 public class Tools {
@@ -213,9 +213,9 @@ public class Tools {
 	
 	public static void printDatabase(DbHelper db) {
 		Log.d("NILS","Printing all database values in init");
-    	ArrayList<StoredVariable> sds = db.getAllVariables();
+    	ArrayList<Variable> sds = db.getAllVariables();
     	int i=0;
-    	for(StoredVariable s:sds) 
+    	for(Variable s:sds) 
     		Log.d("nils",(i++) + ": "+s.getRutId()+","+s.getProvytaId()+","+s.getDelytaId()+","+s.getVarId()+":  "+s.getValue());
 		
 	}

@@ -10,13 +10,10 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.teraim.nils.GlobalState;
@@ -28,10 +25,11 @@ import com.teraim.nils.dynamic.blocks.ButtonBlock;
 import com.teraim.nils.dynamic.blocks.ContainerDefineBlock;
 import com.teraim.nils.dynamic.blocks.CreateEntryFieldBlock;
 import com.teraim.nils.dynamic.blocks.CreateListEntriesBlock;
+import com.teraim.nils.dynamic.blocks.DisplayValueBlock;
 import com.teraim.nils.dynamic.blocks.ListSortingBlock;
 import com.teraim.nils.dynamic.blocks.StartBlock;
+import com.teraim.nils.dynamic.types.Numerable;
 import com.teraim.nils.dynamic.types.Rule;
-import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.types.Workflow;
 import com.teraim.nils.dynamic.workflow_abstracts.Container;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Container;
@@ -183,7 +181,12 @@ public abstract class Executor extends Fragment {
 				AddSumOrCountBlock bl = (AddSumOrCountBlock)b;
 				bl.create(myContext);
 			}
-			
+			else if (b instanceof DisplayValueBlock) {
+				o.addRow("");
+				o.addYellowText("DisplayValueBlock found");
+				DisplayValueBlock bl = (DisplayValueBlock)b;
+				bl.create(myContext);
+			}
 
 		}
 		
@@ -292,7 +295,7 @@ public abstract class Executor extends Fragment {
 				continue;
 			}
 			//Find the target.
-			Variable target;
+			Numerable target;
 			try {
 				target = rule.getTarget();
 			} catch (RuleException e) {

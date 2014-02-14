@@ -3,6 +3,7 @@ package com.teraim.nils.ui;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -37,7 +38,7 @@ public class ConfigMenu extends PreferenceActivity {
 			//Set default values for the prefs.
 			getPreferenceScreen().getSharedPreferences()
 			.registerOnSharedPreferenceChangeListener(this);
-
+			
 			EditTextPreference epref = (EditTextPreference) findPreference(PersistenceHelper.LAG_ID_KEY);
 			epref.setSummary(epref.getText());
 
@@ -68,8 +69,11 @@ public class ConfigMenu extends PreferenceActivity {
 			epref = (EditTextPreference) findPreference(PersistenceHelper.CONFIG_LOCATION);
 			epref.setSummary(epref.getText());
 
-		
+			//CheckBoxPreference cpref = (CheckBoxPreference) findPreference(PersistenceHelper.DEVELOPER_SWITCH);
+			
 		}
+		
+	
 
 		public void onSharedPreferenceChanged(
 				SharedPreferences sharedPreferences, String key) {
@@ -93,6 +97,10 @@ public class ConfigMenu extends PreferenceActivity {
 				ListPreference letp = (ListPreference) pref;
 				pref.setSummary(letp.getValue());
 				
+			}
+			else if (pref instanceof CheckBoxPreference) {
+				CheckBoxPreference cpref = (CheckBoxPreference)pref;
+				GlobalState.getInstance(getActivity()).getLogger().setDev(cpref.isChecked());
 			}
 
 		}

@@ -50,6 +50,7 @@ public class MenuActivity extends Activity {
 		brr = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context ctx, Intent intent) {
+					Log.d("nils","Broadcastreceiver refresh statusrow!");
 					me.refreshStatusRow();
 				}
 				
@@ -104,19 +105,22 @@ public class MenuActivity extends Activity {
 		return MenuChoice(item);
 	}
 
-	private final static int NO_OF_MENU_ITEMS = 6;
+	private final static int NO_OF_MENU_ITEMS = 4;
 	MenuItem mnu[] = new MenuItem[NO_OF_MENU_ITEMS];
 	private void CreateMenu(Menu menu)
 	{
 
-		for(int c=0;c<mnu.length;c++) {
+		for(int c=0;c<mnu.length-1;c++) {
 			mnu[c]=menu.add(0,c,c,"");
 			mnu[c].setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);	
 
 		}
+		mnu[mnu.length-1]=menu.add(0,mnu.length-1,mnu.length-1,"");
+		mnu[mnu.length-1].setIcon(android.R.drawable.ic_menu_preferences);
+		mnu[mnu.length-1].setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		//mnu5.setIcon(android.R.drawable.ic_menu_preferences);
 		//mnu5.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-		refreshStatusRow();
+		//refreshStatusRow();
 	}
 
 	protected void refreshStatusRow() {
@@ -127,10 +131,17 @@ public class MenuActivity extends Activity {
 		mnu[c++].setTitle("Ruta/Provyta: "+rid+"/"+pid);
 		mnu[c++].setTitle("LOG");
 		mnu[c++].setTitle("Synkning: "+gs.getSyncStatusS());
-		mnu[c++].setTitle("Användare: "+gs.getPersistence().get(PersistenceHelper.USER_ID_KEY));
-		mnu[c++].setTitle("Typ: "+gs.getDeviceType());
-		if(!ph.get(PersistenceHelper.POWER_USER_KEY).equals(PersistenceHelper.UNDEFINED))
+		
+		//mnu[c++].setTitle("Användare: "+gs.getPersistence().get(PersistenceHelper.USER_ID_KEY));
+		//mnu[c++].setTitle("Typ: "+gs.getDeviceType());
+		if(!ph.getB(PersistenceHelper.DEVELOPER_SWITCH)) {
+			Log.d("nils","devswitch off");
 			mnu[1].setVisible(false);
+		}
+		else {
+			Log.d("nils","devswitch on");
+			mnu[1].setVisible(true);
+		}
 		
 
 	}
@@ -210,7 +221,6 @@ public class MenuActivity extends Activity {
 
 		case 0:
 		case 3:
-		case 4:
 			Intent intent = new Intent(getBaseContext(),ConfigMenu.class);
 			startActivity(intent);
 			return true;

@@ -32,6 +32,7 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 					o.addRow("found null value in config file row "+index);
 				} else {
 					if (al.getAction(r).equals("create")) {
+						Log.d("nils","create...");
 						//C_F_+index is the ID for the element.
 						//TODO: ID is a bit hacked here..
 						

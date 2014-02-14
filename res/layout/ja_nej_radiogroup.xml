@@ -1,24 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-  <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
-       android:id="@+id/radioG"
-       
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:orientation="horizontal" >
- 
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+
+    <TextView
+        android:id="@+id/header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp" />
+
+    <RadioGroup
+        android:id="@+id/radioG"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
+        android:orientation="horizontal" >
+
         <RadioButton
             android:id="@+id/ja"
-            style="@style/Field_Style"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ja" 
-            />
- 
+            android:text="Ja" />
+
         <RadioButton
             android:id="@+id/nej"
-            style="@style/Field_Style"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Nej" />
- 
     </RadioGroup>
+
+</LinearLayout>

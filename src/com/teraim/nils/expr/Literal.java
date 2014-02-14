@@ -1,9 +1,9 @@
 package com.teraim.nils.expr;
 
-import com.teraim.nils.dynamic.types.Variable;
-import com.teraim.nils.dynamic.types.Variable.Type;
+import com.teraim.nils.dynamic.types.Numerable;
+import com.teraim.nils.dynamic.types.Numerable.Type;
 
-public class Literal implements Variable {
+public class Literal implements Numerable {
 
 	private String name,label,value;
 	

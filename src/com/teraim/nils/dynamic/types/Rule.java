@@ -27,9 +27,9 @@ public  class Rule {
 		Log.e("NILS","Create Rule with name "+ruleName+" and target "+target+" and cond "+ condition);
 
 	}
-	public Variable getTarget() throws RuleException {
+	public Numerable getTarget() throws RuleException {
 		//TODO: Change!!
-		Variable var = null;//GlobalState.getInstance(ctx).getVariable(targetName);
+		Numerable var = null;//GlobalState.getInstance(ctx).getVariable(targetName);
 		if (var==null)
 			throw new RuleException("Variable "+targetName+" must exist");
 

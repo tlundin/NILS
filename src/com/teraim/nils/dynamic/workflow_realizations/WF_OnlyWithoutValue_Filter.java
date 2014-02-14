@@ -21,7 +21,7 @@ public class WF_OnlyWithoutValue_Filter extends WF_Filter {
 				continue;
 			else {
 				it.remove();
-				Log.d("nils","filter removes element "+l.getKey()+" because its value is null");
+				//Log.d("nils","filter removes element "+l.getKey()+" because its value is null");
 			}
 		}
 		return list;

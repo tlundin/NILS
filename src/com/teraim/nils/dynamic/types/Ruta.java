@@ -8,8 +8,7 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.teraim.nils.GlobalState;
-import com.teraim.nils.StoredVariable;
-import com.teraim.nils.StoredVariable.Type;
+import com.teraim.nils.dynamic.types.Variable.StorageType;
 
 public class Ruta extends ParameterCache {
 	private String myId;
@@ -132,7 +131,7 @@ public class Ruta extends ParameterCache {
 	}
 
 	@Override
-	public StoredVariable getVariable(String varId) {
+	public Variable getVariable(String varId) {
 		if (myId == null) {
 			Log.e("nils","My ID was null in getVariable Ruta for variable: "+varId);
 			return null;
@@ -142,10 +141,10 @@ public class Ruta extends ParameterCache {
 	}
 
 	@Override
-	public StoredVariable storeVariable(String varId, String value) {
-		return this.storeVariable(new StoredVariable(this.getId(), null, null,
+	public Variable storeVariable(String varId, String value) {
+		return this.storeVariable(new Variable(this.getId(), null, null,
 				value, 	varId,
-				Type.ruta));
+				StorageType.ruta));
 
 	}
 

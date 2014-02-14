@@ -52,6 +52,8 @@ public class Constants {
 	public static final String WF_FROZEN_FILE_ID = "workflows";
 	public static final String CONFIG_FROZEN_FILE_ID = "artlista";
 
+	public static final int KEY_LENGTH = 10;
+
 	
 	public static UUID getmyUUID() {
 		/*

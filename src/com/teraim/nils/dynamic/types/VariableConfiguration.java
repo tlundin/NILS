@@ -9,7 +9,6 @@ import android.util.Log;
 
 import com.teraim.nils.GlobalState.ErrorCode;
 import com.teraim.nils.GlobalState;
-import com.teraim.nils.StoredVariable;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
 import com.teraim.nils.utils.Tools;
@@ -32,6 +31,7 @@ public class VariableConfiguration {
 	
 	public VariableConfiguration(Table t) {
 		myTable = t;
+		
 	}
 	
 	public ErrorCode validateAndInit() {
@@ -81,15 +81,20 @@ public class VariableConfiguration {
 		return row.get(fromNameToColumn.get(requiredColumns.get(Description)));
 	}
 
-	public Variable.Type getnumType(List<String> row) {
+	public Variable.DataType getnumType(List<String> row) {
 		String type = row.get(fromNameToColumn.get(requiredColumns.get(NUM_TYPE)));
-		return (type.equals("number"))?Variable.Type.NUMERIC:Variable.Type.LITERAL;
+		return type.equals("number")?
+				Variable.DataType.numeric:(type.equals("boolean")?
+				Variable.DataType.bool:(type.equals("list")?
+				Variable.DataType.list:(type.equals("number")?
+				Variable.DataType.numeric:
+				Variable.DataType.text)));
 	}
 
-	public StoredVariable.Type getVarType(List<String> row) {
+	public Variable.StorageType getVarType(List<String> row) {
 		String type = row.get(fromNameToColumn.get(requiredColumns.get(VARIABLE_TYPE)));
-		return type.equals("delyta")? StoredVariable.Type.delyta:(type.equals("provyta")?
-				StoredVariable.Type.provyta:StoredVariable.Type.ruta);
+		return type.equals("delyta")? Variable.StorageType.delyta:(type.equals("provyta")?
+				Variable.StorageType.provyta:Variable.StorageType.ruta);
 	}
 	
 	public boolean isDisplayInList(List<String> row) {

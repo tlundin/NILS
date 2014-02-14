@@ -8,8 +8,8 @@ import android.util.Log;
 import android.view.View;
 
 import com.teraim.nils.GlobalState;
-import com.teraim.nils.StoredVariable;
 import com.teraim.nils.dynamic.types.Delyta;
+import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.types.VariableConfiguration;
 import com.teraim.nils.dynamic.workflow_abstracts.Listable;
 
@@ -57,7 +57,7 @@ public abstract class WF_ListEntry extends WF_Widget implements Listable,Compara
 	public String getValue() {
 		//find the variable ID.
 		String varId = getKey();
-		StoredVariable stv = fetchVariableFromDb(varId);
+		Variable stv = fetchVariableFromDb(varId);
 		
 		if(stv!=null)
 			return stv.getValue();
@@ -68,7 +68,7 @@ public abstract class WF_ListEntry extends WF_Widget implements Listable,Compara
 	@Override
 	public long getTimeStamp() {
 		String varId = getKey();
-		StoredVariable stv = fetchVariableFromDb(varId);
+		Variable stv = fetchVariableFromDb(varId);
 		
 		if(stv!=null)
 			return Long.parseLong(stv.getTimeStamp());		
@@ -79,7 +79,7 @@ public abstract class WF_ListEntry extends WF_Widget implements Listable,Compara
 			
 	}
 		
-	private StoredVariable fetchVariableFromDb(String varId) {
+	private Variable fetchVariableFromDb(String varId) {
 		if (varId==null) 
 			Log.e("nils","Variable with NULL ID in WF_Listelement");
 		else {
@@ -87,10 +87,8 @@ public abstract class WF_ListEntry extends WF_Widget implements Listable,Compara
 			if (d == null) 
 				Log.e("nils","Delyta NULL in WF_Listelement");
 			else {
-				StoredVariable var = d.getVariable(varId);
-				if (var== null) 
-					Log.e("nils","Variable"+varId+" has no valuein WF_ListEntry");
-				else 
+				Variable var = d.getVariable(varId);
+				if (var!=null) 
 					return var;
 			}
 		}

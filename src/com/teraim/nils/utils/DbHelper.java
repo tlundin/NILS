@@ -11,8 +11,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.teraim.nils.GlobalState;
-import com.teraim.nils.StoredVariable;
-import com.teraim.nils.StoredVariable.Type;
+import com.teraim.nils.dynamic.types.Variable;
+import com.teraim.nils.dynamic.types.Variable.StorageType;
  
 public class DbHelper extends SQLiteOpenHelper {
  
@@ -81,18 +81,18 @@ public class DbHelper extends SQLiteOpenHelper {
     
     //Create update delete
     
-    public ArrayList<StoredVariable> getAllVariables() {
-    	ArrayList<StoredVariable> ret = new ArrayList<StoredVariable>();
+    public ArrayList<Variable> getAllVariables() {
+    	ArrayList<Variable> ret = new ArrayList<Variable>();
         //SQLiteDatabase db = this.getReadableDatabase();
         	
        	Cursor c = db.query(TABLE_VARIABLES,null,
     			null,null,null,null,null,null);
        	if (c!=null) {
-       		StoredVariable stV = null;
+       		Variable stV = null;
        		while (c.moveToNext()) {
        			Log.d("nils","Found variable "+c.getString(5)+" in database");
                 String id = c.getString(0);
-                stV = (StoredVariable)Tools.deSerialize(c.getBlob(COLUMN_SERIALIZED));
+                stV = (Variable)Tools.deSerialize(c.getBlob(COLUMN_SERIALIZED));
                 if (stV==null) {
                 	Log.d("nils","Deserialize failed.");
                 } else {
@@ -112,7 +112,7 @@ public class DbHelper extends SQLiteOpenHelper {
     
     //Insert or Update existing value.
     
-    public void insertVariable(StoredVariable var){
+    public void insertVariable(Variable var){
     	PersistenceHelper ph = GlobalState.getInstance(ctx).getPersistence();
         //for logging
     	Log.d("nils", "Inserting variable "+var.toString()+" into database with value "+var.getValue()); 
@@ -151,7 +151,7 @@ public class DbHelper extends SQLiteOpenHelper {
     	//db.close();
 }
     
-    private boolean existsInDB(StoredVariable var,SQLiteDatabase db) {
+    private boolean existsInDB(Variable var,SQLiteDatabase db) {
 		//if we know for sure already, return true.
     	if (var.existsInDB())
 			return true;
@@ -164,7 +164,7 @@ public class DbHelper extends SQLiteOpenHelper {
     	insert,
     	delete
     }
-    public void insertAudit(StoredVariable var, ActionType a){
+    public void insertAudit(Variable var, ActionType a){
         //for logging
     	Log.d("nils", "Audit"); 
     	// 1. get reference to writable DB
@@ -194,7 +194,7 @@ public class DbHelper extends SQLiteOpenHelper {
     	 
     
     
-    public void deleteVariable(StoredVariable var) {
+    public void deleteVariable(Variable var) {
         // 1. get reference to writable DB
         //SQLiteDatabase db = this.getWritableDatabase();
         long rId = -1;
@@ -220,17 +220,17 @@ public class DbHelper extends SQLiteOpenHelper {
     
     
     
-    private long findRow(StoredVariable var,SQLiteDatabase db) {
+    private long findRow(Variable var,SQLiteDatabase db) {
     	String selection = null;
     	String[] selectionArgs = null;
     	
-    	if (var.getType()==Type.ruta) {
+    	if (var.getType()==StorageType.ruta) {
     		selection = "var = ? and ruta = ?";
     		selectionArgs = new String[]{var.getVarId(),var.getRutId()};
-    	} else if (var.getType()==Type.provyta) {
+    	} else if (var.getType()==StorageType.provyta) {
     		selection = "var = ? and ruta = ? and provyta = ?";
     		selectionArgs = new String[]{var.getVarId(),var.getRutId(), var.getProvytaId()};
-    	} else if (var.getType()==Type.delyta) {
+    	} else if (var.getType()==StorageType.delyta) {
     		selection = "var = ? and ruta = ? and provyta = ? and delyta = ?";
     		selectionArgs = new String[]{var.getVarId(), var.getRutId(), var.getProvytaId(), var.getDelytaId()};
     	}
@@ -252,30 +252,30 @@ public class DbHelper extends SQLiteOpenHelper {
         return id;
     }
 
-	public StoredVariable getVariable(Type t, String rutId, String provyteId,
+	public Variable getVariable(StorageType t, String rutId, String provyteId,
 			String delyteId, String varId) {
 	   	String selection = null;
     	String[] selectionArgs = null;
  
         SQLiteDatabase db = this.getReadableDatabase();
         //Log.e("nils","GetVar: R:"+rutId+" P:"+provyteId+" D:"+delyteId+" V:"+varId);
-    	if (t==Type.ruta) {
+    	if (t==StorageType.ruta) {
     		selection = "var = ? and ruta = ?";
     		selectionArgs = new String[]{varId,rutId};
-    	} else if (t==Type.provyta) {
+    	} else if (t==StorageType.provyta) {
     		selection = "var = ? and ruta = ? and provyta = ?";
     		selectionArgs = new String[]{varId,rutId, provyteId};
-    	} else if (t==Type.delyta) {
+    	} else if (t==StorageType.delyta) {
     		selection = "var = ? and ruta = ? and provyta = ? and delyta = ?";
     		selectionArgs = new String[]{varId, rutId, provyteId, delyteId};
     	}	
     	
     	Cursor c = db.query(TABLE_VARIABLES,new String[]{"id","serialized","timestamp"},
     			selection,selectionArgs,null,null,null,null);
-    	StoredVariable stV=null;
+    	Variable stV=null;
         if (c != null && c.moveToFirst() ) {
             String id = c.getString(0);
-            stV = (StoredVariable)Tools.deSerialize(c.getBlob(1));
+            stV = (Variable)Tools.deSerialize(c.getBlob(1));
            
             if (stV==null) {
             	Log.d("nils","Deserialize failed in getVariable.");

@@ -18,8 +18,8 @@ public class PersistenceHelper {
 	public static final String SERVER_URL = "server_location";
 	public static final String CURRENT_VERSION_OF_WF_BUNDLE = "current_version_wf";
 	public static final String CURRENT_VERSION_OF_CONFIG_FILE = "current_version_config";
-	public static final String POWER_USER_KEY = "Powar Uzaarrr";
 	public static final String FIRST_TIME_KEY = "firzzt";
+	public static final String DEVELOPER_SWITCH = "dev_switch";
 
 	SharedPreferences sp;
 	
@@ -36,6 +36,13 @@ public class PersistenceHelper {
 
 	public void put(String key, String value) {
 		sp.edit().putString(key,value).commit();
+	}
+	public void put(String key, boolean value) {
+		sp.edit().putBoolean(key,value).commit();
+	}
+	
+	public boolean getB(String key) {
+		return sp.getBoolean(key, false);
 	}
 	
 

@@ -58,7 +58,7 @@ public class WF_Column_Name_Filter extends WF_Filter {
 
 			if (!match) {
 				it.remove();
-				Log.d("nils","filter removes element "+key+" because "+key.charAt(0)+" doesn't match "+myPrefix);
+				//Log.d("nils","filter removes element "+key+" because "+key.charAt(0)+" doesn't match "+myPrefix);
 			}
 
 		}

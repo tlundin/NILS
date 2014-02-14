@@ -9,7 +9,7 @@ import com.teraim.nils.dynamic.types.Workflow.Unit;
 public  class XML_Variable {		
 	public String name;
 	public String label;
-	public Variable.Type type;
+	public Numerable.Type type;
 	public String purpose;
 	public Unit unit;
 }

@@ -23,29 +23,6 @@
 	<string name="drawer_close">Stäng</string>
 	<string name="local_service_started">Blåtandtjänst startad</string>
 	
-	<style name="Field_Style">
-	<item name="android:textColor">@color/black</item>
-    <item name="android:textSize">30sp</item>
-    <item name="android:textStyle">bold</item>
-    <item name="android:shadowColor">@color/white</item>
-    <item name="android:shadowDx">1</item>
-    <item name="android:shadowDy">1</item>
-    <item name="android:shadowRadius">2</item>
-    
-	</style>
-    	
-	<style name="WF_Text">
-    <item name="android:layout_width">fill_parent</item>
-    <item name="android:layout_height">wrap_content</item>
-    <item name="android:textColor">@color/black</item>
-    <item name="android:gravity">center</item>
-    <item name="android:layout_margin">3dp</item>
-    <item name="android:textSize">30sp</item>
-    <item name="android:textStyle">bold</item>
-    <item name="android:shadowColor">@color/white</item>
-    <item name="android:shadowDx">1</item>
-    <item name="android:shadowDy">1</item>
-    <item name="android:shadowRadius">2</item>
-	</style>
+	
 				
 </resources>

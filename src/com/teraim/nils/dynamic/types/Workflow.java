@@ -10,8 +10,8 @@ import com.teraim.nils.dynamic.blocks.Block;
 import com.teraim.nils.dynamic.blocks.PageDefineBlock;
 import com.teraim.nils.dynamic.blocks.StartBlock;
 import com.teraim.nils.dynamic.templates.DefaultTemplate;
+import com.teraim.nils.dynamic.templates.FixPunktTemplate;
 import com.teraim.nils.dynamic.templates.ListInputTemplate;
-import com.teraim.nils.dynamic.types.Workflow.Type;
 
 //Workflow
 public class Workflow implements Serializable {
@@ -22,11 +22,7 @@ public class Workflow implements Serializable {
 	private List<Block> blocks;
 	private String name=null;
 
-	public enum Type
-	{
-		plain,
-		variable_selection
-	}
+
 	public enum Unit {
 		percentage,
 		dm,
@@ -50,43 +46,33 @@ public class Workflow implements Serializable {
 		return name;
 	}
 
-	public Fragment createFragment(){
-		Fragment ret = null;
-		switch (getType()) {
-		case plain:
-			ret = new DefaultTemplate();
-			break;
-		case variable_selection:
-			ret = new ListInputTemplate();
-			break;
-
+	
+	public Fragment createFragment() {
+		Fragment f = null;
+		try {
+			Class<?> cs = Class.forName("com.teraim.nils.dynamic.templates."+getType());
+			f = (Fragment)cs.newInstance();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e2) {
+			e2.printStackTrace();
+		} catch (IllegalAccessException e3) {
+			e3.printStackTrace();
 		}
-		return ret;
-	}
+	return f;
+}
 
-	private Type getType() {
-		for (Block b:blocks) {
-			if (b instanceof PageDefineBlock) {
-				PageDefineBlock bl = (PageDefineBlock)b;
-				final String type = bl.getPageType();
-				if (type.equals("plain"))
-					return Type.plain;
-				else 
-					if (type.equals("variable_selection"))
-						return Type.variable_selection;
-					else {
-						Log.e("NILS","Type of page not recognized in workflow "+this.getName()+" Will default to plain");
-					}
-				return Type.plain;	
-			}
-
+public String getType() {
+	for (Block b:blocks) {
+		if (b instanceof PageDefineBlock) {
+			PageDefineBlock bl = (PageDefineBlock)b;
+			return bl.getPageType();
 		}
-		Log.e("NILS","Could not find PageDefineBlock for workflow "+this.getName()+" Will default to plain type");
-		return Type.plain;
 	}
-	public Type getTemplateType() {
-		return getType();
-	}
+	Log.e("NILS","Could not find PageDefineBlock for workflow "+this.getName()+" Will default to Default type");
+	return "DefaultTemplate";
+}
+
 
 
 }
