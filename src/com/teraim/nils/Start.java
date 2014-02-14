@@ -37,7 +37,7 @@ import com.teraim.nils.utils.WorkflowParser;
 
 public class Start extends MenuActivity {
 
-	private final String NILS_VERSION = "0.10";
+	private final String NILS_VERSION = "0.11";
 
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
@@ -162,7 +162,7 @@ public class Start extends MenuActivity {
 			loginConsole.clear();
 			loginConsole.addRow("NILS VERSION ");
 			loginConsole.addYellowText("["+NILS_VERSION+"]");
-			loginConsole.addRow("New features: Developer Log in Actionbar.");
+			loginConsole.addRow("New features: Swipeable fragments.");
 
 
 			//If network, go and check for new files.

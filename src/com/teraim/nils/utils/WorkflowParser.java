@@ -266,7 +266,8 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 
 	private DisplayValueBlock readBlockDisplayValue(XmlPullParser parser)throws IOException, XmlPullParserException {
 		o.addRow("Parsing block: block_display_value...");
-		String namn=null, type=null, label=null,variable=null,containerId=null;	
+		String namn=null, type=null, label=null,variable=null,containerId=null;
+		Unit unit=null;	
 		parser.require(XmlPullParser.START_TAG, null,"block_display_value");
 		while (parser.next() != XmlPullParser.END_TAG) {
 			if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -289,12 +290,15 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 			} else if (name.equals("variable")) {
 				variable = readText("variable",parser); 
 				o.addRow("VARIABLE: "+variable);
+			} else if (name.equals("unit")) {
+				unit = Tools.convertToUnit(readText("unit",parser));
+				o.addRow("UNIT: "+unit);	
 			} 
 			else
 				skip(parser);
 
 		}
-		return new DisplayValueBlock(namn, type, label,
+		return new DisplayValueBlock(namn, type, label,unit,
 				variable,containerId);
 	}
 

@@ -72,6 +72,10 @@ public class VarIdentifier {
 		return this.id;
 	}
 	public String getPrintedUnit() {
+		return getPrintedUnit(unit);
+	}
+	
+	public static String getPrintedUnit(Unit unit) {
 		if (unit == Unit.percentage)
 			return "%";
 		if (unit == Unit.nd)
