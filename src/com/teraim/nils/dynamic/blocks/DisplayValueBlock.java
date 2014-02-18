@@ -1,8 +1,9 @@
 package com.teraim.nils.dynamic.blocks;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
-import android.widget.TextView;
+import android.widget.LinearLayout;
 
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
@@ -16,17 +17,16 @@ import com.teraim.nils.dynamic.workflow_realizations.WF_Event_OnSave;
 public class DisplayValueBlock extends Block implements EventGenerator {
 
 	private static final long serialVersionUID = 9151756426062334462L;
-	String namn, type, label,variable, containerId;
+	String namn,  label,formula, containerId;
 	Unit unit;
 	GlobalState gs;
 	
-	public DisplayValueBlock(String namn, String type, String label,Unit unit,
-			String variable, String containerId) {
+	public DisplayValueBlock(String namn, String label,Unit unit,
+			String formula, String containerId) {
 		this.unit=unit;
-		this.namn=namn;
-		this.type=type;
+		this.namn=namn;;
 		this.label=label;
-		this.variable=variable;
+		this.formula=formula;
 		this.containerId=containerId;
 	}
 
@@ -34,10 +34,17 @@ public class DisplayValueBlock extends Block implements EventGenerator {
 		gs = GlobalState.getInstance(myContext.getContext());
 		o=gs.getLogger();
 		Container myContainer = myContext.getContainer(containerId);
+		if (myContainer != null) {
 		final Context ctx = myContext.getContext();
-		TextView tv = (TextView) LayoutInflater.from(ctx).inflate(R.layout.display_value_textview,null);
-		WF_DisplayValueField vf = new WF_DisplayValueField(namn,tv,variable,myContext,unit);
+		LinearLayout tv = (LinearLayout) LayoutInflater.from(ctx).inflate(R.layout.display_value_textview,null);
+		WF_DisplayValueField vf = new WF_DisplayValueField(namn,tv,formula,myContext,unit,label);
 		myContainer.add(vf);
 		vf.onEvent(new WF_Event_OnSave(null));
+		} else {
+			Log.d("nils","ContainerID: "+containerId);
+			o.addRow("");
+			o.addRedText("Could not find container for DisplayValueBlcok with name (container): "+containerId+" (block): "+namn);
+		}
+			
 	}
 }

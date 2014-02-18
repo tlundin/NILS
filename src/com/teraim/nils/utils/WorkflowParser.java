@@ -150,13 +150,14 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 		List<Workflow> bundle = new ArrayList<Workflow>();
 		parser.require(XmlPullParser.START_TAG, null, "bundle");
 		String version = parser.getAttributeValue(null, "version");
-		if(version.equals(ph.get(PersistenceHelper.CURRENT_VERSION_OF_WF_BUNDLE))) {
-			o.addRow("This is the same version...no need to update");
-			throw new SameOldException();
-		} else {
-			o.addRedText("Current workflow bundle version"+ph.get(PersistenceHelper.CURRENT_VERSION_OF_WF_BUNDLE));
-			myVersion = version;
-		}
+		o.addRow("File workflow bundle version: ");o.addYellowText(version);
+		if (ph.getB(PersistenceHelper.VERSION_CONTROL_SWITCH_OFF)) {
+			o.addRow("Version control is switched off.");
+		} else 
+			if(version.equals(ph.get(PersistenceHelper.CURRENT_VERSION_OF_WF_BUNDLE))) 			
+			throw new SameOldException();		
+		o.addRow("Saved workflow bundle version: ");o.addYellowText(ph.get(PersistenceHelper.CURRENT_VERSION_OF_WF_BUNDLE));
+		myVersion = version;		
 		while (parser.next() != XmlPullParser.END_TAG) {
 			if (parser.getEventType() != XmlPullParser.START_TAG) {
 				Log.d("NILS","Skipping "+parser.getName());
@@ -250,8 +251,8 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 					blocks.add(readBlockCreateListEntries(parser));
 				else if (name.equals("block_create_entry_field")) 
 					blocks.add(readBlockCreateEntryField(parser));
-				else if (name.equals("block_display_value"))
-					blocks.add(readBlockDisplayValue(parser));
+				else if (name.equals("block_create_display_field"))
+					blocks.add(readBlockCreateDisplayField(parser));
 				else
 					skip(parser);
 			} catch (EvalException e) {
@@ -264,11 +265,11 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 	}
 
 
-	private DisplayValueBlock readBlockDisplayValue(XmlPullParser parser)throws IOException, XmlPullParserException {
-		o.addRow("Parsing block: block_display_value...");
-		String namn=null, type=null, label=null,variable=null,containerId=null;
+	private DisplayValueBlock readBlockCreateDisplayField(XmlPullParser parser)throws IOException, XmlPullParserException {
+		o.addRow("Parsing block: block_create_display_field...");
+		String namn=null, formula = null, label=null,containerId=null;
 		Unit unit=null;	
-		parser.require(XmlPullParser.START_TAG, null,"block_display_value");
+		parser.require(XmlPullParser.START_TAG, null,"block_create_display_field");
 		while (parser.next() != XmlPullParser.END_TAG) {
 			if (parser.getEventType() != XmlPullParser.START_TAG) {
 				continue;
@@ -278,19 +279,16 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 			if (name.equals("label")) {
 				label = readText("label",parser);
 				o.addRow("LABEL: "+label);
-			} else if (name.equals("type")) {
-				type = readText("type",parser);
-				o.addRow("TYPE: "+type);							
+			} else if (name.equals("expression")) {
+				formula = readText("expression",parser);
+				o.addRow("EXPRESSION (formula): "+formula);							
 			} else if (name.equals("name")) {
 				namn = readText("name",parser);
 				o.addRow("NAME: "+namn);			
 			} else if (name.equals("container_name")) {
 				containerId = readText("container_name",parser);
 				o.addRow("CONTAINER_NAME: "+containerId);
-			} else if (name.equals("variable")) {
-				variable = readText("variable",parser); 
-				o.addRow("VARIABLE: "+variable);
-			} else if (name.equals("unit")) {
+			}  else if (name.equals("unit")) {
 				unit = Tools.convertToUnit(readText("unit",parser));
 				o.addRow("UNIT: "+unit);	
 			} 
@@ -298,15 +296,15 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 				skip(parser);
 
 		}
-		return new DisplayValueBlock(namn, type, label,unit,
-				variable,containerId);
+		return new DisplayValueBlock(namn, label,unit,
+				formula,containerId);
 	}
 
 
 
 	private CreateEntryFieldBlock readBlockCreateEntryField(XmlPullParser parser)throws IOException, XmlPullParserException {
 		o.addRow("Parsing block: block_create_entry_field...");
-		String namn=null, type=null, label=null,purpose=null,containerId=null;
+		String namn=null, label=null,containerId=null,postLabel="";
 		Unit unit = Unit.nd;		
 		parser.require(XmlPullParser.START_TAG, null,"block_create_entry_field");
 		while (parser.next() != XmlPullParser.END_TAG) {
@@ -318,32 +316,22 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 			if (name.equals("label")) {
 				label = readText("label",parser);
 				o.addRow("LABEL: "+label);
-			} else if (name.equals("type")) {
-				type = readText("type",parser);
-				o.addRow("TYPE: "+type);
-				if (!type.equals("numeric")) {
-					o.addRow("");
-					o.addRedText("EntryField ONLY supports NUMERIC!");
-				}				
-			} else if (name.equals("name")) {
+			}  else if (name.equals("name")) {
 				namn = readText("name",parser);
 				o.addRow("NAME: "+namn);			
 			} else if (name.equals("container_name")) {
 				containerId = readText("container_name",parser);
 				o.addRow("CONTAINER_NAME: "+containerId);
-			} else if (name.equals("purpose")) {
-				purpose = readText("purpose",parser); 
-				o.addRow("PURPOSE: "+purpose);
-			} else if (name.equals("unit")) {
-				unit = Tools.convertToUnit(readText("unit",parser));
+			} 
+			  else if (name.equals("unit")) {
+				  postLabel = readText("unit",parser);
 				o.addRow("UNIT: "+unit.name());
 			}
 			else
 				skip(parser);
-
 		}
-		return new CreateEntryFieldBlock(namn, type, label,
-				purpose, unit,containerId);
+		return new CreateEntryFieldBlock(namn, label,
+				postLabel, containerId);
 	}
 
 	/**
@@ -432,7 +420,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 	 * @throws XmlPullParserException
 	 */
 	private AddSumOrCountBlock readBlockAddSelectionOrSum(XmlPullParser parser,boolean isCount) throws IOException, XmlPullParserException {
-		String containerName=null,label=null,filter=null,target=null;
+		String containerName=null,label=null,postLabel = null,filter=null,target=null,result=null;
 		WF_Not_ClickableField_SumAndCountOfVariables.Type type;
 
 		if (isCount)
@@ -468,13 +456,22 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 			}
 			else if (name.equals("target")) {
 				target = readText("target",parser);
-				o.addRow("TARGET: "+target);
-			}	
+				o.addRow("TARGET list: "+target);
+			}
+			else if (name.equals("unit")) {
+				postLabel = readText("unit",parser);
+				o.addRow("UNIT (postLabel): "+postLabel);
+			}
+			else if (name.equals("result")) {
+				result = readText("result",parser);
+				o.addRow("RESULT Variable: "+result);
+			}
+			
 			else
 				skip(parser);
 
 		}
-		return new AddSumOrCountBlock(containerName,label,filter,target,type);
+		return new AddSumOrCountBlock(containerName,label,postLabel,filter,target,type,result);
 	}	
 
 	/*

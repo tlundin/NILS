@@ -37,7 +37,7 @@ import com.teraim.nils.utils.WorkflowParser;
 
 public class Start extends MenuActivity {
 
-	private final String NILS_VERSION = "0.11";
+	private final String NILS_VERSION = "0.13";
 
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
@@ -162,7 +162,7 @@ public class Start extends MenuActivity {
 			loginConsole.clear();
 			loginConsole.addRow("NILS VERSION ");
 			loginConsole.addYellowText("["+NILS_VERSION+"]");
-			loginConsole.addRow("New features: Swipeable fragments.");
+			loginConsole.addRow("New features: Swipeable fragments. Fixpunkter i provyta.");
 
 
 			//If network, go and check for new files.
@@ -382,7 +382,7 @@ public class Start extends MenuActivity {
 		else
 			fragment = new Fragment();
 		Bundle args = new Bundle();
-		args.putString("workflow_name", mapItemsToName.get(position));
+		args.putString("workflow_name", wfId);
 		fragment.setArguments(args);
 
 		// Insert the fragment by replacing any existing fragment
@@ -391,7 +391,6 @@ public class Start extends MenuActivity {
 		.replace(R.id.content_frame, fragment)
 		.addToBackStack(null)
 		.commit();
-		setTitle("Ändra inställningar");
 		mDrawerLayout.closeDrawer(mDrawerList);
 		setTitle(wfId);
 	}
@@ -447,10 +446,11 @@ public class Start extends MenuActivity {
 		if (ph.get(PersistenceHelper.SERVER_URL).equals(PersistenceHelper.UNDEFINED))
 			ph.put(PersistenceHelper.SERVER_URL, "www.teraim.com");
 		if (ph.get(PersistenceHelper.BUNDLE_LOCATION).equals(PersistenceHelper.UNDEFINED))
-			ph.put(PersistenceHelper.BUNDLE_LOCATION, "nb_terje.xml");
+			ph.put(PersistenceHelper.BUNDLE_LOCATION, "nilsbundle3.xml");
 		if (ph.get(PersistenceHelper.CONFIG_LOCATION).equals(PersistenceHelper.UNDEFINED))
 			ph.put(PersistenceHelper.CONFIG_LOCATION, "config.csv");
 		ph.put(PersistenceHelper.DEVELOPER_SWITCH,true);
+		ph.put(PersistenceHelper.VERSION_CONTROL_SWITCH_OFF, true);
 		ph.put(PersistenceHelper.CURRENT_RUTA_ID_KEY, "262");
 		ph.put(PersistenceHelper.CURRENT_PROVYTA_ID_KEY, "6");
 		ph.put(PersistenceHelper.CURRENT_DELYTA_ID_KEY, "1");

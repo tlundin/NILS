@@ -83,12 +83,16 @@ public class VariableConfiguration {
 
 	public Variable.DataType getnumType(List<String> row) {
 		String type = row.get(fromNameToColumn.get(requiredColumns.get(NUM_TYPE)));
+		if (type!=null) {
+		type.trim();
 		return type.equals("number")?
 				Variable.DataType.numeric:(type.equals("boolean")?
 				Variable.DataType.bool:(type.equals("list")?
-				Variable.DataType.list:(type.equals("number")?
+				Variable.DataType.list:(type.equals("numeric")?
 				Variable.DataType.numeric:
 				Variable.DataType.text)));
+		}
+		return null;
 	}
 
 	public Variable.StorageType getVarType(List<String> row) {
@@ -103,6 +107,10 @@ public class VariableConfiguration {
 
 	public Unit getUnit(List<String> row) {
 		return Tools.convertToUnit(row.get(fromNameToColumn.get(requiredColumns.get(UNIT))));
+	}
+
+	public List<String> getCompleteVariableDefinition(String varName) {
+		return myTable.getRowContaining(Col_Variable_Name,varName);
 	}
 	
 	

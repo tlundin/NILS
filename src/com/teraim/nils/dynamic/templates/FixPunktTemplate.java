@@ -3,23 +3,26 @@ package com.teraim.nils.dynamic.templates;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.FragmentTransaction;
 import android.gesture.Gesture;
 import android.gesture.GestureLibraries;
 import android.gesture.GestureLibrary;
 import android.gesture.GestureOverlayView;
-import android.gesture.Prediction;
 import android.gesture.GestureOverlayView.OnGesturePerformedListener;
+import android.gesture.Prediction;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.teraim.nils.R;
 import com.teraim.nils.dynamic.Executor;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Container;
+import com.teraim.nils.statics.FixPunktFragment;
 
 
 public class FixPunktTemplate extends Executor implements OnGesturePerformedListener {
@@ -46,7 +49,7 @@ public class FixPunktTemplate extends Executor implements OnGesturePerformedList
 		myLayouts.add(root);
 		myLayouts.add(new WF_Container("Field_List_panel_1", (LinearLayout)v.findViewById(R.id.fieldList), root));
 		myLayouts.add(new WF_Container("Aggregation_panel_3", (LinearLayout)v.findViewById(R.id.aggregates), root));
-		myLayouts.add(new WF_Container("Description_panel_1", (LinearLayout)v.findViewById(R.id.Description), root));
+		myLayouts.add(new WF_Container("Description_panel_1", (FrameLayout)v.findViewById(R.id.Description), root));
 		myContext.addContainers(getContainers());
 
 		
@@ -103,9 +106,13 @@ public class FixPunktTemplate extends Executor implements OnGesturePerformedList
 	      if (prediction.score > .5) {
 	  		Log.d("nils","MATCH!!");
 	  		if (prediction.name.equals("left")) {
-				Toast.makeText(getActivity(), "LEFT", Toast.LENGTH_LONG).show();
+	  			final FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction(); 
+	  			FixPunktFragment gs = new FixPunktFragment();  			
+	  			ft.replace(R.id.content_frame, gs);
+	  			ft.addToBackStack(null);
+	  			ft.commit(); 
 	  		} else 
-				Toast.makeText(getActivity(), "RIGHT", Toast.LENGTH_LONG).show();
+				Toast.makeText(getActivity(), "bättre kan du", Toast.LENGTH_SHORT).show();
 	  			
 	      }
 	    }		

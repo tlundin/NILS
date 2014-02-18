@@ -39,10 +39,13 @@ public class Table implements Serializable {
 	
 	public ErrCode addRow(List<String> rowEntries) {
 		int index=0;
+		if (rowEntries == null||rowEntries.size()==0)
+			return ErrCode.tooFewColumns;
 		int size = rowEntries.size();
-
+		
 		if (size > myColumns.length)
 			return ErrCode.tooManyColumns;
+		
 		for(String entry:rowEntries) 
 			colTable.get(myColumns[index++]).add(entry);
 		rowTable.put(rowCount++, rowEntries);
@@ -51,6 +54,8 @@ public class Table implements Serializable {
 //			return ErrCode.tooFewColumns;
 		return ErrCode.ok;
 	}
+	//TODO: Change for more complex keys.
+	final static String VAR_KEY_COL = VariableConfiguration.Col_Variable_Name;
 
 
 	public List<String> getColumn(String columnName) {
@@ -63,12 +68,14 @@ public class Table implements Serializable {
 
 	public List<List<String>> getRowsContaining(String columnName, String pattern) {
 		Log.d("nils","Trying to find rows matching column "+columnName+" and pattern "+pattern);
+	
 		List<List<String>> ret = null;
 		List<String> column = colTable.get(columnName);
-		if(column!=null) {
+		if(column!=null && pattern!=null) {
+			pattern.trim();
 			for(int i = 0;i<column.size();i++) {
 				Log.d("nils","i: "+i+" col: "+column.get(i));
-				if (column.get(i).equalsIgnoreCase(pattern)||column.get(i).matches(pattern)) {
+				if (equalsIgnoreAll(column.get(i),pattern)||column.get(i).matches(pattern)) {
 					if (ret == null)
 						ret = new ArrayList<List<String>>();
 					ret.add(rowTable.get(i));
@@ -89,14 +96,26 @@ public class Table implements Serializable {
 
 	public List<String> getRowContaining(String columnName,
 			String key) {
+		if (key==null)
+			return null;
 		List<String> column = colTable.get(columnName);
-		for(int i = 0;i<column.size();i++) 
-			if (column.get(i).equalsIgnoreCase(key)) {
-				//Log.d("nils","found master variable "+key+" in Artlista");
+
+		for(int i = 0;i<column.size();i++) {
+			if (equalsIgnoreAll(column.get(i),key.trim())) {
+				Log.d("nils","found master variable "+key+" in Artlista");
 				return rowTable.get(i);
 			}
+			//Log.d("nils","nomatch: "+column.get(i)+" "+key+" l1: "+column.get(i).length()+" "+"l2:"+key.length());
+		}
+		
 		Log.d("nils","Did not find master variable "+key+" in Artlista column: "+columnName);
 		return null;
+	}
+
+	private boolean equalsIgnoreAll(String string, String key) {
+		string = string.trim();
+		return (string.equalsIgnoreCase(key));
+			
 	}
 
 	public String getElement(String columnName,List<String> row) {
@@ -109,6 +128,8 @@ public class Table implements Serializable {
 			Log.d("nils","Did NOT find field "+columnName+" in class Table");
 		return result;
 	}
+	
+	
 
 
 }

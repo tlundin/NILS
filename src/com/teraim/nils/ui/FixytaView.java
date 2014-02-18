@@ -22,30 +22,32 @@ import com.teraim.nils.utils.Geomatte;
  * 
  * This class is used to draw a Provyta with all its parts (delytor)
  */
-public class ProvytaView extends View {
+public class FixytaView extends View {
 
 
 
-	private Paint p = new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
 
 	private Paint px = new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
-
 	private Paint pl = new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
-	private Paint p50 = new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
-	private Paint p100 = new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
 
-	private Marker focusMarker;
+	private Paint p = new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
+	private Paint p20 = new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
+	private Paint p50 = new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
+	
+	private MovingMarker user = null;
+	private Marker[] fixpunkter;
 	private String msg = "";
 
 	//private Path tag = new Path();
 
+	public void setFixedMarkers (Marker[] fixpunkter) {
+		this.fixpunkter=fixpunkter;
+	}
 
-	public ProvytaView(Context context, AttributeSet attrs, Marker focusMarker) {
+	public FixytaView(Context context, AttributeSet attrs) {
 		super(context,attrs);
 
 
-		p.setColor(Color.BLACK);
-		p.setStyle(Style.STROKE);
 		px.setColor(Color.DKGRAY);
 		px.setTypeface(Typeface.SANS_SERIF);
 
@@ -55,30 +57,29 @@ public class ProvytaView extends View {
 		pl.setTypeface(Typeface.DEFAULT_BOLD); 
 		pl.setTextSize(25);
 
-		p50.setColor(Color.BLUE);
-		p50.setStrokeWidth(2);
+
+		p.setColor(Color.BLACK);
+		p.setStyle(Style.STROKE);
+
+		p20.setColor(Color.BLUE);
+		p20.setStrokeWidth(2);
+		p20.setStyle(Style.STROKE);		
+		p20.setTypeface(Typeface.SANS_SERIF); 
+
+
+		p50.setColor(Color.RED);
+		p50.setStrokeWidth(3);
 		p50.setStyle(Style.STROKE);
-		
 		p50.setTypeface(Typeface.SANS_SERIF); 
-		
 
-		p100.setColor(Color.RED);
-		p100.setStrokeWidth(3);
-		p100.setStyle(Style.STROKE);
-		p100.setTypeface(Typeface.SANS_SERIF); 
 
-		//user = new MovingMarker(BitmapFactory.decodeResource(context.getResources(),
-		//		R.drawable.gps_pil));
-		this.focusMarker=focusMarker;
-		
+
 	}
 
 
-
-
 	final double innerRealRadiusInMeter = 10;
-	final double midRealRadiusInMeter = 50;
-	final double realRadiusinMeter = 100;
+	final double midRealRadiusInMeter = 20;
+	final double realRadiusinMeter = 50;
 	double rScaleF=0,oScaleF=0;
 
 	@Override
@@ -86,82 +87,55 @@ public class ProvytaView extends View {
 		super.onDraw(canvas);			
 		int w = getWidth();
 		int h = getHeight();
-
 		double r;
 		int cy;
 		int cx;
 		r=(w>=h)?((h/2)-h*.1):((w/2)-w*.1);
 		cx = w/2;
 		cy = h/2;
-		//tag.lineTo(w-50,0);
-		//Log.d("NILS","w h r"+w+" "+h+" "+r);
 		oScaleF = r/realRadiusinMeter;
 		//A dot in the middle!
 		canvas.drawPoint(cx, cy, p);
 
-		if (focusMarker.getDistance()>midRealRadiusInMeter) {
-			canvas.drawCircle(cx, cy,(int)r, p100);
-			canvas.drawCircle(cx, cy,(float)(50.0*oScaleF), p50);
-			canvas.drawCircle(cx, cy,(float)(10.0*oScaleF), p);
-			rScaleF = oScaleF;
-			canvas.drawText("100",(int)(cx+r)-25, cy, p100);
-			canvas.drawText("50",(int)(cx+(50.0*oScaleF))-20, cy, p50);
-			canvas.drawText("10",(int)(cx+(10.0*oScaleF))-15, cy, p);
-		} else 
-		if (focusMarker.getDistance()>innerRealRadiusInMeter) {
-			rScaleF = r/midRealRadiusInMeter;
-			canvas.drawCircle(cx, cy,(int)r, p50);
-			canvas.drawCircle(cx, cy,(float)(10.0*rScaleF), p);		
-			canvas.drawText("50",(int)(cx+r)-25, cy, p50);
-			canvas.drawText("10",(int)(cx+(10.0*rScaleF))-15, cy, p);
-
-		} else {
-			canvas.drawCircle(cx, cy,(int)r, p);
-			rScaleF = r/innerRealRadiusInMeter;
-			canvas.drawText("10",(int)(cx+r)-15, cy, p);
-			if (delar !=null)
-				drawTag(canvas,cx,cy);
-		}		
-
+		canvas.drawCircle(cx, cy,(int)r, p50);
+		canvas.drawCircle(cx, cy,(float)(20.0*oScaleF), p20);
+		canvas.drawCircle(cx, cy,(float)(10.0*oScaleF), p);
+		rScaleF = oScaleF;
+		canvas.drawText("50",(int)(cx+r)-25, cy, p);
+		canvas.drawText("20",(int)(cx+(20.0*oScaleF))-20, cy, p);
+		canvas.drawText("10",(int)(cx+(10.0*oScaleF))-15, cy, p);
 		canvas.drawText("N",cx,(float)(h*.1), pl);
 
-		//canvas.drawLine(0, 0, w, h, p);
-		// canvas.drawPath(tag,p);
-		//mDrawable.draw(canvas);
-		//canvas.drawPath(tag, p);
-		if (focusMarker.hasPosition()) {
-			double alfa;
-			//Log.d("NILS","Blue has position");
-			if(focusMarker.getDistance()<realRadiusinMeter) {
-				alfa = focusMarker.getMovementDirection();
-				float degAlfa = (float)(180*alfa/Math.PI);
-				int ux = (int) (cx-focusMarker.x*rScaleF);
-				//icon is a rotating arrow. Get it to point exavtly on x,y.
-				int iconx = (int)(Marker.Pic_H/2+Marker.Pic_H *  Math.sin(alfa));
-				ux = ux - iconx;
-				//inverted north/south
-				int uy = (int) (cy+focusMarker.y*rScaleF);
-				int icony = (int)(MovingMarker.Pic_H/2+MovingMarker.Pic_H *  Math.cos(alfa));
-				uy = uy + icony;
-				//Log.d("NILS","iconx icony "+iconx+" "+icony);
-				canvas.save();
-				canvas.rotate(180+degAlfa, ux, uy);
-				canvas.drawBitmap(focusMarker.bmp, ux, uy, null);
-				canvas.restore();
-				msg = "X: "+ux+" Y: "+uy+" icX: "+(-iconx)+" icY: "+icony;
-			} else {
-				//Log.d("NILS","Blue is outside radius");
-				//Given that blue is outside current Max Radius, draw an arrow to indicate where..
-				alfa = Geomatte.getRikt2(focusMarker.y, focusMarker.x,0,0);
-				float x = (float)(cx + r * Math.sin(alfa));
-				float y =  (float)(cy - r * Math.cos(alfa));
-				canvas.save();
-				canvas.rotate((float)(180+(180*alfa/Math.PI)), x, y);
-				canvas.drawBitmap(focusMarker.bmp, x, y, null);
-				canvas.restore();
-				//TODO:
-				//If last value closer than this value, draw arrow pointing towards middle
-			} 
+		for(Marker focusMarker:fixpunkter) {
+			if (focusMarker.hasPosition()) {
+				double alfa;
+				//Log.d("NILS","Blue has position");
+				if(focusMarker.getDistance()<realRadiusinMeter) {
+					alfa = focusMarker.getMovementDirection();
+					int ux = (int) (cx-focusMarker.x*rScaleF);
+					int iconx = (int)(Marker.Pic_H/2+Marker.Pic_H *  Math.sin(alfa));
+					ux = ux - iconx;
+					int uy = (int) (cy+focusMarker.y*rScaleF);
+					int icony = (int)(MovingMarker.Pic_H/2+MovingMarker.Pic_H *  Math.cos(alfa));
+					uy = uy + icony;
+//					canvas.save();
+					canvas.drawBitmap(focusMarker.bmp, ux, uy, null);
+//					canvas.restore();
+					msg = "X: "+ux+" Y: "+uy+" icX: "+(-iconx)+" icY: "+icony;
+				} else {
+					//Log.d("NILS","Blue is outside radius");
+					//Given that blue is outside current Max Radius, draw an arrow to indicate where..
+					alfa = Geomatte.getRikt2(focusMarker.y, focusMarker.x,0,0);
+					float x = (float)(cx + r * Math.sin(alfa));
+					float y =  (float)(cy - r * Math.cos(alfa));
+					canvas.save();
+					canvas.rotate((float)(180+(180*alfa/Math.PI)), x, y);
+					canvas.drawBitmap(focusMarker.bmp, x, y, null);
+					canvas.restore();
+					//TODO:
+					//If last value closer than this value, draw arrow pointing towards middle
+				} 
+			}
 		}
 
 		//Msg in top.
@@ -169,7 +143,7 @@ public class ProvytaView extends View {
 			canvas.drawText(msg, cx-msg.length()*3, (float)(h*.1+30), px);
 
 		//update other fixpoints.
-		
+
 
 	}
 
@@ -202,7 +176,7 @@ public class ProvytaView extends View {
 				if (del !=null) {
 					tst = del.getPoints();
 					//Log.d("NILS", "Tågets size is "+tst.length);
-					
+
 					if (tst!=null && tst.length>1) {
 						for (int i=0;i<tst.length;i++) {
 							//avstånd från cirkelns mitt;
@@ -242,20 +216,6 @@ public class ProvytaView extends View {
 								c.drawLine(xy[i-1][0], xy[i-1][1],x,y, p);
 							}
 
-							/*if (isArc) {
-						float avgX = Math.abs((xy[i][0]+xy[i-1][0])/2);
-						float avgY = Math.abs((xy[i][1]+xy[i-1][1])/2);
-						Log.d("NILS","isArch i"+isArc+" "+i);
-						c.drawText(Integer.toString(i), avgX, avgY, p);
-					}
-							 */
-
-
-							/*if(i==0)
-						tag.moveTo(x, y);
-						else
-							tag.lineTo(x, y);
-							 */
 						}
 
 					}
@@ -272,18 +232,10 @@ public class ProvytaView extends View {
 
 
 
-	public void showUser(String deviceColor, Location arg0, double alfa,
-			double dist) {
-		// TODO Auto-generated method stub
-
-	}
-
-
-
 
 	public void showUser(String deviceColor, int wx, int wy,int dist) {
 
-		focusMarker.set(wx,wy,dist);
+		user.set(wx,wy,dist);
 
 	}
 
@@ -296,6 +248,7 @@ public class ProvytaView extends View {
 
 
 
+	
 
 
 

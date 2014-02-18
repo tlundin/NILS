@@ -112,16 +112,20 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 				}
 				else {
 					myVersion = vers[1];
-					if (myVersion.equals(ph.get(PersistenceHelper.CURRENT_VERSION_OF_CONFIG_FILE))) {
-						o.addRow("No need to parse...no changes ");
-						br.close();
-						return ErrorCode.sameold;
-					}
+					o.addRow("Config file version: ");o.addYellowText(myVersion);
+					if (ph.getB(PersistenceHelper.VERSION_CONTROL_SWITCH_OFF)) {
+						o.addRow("Version control is switched off.");
+					} else
+						if (myVersion.equals(ph.get(PersistenceHelper.CURRENT_VERSION_OF_CONFIG_FILE))) {
+							o.addRow("No need to parse...no changes ");
+							br.close();
+							return ErrorCode.sameold;
+						}
 
 				}				
 			}
 			header = br.readLine();
-			
+
 			o.addRow("File header reads:["+header+"]");
 			if (header != null) {			
 				myTable = new Table(header.split(","));
@@ -137,7 +141,7 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 						if (e!=ErrCode.ok) {
 							o.addRow("");
 							if (e==ErrCode.tooFewColumns) 
-								o.addRedText("Too few columns on line: "+rowC);
+								o.addRedText("First element empty or corrupt on line: "+rowC+" Row:"+Arrays.asList(r).toString());
 							else
 								o.addRedText("Too many columns on line: "+rowC);	
 						}
@@ -147,9 +151,9 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 			} else {
 				return ErrorCode.parseError;
 			}
-			o.addText("Adding additional Variables to Table: AntalArter, SumTackning");
-			myTable.addRow(Arrays.asList("EE0020,AntalArter,Antal Arter,,,,TRUE,st,delyta,,,,,,,,".split(",")));
-			myTable.addRow(Arrays.asList("EE0030,SumTackning,Summa Täckning,,,,TRUE,%,delyta,,,,,,,,".split(",")));
+			//o.addText("Adding additional Variables to Table: AntalArter, SumTackning");
+			//myTable.addRow(Arrays.asList("EE0020,AntalArter,Antal Arter,,,,TRUE,st,delyta,,,,,,,,".split(",")));
+			//myTable.addRow(Arrays.asList("EE0030,SumTackning,Summa Täckning,,,,TRUE,%,delyta,,,,,,,,".split(",")));
 			br.close();			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

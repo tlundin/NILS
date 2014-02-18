@@ -1,12 +1,12 @@
 package com.teraim.nils.dynamic.types;
 
 import android.graphics.Bitmap;
-
-import com.teraim.nils.utils.Geomatte;
+import android.util.Log;
 
 public class Marker {
 	public final static float Pic_H = 32;
 	public int x,y;
+	public int riktning;
 	public int dist;
 	public Bitmap bmp;
 
@@ -30,6 +30,18 @@ public class Marker {
 
 	public double getMovementDirection() {
 		return 0;
+	}
+
+	public void setValue(String avst, String rikt) {
+		if(avst==null||rikt==null||avst.length()==0||rikt.length()==0) {
+			Log.d("nils","null or empty in setValue Marker class");
+			return;
+		}
+		dist = Integer.parseInt(avst);
+		riktning = Integer.parseInt(rikt);
+		
+		x=(int)(dist*Math.cos(riktning));
+		y=(int)(dist*Math.sin(riktning));
 	}
 }
 

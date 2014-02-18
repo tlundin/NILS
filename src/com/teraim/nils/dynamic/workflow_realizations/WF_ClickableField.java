@@ -123,13 +123,18 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 	}
 
 	@Override
-	public void addVariable(String varLabel, String varId, Unit unit, Variable.DataType numType, Variable.StorageType varType, boolean displayOut) {
+	public void addVariable(String varLabel, String postLabel, String varId, Unit unit, Variable.DataType numType, Variable.StorageType varType, boolean displayOut) {
 
+		if (numType == null) {
+			o.addRow("");
+			o.addRedText("Numtype was null. Cannot add variable "+varLabel);
+			return;
+		}
 		if (displayOut && virgin) {
 			virgin = false;
 			super.setKeyRow(varId);
 		}
-
+		
 		// Set an EditText view to get user input 
 		VarIdentifier varIdentifier = new VarIdentifier(ctx,varLabel,varId,numType,varType,unit);
 
@@ -139,7 +144,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 			o.addRow("Adding boolean dy-variable with label "+label+", name "+varId+", type "+numType.name()+" and unit "+unit.name());
 			View view = LayoutInflater.from(ctx).inflate(R.layout.ja_nej_radiogroup,null);
 			TextView header = (TextView)view.findViewById(R.id.header);
-			header.setText(varLabel);
+			header.setText(varLabel+" "+postLabel);
 			RadioGroup rbg = (RadioGroup)view.findViewById(R.id.radioG);
 			inputContainer.addView(view);
 			myVars.put(varIdentifier,rbg);
@@ -147,7 +152,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 		case list:
 			//Get the list values
 			Table t = gs.getArtLista().getTable();
-			List<String> row = t.getRowContaining("Variable Name", varId);
+			List<String> row = gs.getArtLista().getCompleteVariableDefinition(varId);
 			String options = t.getElement("List Values", row);
 			String[] opt = null;
 			if (options == null||options.isEmpty()) {
@@ -173,7 +178,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 			o.addRow("Adding text field for dy-variable with label "+label+", name "+varId+", type "+numType.name()+" and unit "+unit.name());
 			View l = LayoutInflater.from(ctx).inflate(R.layout.edit_field_text,null);
 			header = (TextView)l.findViewById(R.id.header);
-			header.setText(varLabel);
+			header.setText(varLabel+" "+postLabel);
 			EditText etview = (EditText)l.findViewById(R.id.edit);
 			inputContainer.addView(l);
 			myVars.put(varIdentifier,etview);			
@@ -183,7 +188,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 			l = LayoutInflater.from(ctx).inflate(R.layout.edit_field_numeric,null);
 			header = (TextView)l.findViewById(R.id.header);
 			etview = (EditText)l.findViewById(R.id.edit);
-			header.setText(varLabel+" ("+varIdentifier.getPrintedUnit()+")");
+			header.setText(varLabel+" ("+varIdentifier.getPrintedUnit()+")"+" "+" "+postLabel);
 			etview.setText(varIdentifier.getPrintedValue());
 			inputContainer.addView(l);
 			myVars.put(varIdentifier,etview);

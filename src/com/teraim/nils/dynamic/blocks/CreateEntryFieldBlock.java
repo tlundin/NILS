@@ -20,20 +20,16 @@ public class CreateEntryFieldBlock extends Block {
 	 * 
 	 */
 	private static final long serialVersionUID = 2013870148670474248L;
-	private static final String selectionField = VariableConfiguration.Col_Variable_Name;
-	String name,type,label,purpose,containerId;
+	String name,type,label,containerId,postLabel;
 	Unit unit;
-	private String id;
-	private WF_List_UpdateOnSaveEvent myList;
-
-	public CreateEntryFieldBlock(String name, String type, String label,
-			String purpose, Unit unit,String containerId) {
+	GlobalState gs;
+	
+	public CreateEntryFieldBlock(String name, String label,
+			String postLabel,String containerId) {
 		super();
 		this.name = name;
-		this.type = type;
 		this.label = label;
-		this.purpose = purpose;
-		this.unit = unit;
+		this.postLabel=postLabel;
 		this.containerId=containerId;
 	}
 
@@ -44,12 +40,7 @@ public class CreateEntryFieldBlock extends Block {
 		return name;
 	}
 
-	/**
-	 * @return the type
-	 */
-	public String getType() {
-		return type;
-	}
+
 
 	/**
 	 * @return the label
@@ -58,70 +49,33 @@ public class CreateEntryFieldBlock extends Block {
 		return label;
 	}
 
-	/**
-	 * @return the purpose
-	 */
-	public String getPurpose() {
-		return purpose;
-	}
 
-	/**
-	 * @return the unit
-	 */
-	public Unit getUnit() {
-		return unit;
-	}
+	
 
 	
 
 	public void create(WF_Context myContext) {
-		o = GlobalState.getInstance(myContext.getContext()).getLogger();
-		boolean success = false;
-		VariableConfiguration al = GlobalState.getInstance(myContext.getContext()).getArtLista();
-		List<List<String>>rows = al.getTable().getRowsContaining(selectionField, name);
-		if (rows!=null) {
-			o.addRow("Found row in table for selectionField: "+selectionField+" and name: "+name);
-			Container myContainer = myContext.getContainer(containerId);
-
-/*
-				myList = new WF_List_UpdateOnSaveEvent(name,myContext);
-				myList.createEntriesFromRows(rows);
-				myList.draw();
-				
-				if (myContainer !=null) {
-					myContainer.add(myList);
-					myContext.addList(myList);		
-				} else
-					Log.e("nils","failed to parse listEntriesblock - could not find the container");
-*/
-				
-			//TODO: ONly supports numeric!!
-			List<String> r = rows.get(0);
-
-			if (r!=null) {
- 
-				WF_ClickableField_Selection myField = new WF_ClickableField_Selection(al.getEntryLabel(r),al.getDescription(r),myContext,name);
-				
-				if (myField !=null) {
-					myField.addVariable(label,name, unit,Variable.DataType.numeric, Variable.StorageType.delyta, true);
-					if(myContainer !=null) {
-						myContainer.add(myField);
-						myField.refreshInputFields();
-						success = true;
-					}
-				}
-			} else {
-				o.addRow("");
-				o.addRedText("Strangely enough the row turns out to be empty?");				
-			}
-				
-		} else {
+		gs = GlobalState.getInstance(myContext.getContext());
+		Container myContainer = myContext.getContainer(containerId);
+		o = gs.getLogger();
+		VariableConfiguration al = gs.getArtLista();
+		WF_ClickableField_Selection myField = new WF_ClickableField_Selection(label,"This description has no tag in the xml for block_create_entry_field",myContext,name);
+		Log.d("nils","NAME: "+name);
+		List<String> row = al.getCompleteVariableDefinition(name);
+		if (row == null) {
 			o.addRow("");
-			o.addRedText("Could not create EntryField for selectionfield: "+selectionField+" and name: "+name+".\nNo row matches in variable table");
+			o.addRedText("Variable "+name+" not found in definition file for CreateEntryBlock");
+		} else	{	
+			for (String s:row)
+				Log.d("nils","s: "+s);
+			myField.addVariable(label,postLabel,name, al.getUnit(row),al.getnumType(row), al.getVarType(row), true);
+		}
+			if(myContainer !=null) {
+			myContainer.add(myField);
+			myField.refreshInputFields();				
 		}
 			
-		if (!success)
-			Log.e("nils","CreateEntryFieldBlock: Could not add EntryInputField "+name+".");
+		
 	}
 
 

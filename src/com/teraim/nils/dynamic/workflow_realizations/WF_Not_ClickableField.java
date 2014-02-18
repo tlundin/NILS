@@ -51,7 +51,7 @@ public abstract class WF_Not_ClickableField extends WF_ListEntry {
 	
 	}
 	
-	public void addVariable(String varLabel, String varId, Unit unit, Variable.DataType numType, Variable.StorageType varType, boolean displayOut) {
+	public void addVariable(String varLabel,String postLabel, String varId, Unit unit, Variable.DataType numType, Variable.StorageType varType, boolean displayOut) {
 		
 		if (displayOut && virgin) {
 			virgin = false;
