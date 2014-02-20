@@ -14,7 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.TableLayout.LayoutParams;
 
 import com.teraim.nils.GlobalState;
-import com.teraim.nils.dynamic.types.VariableConfiguration;
+import com.teraim.nils.dynamic.VariableConfiguration;
 import com.teraim.nils.dynamic.workflow_abstracts.Container;
 import com.teraim.nils.dynamic.workflow_abstracts.Filterable;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Column_Name_Filter;

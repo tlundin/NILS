@@ -5,8 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import android.util.Log;
 import android.view.View;
@@ -14,8 +12,6 @@ import android.widget.TextView;
 
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
-import com.teraim.nils.dynamic.types.ParameterCache;
-import com.teraim.nils.dynamic.types.VarIdentifier;
 import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.types.Variable.DataType;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
@@ -25,13 +21,13 @@ import com.teraim.nils.dynamic.workflow_abstracts.EventListener;
 import com.teraim.nils.expr.Expr;
 import com.teraim.nils.expr.Parser;
 import com.teraim.nils.expr.SyntaxException;
+import com.teraim.nils.utils.Tools;
 
 public class WF_DisplayValueField extends WF_Widget implements EventListener {
 
-	String formula;
-	GlobalState gs;
-	Unit unit;
-	ParameterCache pc;
+	private String formula;
+	protected GlobalState gs;
+	protected Unit unit;
 	private Set<Entry<String,DataType>> myVariables;
 	boolean fail = false;
 	boolean stringT = false;
@@ -44,7 +40,6 @@ public class WF_DisplayValueField extends WF_Widget implements EventListener {
 		this.formula = formula;
 		Log.d("nils","In WF_DisplayValueField Create");	
 		ctx.addEventListener(this, EventType.onSave);	
-		pc = gs.getCurrentDelyta();
 		this.unit=unit;
 		Set<String> potVars = new HashSet<String>();
 
@@ -97,6 +92,7 @@ public class WF_DisplayValueField extends WF_Widget implements EventListener {
 				myVariables = new HashSet<Entry<String,DataType>>();
 				for (String var:potVars) {
 					List<String> row = gs.getArtLista().getCompleteVariableDefinition(var);
+					
 					if (row == null) {
 						o.addRow("");
 						o.addRedText("Couldn't find variable "+var+" referenced in formula "+formula);
@@ -141,32 +137,34 @@ public class WF_DisplayValueField extends WF_Widget implements EventListener {
 	//update variable.
 	@Override
 	public void onEvent(Event e) {
-		String strRes="";
 		
-		int intRes = 0;
+		String strRes="";
 		String subst=new String(formula);
 		Log.d("nils","Got event in WF_DisplayValueField");	
-		//TODO: CHANGE WHEN MORE THAN ONE DELYTA
 		if (!fail) {
 			Variable st;
 			boolean substErr = false;
 			for (Entry<String, DataType> entry:myVariables) {
-				st = pc.getVariable(entry.getKey());
+				st = gs.getArtLista().getVariableInstance(entry.getKey());
 				if (st==null) {
 					o.addRow("Couldn't find a value for variable "+entry.getKey()+". Formula cannot be calculated: "+formula);
-					substErr=true;
-					gs.getDb().getAllVariables();
+					substErr=true;					
 					break;
 				} else {
 					if (stringT)
 						strRes+=st.getValue();
 					else {
-						subst = subst.replace(st.getVarId(), st.getValue());
+						subst = subst.replace(st.getId(), st.getValue());
 						Log.d("nils","formula after subst: "+subst);
+						if (st.getValue()==null||st.getValue().isEmpty()) {
+							substErr=true;
+							Log.d("nils","Variable has no value in substitution...");
+						}
+							
 					}
 				}
 			}
-			if (!substErr && !stringT) {
+			if (!substErr && !stringT ) {
 				Parser p = gs.getParser();
 				Expr exp=null;
 				try {
@@ -183,13 +181,16 @@ public class WF_DisplayValueField extends WF_Widget implements EventListener {
 					return;
 				} else
 					strRes = Double.toString(exp.value());
-			} 
+			} else {
+				
+			}
 		} else {
 			o.addRow("");
 			o.addYellowText("Formula "+formula+" is not being calculated because of parse errors");
 			return;
 		}
-		((TextView)this.getWidget().findViewById(R.id.text)).setText(strRes+(unit==Unit.nd?"":VarIdentifier.getPrintedUnit(unit)));
+		((TextView)this.getWidget().findViewById(R.id.text)).setText(strRes+(unit==Unit.nd?"":Tools.getPrintedUnit(unit)));
+	
 	}
 
 

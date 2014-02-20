@@ -1,4 +1,4 @@
-package com.teraim.nils.dynamic.types;
+package com.teraim.nils.dynamic;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -7,10 +7,11 @@ import java.util.Map;
 
 import android.util.Log;
 
-import com.teraim.nils.GlobalState.ErrorCode;
 import com.teraim.nils.GlobalState;
+import com.teraim.nils.GlobalState.ErrorCode;
+import com.teraim.nils.dynamic.types.Table;
+import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
-import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
 import com.teraim.nils.utils.Tools;
 
 
@@ -18,26 +19,28 @@ public class VariableConfiguration {
 
 	public static String Col_Variable_Name = "Variable Name";
 	public static String Col_Entry_Label = "Entry Label";
-	public static String Col_Variable_Scope = "Variable Scope";
-	static List<String>requiredColumns=Arrays.asList("List Entry Name",Col_Variable_Name,Col_Entry_Label,"Action","Variable Label","Num Type",Col_Variable_Scope,"Displayed","Unit","Description");
+	public static String Col_Variable_Keys = "Key Chain";
+	static List<String>requiredColumns=Arrays.asList("List Entry Name",Col_Variable_Name,Col_Entry_Label,"Action","Variable Label","Num Type","Displayed","Unit",Col_Variable_Keys,"Description");
 
 	
-	static int LIST_ENTRY = 0,VARIABLE_NAME=1,ENTRY_LABEL=2,ACTION=3,VARIABLE_LABEL=4,NUM_TYPE=5,VARIABLE_TYPE=6,DISPLAY_IN_LIST=7,UNIT=8,Description=9;
+	public static int LIST_ENTRY = 0,VARIABLE_NAME=1,ENTRY_LABEL=2,ACTION=3,VARIABLE_LABEL=4,NUM_TYPE=5,DISPLAY_IN_LIST=6,UNIT=7,KEY_CHAIN=8,Description=9;
 	
 	Map<String,Integer>fromNameToColumn = new HashMap<String,Integer>();
 
 	
 	Table myTable;
+	GlobalState gs;
 	
-	public VariableConfiguration(Table t) {
-		myTable = t;
+	public VariableConfiguration(GlobalState gs) {
+		this.gs = gs;
+		myTable = gs.thawConfigFile();
 		
 	}
 	
 	public ErrorCode validateAndInit() {
+		if (myTable==null)
+			return ErrorCode.file_not_found;
 		for (String c:requiredColumns) {
-			if (myTable==null)
-				return ErrorCode.file_not_found;
 			int tableIndex = myTable.getColumnIndex(c);
 			if (tableIndex==-1) {
 				Log.e("nils","Missing column: "+c);
@@ -76,6 +79,10 @@ public class VariableConfiguration {
 	public String getVarLabel(List<String> row) {
 		return row.get(fromNameToColumn.get(requiredColumns.get(VARIABLE_LABEL)));
 	}
+	
+	public String getKeyChain(List<String> row) {
+		return row.get(fromNameToColumn.get(requiredColumns.get(KEY_CHAIN)));		
+	}
 
 	public String getDescription(List<String> row) {
 		return row.get(fromNameToColumn.get(requiredColumns.get(Description)));
@@ -95,11 +102,6 @@ public class VariableConfiguration {
 		return null;
 	}
 
-	public Variable.StorageType getVarType(List<String> row) {
-		String type = row.get(fromNameToColumn.get(requiredColumns.get(VARIABLE_TYPE)));
-		return type.equals("delyta")? Variable.StorageType.delyta:(type.equals("provyta")?
-				Variable.StorageType.provyta:Variable.StorageType.ruta);
-	}
 	
 	public boolean isDisplayInList(List<String> row) {
 		return row.get(fromNameToColumn.get(requiredColumns.get(DISPLAY_IN_LIST))).equalsIgnoreCase("TRUE");
@@ -110,7 +112,41 @@ public class VariableConfiguration {
 	}
 
 	public List<String> getCompleteVariableDefinition(String varName) {
-		return myTable.getRowContaining(Col_Variable_Name,varName);
+		return myTable.getRowFromKey(varName);
+	}
+
+	//Create a variable with the current context and the variable's keychain.
+	public Variable getVariableInstance(String varId) {	
+		List<String> row = this.getCompleteVariableDefinition(varId);
+		if (row!=null) {
+		String keyChain = this.getKeyChain(row);
+		Log.d("nils","getVariableInstance for "+varId+" with keychain "+keyChain);
+		Log.d("nils","KeyChain is empty?"+keyChain.isEmpty());
+		Map<String, String> vMap;
+		if (!keyChain.isEmpty()) {
+		String[] keys = keyChain.split("\\.");
+		if (keys.length==0)
+			Log.d("nils","KEYCHAIN EMPTY!!" );
+		//find my keys in the current context.
+		vMap = new HashMap<String,String>();
+		Map<String, String> cMap = gs.getCurrentContext().getKeyHash();
+		for (String key:keys) {
+			String value = cMap.get(key);
+			if (value!=null) {
+				vMap.put(key, value);
+				Log.d("nils","Adding keychain key:"+key+" value: "+value);
+			}
+			else {
+				Log.d("nils","Couldn't find key "+key+" in current context");
+				
+			}
+		}
+		} else
+			vMap=null;
+		return new Variable(varId,row,vMap,gs);
+		}
+		Log.e("nils","Couldn't find variable "+varId+" in getVariableInstance");
+		return null;
 	}
 	
 	

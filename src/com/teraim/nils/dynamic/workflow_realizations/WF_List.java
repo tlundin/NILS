@@ -7,7 +7,7 @@ import android.util.Log;
 import android.widget.LinearLayout;
 
 import com.teraim.nils.GlobalState;
-import com.teraim.nils.dynamic.types.VariableConfiguration;
+import com.teraim.nils.dynamic.VariableConfiguration;
 import com.teraim.nils.dynamic.workflow_abstracts.Filter;
 import com.teraim.nils.dynamic.workflow_abstracts.Filterable;
 import com.teraim.nils.dynamic.workflow_abstracts.Listable;

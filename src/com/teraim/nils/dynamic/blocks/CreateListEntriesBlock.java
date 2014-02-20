@@ -5,7 +5,7 @@ import java.util.List;
 import android.util.Log;
 
 import com.teraim.nils.GlobalState;
-import com.teraim.nils.dynamic.types.VariableConfiguration;
+import com.teraim.nils.dynamic.VariableConfiguration;
 import com.teraim.nils.dynamic.workflow_abstracts.Container;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Alphanumeric_Sorter;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Context;

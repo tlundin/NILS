@@ -19,7 +19,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.teraim.nils.GlobalState;
-import com.teraim.nils.Logger;
+import com.teraim.nils.LoggerI;
 import com.teraim.nils.R;
 import com.teraim.nils.bluetooth.BluetoothRemoteDevice;
 import com.teraim.nils.utils.PersistenceHelper;
@@ -191,7 +191,7 @@ public class MenuActivity extends Activity {
             Typeface type=Typeface.createFromAsset(getAssets(),
     		        "clacon.ttf");
     		tv.setTypeface(type);
-            final Logger log = gs.getLogger();
+            final LoggerI log = gs.getLogger();
             log.setOutputView(tv);
             //trigger redraw.
             log.draw();

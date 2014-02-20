@@ -100,8 +100,12 @@ public class ConfigMenu extends PreferenceActivity {
 			}
 			else if (pref instanceof CheckBoxPreference) {
 				CheckBoxPreference cpref = (CheckBoxPreference)pref;
-				GlobalState.getInstance(getActivity()).getLogger().setDev(cpref.isChecked());
-			}
+				if (key.equals(PersistenceHelper.DEVELOPER_SWITCH))
+					if (cpref.isChecked())
+						GlobalState.getInstance(getActivity()).createLogger();
+					else
+						GlobalState.getInstance(getActivity()).removeLogger();
+				}
 
 		}
 

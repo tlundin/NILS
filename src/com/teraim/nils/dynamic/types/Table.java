@@ -5,8 +5,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
+
+import com.teraim.nils.dynamic.VariableConfiguration;
+
+//SparseArray is not serializable so we cannot use it...so turn off warning.
+@SuppressLint("UseSparseArrays")
 
 public class Table implements Serializable {
 
@@ -15,27 +22,34 @@ public class Table implements Serializable {
 	 */
 	private static final long serialVersionUID = 1183209171210448313L;
 	//The table is a Map of key=Header,value=List of Data.
-	private final Map<String,List<String>> colTable=new HashMap<String,List<String>>();
+	private final Map<String,List<String>> colTable=new TreeMap<String,List<String>>(String.CASE_INSENSITIVE_ORDER);
 	private final Map<Integer,List<String>> rowTable=new HashMap<Integer,List<String>>();
+	private final Map<String,List<String>> nameToRowMap=new TreeMap<String,List<String>>(String.CASE_INSENSITIVE_ORDER);
+	private final ArrayList<String> keyParts = new ArrayList<String>();
 	//Immutable list of Required columns.
-	private int columnCount=0,rowCount=0;
+	private int rowCount=0,keyChainIndex =-1;
 	private String[] myColumns;
+	private String previousKeyChain = null;
+	private int variableIdIndex=-1;
 
 
 
-	public Table (String[] columnNames) {
+	public Table (String[] columnNames,int keyChainIndex,int nameIndex) {
 		assert(columnNames!=null);
 		for(String key:columnNames) 
 			colTable.put(key, new ArrayList<String>());		
-		columnCount = columnNames.length;
+		this.keyChainIndex = keyChainIndex;
+		this.variableIdIndex = nameIndex;
 		myColumns = columnNames;
 	}
 
 	public enum ErrCode {
 		tooManyColumns,
 		tooFewColumns,
+		keyError,
 		ok
 	};
+	
 	
 	public ErrCode addRow(List<String> rowEntries) {
 		int index=0;
@@ -46,12 +60,43 @@ public class Table implements Serializable {
 		if (size > myColumns.length)
 			return ErrCode.tooManyColumns;
 		
+		//columnmap
 		for(String entry:rowEntries) 
 			colTable.get(myColumns[index++]).add(entry);
+		//rowmap
 		rowTable.put(rowCount++, rowEntries);
-//		if (size < myColumns.length) {
-//			Log.d("nils","Number of columns: "+size+" Required number: "+myColumns.length);
-//			return ErrCode.tooFewColumns;
+		
+		//keymap.
+		nameToRowMap.put(rowEntries.get(variableIdIndex),rowEntries);
+
+		//Check keychain and add 
+		if (rowEntries.size()<keyChainIndex) {
+			Log.e("nils","row length shorter than key index");
+			return ErrCode.tooFewColumns;
+		}
+		String keyChain = rowEntries.get(keyChainIndex);
+		
+		
+		//check if any new key
+		//if equal to previous, skip
+		if (!keyChain.equals(previousKeyChain)) {
+		String[] keys = keyChain.split("\\.");
+		if (keys == null) {
+			Log.e("nils","KeyChain null after split");
+			return ErrCode.keyError;
+		}
+		for (String key:keys) {
+			if (!keyParts.contains(key)) {
+				Log.d("nils","found new key part: "+key);
+				//Add to existing Database model.
+				keyParts.add(key);
+			};
+		}
+		//no need to check this one again.
+		previousKeyChain = keyChain;
+		} else
+			Log.d("nils","...matches previous key chain");
+		
 		return ErrCode.ok;
 	}
 	//TODO: Change for more complex keys.
@@ -75,7 +120,7 @@ public class Table implements Serializable {
 			pattern.trim();
 			for(int i = 0;i<column.size();i++) {
 				Log.d("nils","i: "+i+" col: "+column.get(i));
-				if (equalsIgnoreAll(column.get(i),pattern)||column.get(i).matches(pattern)) {
+				if (column.get(i).equals(pattern)||column.get(i).matches(pattern)) {
 					if (ret == null)
 						ret = new ArrayList<List<String>>();
 					ret.add(rowTable.get(i));
@@ -93,15 +138,25 @@ public class Table implements Serializable {
 				return i;
 		return -1;
 	}
+	
+	public List<String> getRowFromKey(String key) {
+		if (key == null) {
+			Log.e("nils","key was null in getRowFromKey (Table.java)");
+			return null;
+		}
+		return nameToRowMap.get(key.trim());
+	}
 
 	public List<String> getRowContaining(String columnName,
 			String key) {
-		if (key==null)
+		if (key==null||columnName==null) {
+			Log.e("nils","key or column was null in getRowContaining (Table.java)");
 			return null;
-		List<String> column = colTable.get(columnName);
+		}
+		List<String> column = colTable.get(columnName.trim());
 
 		for(int i = 0;i<column.size();i++) {
-			if (equalsIgnoreAll(column.get(i),key.trim())) {
+			if (column.get(i).equals(key.trim())) {
 				Log.d("nils","found master variable "+key+" in Artlista");
 				return rowTable.get(i);
 			}
@@ -112,11 +167,7 @@ public class Table implements Serializable {
 		return null;
 	}
 
-	private boolean equalsIgnoreAll(String string, String key) {
-		string = string.trim();
-		return (string.equalsIgnoreCase(key));
-			
-	}
+	
 
 	public String getElement(String columnName,List<String> row) {
 		String result = null;
@@ -127,6 +178,10 @@ public class Table implements Serializable {
 		} else
 			Log.d("nils","Did NOT find field "+columnName+" in class Table");
 		return result;
+	}
+
+	public ArrayList<String> getKeyParts() {
+		return keyParts;
 	}
 	
 	

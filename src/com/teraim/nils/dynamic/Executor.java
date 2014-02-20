@@ -1,6 +1,7 @@
 package com.teraim.nils.dynamic;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.teraim.nils.GlobalState;
-import com.teraim.nils.Logger;
+import com.teraim.nils.LoggerI;
 import com.teraim.nils.R;
 import com.teraim.nils.dynamic.blocks.AddSumOrCountBlock;
 import com.teraim.nils.dynamic.blocks.Block;
@@ -61,19 +62,24 @@ public abstract class Executor extends Fragment {
 
 	protected GlobalState gs;
 	
-	protected Logger o;
+	protected LoggerI o;
 	
-	
+	private final Map<String,String>fakeHash = new HashMap<String,String>();
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		activity = this.getActivity();
 		myContext = new WF_Context((Context)activity,this,R.id.content_frame);
+		
 		gs = GlobalState.getInstance((Context)activity);
+		gs.setCurrentContext(myContext);
 		o = gs.getLogger();
 		wf = getFlow();
 
-		//Execute called from child onCreate.
+		//Create fake hash.		
+		fakeHash.put("ruta", "262");
+		fakeHash.put("provyta", "6");
+		fakeHash.put("delyta", "1");
 	}
 
 
@@ -126,6 +132,9 @@ public abstract class Executor extends Fragment {
 			if (b instanceof StartBlock) {
 				o.addRow("");
 				o.addYellowText("Startblock found");
+				o.addRow("");
+				o.addRedText("No current context!!!....Adding HACKED FAKE keys");
+				myContext.setKeyHash(fakeHash);
 			}
 			
 			else if (b instanceof ContainerDefineBlock) {

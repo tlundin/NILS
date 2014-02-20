@@ -66,7 +66,7 @@ public class Start extends MenuActivity {
 		setContentView(R.layout.naviframe);
 
 		
-		loginConsole = new Logger(this,true);
+		loginConsole = new Logger(this);
 
 		//create subfolders. Copy assets..
 		if (this.initIfFirstTime()) {		
@@ -79,9 +79,6 @@ public class Start extends MenuActivity {
 		//GlobalState
 		gs = GlobalState.getInstance(this.getApplicationContext());
 		ph = gs.getPersistence();
-		gs.getLogger().setDev(ph.getB(PersistenceHelper.DEVELOPER_SWITCH));
-		//TODO: REMOVE
-
 
 		//drawer items
 		items = new ArrayList<DrawerMenuItem>();
@@ -162,7 +159,7 @@ public class Start extends MenuActivity {
 			loginConsole.clear();
 			loginConsole.addRow("NILS VERSION ");
 			loginConsole.addYellowText("["+NILS_VERSION+"]");
-			loginConsole.addRow("New features: Swipeable fragments. Fixpunkter i provyta.");
+			loginConsole.addRow("New features: Expressions. DisplayValue Field.");
 
 
 			//If network, go and check for new files.
@@ -449,7 +446,7 @@ public class Start extends MenuActivity {
 			ph.put(PersistenceHelper.BUNDLE_LOCATION, "nilsbundle3.xml");
 		if (ph.get(PersistenceHelper.CONFIG_LOCATION).equals(PersistenceHelper.UNDEFINED))
 			ph.put(PersistenceHelper.CONFIG_LOCATION, "config.csv");
-		ph.put(PersistenceHelper.DEVELOPER_SWITCH,true);
+		ph.put(PersistenceHelper.DEVELOPER_SWITCH,false);
 		ph.put(PersistenceHelper.VERSION_CONTROL_SWITCH_OFF, true);
 		ph.put(PersistenceHelper.CURRENT_RUTA_ID_KEY, "262");
 		ph.put(PersistenceHelper.CURRENT_PROVYTA_ID_KEY, "6");

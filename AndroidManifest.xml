@@ -41,72 +41,16 @@
         
         <activity
             android:name=".Start"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_nils" >
+            
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-            
-            <activity
-            android:name="com.teraim.nils.alea.SelectRuta"
-            android:exported="false"
-            android:label="@string/title_select_ruta" >
-            <intent-filter>
-                <action android:name="com.teraim.nils.SelectRuta" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-            
-            <activity
-            android:name="com.teraim.nils.alea.SelectColor"
-            android:exported="false"
-            android:label="@string/title_select_color" >
-            <intent-filter>
-                <action android:name="com.teraim.nils.SelectColor" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-            
-        <activity
-            android:name="com.teraim.nils.alea.SelectYta"
-            android:exported="false"
-            android:label="@string/title_select_yta" >
-            <intent-filter>
-                <action android:name="com.teraim.nils.SelectYta" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name="com.teraim.nils.alea.MarkslagsActivity"
-            android:exported="false"
-            android:label="Välj markslag" >
-            <intent-filter>
-                <action android:name="com.teraim.nils.MarkslagsActivity" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
-        <activity
-            android:name="com.teraim.nils.alea.MarkslagTab_Glaciar_Activity"/>
-        <activity
-            android:name="com.teraim.nils.alea.MarkslagTab_Akvatisk_Activity"/>		
-        <activity
-            android:name="com.teraim.nils.alea.MarkslagTab_Anlagd_Activity"/>
-        <activity
-            android:name="com.teraim.nils.alea.MarkslagTab_SA_Activity"/>	
-        <activity
-            android:name="com.teraim.nils.dynamic.templates.DefaultTemplate"/>   
-        <activity
-            android:name="com.teraim.nils.dynamic.templates.ListInputTemplate"/>        	
-        	
-        <activity
-            android:name="com.teraim.nils.alea.StartMenuActivity"/>        	
-        <activity
-            android:name="com.teraim.nils.alea.MapSelect"/>        	
- 
-        
+                   
         <activity
             android:name="com.teraim.nils.ui.ConfigMenu"
             android:exported="false"
@@ -114,113 +58,6 @@
             <intent-filter>
                 <action android:name="com.teraim.nils.ConfigMenu" />
                 <category android:name="android.intent.category.PREFERENCE" />
-            </intent-filter>
-        </activity>
-         <activity
-            android:name="com.teraim.nils.alea.PictureZoom"
-            android:exported="false"
-            android:theme="@android:style/Theme.Dialog"
-            android:label="ZOOM" >
-            <intent-filter>
-                <action android:name="com.teraim.nils.PictureZoom" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-                <activity
-            android:name="com.teraim.nils.alea.TestPic"
-            android:exported="false"
-            android:label="TestPic" >
-            <intent-filter>
-                <action android:name="com.teraim.nils.TestPic" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name="com.teraim.nils.alea.EditDelYta"
-            android:exported="false"
-            android:theme="@android:style/Theme.Dialog"
-            android:label="Delyte-definition" >
-            <intent-filter>
-                <action android:name="com.teraim.nils.EditDelYta" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-                <activity
-            android:name="com.teraim.nils.alea.RiktpunktActivity"
-            android:exported="false"
-            android:label="Sätt riktpunkter" >
-            <intent-filter>
-                <action android:name="com.teraim.nils.RiktpunktActivity" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-          <activity
-            android:name="com.teraim.nils.alea.RiktpunktListViewActivity"
-            android:exported="false"
-            android:theme="@android:style/Theme.Dialog"
-            android:label="Välj objekt" >
-            <intent-filter>
-                <action android:name="com.teraim.nils.RiktpunktListViewActivity" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>           
-              <activity
-            android:name="com.teraim.nils.alea.TestGpsActivity"
-            android:exported="false"
-            android:label="@string/title_find_area" >
-            <intent-filter>
-                <action android:name="com.teraim.nils.TestGpsActivity" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-                <activity
-            android:name="com.teraim.nils.alea.FindAreaActivity"
-            android:exported="false"
-            android:label="@string/title_find_area" >
-            <intent-filter>
-                <action android:name="com.teraim.nils.FindAreaActivity" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-                <activity
-            android:name="com.teraim.nils.alea.HittaYta"
-            android:exported="false"
-            android:label="@string/title_find_area" >
-            <intent-filter>
-                <action android:name="com.teraim.nils.HittaYta" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-                <activity
-            android:name="com.teraim.nils.alea.TakePicture"
-            android:exported="false"
-            android:label="@string/title_take_picture" >
-            <intent-filter>
-                <action android:name="com.teraim.nils.TakePicture" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name="com.teraim.nils.alea.TakePictureActivity"
-            android:exported="false"
-            android:label="@string/title_take_picture" >
-            <intent-filter>
-                <action android:name="com.teraim.nils.TakePictureActivity" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".ShowPic"
-            android:exported="false"
-            android:label="Show a Picturos" >
-            <intent-filter>
-                <action android:name="com.teraim.nils.ShowPic" />
-
-                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         

@@ -1,15 +1,16 @@
 package com.teraim.nils.statics;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.gesture.Gesture;
 import android.gesture.GestureLibraries;
 import android.gesture.GestureLibrary;
 import android.gesture.GestureOverlayView;
-import android.gesture.Prediction;
 import android.gesture.GestureOverlayView.OnGesturePerformedListener;
+import android.gesture.Prediction;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -22,7 +23,6 @@ import android.widget.Toast;
 
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
-import com.teraim.nils.dynamic.types.Delyta;
 import com.teraim.nils.dynamic.types.Marker;
 import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.ui.FixytaView;
@@ -33,18 +33,24 @@ public class FixPunktFragment extends Fragment implements OnGesturePerformedList
 		"FixPunkt1.riktning","FixPunkt2.avstand",
 		"FixPunkt2.riktning","FixPunkt3.avstand",
 		"FixPunkt3.riktning"};
+	final Set<FixPunkt>fixPunkter=new HashSet<FixPunkt>();
 	GlobalState gs;
-	Delyta dy;
-	Marker[] markers = new Marker[3];
 	private GestureLibrary gestureLib;
-
+	protected Marker[] markers;
+	
+	private class FixPunkt {
+		public FixPunkt(Variable avst, Variable rikt) {
+			this.avst=avst;
+			this.rikt=rikt;
+		}
+		Variable avst;
+		Variable rikt;
+	}
 	
 	final int png[] = new int[] {R.drawable.fixpunkt,R.drawable.fixpunkt,R.drawable.fixpunkt};
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		gs = GlobalState.getInstance(getActivity());
-		//TODO : Change later on.
-		dy = gs.getCurrentDelyta();
 		Log.d("nils","in onCreateView of fixpunkt_fragment");
 		View v = inflater.inflate(R.layout.template_fixpunkt_right, container, false);	
 		
@@ -57,12 +63,21 @@ public class FixPunktFragment extends Fragment implements OnGesturePerformedList
 		Bitmap bm;
 		Bitmap scaled;		
 		int h = 48; // height in pixels
-		int w = 48; // width in pixels    
+		int w = 48; // width in pixels  
+		markers = new Marker[3];
+		
 		for(int i=0;i<3;i++) {
 			bm = BitmapFactory.decodeResource(getResources(), png[i]);
 			scaled = Bitmap.createScaledBitmap(bm, h, w, true);
 			markers[i] = new Marker(scaled);
-			
+			Variable avst,rikt;
+			String avstKey,riktKey;
+			avstKey = variables[i*2];
+			riktKey = variables[i*2+1];
+			avst = gs.getArtLista().getVariableInstance(avstKey);
+			rikt = gs.getArtLista().getVariableInstance(riktKey);
+			if (avst!=null && rikt !=null)
+				fixPunkter.add(new FixPunkt(avst,rikt));			
 		}
 		
 		
@@ -87,13 +102,8 @@ public class FixPunktFragment extends Fragment implements OnGesturePerformedList
 	@Override
 	public void onStart() {
 		int j=0;
-		Variable a,r;
-		for(int i = 0; i<variables.length;i+=2) {
-			a = dy.getVariable(variables[i]);
-			r = dy.getVariable(variables[i+1]);
-			if (a!=null&&r!=null)
-				markers[j++].setValue(a.getValue(),r.getValue());
-		}			
+		for (FixPunkt f:fixPunkter)
+			markers[j++].setValue(f.avst.getValue(),f.rikt.getValue());		
 		super.onStart();
 	}
 	

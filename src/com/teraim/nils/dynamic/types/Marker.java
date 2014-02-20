@@ -28,10 +28,6 @@ public class Marker {
 		return dist>0;
 	}
 
-	public double getMovementDirection() {
-		return 0;
-	}
-
 	public void setValue(String avst, String rikt) {
 		if(avst==null||rikt==null||avst.length()==0||rikt.length()==0) {
 			Log.d("nils","null or empty in setValue Marker class");
@@ -40,8 +36,8 @@ public class Marker {
 		dist = Integer.parseInt(avst);
 		riktning = Integer.parseInt(rikt);
 		
-		x=(int)(dist*Math.cos(riktning));
-		y=(int)(dist*Math.sin(riktning));
+		x=(int)(dist*Math.cos(riktning*0.0174532925));
+		y=(int)(dist*Math.sin(riktning*0.0174532925));
 	}
 }
 

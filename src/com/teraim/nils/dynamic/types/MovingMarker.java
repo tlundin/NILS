@@ -17,7 +17,7 @@ public class MovingMarker extends Marker {
 		this.x=x;this.y=y;this.dist = dist;
 	}
 
-	@Override
+	
 	public double getMovementDirection() {
 		return Geomatte.getRikt2(prevy, prevx, y, x);
 	}

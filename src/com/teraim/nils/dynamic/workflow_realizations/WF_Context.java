@@ -2,6 +2,7 @@ package com.teraim.nils.dynamic.workflow_realizations;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import android.app.Activity;
 import android.content.Context;
@@ -154,6 +155,15 @@ public class WF_Context {
 	public int getRootContainer() {
 		return rootContainerId;
 	}
-
+	
+	
+	Map<String,String> myKeyHash;
+	public Map<String,String> getKeyHash() {
+		return myKeyHash;
+	}
+	
+	public void  setKeyHash(Map<String,String> h) { 
+		myKeyHash=h;
+	}
 
 }

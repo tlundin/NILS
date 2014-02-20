@@ -77,8 +77,6 @@ public class FixytaView extends View {
 	}
 
 
-	final double innerRealRadiusInMeter = 10;
-	final double midRealRadiusInMeter = 20;
 	final double realRadiusinMeter = 50;
 	double rScaleF=0,oScaleF=0;
 
@@ -101,9 +99,9 @@ public class FixytaView extends View {
 		canvas.drawCircle(cx, cy,(float)(20.0*oScaleF), p20);
 		canvas.drawCircle(cx, cy,(float)(10.0*oScaleF), p);
 		rScaleF = oScaleF;
-		canvas.drawText("50",(int)(cx+r)-25, cy, p);
+		canvas.drawText("50",(int)(cx+r)-20, cy, p);
 		canvas.drawText("20",(int)(cx+(20.0*oScaleF))-20, cy, p);
-		canvas.drawText("10",(int)(cx+(10.0*oScaleF))-15, cy, p);
+		canvas.drawText("10",(int)(cx+(10.0*oScaleF))-20, cy, p);
 		canvas.drawText("N",cx,(float)(h*.1), pl);
 
 		for(Marker focusMarker:fixpunkter) {
@@ -111,17 +109,13 @@ public class FixytaView extends View {
 				double alfa;
 				//Log.d("NILS","Blue has position");
 				if(focusMarker.getDistance()<realRadiusinMeter) {
-					alfa = focusMarker.getMovementDirection();
-					int ux = (int) (cx-focusMarker.x*rScaleF);
-					int iconx = (int)(Marker.Pic_H/2+Marker.Pic_H *  Math.sin(alfa));
-					ux = ux - iconx;
-					int uy = (int) (cy+focusMarker.y*rScaleF);
-					int icony = (int)(MovingMarker.Pic_H/2+MovingMarker.Pic_H *  Math.cos(alfa));
-					uy = uy + icony;
-//					canvas.save();
+					float ux = (float) (cx+focusMarker.x * oScaleF);
+					float uy = (float) (cy+focusMarker.y * oScaleF);
+					ux = ux - Marker.Pic_H/2;
+					uy = uy - Marker.Pic_H/2; 
 					canvas.drawBitmap(focusMarker.bmp, ux, uy, null);
 //					canvas.restore();
-					msg = "X: "+ux+" Y: "+uy+" icX: "+(-iconx)+" icY: "+icony;
+					
 				} else {
 					//Log.d("NILS","Blue is outside radius");
 					//Given that blue is outside current Max Radius, draw an arrow to indicate where..

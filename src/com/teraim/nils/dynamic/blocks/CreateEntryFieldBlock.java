@@ -5,9 +5,9 @@ import java.util.List;
 import android.util.Log;
 
 import com.teraim.nils.GlobalState;
+import com.teraim.nils.dynamic.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.types.Numerable;
-import com.teraim.nils.dynamic.types.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 import com.teraim.nils.dynamic.workflow_abstracts.Container;
 import com.teraim.nils.dynamic.workflow_realizations.WF_ClickableField_Selection;
@@ -66,9 +66,7 @@ public class CreateEntryFieldBlock extends Block {
 			o.addRow("");
 			o.addRedText("Variable "+name+" not found in definition file for CreateEntryBlock");
 		} else	{	
-			for (String s:row)
-				Log.d("nils","s: "+s);
-			myField.addVariable(label,postLabel,name, al.getUnit(row),al.getnumType(row), al.getVarType(row), true);
+			myField.addVariable(label,postLabel,name, true);
 		}
 			if(myContainer !=null) {
 			myContainer.add(myField);

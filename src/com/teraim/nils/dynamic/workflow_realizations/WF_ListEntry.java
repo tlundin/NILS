@@ -8,10 +8,10 @@ import android.util.Log;
 import android.view.View;
 
 import com.teraim.nils.GlobalState;
-import com.teraim.nils.dynamic.types.Delyta;
+import com.teraim.nils.dynamic.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Variable;
-import com.teraim.nils.dynamic.types.VariableConfiguration;
 import com.teraim.nils.dynamic.workflow_abstracts.Listable;
+import com.teraim.nils.utils.DbHelper.StoredVariableData;
 
 
 public abstract class WF_ListEntry extends WF_Widget implements Listable,Comparable<Listable> {
@@ -21,6 +21,7 @@ public abstract class WF_ListEntry extends WF_Widget implements Listable,Compara
 	List<String> keyRow =null;
 	VariableConfiguration al;
 	String label = "";
+	Variable myVar = null;
 	
 	public abstract void refreshValues();
 	public abstract void refreshInputFields();
@@ -29,12 +30,15 @@ public abstract class WF_ListEntry extends WF_Widget implements Listable,Compara
 		super("LIST_ID",v);
 		this.ctx=ctx;
 		al = GlobalState.getInstance(ctx).getArtLista();
+		o = GlobalState.getInstance(ctx).getLogger();
 	}
 
 	public void setKeyRow(String key) {
-		keyRow = al.getTable().getRowContaining(VariableConfiguration.Col_Variable_Name, key);
-		if (keyRow != null)
-			label = al.getTable().getElement(VariableConfiguration.Col_Entry_Label, keyRow);
+			myVar = al.getVariableInstance(key);
+			if (myVar!=null) {
+				keyRow = myVar.getBackingDataSet();		
+				label = al.getTable().getElement(VariableConfiguration.Col_Entry_Label, keyRow);
+			}
 	}
 
 	@Override
@@ -47,53 +51,34 @@ public abstract class WF_ListEntry extends WF_Widget implements Listable,Compara
 
 	@Override
 	public String getKey() { 
-		if (keyRow != null) 
-			return al.getTable().getElement(VariableConfiguration.Col_Variable_Name, keyRow);
-		return null;
+		if (myVar == null)
+			return null;
+		else return myVar.getId();
 	}
 
 	
 	@Override
 	public String getValue() {
-		//find the variable ID.
-		String varId = getKey();
-		Variable stv = fetchVariableFromDb(varId);
-		
-		if(stv!=null)
-			return stv.getValue();
-		else
+		if (myVar == null)
 			return null;
+		return myVar.getValue();
 	}
 	
 	@Override
 	public long getTimeStamp() {
-		String varId = getKey();
-		Variable stv = fetchVariableFromDb(varId);
-		
-		if(stv!=null)
-			return Long.parseLong(stv.getTimeStamp());		
-		else {
-			Log.e("nils","no timestamp found in WF_ListEntry for "+varId);
+		if (myVar == null)
 			return -1;
+		else {
+			StoredVariableData sv = myVar.getAllFields();
+			if (sv == null)
+				return -1;
+			else 
+				return Long.parseLong(sv.timeStamp);		
 		}
+		
 			
 	}
 		
-	private Variable fetchVariableFromDb(String varId) {
-		if (varId==null) 
-			Log.e("nils","Variable with NULL ID in WF_Listelement");
-		else {
-			Delyta d = GlobalState.getInstance(ctx).getCurrentDelyta();
-			if (d == null) 
-				Log.e("nils","Delyta NULL in WF_Listelement");
-			else {
-				Variable var = d.getVariable(varId);
-				if (var!=null) 
-					return var;
-			}
-		}
-		return null;
-	}
 	
 	public String getLabel() {
 		return label;

@@ -1,6 +1,5 @@
 package com.teraim.nils.dynamic.workflow_realizations;
 
-import java.util.List;
 import java.util.Set;
 
 import android.util.Log;
@@ -9,7 +8,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import com.teraim.nils.R;
-import com.teraim.nils.dynamic.types.VarIdentifier;
+import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.workflow_abstracts.Event;
 import com.teraim.nils.dynamic.workflow_abstracts.Event.EventType;
 import com.teraim.nils.dynamic.workflow_abstracts.EventListener;
@@ -51,14 +50,10 @@ WF_Not_ClickableField implements EventListener {
 	}
 
 	@Override
-	public String getFormattedText(VarIdentifier varId, String value) {
+	public String getFormattedText(Variable varId, String value) {
 		return value;
 	}
 
-	@Override
-	public String getFormattedUnit(VarIdentifier varId) {
-		return varId.getPrintedUnit();
-	}
 
 	@Override
 	public void onEvent(Event e) {
@@ -75,16 +70,19 @@ WF_Not_ClickableField implements EventListener {
 	public void matchAndRecalculateMe() {
 		Long sum=Long.valueOf(0);
 		for (Listable l:targetList.getList()) {
-			Set<VarIdentifier> vars = l.getAssociatedVariables();
+			Set<Variable> vars = l.getAssociatedVariables();
 			if (vars!=null && !vars.isEmpty()) {
-				for (VarIdentifier v:vars) {
+				for (Variable v:vars) {
 					if (v.getId().matches(myPattern)) {
 //						Log.d("nils","ADD_NUMBER_OF_SELECTION: Found match! "+v.getId());				
 						if (v.getValue()!=null) {
 							if (myType == Type.count)
 								sum++;
-							else
-								sum+=v.getValue();
+							else {
+								String val=v.getValue();
+								if (val!=null && !val.isEmpty())
+									sum+=Long.parseLong(v.getValue());
+							}
 						}
 					}
 
@@ -93,7 +91,8 @@ WF_Not_ClickableField implements EventListener {
 				Log.d("nils ","Vars for "+l.getLabel()+" empty");
 			}
 		}
-		myVar.setValue(sum.toString());
+		if (myVar !=null)
+			myVar.setValue(sum.toString());
 
 	}
 

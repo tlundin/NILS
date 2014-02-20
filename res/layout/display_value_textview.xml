@@ -21,15 +21,15 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_marginRight="10dp"
-        android:ems="10"
-        android:gravity="right"
-        android:text="Header" />
+    <TextView 
+    android:id="@+id/text"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginRight="15dp"
+    android:background="@color/grey"
+    android:gravity="right"
+    android:text="30"
+    android:textSize="30sp" />
 </LinearLayout>
 
 <View

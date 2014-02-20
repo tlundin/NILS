@@ -2,12 +2,9 @@ package com.teraim.nils.dynamic.types;
 
 import java.util.ArrayList;
 
-import android.util.Log;
-
 import com.teraim.nils.GlobalState;
-import com.teraim.nils.dynamic.types.Variable.StorageType;
 
-public class Provyta extends ParameterCache {
+public class Provyta  {
 
 	private String id;
 	double N=0;
@@ -19,7 +16,6 @@ public class Provyta extends ParameterCache {
 	private Ruta myParent;
 
 	public Provyta(String id, Ruta parent) {
-		super(parent.getContext());
 		this.id = id;
 		myParent = parent;
 	}
@@ -76,22 +72,7 @@ public class Provyta extends ParameterCache {
 		d.setPoints(tag);
 	}
 
-	@Override
-	public Variable getVariable(String varId) {
-		if (myParent == null) {
-			Log.e("nils","Getvariable called on provyta without parent..?");
-			return null;
-		} else
-			return getProvyteVariable(myParent.getId(),id,varId);
-	}
 
-	@Override
-	public Variable storeVariable(String varId, String value) {
-		return this.storeVariable(new Variable(myParent.getId(), this.getId(), null,
-				value, 	varId,
-				StorageType.provyta));
-
-	}
 
 	public GlobalState getContext() {
 		return myParent.getContext();

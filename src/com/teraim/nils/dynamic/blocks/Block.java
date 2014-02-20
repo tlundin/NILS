@@ -2,7 +2,7 @@ package com.teraim.nils.dynamic.blocks;
 
 import java.io.Serializable;
 
-import com.teraim.nils.Logger;
+import com.teraim.nils.LoggerI;
 
 /**
  * Abstract base class Block
@@ -12,5 +12,5 @@ import com.teraim.nils.Logger;
  */
 public abstract  class Block implements Serializable {
 	private static final long serialVersionUID = -8275181338935274930L;
-	protected Logger o;
+	protected LoggerI o;
 }

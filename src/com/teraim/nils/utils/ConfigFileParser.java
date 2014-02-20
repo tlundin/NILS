@@ -18,7 +18,8 @@ import com.teraim.nils.Constants;
 import com.teraim.nils.FileLoadedCb;
 import com.teraim.nils.FileLoadedCb.ErrorCode;
 import com.teraim.nils.GlobalState;
-import com.teraim.nils.Logger;
+import com.teraim.nils.LoggerI;
+import com.teraim.nils.dynamic.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Table;
 import com.teraim.nils.dynamic.types.Table.ErrCode;
 
@@ -39,7 +40,9 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 	FileLoadedCb cb;
 	String myVersion = null;
 	Table myTable=null;
-	Logger o;
+	LoggerI o;
+	
+	
 
 
 
@@ -81,6 +84,7 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 			else {
 				ph.put(PersistenceHelper.CURRENT_VERSION_OF_CONFIG_FILE,myVersion);
 				code = ErrorCode.newVersionLoaded;
+				
 				o.addRow("");
 				o.addYellowText("New Configuration file loaded. Version: "+myVersion);
 			}
@@ -127,8 +131,9 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 			header = br.readLine();
 
 			o.addRow("File header reads:["+header+"]");
-			if (header != null) {			
-				myTable = new Table(header.split(","));
+			if (header != null) {		
+				//TODO: REMOVE CONSTANT PEEK
+				myTable = new Table(header.split(","),VariableConfiguration.KEY_CHAIN,VariableConfiguration.VARIABLE_NAME);
 				//Find all RutIDs from csv. Create Ruta Class for each.
 				int rowC=1;
 				while((row = br.readLine())!=null) {

@@ -110,7 +110,7 @@ public class Tools {
 	            object = objectIn.readObject();
 
 	        } catch (FileNotFoundException e) {
-	            // Do nothing
+	           // e.printStackTrace();
 	        } catch (IOException e) {
 	            e.printStackTrace();
 	        } catch (ClassNotFoundException e) {
@@ -211,15 +211,6 @@ public class Tools {
 	}
 	
 	
-	public static void printDatabase(DbHelper db) {
-		Log.d("NILS","Printing all database values in init");
-    	ArrayList<Variable> sds = db.getAllVariables();
-    	int i=0;
-    	for(Variable s:sds) 
-    		Log.d("nils",(i++) + ": "+s.getRutId()+","+s.getProvytaId()+","+s.getDelytaId()+","+s.getVarId()+":  "+s.getValue());
-		
-	}
-	
 	
 	/*********************************************************
 	 * 
@@ -304,6 +295,15 @@ public class Tools {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static String getPrintedUnit(Unit unit) {
+		if (unit == Unit.percentage)
+			return "%";
+		if (unit == Unit.nd || unit == null)
+			return "";
+		else
+			return unit.name();
 	}
 
 

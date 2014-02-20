@@ -54,7 +54,7 @@ public class DefaultTemplate extends Executor {
 			}});
 			
 */
-
+		
 	}
 	
 	
@@ -80,6 +80,9 @@ public class DefaultTemplate extends Executor {
 		my_root = (LinearLayout)v.findViewById(R.id.myRoot);
 		myContext.addContainers(getContainers());
 
+		if (wf!=null)
+			run();
+		
 		return v;
 	}
 	
@@ -99,10 +102,9 @@ public class DefaultTemplate extends Executor {
 	@Override
 	public void onStart() {
 		Log.d("nils","I'm in the onStart method");
-
 		super.onStart();
-		if (wf!=null)
-			run();
+
+
 	}
 
 

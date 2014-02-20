@@ -13,7 +13,6 @@ import com.teraim.nils.dynamic.workflow_abstracts.EventListener;
 
 public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,EventGenerator{
 
-	Logger o;
 	
 	public WF_List_UpdateOnSaveEvent(String id, WF_Context ctx) {
 		super(id, ctx);
@@ -45,7 +44,7 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 						Log.d("nils","add...");
 						if (listRow!=null) {
 							Log.d("nils","var added "+al.getVarLabel(r));
-							listRow.addVariable(al.getVarLabel(r),"", al.getVarName(r), al.getUnit(r), al.getnumType(r),al.getVarType(r), al.isDisplayInList(r));
+							listRow.addVariable(al.getVarLabel(r),"", al.getVarName(r),al.isDisplayInList(r));
 						}
 					}
 				}

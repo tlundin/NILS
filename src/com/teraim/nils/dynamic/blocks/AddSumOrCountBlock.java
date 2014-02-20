@@ -49,7 +49,7 @@ public  class AddSumOrCountBlock extends Block {
 			o.addRow("");
 			o.addRedText("Error in XML: block_add_sum_of_selected_variables_display is missing a result parameter for:"+label);
 		} else {
-			field.addVariable(label, postLabel,result, Unit.nd, Variable.DataType.numeric, Variable.StorageType.delyta, true);			
+			field.addVariable(label, postLabel,result, true);			
 		}
 		/*
 		

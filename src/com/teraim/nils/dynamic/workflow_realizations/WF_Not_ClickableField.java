@@ -6,34 +6,34 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.teraim.nils.R;
 import com.teraim.nils.dynamic.types.Variable;
-import com.teraim.nils.dynamic.types.VarIdentifier;
-import com.teraim.nils.dynamic.types.Numerable;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
+import com.teraim.nils.utils.Tools;
 
 public abstract class WF_Not_ClickableField extends WF_ListEntry {
 	protected WF_Context myContext;
 	protected TextView myHeader;
 	final LinearLayout outputContainer;
-	protected Map<VarIdentifier,LinearLayout> myOutputFields = new HashMap<VarIdentifier,LinearLayout>();
+	protected Map<Variable,LinearLayout> myOutputFields = new HashMap<Variable,LinearLayout>();
 
 	//Hack! Used to determine what is the master key for this type of element.
 	//If DisplayOut & Virgin --> This is master key.
 	boolean virgin=true;
-	protected VarIdentifier myVar;
-	
+	protected Variable myVar;
+	private Unit myUnit;
 	public abstract LinearLayout getFieldLayout();
-	public abstract String getFormattedText(VarIdentifier varId, String value);
-	public abstract String getFormattedUnit(VarIdentifier varId);
+	public abstract String getFormattedText(Variable varId, String value);
+
 
 	@Override
-	public Set<VarIdentifier> getAssociatedVariables() {
-		Set<VarIdentifier> s = new HashSet<VarIdentifier>();
+	public Set<Variable> getAssociatedVariables() {
+		Set<Variable> s = new HashSet<Variable>();
 		s.add(myVar);
 		return s;
 	}
@@ -51,16 +51,23 @@ public abstract class WF_Not_ClickableField extends WF_ListEntry {
 	
 	}
 	
-	public void addVariable(String varLabel,String postLabel, String varId, Unit unit, Variable.DataType numType, Variable.StorageType varType, boolean displayOut) {
+	public void addVariable(String varLabel,String postLabel, String varId, boolean displayOut) {
 		
 		if (displayOut && virgin) {
 			virgin = false;
 			super.setKeyRow(varId);
 		}
 
-		// Set an EditText view to get user input 
-		VarIdentifier varIdentifier = new VarIdentifier(ctx,varLabel,varId,numType,varType,unit);
-	
+		
+		Variable var = al.getVariableInstance(varId);
+		if (var==null) {
+			String err = "The Variable with Label "+varLabel+" and name "+varId+" does not exist in config file";
+			Log.e("nils",err);
+			o.addRow("");
+			o.addRedText(err);
+			return;
+		}
+	    myUnit = var.getUnit();
 		if (displayOut) {
 			LinearLayout ll = getFieldLayout();
 
@@ -68,15 +75,15 @@ public abstract class WF_Not_ClickableField extends WF_ListEntry {
 			 TextView o = (TextView)ll.findViewById(R.id.outputValueField);
 			TextView u = (TextView)ll.findViewById(R.id.outputUnitField);
 
-			String value = varIdentifier.getPrintedValue();
+			String value = Variable.getPrintedValue();
 			if (!value.isEmpty()) {
 				o.setText(varLabel+": "+value);	
-				u.setText(" ("+varIdentifier.getPrintedUnit()+")");
+				u.setText(" ("+Variable.getPrintedUnit()+")");
 			}
 			 */
-			myOutputFields.put(varIdentifier,ll);
+			myOutputFields.put(var,ll);
 			outputContainer.addView(ll);
-			myVar = varIdentifier;
+			myVar = var;
 		}
 
 	}
@@ -85,18 +92,18 @@ public abstract class WF_Not_ClickableField extends WF_ListEntry {
 	@Override
 	public void refreshValues() {
 		//Log.d("nils","refreshoutput called on "+myHeader);
-		Iterator<Map.Entry<VarIdentifier,LinearLayout>> it = myOutputFields.entrySet().iterator();
+		Iterator<Map.Entry<Variable,LinearLayout>> it = myOutputFields.entrySet().iterator();
 		while (it.hasNext()) {
-			Map.Entry<VarIdentifier,LinearLayout> pairs = (Map.Entry<VarIdentifier,LinearLayout>)it.next();
+			Map.Entry<Variable,LinearLayout> pairs = (Map.Entry<Variable,LinearLayout>)it.next();
 			//Log.d("nils","Iterator has found "+pairs.getKey()+" "+pairs.getValue());
-			VarIdentifier varId = pairs.getKey();
+			Variable varId = pairs.getKey();
 			LinearLayout ll = pairs.getValue();
 			TextView o = (TextView)ll.findViewById(R.id.outputValueField);
 			TextView u = (TextView)ll.findViewById(R.id.outputUnitField);			
-			String value = varId.getPrintedValue();
+			String value = varId.getValue();
 			if (!value.isEmpty()) {
 				o.setText(getFormattedText(varId,value));	
-				u.setText(getFormattedUnit(varId));
+				u.setText(Tools.getPrintedUnit(myUnit));
 			}
 			else {
 				o.setText("");

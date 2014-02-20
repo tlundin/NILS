@@ -1,10 +1,10 @@
 package com.teraim.nils.dynamic.workflow_realizations;
 
-import com.teraim.nils.R;
-import com.teraim.nils.dynamic.types.VarIdentifier;
-
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
+
+import com.teraim.nils.R;
+import com.teraim.nils.dynamic.types.Variable;
 
 public class WF_ClickableField_Selection extends WF_ClickableField {
 
@@ -25,14 +25,11 @@ public class WF_ClickableField_Selection extends WF_ClickableField {
 	}
 
 	@Override
-	public String getFormattedText(VarIdentifier varId, String value) {
+	public String getFormattedText(Variable varId, String value) {
 		return value;
 	}
 
-	@Override
-	public String getFormattedUnit(VarIdentifier varId) {
-		return varId.getPrintedUnit();
-	}
+
 	
 	
 

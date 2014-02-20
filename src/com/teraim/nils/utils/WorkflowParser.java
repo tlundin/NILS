@@ -20,7 +20,7 @@ import com.teraim.nils.Constants;
 import com.teraim.nils.FileLoadedCb;
 import com.teraim.nils.FileLoadedCb.ErrorCode;
 import com.teraim.nils.GlobalState;
-import com.teraim.nils.Logger;
+import com.teraim.nils.LoggerI;
 import com.teraim.nils.dynamic.blocks.AddRuleBlock;
 import com.teraim.nils.dynamic.blocks.AddSumOrCountBlock;
 import com.teraim.nils.dynamic.blocks.Block;
@@ -56,7 +56,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 	FileLoadedCb cb;
 	String myVersion = null;
 	List<Workflow> myFlow = null;
-	Logger o;
+	LoggerI o;
 
 
 	public WorkflowParser(PersistenceHelper ph, FileLoadedCb fileLoadedCb) {

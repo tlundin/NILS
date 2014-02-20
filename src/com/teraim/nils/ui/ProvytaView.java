@@ -133,7 +133,7 @@ public class ProvytaView extends View {
 			double alfa;
 			//Log.d("NILS","Blue has position");
 			if(focusMarker.getDistance()<realRadiusinMeter) {
-				alfa = focusMarker.getMovementDirection();
+				alfa = 0;//focusMarker.getMovementDirection();
 				float degAlfa = (float)(180*alfa/Math.PI);
 				int ux = (int) (cx-focusMarker.x*rScaleF);
 				//icon is a rotating arrow. Get it to point exavtly on x,y.

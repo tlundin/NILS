@@ -12,12 +12,13 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.teraim.nils.bluetooth.BluetoothRemoteDevice;
+import com.teraim.nils.dynamic.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Delyta;
 import com.teraim.nils.dynamic.types.Provyta;
 import com.teraim.nils.dynamic.types.Ruta;
 import com.teraim.nils.dynamic.types.Table;
-import com.teraim.nils.dynamic.types.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Workflow;
+import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
 import com.teraim.nils.expr.Aritmetic;
 import com.teraim.nils.expr.Parser;
 import com.teraim.nils.utils.DbHelper;
@@ -40,7 +41,7 @@ public class GlobalState  {
 
 
 	private Context myC;
-	private Logger log;
+	private LoggerI log;
 	private PersistenceHelper ph = null;	
 	private DbHelper db = null;
 	private Parser parser=null;
@@ -61,6 +62,9 @@ public class GlobalState  {
 
 	public String TEXT_LARGE;
 
+
+	private WF_Context currentContext;
+
 	public static GlobalState getInstance(Context c) {
 		if (singleton == null) {			
 			singleton = new GlobalState(c.getApplicationContext());
@@ -72,19 +76,26 @@ public class GlobalState  {
 	private GlobalState(Context ctx)  {
 
 		myC = ctx;
-		//Database Helper
-		db = new DbHelper(ctx);
 		//Shared PreferenceHelper 
 		SharedPreferences sp=PreferenceManager.getDefaultSharedPreferences(ctx);
 		ph = new PersistenceHelper(sp);
 		//Logger. Note that logger must be initialized with a TextView when used! 
-		log = new Logger(ctx,ph.getB(PersistenceHelper.DEVELOPER_SWITCH));
+		if (ph.getB(PersistenceHelper.DEVELOPER_SWITCH))
+			createLogger();
+		else
+			removeLogger();
 		//Parser for rules
 		parser = new Parser(this);
 		//Artlista
-		artLista = new VariableConfiguration(this.thawConfigFile());	
+		
+		artLista = new VariableConfiguration(this);	
+		
+		//Database Helper
+		Log.d("nils","artlista: "+artLista);
+		Log.d("nils","table: "+artLista.getTable());
+		db = new DbHelper(ctx,artLista.getTable(),ph);
 		myWfs = thawWorkflows();		
-		Tools.printDatabase(db);
+		db.printAllVariables();
 		Tools.scanRutData(ctx.getResources().openRawResource(R.raw.rutdata_v3),this);
 		Tools.scanDelningsData(ctx.getResources().openRawResource(R.raw.delningsdata),this);	
 
@@ -192,6 +203,7 @@ public class GlobalState  {
 				getCurrentRuta().getId()+"/bilder";
 	} 
 
+	
 	public Ruta getCurrentRuta() {
 		return findRuta(ph.get(PersistenceHelper.CURRENT_RUTA_ID_KEY));
 
@@ -374,15 +386,30 @@ public class GlobalState  {
 
 	//IF new configuration files have been loaded, replace existing instances.
 	public void refresh() {
-		artLista = new VariableConfiguration(this.thawConfigFile());	
-		myWfs = thawWorkflows();		
+		artLista = new VariableConfiguration(this);	
+		myWfs = thawWorkflows();	
+		db.init(artLista.getTable().getKeyParts());
 	}
 
-	public Logger getLogger() {
+	public LoggerI getLogger() {
 		return log;
 	}
 
+	public void setCurrentContext(WF_Context myContext) {
+		currentContext = myContext;
+	}
+
+	public WF_Context getCurrentContext() {
+		return currentContext;
+	}
+
+	public void createLogger() {
+		log = new Logger(this.getContext());
+	}
 	
+	public void removeLogger() {
+		log = new DummyLogger();
+	}
 
 
 	

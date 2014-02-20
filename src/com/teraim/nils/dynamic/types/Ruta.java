@@ -3,21 +3,18 @@ package com.teraim.nils.dynamic.types;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.teraim.nils.GlobalState;
-import com.teraim.nils.dynamic.types.Variable.StorageType;
 
-public class Ruta extends ParameterCache {
+public class Ruta {
 	private String myId;
 	//private Context ctx;
 	GlobalState gs;
 	private ArrayList<Provyta> provytor = new ArrayList<Provyta>();
 
 	public Ruta(GlobalState gs,String id) {
-		super(gs);
 		this.gs = gs;
 		myId = id;
 	}
@@ -130,23 +127,7 @@ public class Ruta extends ParameterCache {
 		return null;
 	}
 
-	@Override
-	public Variable getVariable(String varId) {
-		if (myId == null) {
-			Log.e("nils","My ID was null in getVariable Ruta for variable: "+varId);
-			return null;
-		} else
 
-			return getRutVariable(myId, varId);
-	}
-
-	@Override
-	public Variable storeVariable(String varId, String value) {
-		return this.storeVariable(new Variable(this.getId(), null, null,
-				value, 	varId,
-				StorageType.ruta));
-
-	}
 
 	public GlobalState getContext() {
 		return gs;
