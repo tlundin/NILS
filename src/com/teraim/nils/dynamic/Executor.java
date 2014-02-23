@@ -27,10 +27,11 @@ import com.teraim.nils.dynamic.blocks.ContainerDefineBlock;
 import com.teraim.nils.dynamic.blocks.CreateEntryFieldBlock;
 import com.teraim.nils.dynamic.blocks.CreateListEntriesBlock;
 import com.teraim.nils.dynamic.blocks.DisplayValueBlock;
-import com.teraim.nils.dynamic.blocks.ListSortingBlock;
+import com.teraim.nils.dynamic.blocks.CreateSortWidgetBlock;
 import com.teraim.nils.dynamic.blocks.StartBlock;
 import com.teraim.nils.dynamic.types.Numerable;
 import com.teraim.nils.dynamic.types.Rule;
+import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.types.Workflow;
 import com.teraim.nils.dynamic.workflow_abstracts.Container;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Container;
@@ -44,10 +45,10 @@ import com.teraim.nils.expr.SyntaxException;
 public abstract class Executor extends Fragment {
 
 	protected Workflow wf;
-	
+
 	//Extended context.
 	protected WF_Context myContext;
-	
+
 	//Normal context
 	protected Activity activity;
 	//Keep track of input in below arraylist.
@@ -55,35 +56,37 @@ public abstract class Executor extends Fragment {
 	protected final Map<Rule,Boolean>executedRules = new LinkedHashMap<Rule,Boolean>();	
 
 	protected List<Rule> rules = new ArrayList<Rule>();
-	
-	
+
+
 	protected abstract List<WF_Container> getContainers();
 	public abstract void execute(String function);
 
 	protected GlobalState gs;
-	
+
 	protected LoggerI o;
-	
-	private final Map<String,String>fakeHash = new HashMap<String,String>();
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		activity = this.getActivity();
 		myContext = new WF_Context((Context)activity,this,R.id.content_frame);
-		
+
 		gs = GlobalState.getInstance((Context)activity);
 		gs.setCurrentContext(myContext);
 		o = gs.getLogger();
 		wf = getFlow();
 
-		//Create fake hash.		
+		//TODO: REMOVE
+		//Create fake hash if wf does not provide.
+		final Map<String,String>fakeHash = new HashMap<String,String>();
 		fakeHash.put("ruta", "262");
 		fakeHash.put("provyta", "6");
 		fakeHash.put("delyta", "1");
+		myContext.setKeyHash(fakeHash);
 	}
 
 
-	
+
 
 	protected Workflow getFlow() {
 		Workflow wf=null;
@@ -117,26 +120,96 @@ public abstract class Executor extends Fragment {
 		}
 		return wf;
 	}
-	
-	
+
+
 	/**
 	 * Execute the workflow.
 	 */
 	protected void run() {
-		
+
 		//LinearLayout my_root = (LinearLayout) findViewById(R.id.myRoot);		
 		List<Block>blocks = wf.getBlocks();
 
 		for (Block b:blocks) {
-			
+
 			if (b instanceof StartBlock) {
 				o.addRow("");
 				o.addYellowText("Startblock found");
-				o.addRow("");
-				o.addRedText("No current context!!!....Adding HACKED FAKE keys");
-				myContext.setKeyHash(fakeHash);
+				StartBlock bl = (StartBlock)b;
+				String context = bl.getWorkFlowContext();
+				if (context==null||context.isEmpty()) {
+					Log.d("nils","No context!!");
+					o.addRow("No context...will use existing");
+				} else {
+					Log.d("nils","Found context!!");
+					String[] pairs = context.split(",");
+					if (pairs==null||pairs.length==0) {
+						o.addRow("Could not split context on comma (,). Syntax error?");
+					} else {
+						boolean err = false;
+						Map<String, String> keyHash = new HashMap<String, String>();
+						for (String pair:pairs) {
+							Log.d("nils","found pair: "+pair);
+							if (pair!=null&&!pair.isEmpty()) {
+								String[] kv = pair.split("=");
+								if (kv==null||kv.length<2) {
+									o.addRow("");
+									o.addRedText("Could not split context on comma (,). Syntax error?");
+									err=true;
+								} else {
+									//Calculate value of context variables, if any.
+									//is it a variable or a value?
+									String arg = kv[0].trim();
+									String val = kv[1].trim();
+									Log.d("nils","Keypair: "+arg+","+val);
+									
+									if (val.isEmpty()||arg.isEmpty()) {
+										o.addRow("");
+										o.addRedText("Empty variable or argument in definition");
+										err=true;
+									} else {
+										
+										if (Character.isDigit(val.charAt(0))) {
+											//constant
+											keyHash.put(arg, val);
+											Log.d("nils","Added "+arg+","+val+" to current context");
+										} else {
+											//Variable. need to evaluate first..
+											Variable v = gs.getArtLista().getVariableInstance(val);
+											if (v==null) {
+												err=true;
+												o.addRow("");
+												o.addRedText("One of the variables missing: "+val);
+												Log.d("nils","Couldn't find variable "+val);
+											} else {
+												String varVal = v.getValue();
+												if(varVal==null||varVal.isEmpty()) {
+													err=true;
+													o.addRow("");
+													o.addRedText("One of the variables used in current context("+v.getId()+") has no value in database");
+													Log.e("nils","var was null or empty: "+v.getId());
+												} else {
+													
+													keyHash.put(arg, varVal);
+													Log.d("nils","Added "+arg+","+varVal+" to current context");
+													
+												}
+													
+											}
+											
+										}
+									}
+								}
+							} else
+								Log.d("nils","Found empty or null pair");
+						} if (!err && !keyHash.isEmpty()) {
+							Log.d("nils","added keyhash to gs");
+							myContext.setKeyHash(keyHash);
+						}
+					}
+				}
 			}
-			
+
 			else if (b instanceof ContainerDefineBlock) {
 				o.addRow("");
 				o.addYellowText("ContainerDefineBlock found");
@@ -150,7 +223,7 @@ public abstract class Executor extends Fragment {
 						o.addRow("");
 						o.addRedText("Could not find container "+id+" in template! Will default to root");
 					}
-						
+
 				}
 			}			
 			else if (b instanceof ButtonBlock) {
@@ -159,10 +232,10 @@ public abstract class Executor extends Fragment {
 				ButtonBlock bl = (ButtonBlock) b;
 				bl.create(myContext);
 			}			
-			else if (b instanceof ListSortingBlock) {
+			else if (b instanceof CreateSortWidgetBlock) {
 				o.addRow("");
-				o.addYellowText("ListSortingBlock found");
-				ListSortingBlock bl = (ListSortingBlock) b;
+				o.addYellowText("CreateSortWidgetBlock found");
+				CreateSortWidgetBlock bl = (CreateSortWidgetBlock) b;
 				bl.create(myContext);
 			}/*
 			else if (b instanceof ListFilterBlock) {
@@ -198,7 +271,7 @@ public abstract class Executor extends Fragment {
 			}
 
 		}
-		
+
 		//Now all blocks are executed.
 		//Draw the UI.
 		o.addRow("");
@@ -211,26 +284,26 @@ public abstract class Executor extends Fragment {
 			o.addRedText("TEMPLATE ERROR: Cannot find the root container. \nEach template must have a root! Execution aborted.");				
 		}
 
-		
-		
+
+
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	/*			final Map<String, ViewGroup> layoutContainers = getBlockContainers();
 
 	Log.d("NILS","Drawable_block found");
@@ -250,14 +323,14 @@ public abstract class Executor extends Fragment {
 		bl.draw(this, target);
 	else
 		Log.e("nils","no container found to draw block.");
-	
-*/
+
+	 */
 
 
 
-	
 
-	
+
+
 	/*
 		final InputAlertBuilder.AlertBuildHelper abh = new AlertBuildHelper(this.getBaseContext()) {
 			@Override
@@ -286,8 +359,8 @@ public abstract class Executor extends Fragment {
 	}
 	 */
 
-	
-	
+
+
 	//Evaluate all rules.
 	//Show the rules that were broken in the UI.
 	private void validate() {
@@ -354,6 +427,6 @@ public abstract class Executor extends Fragment {
 
 
 
-	
+
 
 }

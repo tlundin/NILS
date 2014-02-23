@@ -26,6 +26,7 @@ public  class CreateListEntriesBlock extends Block {
 	private String selectionField;
 	private String selectionPattern;
 	private String filterName;
+	private boolean isVisible = true;
 
 	public String getFileName() {
 		return fileName;
@@ -34,7 +35,7 @@ public  class CreateListEntriesBlock extends Block {
 		return containerId;
 	}
 	public CreateListEntriesBlock(String type,String fileName, String containerId, String id, String selectionField, String selectionPattern,
-			String filterName) {
+			String filterName,boolean isVisible) {
 		this.fileName =fileName;
 		this.containerId = containerId;
 		this.id=id;
@@ -42,6 +43,7 @@ public  class CreateListEntriesBlock extends Block {
 		this.selectionPattern=selectionPattern;
 		this.filterName=filterName;
 		this.type=type;
+		this.isVisible=isVisible;
 	}
 
 	public void create(WF_Context myContext) {
@@ -52,18 +54,18 @@ public  class CreateListEntriesBlock extends Block {
 		
 		if (type.equals("selected_values_list")) {
 			o.addRow("This is a selected values type list. Adding Time Order sorter.");
-			myList =  new WF_List_UpdateOnSaveEvent(id,myContext);
+			myList =  new WF_List_UpdateOnSaveEvent(id,myContext,isVisible);
 			myList.addSorter(new WF_TimeOrder_Sorter());	
 		}
 		else { 
 			if (type.equals("selection_list")) {
 				o.addRow("This is a selection list. Adding Alphanumeric sorter.");
-				myList = new WF_List_UpdateOnSaveEvent(id,myContext);
+				myList = new WF_List_UpdateOnSaveEvent(id,myContext,isVisible);
 				myList.addSorter(new WF_Alphanumeric_Sorter());
 			} else
 			{
 				//TODO: Find other solution
-				myList = new WF_List_UpdateOnSaveEvent(id,myContext);
+				myList = new WF_List_UpdateOnSaveEvent(id,myContext,isVisible);
 				myList.addSorter(new WF_Alphanumeric_Sorter());
 			}
 		}

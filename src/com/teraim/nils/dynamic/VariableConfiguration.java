@@ -20,10 +20,11 @@ public class VariableConfiguration {
 	public static String Col_Variable_Name = "Variable Name";
 	public static String Col_Entry_Label = "Entry Label";
 	public static String Col_Variable_Keys = "Key Chain";
-	static List<String>requiredColumns=Arrays.asList("List Entry Name",Col_Variable_Name,Col_Entry_Label,"Action","Variable Label","Num Type","Displayed","Unit",Col_Variable_Keys,"Description");
+	public static String Col_Functional_Group = "Funktionell grupp";
+	public static List<String>requiredColumns=Arrays.asList("List Entry Name",Col_Variable_Name,Col_Entry_Label,"Action","Variable Label","Num Type","Displayed","Unit",Col_Variable_Keys,"Description",Col_Functional_Group);
 
 	
-	public static int LIST_ENTRY = 0,VARIABLE_NAME=1,ENTRY_LABEL=2,ACTION=3,VARIABLE_LABEL=4,NUM_TYPE=5,DISPLAY_IN_LIST=6,UNIT=7,KEY_CHAIN=8,Description=9;
+	private static int LIST_ENTRY = 0,VARIABLE_NAME=1,ENTRY_LABEL=2,ACTION=3,VARIABLE_LABEL=4,NUM_TYPE=5,DISPLAY_IN_LIST=6,UNIT=7,KEY_CHAIN=8,DESCRIPTION=9,FUNCTIONAL_GROUP =10;
 	
 	Map<String,Integer>fromNameToColumn = new HashMap<String,Integer>();
 
@@ -85,9 +86,12 @@ public class VariableConfiguration {
 	}
 
 	public String getDescription(List<String> row) {
-		return row.get(fromNameToColumn.get(requiredColumns.get(Description)));
+		return row.get(fromNameToColumn.get(requiredColumns.get(DESCRIPTION)));
 	}
 
+	public String getFunctionalGroup(List<String> row) {
+		return row.get(fromNameToColumn.get(requiredColumns.get(FUNCTIONAL_GROUP)));
+	}
 	public Variable.DataType getnumType(List<String> row) {
 		String type = row.get(fromNameToColumn.get(requiredColumns.get(NUM_TYPE)));
 		if (type!=null) {
@@ -115,18 +119,21 @@ public class VariableConfiguration {
 		return myTable.getRowFromKey(varName);
 	}
 
+	Map<String,Variable>varCache = new HashMap<String,Variable>();
+	
 	//Create a variable with the current context and the variable's keychain.
 	public Variable getVariableInstance(String varId) {	
+		Variable v = varCache.get(varId);
+		if (v!=null) 
+			return v;
 		List<String> row = this.getCompleteVariableDefinition(varId);
 		if (row!=null) {
 		String keyChain = this.getKeyChain(row);
-		Log.d("nils","getVariableInstance for "+varId+" with keychain "+keyChain);
-		Log.d("nils","KeyChain is empty?"+keyChain.isEmpty());
+		//Log.d("nils","getVariableInstance for "+varId+" with keychain "+keyChain);
+		//Log.d("nils","KeyChain is empty?"+keyChain.isEmpty());
 		Map<String, String> vMap;
 		if (!keyChain.isEmpty()) {
 		String[] keys = keyChain.split("\\.");
-		if (keys.length==0)
-			Log.d("nils","KEYCHAIN EMPTY!!" );
 		//find my keys in the current context.
 		vMap = new HashMap<String,String>();
 		Map<String, String> cMap = gs.getCurrentContext().getKeyHash();
@@ -134,18 +141,21 @@ public class VariableConfiguration {
 			String value = cMap.get(key);
 			if (value!=null) {
 				vMap.put(key, value);
-				Log.d("nils","Adding keychain key:"+key+" value: "+value);
+				//Log.d("nils","Adding keychain key:"+key+" value: "+value);
 			}
 			else {
-				Log.d("nils","Couldn't find key "+key+" in current context");
+				Log.e("nils","Couldn't find key "+key+" in current context");
 				
 			}
 		}
 		} else
 			vMap=null;
-		return new Variable(varId,row,vMap,gs);
+		//Use a cache for faster access.
+		v = new Variable(varId,row,vMap,gs);
+		varCache.put(varId, v);
+		return v;
 		}
-		Log.e("nils","Couldn't find variable "+varId+" in getVariableInstance");
+		//Log.e("nils","Couldn't find variable "+varId+" in getVariableInstance");
 		return null;
 	}
 	

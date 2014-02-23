@@ -289,7 +289,8 @@ public class Start extends MenuActivity {
 			}
 
 			loginConsole.draw();
-
+			//TODO:REMOVE
+			gs.getDb().speziale();
 			break;
 
 
@@ -446,13 +447,13 @@ public class Start extends MenuActivity {
 			ph.put(PersistenceHelper.BUNDLE_LOCATION, "nilsbundle3.xml");
 		if (ph.get(PersistenceHelper.CONFIG_LOCATION).equals(PersistenceHelper.UNDEFINED))
 			ph.put(PersistenceHelper.CONFIG_LOCATION, "config.csv");
-		ph.put(PersistenceHelper.DEVELOPER_SWITCH,false);
+		ph.put(PersistenceHelper.DEVELOPER_SWITCH,true);
 		ph.put(PersistenceHelper.VERSION_CONTROL_SWITCH_OFF, true);
 		ph.put(PersistenceHelper.CURRENT_RUTA_ID_KEY, "262");
 		ph.put(PersistenceHelper.CURRENT_PROVYTA_ID_KEY, "6");
 		ph.put(PersistenceHelper.CURRENT_DELYTA_ID_KEY, "1");
 
-
+		
 
 		//copy the configuration files into the root dir.
 		//copyAssets();

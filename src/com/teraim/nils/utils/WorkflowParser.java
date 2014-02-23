@@ -28,9 +28,9 @@ import com.teraim.nils.dynamic.blocks.ButtonBlock;
 import com.teraim.nils.dynamic.blocks.ContainerDefineBlock;
 import com.teraim.nils.dynamic.blocks.CreateEntryFieldBlock;
 import com.teraim.nils.dynamic.blocks.CreateListEntriesBlock;
+import com.teraim.nils.dynamic.blocks.CreateSortWidgetBlock;
 import com.teraim.nils.dynamic.blocks.DisplayValueBlock;
 import com.teraim.nils.dynamic.blocks.LayoutBlock;
-import com.teraim.nils.dynamic.blocks.ListSortingBlock;
 import com.teraim.nils.dynamic.blocks.PageDefineBlock;
 import com.teraim.nils.dynamic.blocks.StartBlock;
 import com.teraim.nils.dynamic.types.Workflow;
@@ -234,15 +234,13 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 					blocks.add(readBlockLayout(parser));				
 				else if (name.equals("block_button")) 
 					blocks.add(readBlockButton(parser));
-				//				else if (name.equals("block_set_value")) 
-				//					blocks.add(readBlockSetValue(parser));
 				else if (name.equals("block_add_rule")) 
 					blocks.add(readBlockAddRule(parser));
 				else if (name.equals("block_add_sum_of_selected_variables_display")) 
 					blocks.add(readBlockAddSelectionOrSum(parser,isSum));
 				else if (name.equals("block_add_number_of_selections_display")) 
 					blocks.add(readBlockAddSelectionOrSum(parser,isCount));
-				else if (name.equals("block_create_list_sorting_function")) 
+				else if (name.equals("block_create_sort_widget")) 
 					blocks.add(readBlockCreateSorting(parser));
 				//This is a dummy call. Not supported block.
 				else if (name.equals("block_create_list_filter")) 
@@ -267,6 +265,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 
 	private DisplayValueBlock readBlockCreateDisplayField(XmlPullParser parser)throws IOException, XmlPullParserException {
 		o.addRow("Parsing block: block_create_display_field...");
+		boolean isVisible = true;
 		String namn=null, formula = null, label=null,containerId=null;
 		Unit unit=null;	
 		parser.require(XmlPullParser.START_TAG, null,"block_create_display_field");
@@ -291,19 +290,22 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 			}  else if (name.equals("unit")) {
 				unit = Tools.convertToUnit(readText("unit",parser));
 				o.addRow("UNIT: "+unit);	
+			} else if (name.equals("is_visible")) {
+				isVisible = !readText("is_visible",parser).equals("false");
+				o.addRow("IS_VISIBLE: "+isVisible);	
 			} 
 			else
 				skip(parser);
 
 		}
 		return new DisplayValueBlock(namn, label,unit,
-				formula,containerId);
+				formula,containerId,isVisible);
 	}
 
-
-
+	
 	private CreateEntryFieldBlock readBlockCreateEntryField(XmlPullParser parser)throws IOException, XmlPullParserException {
 		o.addRow("Parsing block: block_create_entry_field...");
+		boolean isVisible = true;
 		String namn=null, label=null,containerId=null,postLabel="";
 		Unit unit = Unit.nd;		
 		parser.require(XmlPullParser.START_TAG, null,"block_create_entry_field");
@@ -323,15 +325,15 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 				containerId = readText("container_name",parser);
 				o.addRow("CONTAINER_NAME: "+containerId);
 			} 
-			  else if (name.equals("unit")) {
-				  postLabel = readText("unit",parser);
-				o.addRow("UNIT: "+unit.name());
-			}
+			  else if (name.equals("is_visible")) {
+				isVisible = !readText("is_visible",parser).equals("false");
+				o.addRow("IS_VISIBLE: "+isVisible);	
+			} 
 			else
 				skip(parser);
 		}
 		return new CreateEntryFieldBlock(namn, label,
-				postLabel, containerId);
+				postLabel, containerId,isVisible);
 	}
 
 	/**
@@ -347,37 +349,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 		o.addRow("");
 		o.addRedText("This type of block is not supported");
 	}
-/*		String containerId=null,type=null,target=null,label=null,function=null;
 
-		parser.require(XmlPullParser.START_TAG, null,"block_create_list_filter");
-		while (parser.next() != XmlPullParser.END_TAG) {
-			if (parser.getEventType() != XmlPullParser.START_TAG) {
-				continue;
-			}
-			String name= parser.getName();
-
-			if (name.equals("label")) {
-				label = readText("label",parser);
-				o.addRow("LABEL: "+label);
-			} else if (name.equals("type")) {
-				type = readText("type",parser);
-				o.addRow("TYPE: "+type);
-			} else if (name.equals("function_name")) {
-				function = readText("function_name",parser);
-			} else if (name.equals("container_name")) {
-				containerId = readText("container_name",parser);
-				o.addRow("CONTAINER_NAME: "+containerId);
-			} else if (name.equals("target")) {
-				target = readText("target",parser);
-				o.addRow("TARGET: "+target);
-			}
-			else
-				skip(parser);
-
-		}
-		return new ListFilterBlock(containerId, type, target,label, function);
-	}
-	*/
 
 	/**
 	 * Creates a Block for adding a sorting function on Target List. 
@@ -386,10 +358,11 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 	 * @throws IOException
 	 * @throws XmlPullParserException
 	 */
-	private ListSortingBlock readBlockCreateSorting(XmlPullParser parser) throws IOException, XmlPullParserException {
-		o.addRow("Parsing block: block_create_list_sorting_function...");
-		String containerName=null,type=null,target=null;
-		parser.require(XmlPullParser.START_TAG, null,"block_create_list_sorting_function");
+	private CreateSortWidgetBlock readBlockCreateSorting(XmlPullParser parser) throws IOException, XmlPullParserException {
+		o.addRow("Parsing block: block_create_sort_widget...");
+		String namn=null,containerName=null,type=null,target=null,selectionField=null,displayField=null,selectionPattern=null;
+		boolean isVisible = true;
+		parser.require(XmlPullParser.START_TAG, null,"block_create_sort_widget");
 		while (parser.next() != XmlPullParser.END_TAG) {
 			if (parser.getEventType() != XmlPullParser.START_TAG) {
 				continue;
@@ -398,18 +371,35 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 
 			if (name.equals("container_name")) {
 				containerName = readText("container_name",parser);
-				o.addRow("CONTAINER_NAME: "+containerName);
+				o.addRow("CONTAINER_NAME: "+containerName);				
+			} else if (name.equals("name")) {
+				namn = readText("name",parser);
+				o.addRow("NAME: "+namn);
 			} else if (name.equals("type")) {
 				type = readText("type",parser);
 				o.addRow("TYPE: "+type);
 			} else if (name.equals("target")) {
 				target = readText("target",parser);
 				o.addRow("TARGET: "+target);
-			}else 
+			} else if (name.equals("is_visible")) {
+				isVisible = !readText("is_visible",parser).equals("false");
+				o.addRow("IS_VISIBLE: "+isVisible);	
+			}  else if (name.equals("selection_field")) {
+				selectionField = readText("selection_field",parser);
+				o.addRow("SELECTION_FIELD: "+selectionField);
+			}  else if (name.equals("display_field")) {
+					displayField = readText("display_field",parser);
+					o.addRow("DISPLAY_FIELD: "+displayField);
+			}  else if (name.equals("selection_pattern")) {
+				selectionPattern = readText("selection_pattern",parser);
+				o.addRow("SELECTION_PATTERN: "+selectionPattern);	
+			}
+			
+			else 
 				skip(parser);
 
 		}
-		return new ListSortingBlock(type, containerName,target);
+		return new CreateSortWidgetBlock(namn,type, containerName,target,selectionField,displayField,selectionPattern,isVisible);
 	}
 
 	/**
@@ -422,7 +412,9 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 	private AddSumOrCountBlock readBlockAddSelectionOrSum(XmlPullParser parser,boolean isCount) throws IOException, XmlPullParserException {
 		String containerName=null,label=null,postLabel = null,filter=null,target=null,result=null;
 		WF_Not_ClickableField_SumAndCountOfVariables.Type type;
-
+		
+		boolean isVisible = true;
+		
 		if (isCount)
 			type = WF_Not_ClickableField_SumAndCountOfVariables.Type.count;
 		else
@@ -466,67 +458,18 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 				result = readText("result",parser);
 				o.addRow("RESULT Variable: "+result);
 			}
+			else if (name.equals("is_visible")) {
+				isVisible = !readText("is_visible",parser).equals("false");
+				o.addRow("IS_VISIBLE: "+isVisible);	
+			} 
+			
 			
 			else
 				skip(parser);
 
 		}
-		return new AddSumOrCountBlock(containerName,label,postLabel,filter,target,type,result);
+		return new AddSumOrCountBlock(containerName,label,postLabel,filter,target,type,result,isVisible);
 	}	
-
-	/*
-
-
-	private CreateListEntryBlock readBlockCreateListEntry(XmlPullParser parser) throws IOException, XmlPullParserException, EvalException {
-		Log.d("NILS","Create List Entry block...");
-		ArrayList<XML_Variable> vars = new ArrayList<XML_Variable>();
-		String listName="";
-		XML_Variable Xvar=null;
-		parser.require(XmlPullParser.START_TAG, null,"block_create_list_entry");
-		while (parser.next() != XmlPullParser.END_TAG) {
-			if (parser.getEventType() != XmlPullParser.START_TAG) {
-				continue;
-			}	
-			String name= parser.getName();
-			//If a unique varname tag found, instantiate a new XML_variable. 
-			if (name.equals("name")) {
-				listName = readText("name",parser);
-				Log.d("NILS","listName: "+listName);
-			}
-			else {
-				if (name.equals("varname")) {
-					if (Xvar !=null) {
-						Log.d("NILS","Added variable "+Xvar.name);
-						vars.add(Xvar);
-					}
-					Xvar = new XML_Variable();
-					Xvar.name = readText("varname",parser);
-					Xvar.type = Variable.Type.NUMERIC;
-					Xvar.purpose = "editable";
-					Xvar.label = Xvar.name;
-				}
-				else if (Xvar!=null) {
-					if (name.equals("vartype")) 
-						Xvar.type = Tools.convertToType(readText("vartype",parser));
-
-					else if (name.equals("purpose")) 
-						Xvar.purpose = readText("purpose",parser);
-					else if (name.equals("field_label")) 
-						Xvar.label = readText("field_label",parser);
-					else
-						skip(parser);
-				} else
-					skip(parser);
-
-
-			}
-		} if (Xvar !=null) {
-			Log.d("NILS","Added variable "+Xvar.name);
-			vars.add(Xvar);
-		}
-		return new CreateListEntryBlock(ctx,vars,listName);
-	}
-	 */
 
 
 	/**
@@ -539,6 +482,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 	 */	
 	private CreateListEntriesBlock readBlockCreateListEntries(XmlPullParser parser) throws IOException, XmlPullParserException, EvalException {
 		o.addRow("Parsing block: block_create_list_entries...");
+		boolean isVisible = true;
 		String type=null,fileName="",containerName=null,namn=null,selectionField=null,selectionPattern=null,filter=null;
 		parser.require(XmlPullParser.START_TAG, null,"block_create_list_entries");
 		while (parser.next() != XmlPullParser.END_TAG) {
@@ -568,51 +512,20 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 			} else if (name.equals("filter")) {
 				filter = readText("filter",parser);
 				o.addRow("FILTER: "+filter);
-			} else
+			} else if (name.equals("is_visible")) {
+				isVisible = !readText("is_visible",parser).equals("false");
+				o.addRow("IS_VISIBLE: "+isVisible);	
+			} 			
+			else
 				skip(parser);
 
 
 		}
 
-		return new CreateListEntriesBlock(type,fileName,containerName,namn,selectionField,selectionPattern,filter);
+		return new CreateListEntriesBlock(type,fileName,containerName,namn,selectionField,selectionPattern,filter,isVisible);
 	}
 
 
-	/*	private CreateFieldBlock readBlockCreateField(XmlPullParser parser) throws IOException, XmlPullParserException, EvalException {
-		 Log.d("NILS","Create Field block...");
-		 XML_Variable var = new XML_Variable();
-		 parser.require(XmlPullParser.START_TAG, null,"block_create_field");
-		 while (parser.next() != XmlPullParser.END_TAG) {
-			 if (parser.getEventType() != XmlPullParser.START_TAG) {
-				 continue;
-			 }	
-			 String name= parser.getName();
-			 if (name.equals("name")) 
-				 var.name = readText("name",parser);
-			 else if (name.equals("type")) 
-				 var.type = Tools.convertToType(readText("type",parser));
-			 //TODO: PAGENAME.			
-			 else if (name.equals("purpose")) 
-				 var.purpose = readText("purpose",parser);
-			 else if (name.equals("label")) 
-				 var.label = readText("label",parser);
-			 else if (name.equals("unit")) {
-				 var.unit = Tools.convertToUnit(readText("unit",parser));
-				 if (var.unit==null) {
-					 var.unit=Unit.undefined;
-					 Log.e("nils","Failed to understand Unit: "+readText("unit",parser)+" revert to no unit.");
-					 Log.e("nils","Allowed units: ");
-					 for (int i = 0 ; i<Unit.values().length;i++)
-						 Log.e("nils",Unit.values()[i].name());
-				 }
-			 }
-
-			 else
-				 skip(parser);
-		 }
-		 return new CreateFieldBlock(ctx,var);
-	 }
-	 */
 
 	/**
 	 *  Creates a Buttonblock. 
@@ -625,6 +538,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 	private ButtonBlock readBlockButton(XmlPullParser parser) throws IOException, XmlPullParserException {
 		o.addRow("Parsing block: block_button...");
 		String label=null,onClick=null,myname=null,containerName=null,target=null,type=null;
+		boolean isVisible = true;
 		parser.require(XmlPullParser.START_TAG, null,"block_button");
 		while (parser.next() != XmlPullParser.END_TAG) {
 			if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -655,11 +569,15 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 				target = readText("target",parser);
 				o.addRow("TARGET: "+target);
 			}
+			else if (name.equals("is_visible")) {
+				isVisible = !readText("is_visible",parser).equals("false");
+				o.addRow("IS_VISIBLE: "+isVisible);	
+			} 
 			else
 				skip(parser);
 		}
 
-		return new ButtonBlock(label,onClick,myname,containerName,target,type);
+		return new ButtonBlock(label,onClick,myname,containerName,target,type,isVisible);
 	}
 
 	/**
@@ -672,7 +590,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 	//Block Start contains the name of the worklfow and the Arguments.
 	private StartBlock readBlockStart(XmlPullParser parser) throws IOException, XmlPullParserException {
 		o.addRow("Parsing block: block_start...");
-		String workflowName=null; String args[]=null;
+		String workflowName=null; String args[]=null,context=null;
 		parser.require(XmlPullParser.START_TAG, null,"block_start");
 		while (parser.next() != XmlPullParser.END_TAG) {
 			if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -688,6 +606,10 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 				o.addRow("input variables: ");
 				for(int i=0;i<args.length;i++)
 					o.addYellowText(args[i]+",");
+			} 
+			else if (name.equals("context")) {
+				context = readText("context",parser);
+				o.addRow("WF Context: "+context);			
 			}
 			else
 				skip(parser);
@@ -697,36 +619,11 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 			o.addRedText("Error reading startblock. Workflowname missing");
 			throw new XmlPullParserException("Parameter missing");
 		}
-		return new StartBlock(args,workflowName);
+		return new StartBlock(args,workflowName,context);
 	}
 
 	/*
-	 //For now just create dummy.
-	 private SetValueBlock readBlockSetValue(XmlPullParser parser) throws IOException, XmlPullParserException {
-		 Log.d("NILS","set value block...");
-		 String varRef=null,expr=null,label=null;
-		 parser.require(XmlPullParser.START_TAG, null,"block_set_value");
-		 while (parser.next() != XmlPullParser.END_TAG) {
-			 if (parser.getEventType() != XmlPullParser.START_TAG) {
-				 continue;
-			 }
-			 String name= parser.getName();
-			 if (name.equals("varname"))  
-				 varRef = readSymbol("varname",parser);
-			 else if (name.equals("expression"))  
-				 expr = readText("expression",parser);
-			 else if (name.equals("label")) 
-				 label = readText("label",parser);
-			 else
-				 skip(parser);
-		 }
-		 if (varRef == null || expr == null)  {
-			 Log.e("NILS","Error reading SetValueblock. Either varRef or Expression is null. Varref: "+varRef);
-			 throw new XmlPullParserException("Parameter missing");
-		 }
-		 return new SetValueBlock(ctx,label,varRef,expr);
-	 }
-	 */
+
 
 	/**
 	 * Creates a LayoutBlock. LayoutBlocks are used to set the direction of the layout 

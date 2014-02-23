@@ -3,8 +3,6 @@ package com.teraim.nils.dynamic.workflow_realizations;
 import java.util.Comparator;
 import java.util.List;
 
-import android.content.Context;
-import android.util.Log;
 import android.view.View;
 
 import com.teraim.nils.GlobalState;
@@ -16,7 +14,6 @@ import com.teraim.nils.utils.DbHelper.StoredVariableData;
 
 public abstract class WF_ListEntry extends WF_Widget implements Listable,Comparable<Listable> {
 
-	Context ctx=null;
 	//String keyVariable=null;
 	List<String> keyRow =null;
 	VariableConfiguration al;
@@ -26,11 +23,10 @@ public abstract class WF_ListEntry extends WF_Widget implements Listable,Compara
 	public abstract void refreshValues();
 	public abstract void refreshInputFields();
 
-	public WF_ListEntry(View v,Context ctx) {
-		super("LIST_ID",v);
-		this.ctx=ctx;
-		al = GlobalState.getInstance(ctx).getArtLista();
-		o = GlobalState.getInstance(ctx).getLogger();
+	public WF_ListEntry(View v,WF_Context ctx,boolean isVisible) {
+		super("LIST_ID",v,isVisible,ctx);
+		al = GlobalState.getInstance(ctx.getContext()).getArtLista();
+		o = GlobalState.getInstance(ctx.getContext()).getLogger();
 	}
 
 	public void setKeyRow(String key) {

@@ -55,13 +55,13 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 	}
 
 	public  WF_ClickableField(final String myId,final String descriptionT, WF_Context context,String id, View view) {
-		super(myId,descriptionT,context,view);	
+		super(myId,descriptionT,context,view,true);	
 		gs = GlobalState.getInstance(context.getContext());
 		al = gs.getArtLista();
 		o = gs.getLogger();
 		//SpannableString content = new SpannableString(headerT);
 		//content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-		inputContainer = new LinearLayout(ctx);
+		inputContainer = new LinearLayout(context.getContext());
 		inputContainer.setOrientation(LinearLayout.VERTICAL);
 		inputContainer.setLayoutParams(new LinearLayout.LayoutParams(
 				LinearLayout.LayoutParams.MATCH_PARENT, 
@@ -144,7 +144,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 		switch (var.getType()) {
 		case bool:
 			//o.addRow("Adding boolean dy-variable with label "+label+", name "+varId+", type "+var.getType().name()+" and unit "+unit.name());
-			View view = LayoutInflater.from(ctx).inflate(R.layout.ja_nej_radiogroup,null);
+			View view = LayoutInflater.from(myContext.getContext()).inflate(R.layout.ja_nej_radiogroup,null);
 			TextView header = (TextView)view.findViewById(R.id.header);
 			header.setText(varLabel+" "+postLabel);
 			RadioGroup rbg = (RadioGroup)view.findViewById(R.id.radioG);
@@ -170,15 +170,15 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 			//Add dropdown.
 			Log.d("nils","Adding spinner for label "+label);
 			//o.addRow("Adding spinner field for dy-variable with label "+label+", name "+varId+", type "+var.getType().name()+" and unit "+unit.name());
-			final Spinner spinner = (Spinner)LayoutInflater.from(ctx).inflate(R.layout.edit_field_spinner, null);
-			ArrayAdapter<String> adapter = new ArrayAdapter<String>(ctx, android.R.layout.simple_spinner_dropdown_item, opt);		
+			final Spinner spinner = (Spinner)LayoutInflater.from(myContext.getContext()).inflate(R.layout.edit_field_spinner, null);
+			ArrayAdapter<String> adapter = new ArrayAdapter<String>(myContext.getContext(), android.R.layout.simple_spinner_dropdown_item, opt);		
 			spinner.setAdapter(adapter);
 			inputContainer.addView(spinner);
 			myVars.put(var,spinner);
 			break;
 		case text:
 			//o.addRow("Adding text field for dy-variable with label "+label+", name "+varId+", type "+var.getType().name()+" and unit "+unit.name());
-			View l = LayoutInflater.from(ctx).inflate(R.layout.edit_field_text,null);
+			View l = LayoutInflater.from(myContext.getContext()).inflate(R.layout.edit_field_text,null);
 			header = (TextView)l.findViewById(R.id.header);
 			header.setText(varLabel+" "+postLabel);
 			EditText etview = (EditText)l.findViewById(R.id.edit);
@@ -187,11 +187,11 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 			break;
 		case numeric:
 			//o.addRow("Adding edit field for dy-variable with label "+label+", name "+varId+", type "+numType.name()+" and unit "+unit.name());
-			l = LayoutInflater.from(ctx).inflate(R.layout.edit_field_numeric,null);
+			l = LayoutInflater.from(myContext.getContext()).inflate(R.layout.edit_field_numeric,null);
 			header = (TextView)l.findViewById(R.id.header);
 			etview = (EditText)l.findViewById(R.id.edit);
 			header.setText(varLabel+" ("+unit.name()+")"+" "+" "+postLabel);
-			etview.setText(Tools.getPrintedUnit(unit));
+			//etview.setText(Tools.getPrintedUnit(unit));
 			inputContainer.addView(l);
 			myVars.put(var,etview);
 
@@ -241,7 +241,9 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 				if (type == DataType.numeric||
 						type == DataType.text){
 					EditText et = (EditText)view;
-					variable.setValue(et.getText().toString());
+					String txt = et.getText().toString();
+					if (txt.trim().length()>0)
+					variable.setValue(txt);
 				} else				
 					if (type == DataType.list) {
 						Spinner sp = (Spinner)view;

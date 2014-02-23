@@ -18,7 +18,7 @@ public class WF_Not_ClickableField_SumAndCountOfVariables extends
 WF_Not_ClickableField implements EventListener {
 
 	private WF_List targetList;
-
+	private WF_Context myContext;
 	String myPattern;
 	//Detta är en id för widgeten - inte variabeln!!
 	//private static final String MY_WIDGET_ID = "Antal Arter";
@@ -30,9 +30,9 @@ WF_Not_ClickableField implements EventListener {
 	Type myType;
 
 	public WF_Not_ClickableField_SumAndCountOfVariables(String header,String descriptionT, WF_Context myContext, 
-			View view, String myTarget, String pattern,Type sumOrCount) {
-		super(header, descriptionT, myContext, view);
-
+			View view, String myTarget, String pattern,Type sumOrCount,boolean isVisible) {
+		super(header, descriptionT, myContext, view,isVisible);
+		this.myContext=myContext;
 		targetList = myContext.getList(myTarget);
 		if (targetList == null) {
 			Log.e("parser","couldn't create sortwidget - could not find target list");
@@ -46,7 +46,7 @@ WF_Not_ClickableField implements EventListener {
 
 	@Override
 	public LinearLayout getFieldLayout() {
-		return (LinearLayout)LayoutInflater.from(ctx).inflate(R.layout.output_field_selection_element,null);
+		return (LinearLayout)LayoutInflater.from(myContext.getContext()).inflate(R.layout.output_field_selection_element,null);
 	}
 
 	@Override
@@ -71,11 +71,13 @@ WF_Not_ClickableField implements EventListener {
 		Long sum=Long.valueOf(0);
 		for (Listable l:targetList.getList()) {
 			Set<Variable> vars = l.getAssociatedVariables();
+			Log.d("nils","now in matchandrecalculate with list "+vars.size());
 			if (vars!=null && !vars.isEmpty()) {
 				for (Variable v:vars) {
 					if (v.getId().matches(myPattern)) {
-//						Log.d("nils","ADD_NUMBER_OF_SELECTION: Found match! "+v.getId());				
+						Log.e("nils","SUM AND COUNT: Found match! "+v.getId());				
 						if (v.getValue()!=null) {
+							Log.d("nils","VALUE: "+v.getValue());
 							if (myType == Type.count)
 								sum++;
 							else {

@@ -33,7 +33,7 @@ public class Table implements Serializable {
 	private int variableIdIndex=-1;
 
 
-
+	//Keychain + name = primary key.
 	public Table (String[] columnNames,int keyChainIndex,int nameIndex) {
 		assert(columnNames!=null);
 		for(String key:columnNames) 
@@ -86,16 +86,15 @@ public class Table implements Serializable {
 			return ErrCode.keyError;
 		}
 		for (String key:keys) {
-			if (!keyParts.contains(key)) {
-				Log.d("nils","found new key part: "+key);
+			if (!keyParts.contains(key)&&key.trim().length()>0) {
+				//Log.d("nils","found new key part: "+key);
 				//Add to existing Database model.
 				keyParts.add(key);
 			};
 		}
 		//no need to check this one again.
 		previousKeyChain = keyChain;
-		} else
-			Log.d("nils","...matches previous key chain");
+		} 
 		
 		return ErrCode.ok;
 	}
@@ -106,28 +105,29 @@ public class Table implements Serializable {
 	public List<String> getColumn(String columnName) {
 		return colTable.get(columnName);
 	}
+	
 
 	public List<String> getRow(Integer row) {
 		return rowTable.get(row);
 	}
 
 	public List<List<String>> getRowsContaining(String columnName, String pattern) {
-		Log.d("nils","Trying to find rows matching column "+columnName+" and pattern "+pattern);
+		//Log.d("nils","Trying to find rows matching column "+columnName+" and pattern "+pattern);
 	
 		List<List<String>> ret = null;
 		List<String> column = colTable.get(columnName);
 		if(column!=null && pattern!=null) {
 			pattern.trim();
 			for(int i = 0;i<column.size();i++) {
-				Log.d("nils","i: "+i+" col: "+column.get(i));
+				//Log.d("nils","i: "+i+" col: "+column.get(i));
 				if (column.get(i).equals(pattern)||column.get(i).matches(pattern)) {
 					if (ret == null)
 						ret = new ArrayList<List<String>>();
 					ret.add(rowTable.get(i));
 				}
 			}
-			if (ret!=null)
-				Log.d("nils","Returning "+ret.size()+" rows in getRows(Table)");
+//			if (ret!=null)
+//				Log.d("nils","Returning "+ret.size()+" rows in getRows(Table)");
 		} 
 		return ret;
 	}
@@ -157,13 +157,13 @@ public class Table implements Serializable {
 
 		for(int i = 0;i<column.size();i++) {
 			if (column.get(i).equals(key.trim())) {
-				Log.d("nils","found master variable "+key+" in Artlista");
+				//Log.d("nils","found master variable "+key+" in Artlista");
 				return rowTable.get(i);
 			}
 			//Log.d("nils","nomatch: "+column.get(i)+" "+key+" l1: "+column.get(i).length()+" "+"l2:"+key.length());
 		}
 		
-		Log.d("nils","Did not find master variable "+key+" in Artlista column: "+columnName);
+		Log.e("nils","Did not find master variable "+key+" in Artlista column: "+columnName);
 		return null;
 	}
 
@@ -176,7 +176,7 @@ public class Table implements Serializable {
 			result = row.get(index);
 			//Log.d("nils","found field "+columnName+": "+result+" in class Table");
 		} else
-			Log.d("nils","Did NOT find field "+columnName+" in class Table");
+			Log.e("nils","Did NOT find field "+columnName+" in class Table");
 		return result;
 	}
 

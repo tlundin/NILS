@@ -12,7 +12,8 @@ import android.widget.LinearLayout;
 
 import com.teraim.nils.R;
 import com.teraim.nils.dynamic.Executor;
-import com.teraim.nils.dynamic.blocks.ListSortingBlock;
+import com.teraim.nils.dynamic.VariableConfiguration;
+import com.teraim.nils.dynamic.blocks.CreateSortWidgetBlock;
 import com.teraim.nils.dynamic.workflow_abstracts.Filter;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Container;
 import com.teraim.nils.dynamic.workflow_realizations.WF_List;
@@ -21,7 +22,9 @@ import com.teraim.nils.dynamic.workflow_realizations.WF_SorterWidget;
 
 
 public class ListInputTemplate extends Executor {
-	public static String FIELD_LIST = "Field_list_1";
+	public static String FIELD_LIST = "Field_list_1",
+			SORTER_A_O = "alphanumeric_sorting_function",
+			SORTER_FAMILJ="familje_sorting_function";
 	private LinearLayout sortPanel;
 	List<WF_Container> myLayouts;
 	private WF_SorterWidget a_o_widget,familj_widget;
@@ -33,7 +36,6 @@ public class ListInputTemplate extends Executor {
 	 * @see android.app.Fragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
 	 */
 	ViewGroup myContainer = null;
-	ListSortingBlock a_o,slakt;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -52,14 +54,10 @@ public class ListInputTemplate extends Executor {
 		myLayouts.add(new WF_Container("Filter_panel_4", (LinearLayout)v.findViewById(R.id.filterPanel), root));
 		myLayouts.add(new WF_Container("Field_List_panel_2", (LinearLayout)v.findViewById(R.id.Selected), root));
 		myContext.addContainers(getContainers());
-		a_o = new ListSortingBlock("alphanumeric_sorting_function","Sort_Panel_1",FIELD_LIST);
-		slakt = new ListSortingBlock("familje_sorting_function","Sort_Panel_1",FIELD_LIST);
 
 		if (wf!=null) {
 			run();
 		}
-		a_o_widget = a_o.create(myContext);
-		familj_widget = slakt.create(myContext);
 		
 		return v;
 
@@ -88,12 +86,7 @@ public class ListInputTemplate extends Executor {
 	}
 
 	public void execute(String name) {
-
-		if (name.equals("template_function_show_sorter"))
-			toggleSorter();
-		else if (name.equals("template_function_show_familjer"))
-			toggleFamiljer();
-		else if (name.equals("template_function_hide_edited"))
+		if (name.equals("template_function_hide_edited"))
 			hideEdited();
 
 	}
@@ -110,28 +103,7 @@ public class ListInputTemplate extends Executor {
 		toggleStateH = !toggleStateH;
 	}
 
-	private boolean toggleStateF = true;
-	private void toggleFamiljer() {
-		if (toggleStateF)
-			sortPanel.addView(familj_widget.getWidget());
-		else {
-			sortPanel.removeView(familj_widget.getWidget());
-			familj_widget.removeExistingFilter();
-		}
-		toggleStateF = !toggleStateF;
 
-	}
-	boolean toggleStateS = true;
-	private void toggleSorter() {
-		if (toggleStateS) 
-			sortPanel.addView(a_o_widget.getWidget());
-			
-		else {
-			sortPanel.removeView(a_o_widget.getWidget());
-			a_o_widget.removeExistingFilter();
-		}
-		toggleStateS=!toggleStateS;
-	}
 
 
 

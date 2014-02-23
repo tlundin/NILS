@@ -1,6 +1,7 @@
 package com.teraim.nils.dynamic.workflow_realizations;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +23,7 @@ public class WF_Context {
 
 	private Context ctx;
 	private final List<WF_List> lists=new ArrayList<WF_List>();
-	private List<Drawable> drawables;
+	private Map<String,Drawable> drawables;
 	private List<WF_Container> containers;
 	private final Executor myTemplate;
 	private final EventBroker eventBroker;
@@ -34,6 +35,7 @@ public class WF_Context {
 		myTemplate = e;
 		eventBroker = new EventBroker();
 		this.rootContainerId=rootContainerId;
+		this.drawables=new HashMap<String,Drawable>();
 	}
 	public Context getContext() {
 		return ctx;
@@ -83,6 +85,14 @@ public class WF_Context {
 
 	public void addList(WF_List l) {
 		lists.add(l);
+	}
+	
+	public void addDrawable(String key,Drawable d) {	
+		drawables.put(key,d);
+	}
+	
+	public Drawable getDrawable(String name) {
+		return drawables.get(name);
 	}
 
 

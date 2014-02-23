@@ -24,26 +24,31 @@ import com.teraim.nils.dynamic.workflow_realizations.WF_List;
 import com.teraim.nils.dynamic.workflow_realizations.WF_SorterWidget;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Widget;
 
-public class ListSortingBlock extends Block {
+public class CreateSortWidgetBlock extends Block {
 
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 4728236327056430480L;
-	String containerId,type,target;
+	String containerId,type,target,selF,selP,dispF,name;
 	Filterable targetList;
-	
+	boolean isVisible = true;
 	
 
-	public ListSortingBlock(String type,String containerId, String targetId) {
+	public CreateSortWidgetBlock(String name,String type,String containerId, String targetId,String selectionField,String displayField,String selectionPattern,boolean isVisible) {
 		this.type = type;
 		this.containerId = containerId;
 		this.target = targetId;
+		selF = selectionField;
+		dispF = displayField;
+		selP = selectionPattern;
+		this.isVisible = isVisible;
+		this.name=name;
 	}
 
 
-	public WF_SorterWidget create(WF_Context ctx) {
+	public void create(WF_Context ctx) {
 
 		o = GlobalState.getInstance(ctx.getContext()).getLogger();
 		//Identify targetList. If no list, no game.
@@ -58,11 +63,11 @@ public class ListSortingBlock extends Block {
 		if (targetList == null) {
 			o.addRow("");
 			o.addRedText("couldn't create sortwidget - could not find target list: "+target);
-			return null;
+			
 		}
 		else {
 			o.addRow("Adding new SorterWidget of type "+type);
-			return new WF_SorterWidget(ctx,type,((WF_List)targetList));
+			myContainer.add(new WF_SorterWidget(name,ctx,type,((WF_List)targetList),selF,dispF,selP,isVisible));
 			//myContainer.add(new WF_Widget(buttonPanel));
 		}
 

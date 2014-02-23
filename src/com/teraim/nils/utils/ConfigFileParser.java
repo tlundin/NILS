@@ -132,12 +132,27 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 
 			o.addRow("File header reads:["+header+"]");
 			if (header != null) {		
+				String[] headerS = header.split(",");
+				int keyChainIndex=-1,nameIndex = -1;
+				
+				for (int i = 0; i<headerS.length;i++) {
+					if (headerS[i].trim().equals(VariableConfiguration.Col_Variable_Keys))
+						keyChainIndex = i;
+					else if  (headerS[i].trim().equals(VariableConfiguration.Col_Variable_Name))
+						nameIndex = i;
+				}
+				if (nameIndex ==-1 || keyChainIndex == -1) {
+					o.addRow("");
+					o.addRedText("Header missing either name or keychain column. Load cannot proceed");
+					br.close();
+					return ErrorCode.parseError;
+				}
 				//TODO: REMOVE CONSTANT PEEK
-				myTable = new Table(header.split(","),VariableConfiguration.KEY_CHAIN,VariableConfiguration.VARIABLE_NAME);
+				myTable = new Table(headerS,keyChainIndex,nameIndex);
 				//Find all RutIDs from csv. Create Ruta Class for each.
 				int rowC=1;
 				while((row = br.readLine())!=null) {
-					String[]  r = row.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");				
+					String[]  r = row.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)",-1);				
 					if (r!=null) {
 						for(int i=0;i<r.length;i++)
 							if (r[i]!=null)

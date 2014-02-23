@@ -24,9 +24,12 @@ public  class AddSumOrCountBlock extends Block {
 	private static final long serialVersionUID = -4139158043307360229L;
 	String containerId, label, postLabel,myPattern, target,result;
 	WF_Not_ClickableField_SumAndCountOfVariables.Type type;
+	boolean isVisible = true;
 	
 	public AddSumOrCountBlock(String containerId, String label,String postLabel,
-			String filter, String target,WF_Not_ClickableField_SumAndCountOfVariables.Type sumOrCount,String result) {
+			String filter, String target,
+			WF_Not_ClickableField_SumAndCountOfVariables.Type sumOrCount,String result,
+			boolean isVisible) {
 		this.containerId=containerId;
 		this.label=label;
 		this.myPattern=filter;
@@ -34,6 +37,7 @@ public  class AddSumOrCountBlock extends Block {
 		type = sumOrCount;
 		this.result = result;
 		this.postLabel = postLabel;
+		this.isVisible = isVisible;
 		
 	}
 	
@@ -44,7 +48,7 @@ public  class AddSumOrCountBlock extends Block {
 		WF_Not_ClickableField_SumAndCountOfVariables field = new WF_Not_ClickableField_SumAndCountOfVariables(
 				label,"", myContext, LayoutInflater.from(myContext.getContext()).inflate(R.layout.selection_field_normal,null), 
 				target, myPattern,
-				type);
+				type,isVisible);
 		if (result == null) {
 			o.addRow("");
 			o.addRedText("Error in XML: block_add_sum_of_selected_variables_display is missing a result parameter for:"+label);

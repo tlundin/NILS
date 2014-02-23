@@ -38,7 +38,7 @@ public class ConfigMenu extends PreferenceActivity {
 			//Set default values for the prefs.
 			getPreferenceScreen().getSharedPreferences()
 			.registerOnSharedPreferenceChangeListener(this);
-			
+		
 			EditTextPreference epref = (EditTextPreference) findPreference(PersistenceHelper.LAG_ID_KEY);
 			epref.setSummary(epref.getText());
 
@@ -74,6 +74,33 @@ public class ConfigMenu extends PreferenceActivity {
 		}
 		
 	
+		
+
+		/* (non-Javadoc)
+		 * @see android.app.Fragment#onPause()
+		 */
+		@Override
+		public void onPause() {
+			getPreferenceScreen().getSharedPreferences()
+			.unregisterOnSharedPreferenceChangeListener(this);
+			super.onPause();
+		}
+
+
+
+
+		/* (non-Javadoc)
+		 * @see android.app.Fragment#onResume()
+		 */
+		@Override
+		public void onResume() {
+			getPreferenceScreen().getSharedPreferences()
+			.registerOnSharedPreferenceChangeListener(this);
+			super.onResume();
+		}
+
+
+
 
 		public void onSharedPreferenceChanged(
 				SharedPreferences sharedPreferences, String key) {
@@ -101,10 +128,14 @@ public class ConfigMenu extends PreferenceActivity {
 			else if (pref instanceof CheckBoxPreference) {
 				CheckBoxPreference cpref = (CheckBoxPreference)pref;
 				if (key.equals(PersistenceHelper.DEVELOPER_SWITCH))
-					if (cpref.isChecked())
+					if (cpref.isChecked()) {
 						GlobalState.getInstance(getActivity()).createLogger();
-					else
+						Log.d("NILS","CREATED ZIZ LOGGER");
+					}
+					else {
+						Log.d("NILS","UNCREATED ZIZ LOGGER");
 						GlobalState.getInstance(getActivity()).removeLogger();
+					}
 				}
 
 		}

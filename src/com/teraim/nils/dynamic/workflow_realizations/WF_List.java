@@ -23,8 +23,8 @@ public abstract class WF_List extends WF_Widget implements Sortable,Filterable {
 	protected VariableConfiguration al;
 	private List<? extends Listable> filteredList;
 	//How about using the Container's panel?? TODO
-	public WF_List(String id, WF_Context ctx) {
-		super(id,new LinearLayout(ctx.getContext()));	
+	public WF_List(String id, WF_Context ctx,boolean isVisible) {
+		super(id,new LinearLayout(ctx.getContext()),isVisible,ctx);	
 		myWidget = (LinearLayout)getWidget();
 		myWidget.setOrientation(LinearLayout.VERTICAL);
 		myContext = ctx;
@@ -59,8 +59,9 @@ public abstract class WF_List extends WF_Widget implements Sortable,Filterable {
 	}
 	public abstract void addEntriesFromRows(List<List<String>> rows);
 
-
+	int intC=0;
 	public void draw() {
+		Log.e("draw","DRAW CALLED "+ (++intC)+" times");
 		filteredList = list;
 		if (myFilters != null) {			
 			List<Listable> listx = new ArrayList<Listable>(list);

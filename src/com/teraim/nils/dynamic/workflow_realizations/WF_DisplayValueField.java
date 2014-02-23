@@ -32,8 +32,8 @@ public class WF_DisplayValueField extends WF_Widget implements EventListener {
 	boolean fail = false;
 	boolean stringT = false;
 
-	public WF_DisplayValueField(String id, View v, String formula,WF_Context ctx, Unit unit, String label) {
-		super(id, v);
+	public WF_DisplayValueField(String id, View v, String formula,WF_Context ctx, Unit unit, String label, boolean isVisible) {
+		super(id, v, isVisible,ctx);
 		((TextView)v.findViewById(R.id.header)).setText(label);
 		gs = GlobalState.getInstance(ctx.getContext());
 		o = gs.getLogger();
@@ -146,13 +146,15 @@ public class WF_DisplayValueField extends WF_Widget implements EventListener {
 			boolean substErr = false;
 			for (Entry<String, DataType> entry:myVariables) {
 				st = gs.getArtLista().getVariableInstance(entry.getKey());
-				if (st==null) {
+				if (st==null||st.getValue()==null) {
 					o.addRow("Couldn't find a value for variable "+entry.getKey()+". Formula cannot be calculated: "+formula);
 					substErr=true;					
 					break;
 				} else {
-					if (stringT)
+					if (stringT) {
+						
 						strRes+=st.getValue();
+					}
 					else {
 						subst = subst.replace(st.getId(), st.getValue());
 						Log.d("nils","formula after subst: "+subst);

@@ -18,6 +18,7 @@ import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
 import com.teraim.nils.dynamic.types.Workflow;
 import com.teraim.nils.dynamic.workflow_abstracts.Container;
+import com.teraim.nils.dynamic.workflow_abstracts.Drawable;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Widget;
 
@@ -39,13 +40,14 @@ public  class ButtonBlock extends Block {
 	Type type;
 	
 	WF_Context myContext;
+	private boolean isVisible;
 
 	enum Type {
 		action,
 		toggle
 	}
 
-	public ButtonBlock(String lbl,String action, String name,String container,String target, String type) {
+	public ButtonBlock(String lbl,String action, String name,String container,String target, String type, boolean isVisible) {
 		Log.d("NILS","BUTTONBLOCK type Action. Action is set to "+action);
 		this.text = lbl;
 		this.onClick=action;
@@ -53,6 +55,7 @@ public  class ButtonBlock extends Block {
 		this.containerId = container;
 		this.target=target;
 		this.type=type.equals("toggle")?Type.toggle:Type.action;
+		this.isVisible = isVisible;
 
 	}
 
@@ -156,7 +159,7 @@ public  class ButtonBlock extends Block {
 				}
 
 			});
-			myContainer.add(new WF_Widget(text,button));
+			myContainer.add(new WF_Widget(text,button,isVisible,myContext));
 		} else if (type == Type.toggle) {
 			o.addRow("Creating Toggle Button with text: "+text);
 			ToggleButton toggleB = (ToggleButton)LayoutInflater.from(ctx).inflate(R.layout.toggle_button,null);
@@ -172,13 +175,37 @@ public  class ButtonBlock extends Block {
 			toggleB.setLayoutParams(params);
 			
 			toggleB.setOnClickListener(new OnClickListener() {
+				
 				@Override
 				public void onClick(View v) {
+						if(onClick==null||onClick.trim().length()==0) {
+							o.addRow("");
+							o.addRedText("Button "+text+" has no onClick action!");
+							Log.e("nils","Button clicked ("+text+") but found no action");
+						} else {
+							
 						o.addRow("Togglebutton "+text+" pressed. Executing function "+onClick);
-						myContext.getTemplate().execute(onClick);					
+						if (onClick.startsWith("template")) 
+							myContext.getTemplate().execute(onClick);	
+						else if (onClick.equals("toggle_visible")) {
+							Log.d("nils","Executing toggle");
+							Drawable d = myContext.getDrawable(target);
+							if (d!=null) {
+							if(d.isVisible())
+								d.hide();
+							else
+								d.show();
+							} else {
+								Log.e("nils","Couldn't find target "+target+" for button");
+								o.addRow("");
+								o.addRedText("Target for button missing: "+target);
+							}
+								
+						}
+						}
 				}
 			});
-			myContainer.add(new WF_Widget(text,toggleB));
+			myContainer.add(new WF_Widget(text,toggleB,isVisible,myContext));
 		}
 	}
 }

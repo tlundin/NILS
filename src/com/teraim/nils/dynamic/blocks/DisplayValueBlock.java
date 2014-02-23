@@ -18,16 +18,18 @@ public class DisplayValueBlock extends Block implements EventGenerator {
 
 	private static final long serialVersionUID = 9151756426062334462L;
 	String namn,  label,formula, containerId;
+	boolean isVisible = false;
 	Unit unit;
 	GlobalState gs;
 	
 	public DisplayValueBlock(String namn, String label,Unit unit,
-			String formula, String containerId) {
+			String formula, String containerId,boolean isVisible) {
 		this.unit=unit;
 		this.namn=namn;;
 		this.label=label;
 		this.formula=formula;
 		this.containerId=containerId;
+		this.isVisible=isVisible;
 	}
 
 	public void create(final WF_Context myContext) {
@@ -37,7 +39,7 @@ public class DisplayValueBlock extends Block implements EventGenerator {
 		if (myContainer != null) {
 		final Context ctx = myContext.getContext();
 		LinearLayout tv = (LinearLayout) LayoutInflater.from(ctx).inflate(R.layout.display_value_textview,null);
-		WF_DisplayValueField vf = new WF_DisplayValueField(namn,tv,formula,myContext,unit,label);
+		WF_DisplayValueField vf = new WF_DisplayValueField(namn,tv,formula,myContext,unit,label,isVisible);
 		myContainer.add(vf);
 		vf.onEvent(new WF_Event_OnSave(null));
 		} else {

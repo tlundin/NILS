@@ -23,14 +23,16 @@ public class CreateEntryFieldBlock extends Block {
 	String name,type,label,containerId,postLabel;
 	Unit unit;
 	GlobalState gs;
+	boolean isVisible = false;
 	
 	public CreateEntryFieldBlock(String name, String label,
-			String postLabel,String containerId) {
+			String postLabel,String containerId,boolean isVisible) {
 		super();
 		this.name = name;
 		this.label = label;
 		this.postLabel=postLabel;
 		this.containerId=containerId;
+		this.isVisible=isVisible;
 	}
 
 	/**
@@ -59,7 +61,7 @@ public class CreateEntryFieldBlock extends Block {
 		Container myContainer = myContext.getContainer(containerId);
 		o = gs.getLogger();
 		VariableConfiguration al = gs.getArtLista();
-		WF_ClickableField_Selection myField = new WF_ClickableField_Selection(label,"This description has no tag in the xml for block_create_entry_field",myContext,name);
+		WF_ClickableField_Selection myField = new WF_ClickableField_Selection(label,"This description has no tag in the xml for block_create_entry_field",myContext,name,isVisible);
 		Log.d("nils","NAME: "+name);
 		List<String> row = al.getCompleteVariableDefinition(name);
 		if (row == null) {

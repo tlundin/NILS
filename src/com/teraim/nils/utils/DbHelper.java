@@ -20,7 +20,7 @@ import com.teraim.nils.dynamic.types.Variable;
 public class DbHelper extends SQLiteOpenHelper {
 
 	// Database Version
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 	// Database Name
 	private static final String DATABASE_NAME = "Nils";
 
@@ -94,6 +94,22 @@ public class DbHelper extends SQLiteOpenHelper {
 		Set<String> s = keyColM.keySet();
 		for (String e:s)
 			Log.d("nils","Key: "+e+"Value:"+keyColM.get(e));
+		
+		
+	}
+	
+	public void speziale() {
+		//TODO: REMOVE
+		//Insert values for current.
+		
+		Variable v;
+		v=GlobalState.getInstance(ctx).getArtLista().getVariableInstance("current_ruta");
+		this.insertVariable(v, "3");
+		v=GlobalState.getInstance(ctx).getArtLista().getVariableInstance("current_provyta");
+		this.insertVariable(v, "2");
+		v=GlobalState.getInstance(ctx).getArtLista().getVariableInstance("current_delyta");
+		this.insertVariable(v, "2");
+
 	}
 
 	@Override
@@ -112,7 +128,7 @@ public class DbHelper extends SQLiteOpenHelper {
 				"L8 TEXT , "+
 				"L9 TEXT , "+
 				"L10 TEXT , "+
-				"var TEXT , "+
+				"var TEXT COLLATE NOCASE, "+
 				"value TEXT, "+
 				"lag TEXT, "+
 				"timestamp TEXT, "+
@@ -346,7 +362,7 @@ public class DbHelper extends SQLiteOpenHelper {
 	public void insertVariable(Variable var,String newValue){
 		PersistenceHelper ph = GlobalState.getInstance(ctx).getPersistence();
 		//for logging
-		Log.d("nils", "Inserting variable "+var.getId()+" into database with value "+var.getValue()); 
+		//Log.d("nils", "Inserting variable "+var.getId()+" into database with value "+var.getValue()); 
 
 		int found = getId(var.getId(),var.getSelection());
 		boolean replace = (found != -1);
@@ -357,15 +373,15 @@ public class DbHelper extends SQLiteOpenHelper {
 		Map<String,String> keyChain=var.getKeyChain();
 		//If no key column mappings, skip. Variable is global with Id as key.
 		if (keyChain!=null) {
-			Log.d("nils","keychain has "+keyChain.size()+" elements");
+			//Log.d("nils","keychain has "+keyChain.size()+" elements");
 			for(String key:keyChain.keySet()) {
 				String value = keyChain.get(key);
 				String column = keyColM.get(key);
 				values.put(column,value);
-				Log.d("nils","Adding column "+column+" with value "+value);
+				//Log.d("nils","Adding column "+column+" with value "+value);
 			}
 		} else 
-			Log.d("nils","Inserting global variable "+var.getId());
+			//Log.d("nils","Inserting global variable "+var.getId());
 		values.put("var", var.getId());
 		values.put("value", newValue);
 		values.put("lag",ph.get(PersistenceHelper.LAG_ID_KEY));
@@ -382,7 +398,7 @@ public class DbHelper extends SQLiteOpenHelper {
 				values
 				); 
 		} else {
-			Log.d("nils","REPLACING in INSERTX");
+			//Log.d("nils","REPLACING in INSERTX");
 			rId = db.replace(TABLE_VARIABLES, // table
 					null, //nullColumnHack
 					values
@@ -415,7 +431,7 @@ public class DbHelper extends SQLiteOpenHelper {
 			if (selection!=null) {
 				Log.d("nils","found cached selArgs: "+selection);
 			} else {
-				Log.d("nils","selection null...creating");
+				//Log.d("nils","selection null...creating");
 				//Does not exist...need to create.
 				String col;
 				selection="";
@@ -434,7 +450,7 @@ public class DbHelper extends SQLiteOpenHelper {
 		
 		ret.selection=selection;	
 
-		Log.d("nils","created new selection: "+selection);
+		//Log.d("nils","created new selection: "+selection);
 
 		String[] selectionArgs;
 		//Create selectionArgs
@@ -445,13 +461,13 @@ public class DbHelper extends SQLiteOpenHelper {
 			int c=0;
 			for (String key:keySet.keySet()) {			
 				selectionArgs[c++]=keySet.get(key);
-				Log.d("nils","Adding selArg "+keySet.get(key)+" for key "+key);
+				//Log.d("nils","Adding selArg "+keySet.get(key)+" for key "+key);
 			}
 			//add name part
 			selectionArgs[keySet.keySet().size()]=name;
 		}
 		ret.selectionArgs=selectionArgs;
-		Log.d("nils","CREATE SELECTION RETURNS: "+ret.selection+" "+print(ret.selectionArgs));
+		//Log.d("nils","CREATE SELECTION RETURNS: "+ret.selection+" "+print(ret.selectionArgs));
 		return ret;
 	}
 

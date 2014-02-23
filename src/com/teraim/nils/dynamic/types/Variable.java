@@ -25,10 +25,10 @@ public class Variable implements Serializable {
 	private static final long serialVersionUID = 6239650487891494128L;
 	
 	Map<String, String> keyChain = new HashMap <String,String>(); 
-	
 	//String value=null;
 	String name=null;
 	DataType myType=null;
+	String myValue=null;
 
 	Selection mySelection=null;
 	
@@ -43,10 +43,9 @@ public class Variable implements Serializable {
 	}
 	
 	public String getValue() {
-		String value = myDb.getValue(name,mySelection);
-		if (value==null)
-			value ="";
-		return value;
+		if (myValue==null)
+			myValue = myDb.getValue(name,mySelection);
+		return myValue;
 	}
 	
 	public StoredVariableData getAllFields() {
@@ -54,6 +53,7 @@ public class Variable implements Serializable {
 	}
 	
 	public void setValue(String value) {
+		myValue = value;
 		myDb.insertVariable(this,value);
 	}
 	

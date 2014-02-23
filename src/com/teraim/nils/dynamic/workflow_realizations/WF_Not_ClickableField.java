@@ -39,8 +39,8 @@ public abstract class WF_Not_ClickableField extends WF_ListEntry {
 	}
 	
 	
-	public WF_Not_ClickableField(final String myId,final String descriptionT, WF_Context myContext, View view) {
-		super(view,myContext.getContext());
+	public WF_Not_ClickableField(final String myId,final String descriptionT, WF_Context myContext, View view,boolean isVisible) {
+		super(view,myContext,isVisible);
 	
 		this.myContext = myContext;
 		myHeader = (TextView)getWidget().findViewById(R.id.editfieldtext);
@@ -101,7 +101,7 @@ public abstract class WF_Not_ClickableField extends WF_ListEntry {
 			TextView o = (TextView)ll.findViewById(R.id.outputValueField);
 			TextView u = (TextView)ll.findViewById(R.id.outputUnitField);			
 			String value = varId.getValue();
-			if (!value.isEmpty()) {
+			if (value!=null&&!value.isEmpty()) {
 				o.setText(getFormattedText(varId,value));	
 				u.setText(Tools.getPrintedUnit(myUnit));
 			}
