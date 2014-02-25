@@ -71,6 +71,7 @@ public class Tools {
 	
 	   public static boolean witeObjectToFile(Context context, Object object, String filename) {
 
+		   Log.d("nils","Writing frozen object to file "+filename);
 	        ObjectOutputStream objectOut = null;
 	        try {
 	            FileOutputStream fileOut = new FileOutputStream(filename);
@@ -86,7 +87,7 @@ public class Tools {
 	                    objectOut.close();
 	                    return true;
 	                } catch (IOException e) {
-	                    // do nowt
+	                    e.printStackTrace();
 	                }
 	            }
 	        }
@@ -115,7 +116,10 @@ public class Tools {
 	            e.printStackTrace();
 	        } catch (ClassNotFoundException e) {
 	            e.printStackTrace();
-	        } finally {
+	        } catch (Exception e) {
+	        	e.printStackTrace();
+	        }
+	        finally {
 	            if (objectIn != null) {
 	                try {
 	                    objectIn.close();

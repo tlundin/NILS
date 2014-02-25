@@ -23,8 +23,7 @@ public class WF_SorterWidget extends WF_Widget {
 			"*","ABC","DEF","GHI","JKL",
 			"MN","OPQ","RS","T","UV",
 			"WXYZ","Å","Ä","Ö"};
-	
-	final static String Col_Familj = "Familj";
+
 
 	
 	WF_Filter existing;

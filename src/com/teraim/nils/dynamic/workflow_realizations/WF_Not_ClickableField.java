@@ -51,22 +51,14 @@ public abstract class WF_Not_ClickableField extends WF_ListEntry {
 	
 	}
 	
-	public void addVariable(String varLabel,String postLabel, String varId, boolean displayOut) {
+	public void addVariable(Variable var, boolean displayOut) {
 		
+		String varId = var.getId();
 		if (displayOut && virgin) {
 			virgin = false;
 			super.setKeyRow(varId);
 		}
-
 		
-		Variable var = al.getVariableInstance(varId);
-		if (var==null) {
-			String err = "The Variable with Label "+varLabel+" and name "+varId+" does not exist in config file";
-			Log.e("nils",err);
-			o.addRow("");
-			o.addRedText(err);
-			return;
-		}
 	    myUnit = var.getUnit();
 		if (displayOut) {
 			LinearLayout ll = getFieldLayout();

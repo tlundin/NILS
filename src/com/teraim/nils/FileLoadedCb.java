@@ -3,7 +3,9 @@ package com.teraim.nils;
 public interface FileLoadedCb {
 
 	enum ErrorCode {
-		newVersionLoaded,
+		newConfigVersionLoaded,
+		newVarPatternVersionLoaded,
+		bothFilesLoaded,
 		notFound,
 		parseError,
 		ioError,

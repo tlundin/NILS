@@ -28,19 +28,22 @@ public class Table implements Serializable {
 	private final ArrayList<String> keyParts = new ArrayList<String>();
 	//Immutable list of Required columns.
 	private int rowCount=0,keyChainIndex =-1;
-	private String[] myColumns;
+	private List<String> myColumns;
 	private String previousKeyChain = null;
 	private int variableIdIndex=-1;
 
 
+	
+	
 	//Keychain + name = primary key.
-	public Table (String[] columnNames,int keyChainIndex,int nameIndex) {
+	public Table (List<String> columnNames,int keyChainIndex,int nameIndex) {
 		assert(columnNames!=null);
 		for(String key:columnNames) 
 			colTable.put(key, new ArrayList<String>());		
 		this.keyChainIndex = keyChainIndex;
 		this.variableIdIndex = nameIndex;
 		myColumns = columnNames;
+		Log.d("nils","Created table with column names: "+myColumns.toString());
 	}
 
 	public enum ErrCode {
@@ -50,25 +53,25 @@ public class Table implements Serializable {
 		ok
 	};
 	
+	public List<String> getColumnHeaders() {
+		return myColumns;
+	}
+	
 	
 	public ErrCode addRow(List<String> rowEntries) {
 		int index=0;
 		if (rowEntries == null||rowEntries.size()==0)
 			return ErrCode.tooFewColumns;
-		int size = rowEntries.size();
-		
-		if (size > myColumns.length)
-			return ErrCode.tooManyColumns;
-		
+		int size = rowEntries.size();		
+		if (size > myColumns.size())
+			return ErrCode.tooManyColumns;		
 		//columnmap
 		for(String entry:rowEntries) 
-			colTable.get(myColumns[index++]).add(entry);
+			colTable.get(myColumns.get(index++)).add(entry);
 		//rowmap
-		rowTable.put(rowCount++, rowEntries);
-		
+		rowTable.put(rowCount++, rowEntries);	
 		//keymap.
 		nameToRowMap.put(rowEntries.get(variableIdIndex),rowEntries);
-
 		//Check keychain and add 
 		if (rowEntries.size()<keyChainIndex) {
 			Log.e("nils","row length shorter than key index");
@@ -80,7 +83,7 @@ public class Table implements Serializable {
 		//check if any new key
 		//if equal to previous, skip
 		if (!keyChain.equals(previousKeyChain)) {
-		String[] keys = keyChain.split("\\.");
+		String[] keys = keyChain.split("\\|");
 		if (keys == null) {
 			Log.e("nils","KeyChain null after split");
 			return ErrCode.keyError;
@@ -133,8 +136,8 @@ public class Table implements Serializable {
 	}
 
 	public int getColumnIndex(String c) {
-		for (int i=0;i<myColumns.length;i++)
-			if (c.equals(myColumns[i]))
+		for (int i=0;i<myColumns.size();i++)
+			if (c.equals(myColumns.get(i)))
 				return i;
 		return -1;
 	}
@@ -173,7 +176,8 @@ public class Table implements Serializable {
 		String result = null;
 		int index = getColumnIndex(columnName);
 		if (index !=-1) {	
-			result = row.get(index);
+			if (row.size()>index)
+				result = row.get(index);
 			//Log.d("nils","found field "+columnName+": "+result+" in class Table");
 		} else
 			Log.e("nils","Did NOT find field "+columnName+" in class Table");

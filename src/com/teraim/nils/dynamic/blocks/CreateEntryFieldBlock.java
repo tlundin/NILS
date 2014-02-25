@@ -63,12 +63,12 @@ public class CreateEntryFieldBlock extends Block {
 		VariableConfiguration al = gs.getArtLista();
 		WF_ClickableField_Selection myField = new WF_ClickableField_Selection(label,"This description has no tag in the xml for block_create_entry_field",myContext,name,isVisible);
 		Log.d("nils","NAME: "+name);
-		List<String> row = al.getCompleteVariableDefinition(name);
-		if (row == null) {
+		Variable v = al.getVariableInstance(name);
+		if (v == null) {
 			o.addRow("");
 			o.addRedText("Variable "+name+" not found in definition file for CreateEntryBlock");
 		} else	{	
-			myField.addVariable(label,postLabel,name, true);
+			myField.addVariable(v, true);
 		}
 			if(myContainer !=null) {
 			myContainer.add(myField);

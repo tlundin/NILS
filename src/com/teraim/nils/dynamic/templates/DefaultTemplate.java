@@ -93,7 +93,7 @@ public class DefaultTemplate extends Executor {
 		return ret;
 	}
 	@Override
-	public void execute(String function) {
+	public void execute(String function, String target) {
 		
 	}
 	

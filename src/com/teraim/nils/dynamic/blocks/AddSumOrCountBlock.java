@@ -3,11 +3,9 @@ package com.teraim.nils.dynamic.blocks;
 import android.view.LayoutInflater;
 
 import com.teraim.nils.GlobalState;
-import com.teraim.nils.Logger;
 import com.teraim.nils.R;
+import com.teraim.nils.dynamic.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Variable;
-import com.teraim.nils.dynamic.types.Numerable.Type;
-import com.teraim.nils.dynamic.types.Workflow.Unit;
 import com.teraim.nils.dynamic.workflow_abstracts.Container;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Not_ClickableField_SumAndCountOfVariables;
@@ -25,7 +23,7 @@ public  class AddSumOrCountBlock extends Block {
 	String containerId, label, postLabel,myPattern, target,result;
 	WF_Not_ClickableField_SumAndCountOfVariables.Type type;
 	boolean isVisible = true;
-	
+	private VariableConfiguration al;
 	public AddSumOrCountBlock(String containerId, String label,String postLabel,
 			String filter, String target,
 			WF_Not_ClickableField_SumAndCountOfVariables.Type sumOrCount,String result,
@@ -41,9 +39,12 @@ public  class AddSumOrCountBlock extends Block {
 		
 	}
 	
+	//TODO: CHECK ON POSTLABEL
 	
 	public void create(WF_Context myContext) {
 		o = GlobalState.getInstance(myContext.getContext()).getLogger();
+		al = GlobalState.getInstance(myContext.getContext()).getArtLista();
+
 		Container myContainer = myContext.getContainer(containerId);
 		WF_Not_ClickableField_SumAndCountOfVariables field = new WF_Not_ClickableField_SumAndCountOfVariables(
 				label,"", myContext, LayoutInflater.from(myContext.getContext()).inflate(R.layout.selection_field_normal,null), 
@@ -53,7 +54,12 @@ public  class AddSumOrCountBlock extends Block {
 			o.addRow("");
 			o.addRedText("Error in XML: block_add_sum_of_selected_variables_display is missing a result parameter for:"+label);
 		} else {
-			field.addVariable(label, postLabel,result, true);			
+			Variable v = al.getVariableInstance(result);
+			if (v==null) {
+				o.addRow("");
+				o.addRedText("Error in block_add_sum_of_selected_variables_display: missing variable for result parameter: "+result);
+			} else 
+				field.addVariable(v, true);			
 		}
 		/*
 		

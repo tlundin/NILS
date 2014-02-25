@@ -54,18 +54,18 @@ public  class CreateListEntriesBlock extends Block {
 		
 		if (type.equals("selected_values_list")) {
 			o.addRow("This is a selected values type list. Adding Time Order sorter.");
-			myList =  new WF_List_UpdateOnSaveEvent(id,myContext,isVisible);
+			myList =  new WF_List_UpdateOnSaveEvent(id,myContext,rows,isVisible);
 			myList.addSorter(new WF_TimeOrder_Sorter());	
 		}
 		else { 
 			if (type.equals("selection_list")) {
 				o.addRow("This is a selection list. Adding Alphanumeric sorter.");
-				myList = new WF_List_UpdateOnSaveEvent(id,myContext,isVisible);
+				myList = new WF_List_UpdateOnSaveEvent(id,myContext,rows,isVisible);
 				myList.addSorter(new WF_Alphanumeric_Sorter());
 			} else
 			{
 				//TODO: Find other solution
-				myList = new WF_List_UpdateOnSaveEvent(id,myContext,isVisible);
+				myList = new WF_List_UpdateOnSaveEvent(id,myContext,rows,isVisible);
 				myList.addSorter(new WF_Alphanumeric_Sorter());
 			}
 		}

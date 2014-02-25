@@ -21,13 +21,15 @@ import com.teraim.nils.GlobalState;
 import com.teraim.nils.LoggerI;
 import com.teraim.nils.R;
 import com.teraim.nils.dynamic.blocks.AddSumOrCountBlock;
+import com.teraim.nils.dynamic.blocks.AddVariableToEveryListEntryBlock;
 import com.teraim.nils.dynamic.blocks.Block;
+import com.teraim.nils.dynamic.blocks.BlockCreateListEntriesFromFieldList;
 import com.teraim.nils.dynamic.blocks.ButtonBlock;
 import com.teraim.nils.dynamic.blocks.ContainerDefineBlock;
 import com.teraim.nils.dynamic.blocks.CreateEntryFieldBlock;
 import com.teraim.nils.dynamic.blocks.CreateListEntriesBlock;
-import com.teraim.nils.dynamic.blocks.DisplayValueBlock;
 import com.teraim.nils.dynamic.blocks.CreateSortWidgetBlock;
+import com.teraim.nils.dynamic.blocks.DisplayValueBlock;
 import com.teraim.nils.dynamic.blocks.StartBlock;
 import com.teraim.nils.dynamic.types.Numerable;
 import com.teraim.nils.dynamic.types.Rule;
@@ -36,6 +38,7 @@ import com.teraim.nils.dynamic.types.Workflow;
 import com.teraim.nils.dynamic.workflow_abstracts.Container;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Container;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
+import com.teraim.nils.dynamic.workflow_realizations.WF_List;
 import com.teraim.nils.exceptions.RuleException;
 import com.teraim.nils.expr.SyntaxException;
 
@@ -59,7 +62,7 @@ public abstract class Executor extends Fragment {
 
 
 	protected abstract List<WF_Container> getContainers();
-	public abstract void execute(String function);
+	public abstract void execute(String function, String target);
 
 	protected GlobalState gs;
 
@@ -79,6 +82,7 @@ public abstract class Executor extends Fragment {
 		//TODO: REMOVE
 		//Create fake hash if wf does not provide.
 		final Map<String,String>fakeHash = new HashMap<String,String>();
+		fakeHash.put("år", "2014");
 		fakeHash.put("ruta", "262");
 		fakeHash.put("provyta", "6");
 		fakeHash.put("delyta", "1");
@@ -269,6 +273,18 @@ public abstract class Executor extends Fragment {
 				DisplayValueBlock bl = (DisplayValueBlock)b;
 				bl.create(myContext);
 			}
+			else if (b instanceof AddVariableToEveryListEntryBlock) {
+				o.addRow("");
+				o.addYellowText("AddVariableToEveryListEntryBlock found");
+				AddVariableToEveryListEntryBlock bl = (AddVariableToEveryListEntryBlock)b;
+				bl.create(myContext);
+			}
+			else if (b instanceof BlockCreateListEntriesFromFieldList) {
+				o.addRow("");
+				o.addYellowText("BlockCreateListEntriesFromFieldList found");
+				BlockCreateListEntriesFromFieldList bl = (BlockCreateListEntriesFromFieldList)b;
+				bl.create(myContext);
+			}
 
 		}
 
@@ -276,6 +292,10 @@ public abstract class Executor extends Fragment {
 		//Draw the UI.
 		o.addRow("");
 		o.addYellowText("Now Drawing components recursively");
+		//Draw all lists first.
+		for (WF_List l:myContext.getLists()) {
+			l.draw();
+		}
 		Container root = myContext.getContainer("root");
 		if (root!=null)
 			myContext.drawRecursively(root);

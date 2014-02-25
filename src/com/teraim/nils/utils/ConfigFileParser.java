@@ -9,10 +9,16 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.teraim.nils.Constants;
 import com.teraim.nils.FileLoadedCb;
@@ -38,11 +44,12 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 	//Location of bundle.
 	PersistenceHelper ph;
 	FileLoadedCb cb;
-	String myVersion = null;
+	String fVersion = null;
+	String vVersion = null;
 	Table myTable=null;
 	LoggerI o;
-	
-	
+
+
 
 
 
@@ -71,110 +78,236 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 			serverUrl = "http://"+serverUrl;
 			o.addRow("server url name missing http header...adding");		
 		}
-		return parse(serverUrl+ph.get(PersistenceHelper.CONFIG_LOCATION));
+		return parse(serverUrl,ph.get(PersistenceHelper.CONFIG_LOCATION));
 	}
 
 	@Override
 	protected void onPostExecute(ErrorCode code) {
 
-		if (code == ErrorCode.newVersionLoaded) {
+		if (code == ErrorCode.newConfigVersionLoaded|| code == ErrorCode.bothFilesLoaded) {
 			boolean ok= Tools.witeObjectToFile(ctx, myTable, Constants.CONFIG_FILES_DIR+Constants.CONFIG_FROZEN_FILE_ID);
 			if (!ok)
 				code = ErrorCode.ioError;
 			else {
-				ph.put(PersistenceHelper.CURRENT_VERSION_OF_CONFIG_FILE,myVersion);
-				code = ErrorCode.newVersionLoaded;
-				
+				ph.put(PersistenceHelper.CURRENT_VERSION_OF_CONFIG_FILE,fVersion);
 				o.addRow("");
-				o.addYellowText("New Configuration file loaded. Version: "+myVersion);
+				o.addYellowText("Configuration file loaded. Version: "+fVersion);
 			}
 		}
+		if (code == ErrorCode.newVarPatternVersionLoaded|| code == ErrorCode.bothFilesLoaded) {
+			boolean ok= Tools.witeObjectToFile(ctx, myTable, Constants.CONFIG_FILES_DIR+Constants.CONFIG_FROZEN_FILE_ID);
+			if (!ok)
+				code = ErrorCode.ioError;
+			else {
+				ph.put(PersistenceHelper.CURRENT_VERSION_OF_VARPATTERN_FILE,vVersion);
+				o.addRow("");
+				o.addYellowText("Varpattern file loaded. Version: "+vVersion);
+			}
+		}
+
+
 		cb.onFileLoaded(code);	
 	}
 
 
 	//Creates the ArtLista arteface from a configuration file.
 
-	public ErrorCode parse(String fileUrl) {
+	public ErrorCode parse(String serverUrl, String fileName) {
+		final String FileUrl = serverUrl+fileName;
+		final String VarUrl = serverUrl+"varpattern.csv";
+		boolean parseConfig=true,parseVarPattern=true;
 		o.addRow("");
-		o.addYellowText("Now parsing variable configuration file. ");
-		o.addRow("File URL: "+fileUrl);
+		o.addYellowText("Now parsing variable configuration files. ");
+		o.addRow("Artlista URL: "+FileUrl);
+		o.addRow("Variable URL: "+VarUrl);
 		try {	
-			URL url = new URL(fileUrl);
+			URL url = new URL(FileUrl);
+			URL url2 = new URL(VarUrl);
 			/* Open a connection to that URL. */
 			URLConnection ucon = url.openConnection();
+			URLConnection ucon2 = url2.openConnection();
 			InputStream in = ucon.getInputStream();
+			InputStream in2 = ucon2.getInputStream();
 			BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-			String header;
+			BufferedReader br2 = new BufferedReader(new InputStreamReader(in2, "UTF-8"));
+
+			String configFileHeader,varPatternFileHeader;
 			String row;
-			String versionR = br.readLine();
-			if (versionR !=null) {
-				String vers[] = versionR.split(",");
-				if (vers.length<2) {
+			String configFileVersion = br.readLine();
+			String varPatternFileVersion = br2.readLine();
+			if (configFileVersion !=null && varPatternFileVersion !=null) {
+				String fvers[] = configFileVersion.split(",");
+				String vvers[] = varPatternFileVersion.split(",");
+				if (fvers.length<2) {
 					o.addRow("");
-					o.addRedText("Unable to read version row...corrupt? "+versionR);
+					o.addRedText("Unable to read config file version. Row corrupt? "+configFileVersion);					
 				}
-				else {
-					myVersion = vers[1];
-					o.addRow("Config file version: ");o.addYellowText(myVersion);
-					if (ph.getB(PersistenceHelper.VERSION_CONTROL_SWITCH_OFF)) {
-						o.addRow("Version control is switched off.");
-					} else
-						if (myVersion.equals(ph.get(PersistenceHelper.CURRENT_VERSION_OF_CONFIG_FILE))) {
-							o.addRow("No need to parse...no changes ");
-							br.close();
-							return ErrorCode.sameold;
-						}
+				if (vvers.length<2) {
+					o.addRow("");
+					o.addRedText("Unable to read varpattern file version. Row corrupt? "+configFileVersion);
+				}
 
-				}				
-			}
-			header = br.readLine();
+				fVersion = fvers[1];
+				vVersion = vvers[1];
+				o.addRow("Config file version: ");o.addYellowText(fVersion);
+				if (ph.getB(PersistenceHelper.VERSION_CONTROL_SWITCH_OFF)) {
+					o.addRow("Version control is switched off.");
+				} else {
+					if (fVersion.equals(ph.get(PersistenceHelper.CURRENT_VERSION_OF_CONFIG_FILE))) {
+						o.addRow("No need to parse...no changes ");
+						br.close();
+						parseConfig = false;
 
-			o.addRow("File header reads:["+header+"]");
-			if (header != null) {		
-				String[] headerS = header.split(",");
-				int keyChainIndex=-1,nameIndex = -1;
-				
-				for (int i = 0; i<headerS.length;i++) {
-					if (headerS[i].trim().equals(VariableConfiguration.Col_Variable_Keys))
-						keyChainIndex = i;
-					else if  (headerS[i].trim().equals(VariableConfiguration.Col_Variable_Name))
+					}
+					if (vVersion.equals(ph.get(PersistenceHelper.CURRENT_VERSION_OF_VARPATTERN_FILE))) {
+						o.addRow("No need to parse...no changes ");
+						br.close();
+						parseVarPattern = false;
+
+					}
+					if (!parseConfig && !parseVarPattern)
+						return ErrorCode.sameold;
+				}
+
+			}				
+
+			configFileHeader = br.readLine();
+			varPatternFileHeader = br2.readLine();
+
+			o.addRow("Config file header reads:["+configFileHeader+"]");
+			o.addRow("Varpattern file header reads:["+varPatternFileHeader+"]");
+			if (configFileHeader != null && varPatternFileHeader != null) {	
+
+				String[] configFileHeaderS = configFileHeader.split(",");
+				String[] varPatternHeaderS = varPatternFileHeader.split(",");
+
+				//Go through varpattern. Generate rows for the master table.
+				//...but first - find the key columns in Artlista.
+				int nameIndex = -1;
+				int groupIndex = -1;
+				int pNameIndex = 2;
+				int pGroupIndex = 1;
+
+
+				//Find the Variable key row.
+				for (int i = 0; i<configFileHeaderS.length;i++) {
+					if (configFileHeaderS[i].trim().equals(VariableConfiguration.Col_Functional_Group))
+						groupIndex = i;
+					else if  (configFileHeaderS[i].trim().equals(VariableConfiguration.Col_Variable_Name))
 						nameIndex = i;
 				}
-				if (nameIndex ==-1 || keyChainIndex == -1) {
+
+				if (nameIndex ==-1 || groupIndex == -1) {
 					o.addRow("");
-					o.addRedText("Header missing either name or keychain column. Load cannot proceed");
+					o.addRedText("Config file Header missing either name or functional group column. Load cannot proceed");
 					br.close();
 					return ErrorCode.parseError;
 				}
-				//TODO: REMOVE CONSTANT PEEK
-				myTable = new Table(headerS,keyChainIndex,nameIndex);
-				//Find all RutIDs from csv. Create Ruta Class for each.
-				int rowC=1;
+
+
+
+				//Split config file into parts according to functional group.
+
+				Map <String, List<List<String>>> groups=new HashMap<String,List<List<String>>>();
+
 				while((row = br.readLine())!=null) {
 					String[]  r = row.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)",-1);				
 					if (r!=null) {
-						for(int i=0;i<r.length;i++)
+						for(int i=0;i<r.length;i++) {
 							if (r[i]!=null)
 								r[i] = r[i].replace("\"", "");
-						Table.ErrCode e = myTable.addRow(Arrays.asList(r));	
-						if (e!=ErrCode.ok) {
-							o.addRow("");
-							if (e==ErrCode.tooFewColumns) 
-								o.addRedText("First element empty or corrupt on line: "+rowC+" Row:"+Arrays.asList(r).toString());
-							else
-								o.addRedText("Too many columns on line: "+rowC);	
+
+						}
+						String group = r[groupIndex];
+						List<List<String>> elem = groups.get(group); 
+						if (elem==null) {
+							elem = new ArrayList<List<String>>();
+							groups.put(group,elem);
+						}
+						elem.add(Arrays.asList(r));
+
+
+
+						//Table.ErrCode e = myTable.addRow(Arrays.asList(r));	
+
+					}
+				}
+
+				//Now all groups are created. 
+
+				//Create header. Remove duplicte group column and varname. 
+				final List<String> cheaderL =  new ArrayList<String>();
+				Collections.addAll(cheaderL,configFileHeaderS); 
+				cheaderL.remove(VariableConfiguration.Col_Functional_Group);
+				cheaderL.remove(VariableConfiguration.Col_Variable_Name);
+				List<String> vheaderL = new ArrayList<String>(Arrays.asList(varPatternHeaderS));
+				vheaderL.addAll(cheaderL);
+				myTable = new Table(vheaderL,0,pNameIndex);
+
+				int rowC=1;
+				//Scan through VarPattern to generate variables.
+				Log.d("nils","Starting scan of varPattern");
+				String r[];
+				final int VAR_PATTERN_ROW_LENGTH = 7;
+				List<List<String>> elems;
+				while((row = br2.readLine())!=null) {
+					r =row.split(",",-1);
+					if (r==null || r.length<VAR_PATTERN_ROW_LENGTH) {
+						Log.e("nils","found null or too short row at "+rowC+" in config file");
+					} else {			
+						String pGroup = r[pGroupIndex];
+						Log.d("nils","found group name: "+pGroup);
+						if (pGroup==null || pGroup.trim().length()==0) {
+							Log.d("nils","found variable "+r[pNameIndex]+" in varpattern");
+							myTable.addRow(Arrays.asList(r));
+						} else {
+							elems = groups.get(pGroup);
+							if (elems==null) {
+								Log.e("nils","Group "+pGroup+" in VarPattern, line#"+rowC+" does not exist in Config file.");
+							} else {
+								for (List<String>elem:elems) {
+									//Go through all rows in group. Generate variables.
+									String cFileNamePart = elem.get(nameIndex);
+									String varPatternName = r[pNameIndex];
+									if (cFileNamePart == null||varPatternName==null) {
+										Log.e("nils","Either varPatternNamepart or configFile namepart evaluates to null at line#"+rowC+" in varpattern file");
+									} else {
+										String fullVarName = pGroup+"_"+cFileNamePart+"_"+varPatternName;
+										//Remove duplicate elements from Config File row.
+										//Make a copy.
+										List<String>elemCopy = new ArrayList<String>(elem);
+										elemCopy.remove(nameIndex);
+										elemCopy.remove(groupIndex);
+										List<String>varPatternL = new ArrayList<String>(Arrays.asList(r));
+										varPatternL.addAll(elemCopy);
+										//Replace name column with full name.
+										varPatternL.set(pNameIndex, fullVarName);
+										Log.d("nils","Generated variable with values "+varPatternL.toString());
+										ErrCode err = myTable.addRow(varPatternL);
+										if (err!=ErrCode.ok) {
+											switch (err) {
+											case keyError:
+											case tooFewColumns:
+											case tooManyColumns:
+												Log.d("nils", "row not inserted. Something wrong at line "+rowC);
+												break;
+											}
+										}
+									}
+								}
+							}
 						}
 					}
 					rowC++;
 				}
+				Log.d("nils","Scanned "+rowC+" rows");
 			} else {
+				br.close();
+				br2.close();
 				return ErrorCode.parseError;
-			}
-			//o.addText("Adding additional Variables to Table: AntalArter, SumTackning");
-			//myTable.addRow(Arrays.asList("EE0020,AntalArter,Antal Arter,,,,TRUE,st,delyta,,,,,,,,".split(",")));
-			//myTable.addRow(Arrays.asList("EE0030,SumTackning,Summa Täckning,,,,TRUE,%,delyta,,,,,,,,".split(",")));
-			br.close();			
+			}			
+			br.close();	
+			br2.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			o.addRow("");
@@ -189,6 +322,7 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 			o.addRedText(sw.toString());
 			return ErrorCode.ioError;			
 		}
-		return ErrorCode.newVersionLoaded;
+		
+		return ErrorCode.newConfigVersionLoaded;
 	}
 }

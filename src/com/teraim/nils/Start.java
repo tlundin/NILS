@@ -37,7 +37,7 @@ import com.teraim.nils.utils.WorkflowParser;
 
 public class Start extends MenuActivity {
 
-	private final String NILS_VERSION = "0.13";
+	private final String NILS_VERSION = "0.15";
 
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
@@ -78,6 +78,8 @@ public class Start extends MenuActivity {
 
 		//GlobalState
 		gs = GlobalState.getInstance(this.getApplicationContext());
+		gs.createLogger();
+		//TODO:REMOVE
 		ph = gs.getPersistence();
 
 		//drawer items
@@ -201,17 +203,26 @@ public class Start extends MenuActivity {
 			switch(errCode) {
 			case ioError:
 				loginConsole.addRedText("[IO-ERROR]");
-				loginConsole.addRow("Couldn't load "+(state==State.WF_LOADED?"workflow":"artlista") +" config.\nWrong server url? :"+ph.get(PersistenceHelper.SERVER_URL)+
-						"\nWrong filename? : "+(state==State.WF_LOADED?ph.get(PersistenceHelper.BUNDLE_LOCATION):ph.get(PersistenceHelper.CONFIG_LOCATION)));
+				loginConsole.addRow("Couldn't load "+(state==State.WF_LOADED?"workflow":"artlista and/or varpattern") +" config.\nWrong server url? :"+ph.get(PersistenceHelper.SERVER_URL)+
+						"\nWrong filename? : "+(state==State.WF_LOADED?ph.get(PersistenceHelper.BUNDLE_LOCATION):("Artlista: "+ph.get(PersistenceHelper.CONFIG_LOCATION)
+								+" Varpattern: "+ph.get("varpattern.csv"))));
 				break;
 			case sameold:
-				loginConsole.addGreenText("[Latest version already installed]");
+				loginConsole.addGreenText("[Latest version(s) already installed]");
 				break;
 			case parseError:
 				loginConsole.addRedText("[Parse Error]");
 				break;
-			case newVersionLoaded:
-				loginConsole.addGreenText("[New version loaded]");
+			case newConfigVersionLoaded:
+				loginConsole.addGreenText("[New artlista version loaded]");
+				doRefresh=true;
+				break;
+			case newVarPatternVersionLoaded:
+				loginConsole.addGreenText("[New varpattern version loaded]");
+				doRefresh=true;
+				break;
+			case bothFilesLoaded:
+				loginConsole.addGreenText("[New artlista and varpattern version loaded]");
 				doRefresh=true;
 				break;
 			case notFound:
@@ -444,14 +455,15 @@ public class Start extends MenuActivity {
 		if (ph.get(PersistenceHelper.SERVER_URL).equals(PersistenceHelper.UNDEFINED))
 			ph.put(PersistenceHelper.SERVER_URL, "www.teraim.com");
 		if (ph.get(PersistenceHelper.BUNDLE_LOCATION).equals(PersistenceHelper.UNDEFINED))
-			ph.put(PersistenceHelper.BUNDLE_LOCATION, "nilsbundle3.xml");
+			ph.put(PersistenceHelper.BUNDLE_LOCATION, "nb_terje.xml");
 		if (ph.get(PersistenceHelper.CONFIG_LOCATION).equals(PersistenceHelper.UNDEFINED))
-			ph.put(PersistenceHelper.CONFIG_LOCATION, "config.csv");
+			ph.put(PersistenceHelper.CONFIG_LOCATION, "configv2.csv");
 		ph.put(PersistenceHelper.DEVELOPER_SWITCH,true);
 		ph.put(PersistenceHelper.VERSION_CONTROL_SWITCH_OFF, true);
 		ph.put(PersistenceHelper.CURRENT_RUTA_ID_KEY, "262");
 		ph.put(PersistenceHelper.CURRENT_PROVYTA_ID_KEY, "6");
 		ph.put(PersistenceHelper.CURRENT_DELYTA_ID_KEY, "1");
+		ph.put(PersistenceHelper.CURRENT_YEAR_ID_KEY, "2014");
 
 		
 

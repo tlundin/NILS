@@ -171,9 +171,8 @@ public class GlobalState  {
 		return ret;
 	}
 	
-	public Table thawConfigFile() {
-		return ((Table)Tools.readObjectFromFile(myC,Constants.CONFIG_FILES_DIR+Constants.CONFIG_FROZEN_FILE_ID));
-		
+	public Table thawTable() { 	
+		return ((Table)Tools.readObjectFromFile(myC,Constants.CONFIG_FILES_DIR+Constants.CONFIG_FROZEN_FILE_ID));		
 	}
 
 	public Workflow getWorkflow(String id) {
@@ -388,8 +387,14 @@ public class GlobalState  {
 	public void refresh() {
 		artLista = new VariableConfiguration(this);	
 		myWfs = thawWorkflows();	
-		db.init(artLista.getTable().getKeyParts());
+		if (artLista.getTable()!=null)
+			db.init(artLista.getTable().getKeyParts());
+		else {
+			log.addRow("");
+			log.addRedText("Refresh failed - Table is missing. This is likely due to previous errors on startup");
+		}
 	}
+	
 
 	public LoggerI getLogger() {
 		return log;

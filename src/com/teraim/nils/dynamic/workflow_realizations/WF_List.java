@@ -8,6 +8,7 @@ import android.widget.LinearLayout;
 
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.dynamic.VariableConfiguration;
+import com.teraim.nils.dynamic.types.Workflow.Unit;
 import com.teraim.nils.dynamic.workflow_abstracts.Filter;
 import com.teraim.nils.dynamic.workflow_abstracts.Filterable;
 import com.teraim.nils.dynamic.workflow_abstracts.Listable;
@@ -19,16 +20,21 @@ public abstract class WF_List extends WF_Widget implements Sortable,Filterable {
 	protected final List<Listable> list = new  ArrayList<Listable>(); //Instantiated in constructor
 	protected final List<Filter> myFilters=new ArrayList<Filter>();
 	protected final List<Sorter> mySorters=new ArrayList<Sorter>();
+	private List<? extends Listable> filteredList;
+	protected final List<List<String>> myRows;
 	protected WF_Context myContext;
 	protected VariableConfiguration al;
-	private List<? extends Listable> filteredList;
+	protected String group;
 	//How about using the Container's panel?? TODO
-	public WF_List(String id, WF_Context ctx,boolean isVisible) {
+	public WF_List(String id, WF_Context ctx,List<List<String>> rows,boolean isVisible) {
 		super(id,new LinearLayout(ctx.getContext()),isVisible,ctx);	
 		myWidget = (LinearLayout)getWidget();
 		myWidget.setOrientation(LinearLayout.VERTICAL);
 		myContext = ctx;
 		al = GlobalState.getInstance(ctx.getContext()).getArtLista();
+		myRows = rows;
+		group = al.getFunctionalGroup(myRows.get(0));
+
 	}
 
 	@Override
@@ -57,6 +63,8 @@ public abstract class WF_List extends WF_Widget implements Sortable,Filterable {
 		myWidget.removeAllViews();
 		addEntriesFromRows(rows);
 	}
+	
+		
 	public abstract void addEntriesFromRows(List<List<String>> rows);
 
 	int intC=0;
@@ -85,6 +93,8 @@ public abstract class WF_List extends WF_Widget implements Sortable,Filterable {
 		} 
 
 	}
+
+	public abstract void addVariableToEveryListEntry(String varSuffix,boolean displayOut);
 
 
 

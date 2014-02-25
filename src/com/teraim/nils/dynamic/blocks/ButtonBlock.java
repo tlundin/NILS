@@ -186,7 +186,7 @@ public  class ButtonBlock extends Block {
 							
 						o.addRow("Togglebutton "+text+" pressed. Executing function "+onClick);
 						if (onClick.startsWith("template")) 
-							myContext.getTemplate().execute(onClick);	
+							myContext.getTemplate().execute(onClick,target);	
 						else if (onClick.equals("toggle_visible")) {
 							Log.d("nils","Executing toggle");
 							Drawable d = myContext.getDrawable(target);

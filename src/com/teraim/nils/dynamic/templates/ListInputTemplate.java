@@ -85,16 +85,16 @@ public class ListInputTemplate extends Executor {
 		return myLayouts;
 	}
 
-	public void execute(String name) {
+	public void execute(String name, String target) {
 		if (name.equals("template_function_hide_edited"))
-			hideEdited();
+			hideEdited(target);
 
 	}
 
 	Filter f = new WF_OnlyWithoutValue_Filter();
 	private boolean toggleStateH = true;
-	private void hideEdited() {
-		final WF_List fieldList = (WF_List)myContext.getFilterable(FIELD_LIST);
+	private void hideEdited(String target) {
+		final WF_List fieldList = (WF_List)myContext.getFilterable(target);
 		if (toggleStateH) {
 			fieldList.addFilter(f);
 		} else

@@ -69,7 +69,6 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 				1));
 
 
-		//TODO: SUPPORT FOR OTHER THAN EDITTEXT!!!
 
 		//Empty all inputs and save.
 		getWidget().setClickable(true);	
@@ -127,19 +126,19 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 	}
 
 	@Override
-	public void addVariable(String varLabel, String postLabel, String varId, boolean displayOut) {
+	public void addVariable(Variable var, boolean displayOut) {
 
-		
+
+		String varLabel = var.getLabel();
+		String postLabel = "";
+		String varId = var.getId();
+
+		// Set an EditText view to get user input 
 		if (displayOut && virgin) {
 			virgin = false;
 			super.setKeyRow(varId);
 		}
-		
-		Variable var = al.getVariableInstance(varId);
-		if (var==null)
-			return;
-		// Set an EditText view to get user input 
-		
+
 		Unit unit = var.getUnit();
 		switch (var.getType()) {
 		case bool:
@@ -239,11 +238,13 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 			} else 
 
 				if (type == DataType.numeric||
-						type == DataType.text){
+				type == DataType.text){
 					EditText et = (EditText)view;
 					String txt = et.getText().toString();
 					if (txt.trim().length()>0)
-					variable.setValue(txt);
+						variable.setValue(txt);
+					else
+						variable.deleteValue();
 				} else				
 					if (type == DataType.list) {
 						Spinner sp = (Spinner)view;

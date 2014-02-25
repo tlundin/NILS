@@ -44,6 +44,10 @@ public class WF_Context {
 	public Activity getActivity() {
 		return (Activity)ctx;
 	}
+	
+	public List<WF_List> getLists() {
+		return lists;
+	}
 
 	public  WF_List getList(String id) {
 		for (WF_List wfl:lists) {

@@ -26,11 +26,13 @@ public class Variable implements Serializable {
 	
 	Map<String, String> keyChain = new HashMap <String,String>(); 
 	//String value=null;
-	String name=null;
-	DataType myType=null;
-	String myValue=null;
+	private String name=null;
+	private DataType myType=null;
+	private String myValue=null;
 
-	Selection mySelection=null;
+	private Selection mySelection=null;
+	
+	private String myLabel = null;
 	
 	private DbHelper myDb;
 
@@ -43,9 +45,11 @@ public class Variable implements Serializable {
 	}
 	
 	public String getValue() {
-		if (myValue==null)
-			myValue = myDb.getValue(name,mySelection);
 		return myValue;
+	}
+	
+	public String getLabel() {
+		return myLabel;
 	}
 	
 	public StoredVariableData getAllFields() {
@@ -86,7 +90,7 @@ public class Variable implements Serializable {
 	}
 	
 	
-	public Variable(String name,List<String> row,Map<String,String>keyChain, GlobalState gs) {
+	public Variable(String name,String label,List<String> row,Map<String,String>keyChain, GlobalState gs) {
 		this.name = name;
 		myType = gs.getArtLista().getnumType(row);
 		myUnit = gs.getArtLista().getUnit(row);
@@ -94,6 +98,13 @@ public class Variable implements Serializable {
 		this.keyChain=keyChain;		
 		myDb = gs.getDb();
 		mySelection = myDb.createSelection(keyChain,name);
+		myLabel = label;
+		myValue = myDb.getValue(name,mySelection);
+	}
+
+	public void deleteValue() {
+		myDb.deleteVariable(name, mySelection);
+		myValue=null;
 	}
 
 

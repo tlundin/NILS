@@ -18,13 +18,20 @@ import com.teraim.nils.utils.Tools;
 public class VariableConfiguration {
 
 	public static String Col_Variable_Name = "Variable Name";
-	public static String Col_Entry_Label = "Entry Label";
+	public static String Col_Variable_Label = "Variable Label";
 	public static String Col_Variable_Keys = "Key Chain";
+	public static String Type = "Type";
 	public static String Col_Functional_Group = "Funktionell grupp";
-	public static List<String>requiredColumns=Arrays.asList("List Entry Name",Col_Variable_Name,Col_Entry_Label,"Action","Variable Label","Num Type","Displayed","Unit",Col_Variable_Keys,"Description",Col_Functional_Group);
+	
+		
+	
+	
+	
+	
+	public static List<String>requiredColumns=Arrays.asList(Col_Variable_Keys,Col_Functional_Group,Col_Variable_Name,Col_Variable_Label,Type,"Unit","List Values");
 
 	
-	private static int LIST_ENTRY = 0,VARIABLE_NAME=1,ENTRY_LABEL=2,ACTION=3,VARIABLE_LABEL=4,NUM_TYPE=5,DISPLAY_IN_LIST=6,UNIT=7,KEY_CHAIN=8,DESCRIPTION=9,FUNCTIONAL_GROUP =10;
+	private static int KEY_CHAIN=0,FUNCTIONAL_GROUP=1,VARIABLE_NAME=2,VARIABLE_LABEL=3,TYPE=4,UNIT=5,LIST_VALUES=6;
 	
 	Map<String,Integer>fromNameToColumn = new HashMap<String,Integer>();
 
@@ -34,7 +41,7 @@ public class VariableConfiguration {
 	
 	public VariableConfiguration(GlobalState gs) {
 		this.gs = gs;
-		myTable = gs.thawConfigFile();
+		myTable = gs.thawTable();
 		
 	}
 	
@@ -45,6 +52,7 @@ public class VariableConfiguration {
 			int tableIndex = myTable.getColumnIndex(c);
 			if (tableIndex==-1) {
 				Log.e("nils","Missing column: "+c);
+				Log.e("nils","Tabe has "+myTable.getColumnHeaders().toString());
 				return ErrorCode.missing_required_column;
 			}
 			else
@@ -60,21 +68,14 @@ public class VariableConfiguration {
 		return myTable;
 	}
 	
-	
+	/*
 	public String getListEntryName(List<String> row) {
 		return row.get(fromNameToColumn.get(requiredColumns.get(LIST_ENTRY)));
 	}
-
+	*/
+	
 	public String getVarName(List<String> row) {
 		return row.get(fromNameToColumn.get(requiredColumns.get(VARIABLE_NAME)));
-	}
-
-	public String getEntryLabel(List<String> row) {
-		return row.get(fromNameToColumn.get(requiredColumns.get(ENTRY_LABEL)));
-	}
-
-	public String getAction(List<String> row) {
-		return row.get(fromNameToColumn.get(requiredColumns.get(ACTION)));
 	}
 
 	public String getVarLabel(List<String> row) {
@@ -85,15 +86,11 @@ public class VariableConfiguration {
 		return row.get(fromNameToColumn.get(requiredColumns.get(KEY_CHAIN)));		
 	}
 
-	public String getDescription(List<String> row) {
-		return row.get(fromNameToColumn.get(requiredColumns.get(DESCRIPTION)));
-	}
-
 	public String getFunctionalGroup(List<String> row) {
 		return row.get(fromNameToColumn.get(requiredColumns.get(FUNCTIONAL_GROUP)));
 	}
 	public Variable.DataType getnumType(List<String> row) {
-		String type = row.get(fromNameToColumn.get(requiredColumns.get(NUM_TYPE)));
+		String type = row.get(fromNameToColumn.get(requiredColumns.get(TYPE)));
 		if (type!=null) {
 		type.trim();
 		return type.equals("number")?
@@ -106,10 +103,6 @@ public class VariableConfiguration {
 		return null;
 	}
 
-	
-	public boolean isDisplayInList(List<String> row) {
-		return row.get(fromNameToColumn.get(requiredColumns.get(DISPLAY_IN_LIST))).equalsIgnoreCase("TRUE");
-	}
 
 	public Unit getUnit(List<String> row) {
 		return Tools.convertToUnit(row.get(fromNameToColumn.get(requiredColumns.get(UNIT))));
@@ -117,6 +110,26 @@ public class VariableConfiguration {
 
 	public List<String> getCompleteVariableDefinition(String varName) {
 		return myTable.getRowFromKey(varName);
+	}
+	
+	public String getAction(List<String> row) {
+		return null;
+	}
+	
+	public String getEntryLabel(List<String> row) {
+		String res= myTable.getElement("Svenskt Namn", row);
+		//If this is a non-art variable, use varlabel instead.
+		if (res==null) 
+			res =this.getVarLabel(row);
+		return res;
+	}
+	
+	public String getDescription(List<String> row) {
+		return myTable.getElement("Beskrivning", row);
+	}
+	
+	public boolean isDisplayInList(List<String> row) {
+		return false;
 	}
 
 	Map<String,Variable>varCache = new HashMap<String,Variable>();
@@ -126,14 +139,16 @@ public class VariableConfiguration {
 		Variable v = varCache.get(varId);
 		if (v!=null) 
 			return v;
+		String varLabel =null;
 		List<String> row = this.getCompleteVariableDefinition(varId);
 		if (row!=null) {
 		String keyChain = this.getKeyChain(row);
+		varLabel = this.getVarLabel(row);
 		//Log.d("nils","getVariableInstance for "+varId+" with keychain "+keyChain);
 		//Log.d("nils","KeyChain is empty?"+keyChain.isEmpty());
 		Map<String, String> vMap;
 		if (!keyChain.isEmpty()) {
-		String[] keys = keyChain.split("\\.");
+		String[] keys = keyChain.split("\\|");
 		//find my keys in the current context.
 		vMap = new HashMap<String,String>();
 		Map<String, String> cMap = gs.getCurrentContext().getKeyHash();
@@ -151,11 +166,11 @@ public class VariableConfiguration {
 		} else
 			vMap=null;
 		//Use a cache for faster access.
-		v = new Variable(varId,row,vMap,gs);
+		v = new Variable(varId,varLabel,row,vMap,gs);
 		varCache.put(varId, v);
 		return v;
-		}
-		//Log.e("nils","Couldn't find variable "+varId+" in getVariableInstance");
+		} 
+		Log.e("nils","Couldn't find variable "+varId+" in getVariableInstance");
 		return null;
 	}
 	

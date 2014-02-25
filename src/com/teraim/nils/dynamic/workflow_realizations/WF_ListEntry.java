@@ -3,6 +3,7 @@ package com.teraim.nils.dynamic.workflow_realizations;
 import java.util.Comparator;
 import java.util.List;
 
+import android.util.Log;
 import android.view.View;
 
 import com.teraim.nils.GlobalState;
@@ -33,7 +34,8 @@ public abstract class WF_ListEntry extends WF_Widget implements Listable,Compara
 			myVar = al.getVariableInstance(key);
 			if (myVar!=null) {
 				keyRow = myVar.getBackingDataSet();		
-				label = al.getTable().getElement(VariableConfiguration.Col_Entry_Label, keyRow);
+				Log.d("nils","Calling setKeyRow for "+keyRow.toString());
+				label = al.getEntryLabel(keyRow);
 			}
 	}
 

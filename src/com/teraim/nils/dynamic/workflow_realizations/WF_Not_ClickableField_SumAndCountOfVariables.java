@@ -34,13 +34,17 @@ WF_Not_ClickableField implements EventListener {
 		super(header, descriptionT, myContext, view,isVisible);
 		this.myContext=myContext;
 		targetList = myContext.getList(myTarget);
-		if (targetList == null) {
-			Log.e("parser","couldn't create sortwidget - could not find target list");
-		}
-
-		myPattern = pattern;
-		myContext.addEventListener(this,EventType.onRedraw);
 		myType = sumOrCount;
+		myPattern = pattern;
+
+		if (targetList == null) {
+			o.addRow("");
+			o.addRedText("Couldn't create "+header+" since target list: "+myTarget+" does not exist");
+			Log.e("parser","couldn't create SumAndCountOfVariables - could not find target list "+myTarget);
+		} else {
+
+		myContext.addEventListener(this,EventType.onRedraw);
+		}
 		
 	}
 

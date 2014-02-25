@@ -103,6 +103,8 @@ public class DbHelper extends SQLiteOpenHelper {
 		//Insert values for current.
 		
 		Variable v;
+		v=GlobalState.getInstance(ctx).getArtLista().getVariableInstance("current_year");	
+		this.insertVariable(v, "2014");
 		v=GlobalState.getInstance(ctx).getArtLista().getVariableInstance("current_ruta");
 		this.insertVariable(v, "3");
 		v=GlobalState.getInstance(ctx).getArtLista().getVariableInstance("current_provyta");
