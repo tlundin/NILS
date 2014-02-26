@@ -48,16 +48,6 @@ public class ConfigMenu extends PreferenceActivity {
 			epref = (EditTextPreference) findPreference(PersistenceHelper.USER_ID_KEY);
 			epref.setSummary(epref.getText());
 			
-			ListPreference ruta = (ListPreference)findPreference(PersistenceHelper.CURRENT_RUTA_ID_KEY);
-			
-			if (ruta != null) {
-				ruta.setSummary(ruta.getValue());
-				String[] rutlist = GlobalState.getInstance(this.getActivity()).getRutIds();
-			    CharSequence entries[] = rutlist;
-			    CharSequence entryValues[] = rutlist;
-			    ruta.setEntries(entries);
-			    ruta.setEntryValues(entryValues);
-			}
 
 			epref = (EditTextPreference) findPreference(PersistenceHelper.SERVER_URL);
 			epref.setSummary(epref.getText());

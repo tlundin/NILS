@@ -1,7 +1,6 @@
 package com.teraim.nils;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,18 +17,24 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 
 import com.teraim.nils.FileLoadedCb.ErrorCode;
 import com.teraim.nils.dynamic.types.Workflow;
+import com.teraim.nils.log.Logger;
 import com.teraim.nils.ui.DrawerMenuAdapter;
 import com.teraim.nils.ui.DrawerMenuHeader;
 import com.teraim.nils.ui.DrawerMenuItem;
 import com.teraim.nils.ui.DrawerMenuSelectable;
+import com.teraim.nils.ui.LoginConsoleFragment;
 import com.teraim.nils.ui.MenuActivity;
 import com.teraim.nils.utils.ConfigFileParser;
 import com.teraim.nils.utils.PersistenceHelper;
@@ -37,7 +42,7 @@ import com.teraim.nils.utils.WorkflowParser;
 
 public class Start extends MenuActivity {
 
-	private final String NILS_VERSION = "0.15";
+	private final String NILS_VERSION = "0.16";
 
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
@@ -81,7 +86,10 @@ public class Start extends MenuActivity {
 		gs.createLogger();
 		//TODO:REMOVE
 		ph = gs.getPersistence();
-
+		
+		//write down version..quickly! :)
+		ph.put(PersistenceHelper.CURRENT_VERSION_OF_PROGRAM, NILS_VERSION);
+		
 		//drawer items
 		items = new ArrayList<DrawerMenuItem>();
 
@@ -460,16 +468,14 @@ public class Start extends MenuActivity {
 			ph.put(PersistenceHelper.CONFIG_LOCATION, "configv2.csv");
 		ph.put(PersistenceHelper.DEVELOPER_SWITCH,true);
 		ph.put(PersistenceHelper.VERSION_CONTROL_SWITCH_OFF, true);
-		ph.put(PersistenceHelper.CURRENT_RUTA_ID_KEY, "262");
-		ph.put(PersistenceHelper.CURRENT_PROVYTA_ID_KEY, "6");
-		ph.put(PersistenceHelper.CURRENT_DELYTA_ID_KEY, "1");
-		ph.put(PersistenceHelper.CURRENT_YEAR_ID_KEY, "2014");
 
 		
 
 		//copy the configuration files into the root dir.
 		//copyAssets();
 	}
+
+
 
 
 

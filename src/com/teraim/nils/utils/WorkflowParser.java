@@ -20,7 +20,6 @@ import com.teraim.nils.Constants;
 import com.teraim.nils.FileLoadedCb;
 import com.teraim.nils.FileLoadedCb.ErrorCode;
 import com.teraim.nils.GlobalState;
-import com.teraim.nils.LoggerI;
 import com.teraim.nils.dynamic.blocks.AddRuleBlock;
 import com.teraim.nils.dynamic.blocks.AddSumOrCountBlock;
 import com.teraim.nils.dynamic.blocks.AddVariableToEveryListEntryBlock;
@@ -40,6 +39,7 @@ import com.teraim.nils.dynamic.types.Workflow.Unit;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Not_ClickableField_SumAndCountOfVariables;
 import com.teraim.nils.exceptions.EvalException;
 import com.teraim.nils.exceptions.SameOldException;
+import com.teraim.nils.log.LoggerI;
 
 /**
  * 

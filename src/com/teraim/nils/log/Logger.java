@@ -1,4 +1,7 @@
-package com.teraim.nils;
+package com.teraim.nils.log;
+
+import com.teraim.nils.R;
+import com.teraim.nils.R.style;
 
 import android.content.Context;
 import android.text.Spannable;

@@ -6,10 +6,10 @@ import android.content.SharedPreferences;
 
 public class PersistenceHelper {
 	public static final String UNDEFINED = "";
-	public static final String CURRENT_RUTA_ID_KEY = "ruta_id";
-	public static final String CURRENT_PROVYTA_ID_KEY = "provyta_id";
-	public static final String CURRENT_DELYTA_ID_KEY = "delyta_id";
-	public static final String CURRENT_YEAR_ID_KEY = "current_year_id";
+//	public static final String CURRENT_RUTA_ID_KEY = "ruta_id";
+//	public static final String CURRENT_PROVYTA_ID_KEY = "provyta_id";
+//	public static final String CURRENT_DELYTA_ID_KEY = "delyta_id";
+//	public static final String CURRENT_YEAR_ID_KEY = "current_year_id";
 	public static final String USER_ID_KEY = "user_id";
 	public static final String LAG_ID_KEY = "lag_id";
 	public static final String MITTPUNKT_KEY = "mittpunkt";
@@ -19,6 +19,7 @@ public class PersistenceHelper {
 	public static final String SERVER_URL = "server_location";
 	public static final String CURRENT_VERSION_OF_WF_BUNDLE = "current_version_wf";
 	public static final String CURRENT_VERSION_OF_CONFIG_FILE = "current_version_config";
+	public static final String CURRENT_VERSION_OF_PROGRAM = "prog_version";
 	public static final String FIRST_TIME_KEY = "firzzt";
 	public static final String DEVELOPER_SWITCH = "dev_switch";
 	public static final String VERSION_CONTROL_SWITCH_OFF = "no_version_control";

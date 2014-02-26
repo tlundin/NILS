@@ -1,4 +1,4 @@
-package com.teraim.nils.statics;
+package com.teraim.nils.ui;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,7 +25,6 @@ import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
 import com.teraim.nils.dynamic.types.Marker;
 import com.teraim.nils.dynamic.types.Variable;
-import com.teraim.nils.ui.FixytaView;
 
 public class FixPunktFragment extends Fragment implements OnGesturePerformedListener {
 

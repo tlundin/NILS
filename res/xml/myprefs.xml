@@ -8,10 +8,7 @@ xmlns:android="http://schemas.android.com/apk/res/android" >
      android:entryValues="@array/deviceTypes" 
      android:title="Dosans Typ" 
      android:entries="@array/deviceTypes" />
-  <ListPreference 
-     android:key="ruta_id"
-     android:title="Vald ruta" 
-      />   
+
 <EditTextPreference
             android:key="lag_id"
             android:title="Lag" 

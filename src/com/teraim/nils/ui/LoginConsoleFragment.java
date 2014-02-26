@@ -1,4 +1,8 @@
-package com.teraim.nils;
+package com.teraim.nils.ui;
+
+import com.teraim.nils.R;
+import com.teraim.nils.R.id;
+import com.teraim.nils.R.layout;
 
 import android.app.Fragment;
 import android.graphics.Typeface;

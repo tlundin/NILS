@@ -65,7 +65,7 @@ WF_Not_ClickableField implements EventListener {
 				"type of event: "+e.getType().name());
 		if (e.getProvider().equals(targetList.getId())) {
 			matchAndRecalculateMe();
-			this.refreshValues();
+			this.refreshOutputFields();
 		} else
 			Log.d("nils","event discarded - from wrong list");
 
@@ -90,7 +90,8 @@ WF_Not_ClickableField implements EventListener {
 									sum+=Long.parseLong(v.getValue());
 							}
 						}
-					}
+					} else
+						Log.d("nils","NO MATCH! Pattern: "+myPattern+" Variable: "+v.getId());
 
 				}
 			} else {

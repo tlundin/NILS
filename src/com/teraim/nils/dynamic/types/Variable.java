@@ -92,9 +92,11 @@ public class Variable implements Serializable {
 	
 	public Variable(String name,String label,List<String> row,Map<String,String>keyChain, GlobalState gs) {
 		this.name = name;
-		myType = gs.getArtLista().getnumType(row);
-		myUnit = gs.getArtLista().getUnit(row);
-		myRow = row;
+		if (row!=null) {
+			myRow = row;
+			myType = gs.getArtLista().getnumType(row);		
+			myUnit = gs.getArtLista().getUnit(row);
+		}		
 		this.keyChain=keyChain;		
 		myDb = gs.getDb();
 		mySelection = myDb.createSelection(keyChain,name);

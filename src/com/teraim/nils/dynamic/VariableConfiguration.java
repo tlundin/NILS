@@ -134,6 +134,11 @@ public class VariableConfiguration {
 
 	Map<String,Variable>varCache = new HashMap<String,Variable>();
 	
+	public String getVariableValue(String keyChain, String varId) {
+		return new Variable(varId,null,null,null,gs).getValue();
+
+	}
+	
 	//Create a variable with the current context and the variable's keychain.
 	public Variable getVariableInstance(String varId) {	
 		Variable v = varCache.get(varId);
@@ -142,12 +147,13 @@ public class VariableConfiguration {
 		String varLabel =null;
 		List<String> row = this.getCompleteVariableDefinition(varId);
 		if (row!=null) {
+		Log.d("nils","Fetching keychain from row "+row);
 		String keyChain = this.getKeyChain(row);
 		varLabel = this.getVarLabel(row);
 		//Log.d("nils","getVariableInstance for "+varId+" with keychain "+keyChain);
 		//Log.d("nils","KeyChain is empty?"+keyChain.isEmpty());
 		Map<String, String> vMap;
-		if (!keyChain.isEmpty()) {
+		if (keyChain!=null&&!keyChain.isEmpty()) {
 		String[] keys = keyChain.split("\\|");
 		//find my keys in the current context.
 		vMap = new HashMap<String,String>();

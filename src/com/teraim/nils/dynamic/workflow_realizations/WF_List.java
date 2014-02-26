@@ -3,12 +3,12 @@ package com.teraim.nils.dynamic.workflow_realizations;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.util.Log;
 import android.widget.LinearLayout;
 
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.dynamic.VariableConfiguration;
-import com.teraim.nils.dynamic.types.Workflow.Unit;
 import com.teraim.nils.dynamic.workflow_abstracts.Filter;
 import com.teraim.nils.dynamic.workflow_abstracts.Filterable;
 import com.teraim.nils.dynamic.workflow_abstracts.Listable;
@@ -34,7 +34,7 @@ public abstract class WF_List extends WF_Widget implements Sortable,Filterable {
 		al = GlobalState.getInstance(ctx.getContext()).getArtLista();
 		myRows = rows;
 		group = al.getFunctionalGroup(myRows.get(0));
-
+		
 	}
 
 	@Override
@@ -87,6 +87,7 @@ public abstract class WF_List extends WF_Widget implements Sortable,Filterable {
 		myWidget.removeAllViews();
 		for (Listable l:filteredList) {
 			l.refreshInputFields();
+			l.refreshOutputFields();
 			//Everything is WF_Widgets, so this is safe!
 			
 			myWidget.addView(((WF_Widget)l).getWidget());

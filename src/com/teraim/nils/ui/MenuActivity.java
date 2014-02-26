@@ -19,9 +19,10 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.teraim.nils.GlobalState;
-import com.teraim.nils.LoggerI;
 import com.teraim.nils.R;
 import com.teraim.nils.bluetooth.BluetoothRemoteDevice;
+import com.teraim.nils.dynamic.types.Variable;
+import com.teraim.nils.log.LoggerI;
 import com.teraim.nils.utils.PersistenceHelper;
 
 /**
@@ -126,8 +127,11 @@ public class MenuActivity extends Activity {
 	protected void refreshStatusRow() {
 		Log.d("NILS","Refreshing status row ");
 		int c=0;
-		String pid = ph.get(PersistenceHelper.CURRENT_PROVYTA_ID_KEY);
-		String rid = ph.get(PersistenceHelper.CURRENT_RUTA_ID_KEY);
+		String r,p;
+		r = gs.getArtLista().getVariableValue(null,"Current_Provyta");
+		p = gs.getArtLista().getVariableValue(null,"Current_Ruta");
+		String pid = p==null?"?":p;
+		String rid = r==null?"?":r;
 		mnu[c++].setTitle("Ruta/Provyta: "+rid+"/"+pid);
 		mnu[c++].setTitle("LOG");
 		mnu[c++].setTitle("Synkning: "+gs.getSyncStatusS());

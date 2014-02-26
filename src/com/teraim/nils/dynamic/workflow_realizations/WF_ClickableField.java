@@ -2,16 +2,20 @@ package com.teraim.nils.dynamic.workflow_realizations;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
@@ -32,7 +36,6 @@ import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.types.Variable.DataType;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 import com.teraim.nils.dynamic.workflow_abstracts.EventGenerator;
-import com.teraim.nils.utils.Tools;
 
 public abstract class WF_ClickableField extends WF_Not_ClickableField implements  EventGenerator {
 
@@ -53,6 +56,66 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 	public Set<Variable> getAssociatedVariables() {
 		return myVars.keySet();
 	}
+	
+	private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+
+	    // Called when the action mode is created; startActionMode() was called
+	    @Override
+	    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+	        // Inflate a menu resource providing context menu items
+	        MenuInflater inflater = mode.getMenuInflater();
+	        inflater.inflate(R.menu.tagpopmenu, menu);
+	        return true;
+	    }
+
+	    // Called each time the action mode is shown. Always called after onCreateActionMode, but
+	    // may be called multiple times if the mode is invalidated.
+	    @Override
+	    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+	        return false; // Return false if nothing is done
+	    }
+
+	    // Called when the user selects a contextual menu item
+	    @Override
+	    public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
+	        switch (item.getItemId()) {
+	            case R.id.menu_delete:
+	            	for (View inf:myVars.values()) {
+						if (inf!=null) {
+							if (inf instanceof EditText)
+								((EditText)inf).setText("");
+
+						}
+					}
+					save();
+	                mode.finish(); // Action picked, so close the CAB
+	                return true;
+	            case R.id.menu_info:
+	            	new AlertDialog.Builder(myContext.getContext())
+	                .setTitle("Beskrivning")
+	                .setMessage(myDescription)
+	                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+	                    public void onClick(DialogInterface dialog, int which) { 
+	                    	mode.finish();
+	                    }
+	                 })
+	                .setIcon(android.R.drawable.ic_dialog_info)
+	                 .show();
+	            	
+	            	return true;
+	            default:
+	                return false;
+	        }
+	    }
+
+	    // Called when the user exits the action mode
+	    @Override
+	    public void onDestroyActionMode(ActionMode mode) {
+	        mActionMode = null;
+	    }
+	};
+
+	ActionMode mActionMode;
 
 	public  WF_ClickableField(final String myId,final String descriptionT, WF_Context context,String id, View view) {
 		super(myId,descriptionT,context,view,true);	
@@ -68,13 +131,23 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 				LinearLayout.LayoutParams.MATCH_PARENT,
 				1));
 
-
-
 		//Empty all inputs and save.
 		getWidget().setClickable(true);	
 		getWidget().setOnLongClickListener(new OnLongClickListener(){
 			@Override
 			public boolean onLongClick(View v) {
+				
+				
+		        
+				if (mActionMode != null) {
+		            return false;
+		        }
+
+		        // Start the CAB using the ActionMode.Callback defined above
+		        mActionMode = ((Activity)myContext.getContext()).startActionMode(mActionModeCallback);
+		        WF_ClickableField.this.getWidget().setSelected(true);
+		        return true;
+				/*
 				for (View inf:myVars.values()) {
 					if (inf!=null) {
 						if (inf instanceof EditText)
@@ -84,8 +157,13 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 				}
 				save();
 				return true;
+				*/
 			}
 		});
+
+		
+		
+
 
 
 		getWidget().setOnClickListener(new OnClickListener() {			
@@ -96,11 +174,12 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 				AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
 				alert.setTitle(myId);
 				alert.setMessage(descriptionT);
+				refreshInputFields();
 
 				alert.setPositiveButton("Spara", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {				  
 						save();
-						refreshValues();
+						refreshOutputFields();
 						((ViewGroup)inputContainer.getParent()).removeView(inputContainer);
 					}
 				});
@@ -215,6 +294,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 			outputContainer.addView(ll);
 		}
 		refreshInputFields();
+		refreshOutputFields();
 	}
 
 
@@ -265,58 +345,61 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 			String value = variable.getValue();
 			numType = variable.getType();
 
-			if (value == null)
-				Log.d("nils","WF_Clickable:value was null in refreshinput");
-			else {
-				View v = entry.getValue();
+			View v = entry.getValue();
 
-				if (numType == DataType.bool) {
-					RadioButton ja = (RadioButton)v.findViewById(R.id.ja);
-					RadioButton nej = (RadioButton)v.findViewById(R.id.nej);
-					if(value!=null) {
-						if(value.equals("1"))
-							ja.setEnabled(true);
-						else
-							nej.setEnabled(true);
-						ja.setChecked(true);
-					}
+			if (numType == DataType.bool) {
+				RadioButton ja = (RadioButton)v.findViewById(R.id.ja);
+				RadioButton nej = (RadioButton)v.findViewById(R.id.nej);
+				if(value!=null) {
+					if(value == null||value.equals("1"))
+						ja.setEnabled(true);
+					else
+						nej.setEnabled(true);
+					ja.setChecked(true);
+				}
+			} else
+				if (numType == Variable.DataType.numeric||
+				numType ==DataType.text) {
+					EditText et = (EditText)v.findViewById(R.id.edit);
+					if (et!=null)
+						et.setText(value==null?"":value);
+					else
+						Log.d("nils","WF_Clickable:view was null in refreshinput");
 				} else
-					if (numType == Variable.DataType.numeric||
-					numType ==DataType.text) {
-						EditText et = (EditText)v.findViewById(R.id.edit);
-						if (et!=null)
-							et.setText(value);
-						else
-							Log.d("nils","WF_Clickable:view was null in refreshinput");
-					} else
-						if (numType==DataType.list) {
-							Spinner sp = (Spinner)v;
-							String item = null;
-							for (int i=0;i<sp.getAdapter().getCount();i++) {
-								item = (String)sp.getAdapter().getItem(i);
-								if (item == null)
-									continue;
-								else
-									if (item.equals(value))
-										sp.setSelection(i);
+					if (numType==DataType.list) {
+						Spinner sp = (Spinner)v;
+						String item = null;
+						if (sp.getAdapter().getCount()>0) {
+							if (value!=null) {								
+								for (int i=0;i<sp.getAdapter().getCount();i++) {
+									item = (String)sp.getAdapter().getItem(i);
+									if (item == null)
+										continue;
+									else
+										if (item.equals(value))
+											sp.setSelection(i);
+								}
 							}
-
+						} else {
+							o.addRow("");
+							o.addRedText("Empty spinner for variable "+v+". Check your variable configuration.");
 						}
-			} 
 
-		}
-		refreshValues();
+					}
+		} 
+
 	}
 
-
-
-
-
-
-
-
-
-
-
-
 }
+
+
+
+
+
+
+
+
+
+
+
+

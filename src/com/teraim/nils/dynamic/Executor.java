@@ -18,7 +18,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.teraim.nils.GlobalState;
-import com.teraim.nils.LoggerI;
 import com.teraim.nils.R;
 import com.teraim.nils.dynamic.blocks.AddSumOrCountBlock;
 import com.teraim.nils.dynamic.blocks.AddVariableToEveryListEntryBlock;
@@ -41,6 +40,7 @@ import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
 import com.teraim.nils.dynamic.workflow_realizations.WF_List;
 import com.teraim.nils.exceptions.RuleException;
 import com.teraim.nils.expr.SyntaxException;
+import com.teraim.nils.log.LoggerI;
 
 /*
  * Executes workflow blocks. Child classes define layouts and other specialized behavior

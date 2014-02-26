@@ -3,5 +3,10 @@
 <string-array name="deviceTypes">
     <item>Mästare</item>
     <item>Slav</item>
+</string-array> 
+<string-array name="menu">
+    <item>Beskrivning</item>
+    <item>På webben</item>
+    <item>Delete</item>
 </string-array>    
 </resources>

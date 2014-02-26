@@ -2,7 +2,7 @@ package com.teraim.nils.dynamic.workflow_realizations;
 
 import android.widget.LinearLayout;
 
-import com.teraim.nils.LoggerI;
+import com.teraim.nils.log.LoggerI;
 
 
 public abstract class WF_Thing {

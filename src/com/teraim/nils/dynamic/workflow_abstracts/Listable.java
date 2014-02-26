@@ -13,7 +13,7 @@ public interface Listable {
 	public long getTimeStamp();
 	public String getValue();
 	public String getLabel();
-	public void refreshValues();
+	public void refreshOutputFields();
 	public void refreshInputFields();
 	Set<Variable> getAssociatedVariables();
 

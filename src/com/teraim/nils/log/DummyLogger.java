@@ -1,4 +1,4 @@
-package com.teraim.nils;
+package com.teraim.nils.log;
 import android.widget.TextView;
 
 

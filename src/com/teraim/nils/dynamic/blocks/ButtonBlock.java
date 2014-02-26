@@ -6,7 +6,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -38,7 +37,7 @@ public  class ButtonBlock extends Block {
 	private static final long serialVersionUID = 6454431627090793558L;
 	String text,onClick,name,containerId,target;
 	Type type;
-	
+
 	WF_Context myContext;
 	private boolean isVisible;
 
@@ -59,14 +58,11 @@ public  class ButtonBlock extends Block {
 
 	}
 
-	
+
 	public String getText() {
 		return text;
 	}
 
-	public Action getAction() {
-		return new Action();
-	}
 
 	public String getName() {
 		return name;
@@ -74,88 +70,69 @@ public  class ButtonBlock extends Block {
 	public String getTarget() {
 		return target;
 	}
-	public class Action {
-		public final static int VALIDATE = -1;
-		public final static int WF_EXECUTE = -2;
 
-		private int type;
-		public String wfName=null;
-		public Action() {
-			if (onClick.equals("validate"))
-				type = VALIDATE;
-			else if (onClick.equals("Start_Workflow"))
-				type = WF_EXECUTE;
-			wfName = target;
-			Log.d("NILS","Workflowname in ACTION is "+target+" with length "+target.length());
-		}
-		public boolean isWorkflow() {
-			return type==WF_EXECUTE;
-		}
-	}
 
 	public void create(final WF_Context myContext) {
 		o=GlobalState.getInstance(myContext.getContext()).getLogger();
 		Container myContainer = myContext.getContainer(containerId);
 		final Context ctx = myContext.getContext();
-		
+
 		if (type == Type.action) {
 			o.addRow("Creating Action Button.");
 			Button button = new Button(ctx);
 			//button.setBackgroundDrawable(ctx.getResources().getDrawable(R.drawable.button_bg_selector));
 			//button.setTextAppearance(ctx, R.style.WF_Text);
+			Log.d("nils","BUTTON TEXT:"+getText());
 			button.setText(getText());
 
 			LayoutParams params = new LayoutParams();
-			params.width = LayoutParams.WRAP_CONTENT;
-			params.height = LayoutParams.MATCH_PARENT;
-			params.gravity = Gravity.CENTER_HORIZONTAL;
-			params.leftMargin = 50;
-			params.rightMargin = 50;
-			//Not sure about these..
-			params.bottomMargin = 10;
-			params.topMargin = 10;
+			params.width = LayoutParams.MATCH_PARENT;
+			params.height = LayoutParams.WRAP_CONTENT;
+
 			button.setLayoutParams(params);
 			button.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30);
 
 			button.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View arg0) {
-					Action action = getAction();
+
 					//ACtion = workflow to execute.
 					//Commence!
 
-					if (action!=null) {
-						//Workflow?
-						if (action.isWorkflow()){
+					if (onClick.startsWith("template"))
+						myContext.getTemplate().execute(onClick,target);
+					else if (onClick.equals("validate"))
+						;//TODO
+					else if (onClick.equals("Start_Workflow")) {
 
-							Workflow wf = GlobalState.getInstance(ctx).getWorkflow(action.wfName);
-							if (wf == null) {
-								Log.e("NILS","Cannot find wf referenced by button "+getName());
+						Workflow wf = GlobalState.getInstance(ctx).getWorkflow(target);
+						if (wf == null) {
+							Log.e("NILS","Cannot find wf referenced by button "+getName());
 
-							} else {
+						} else {
+							o.addRow("");
+							o.addRow("Action button pressed. Executing wf: "+target);
+							Fragment f = wf.createFragment();
+							if (f == null) {
 								o.addRow("");
-								o.addRow("Action button pressed. Executing wf: "+action.wfName);
-								Fragment f = wf.createFragment();
-								if (f == null) {
-									o.addRow("");
-									o.addRedText("Couldn't create new fragment...Template was named"+wf.getName());
-								}
-								Bundle b = new Bundle();
-								b.putString("workflow_name", action.wfName); //Your id
-								f.setArguments(b); //Put your id to your next Intent
-								//save all changes
-								final FragmentTransaction ft = myContext.getActivity().getFragmentManager().beginTransaction(); 
-								ft.replace(myContext.getRootContainer(), f);
-								ft.addToBackStack(null);
-								ft.commit(); 
-								//Validation?
+								o.addRedText("Couldn't create new fragment...Template was named"+wf.getName());
 							}
-						} //else
-						//validate();
+							Bundle b = new Bundle();
+							b.putString("workflow_name", target); //Your id
+							f.setArguments(b); //Put your id to your next Intent
+							//save all changes
+							final FragmentTransaction ft = myContext.getActivity().getFragmentManager().beginTransaction(); 
+							ft.replace(myContext.getRootContainer(), f);
+							ft.addToBackStack(null);
+							ft.commit(); 
+							//Validation?
+						}
+
 					} else {
 						o.addRow("");
 						o.addRedText("Action button had no associated action!");
 					}
+
 				}
 
 			});
@@ -170,20 +147,19 @@ public  class ButtonBlock extends Block {
 			LayoutParams params = new LayoutParams();
 			params.width = LayoutParams.MATCH_PARENT;
 			params.height = LayoutParams.WRAP_CONTENT;
-			
 			toggleB.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30);
 			toggleB.setLayoutParams(params);
-			
+
 			toggleB.setOnClickListener(new OnClickListener() {
-				
+
 				@Override
 				public void onClick(View v) {
-						if(onClick==null||onClick.trim().length()==0) {
-							o.addRow("");
-							o.addRedText("Button "+text+" has no onClick action!");
-							Log.e("nils","Button clicked ("+text+") but found no action");
-						} else {
-							
+					if(onClick==null||onClick.trim().length()==0) {
+						o.addRow("");
+						o.addRedText("Button "+text+" has no onClick action!");
+						Log.e("nils","Button clicked ("+text+") but found no action");
+					} else {
+
 						o.addRow("Togglebutton "+text+" pressed. Executing function "+onClick);
 						if (onClick.startsWith("template")) 
 							myContext.getTemplate().execute(onClick,target);	
@@ -191,18 +167,18 @@ public  class ButtonBlock extends Block {
 							Log.d("nils","Executing toggle");
 							Drawable d = myContext.getDrawable(target);
 							if (d!=null) {
-							if(d.isVisible())
-								d.hide();
-							else
-								d.show();
+								if(d.isVisible())
+									d.hide();
+								else
+									d.show();
 							} else {
 								Log.e("nils","Couldn't find target "+target+" for button");
 								o.addRow("");
 								o.addRedText("Target for button missing: "+target);
 							}
-								
+
 						}
-						}
+					}
 				}
 			});
 			myContainer.add(new WF_Widget(text,toggleB,isVisible,myContext));

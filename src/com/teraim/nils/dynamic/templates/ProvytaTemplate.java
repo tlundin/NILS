@@ -23,9 +23,10 @@ import com.teraim.nils.R;
 import com.teraim.nils.dynamic.Executor;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Container;
 import com.teraim.nils.ui.FixPunktFragment;
+import com.teraim.nils.utils.PersistenceHelper;
 
 
-public class FixPunktTemplate extends Executor implements OnGesturePerformedListener {
+public class ProvytaTemplate extends Executor implements OnGesturePerformedListener {
 	List<WF_Container> myLayouts;
 
 
@@ -42,26 +43,29 @@ public class FixPunktTemplate extends Executor implements OnGesturePerformedList
 			Bundle savedInstanceState) {
 		myContext.onResume();
 		myLayouts = new ArrayList<WF_Container>();
-		Log.d("nils","in onCreateView of fixpunkt_template");
+		Log.d("nils","in onCreateView of provyta_template");
 		myContainer = container;
-		View v = inflater.inflate(R.layout.template_fixpunkt_wf, container, false);	
+		View v = inflater.inflate(R.layout.template_list_input_wf, container, false);	
 		WF_Container root = new WF_Container("root", (LinearLayout)v.findViewById(R.id.root), null);
 		myLayouts.add(root);
 		myLayouts.add(new WF_Container("Field_List_panel_1", (LinearLayout)v.findViewById(R.id.fieldList), root));
 		myLayouts.add(new WF_Container("Aggregation_panel_3", (LinearLayout)v.findViewById(R.id.aggregates), root));
-		myLayouts.add(new WF_Container("Description_panel_1", (FrameLayout)v.findViewById(R.id.Description), root));
+		myLayouts.add(new WF_Container("Filter_panel_4", (LinearLayout)v.findViewById(R.id.filterPanel), root));
+		myLayouts.add(new WF_Container("Field_List_panel_2", (LinearLayout)v.findViewById(R.id.Selected), root));
 		myContext.addContainers(getContainers());
 
 		
 		//Gestures
+	    /*
 	    GestureOverlayView gestureOverlayView = (GestureOverlayView)v.findViewById(R.id.gesture_overlay);
+	     
 	    gestureOverlayView.setGestureVisible(false);
 	    gestureOverlayView.addOnGesturePerformedListener(this);
 	    gestureLib = GestureLibraries.fromRawResource(this.getActivity(), R.raw.gestures);
 	    if (!gestureLib.load()) {      	
 	    	        Log.i("nils", "Load gesture libraries failed.");  
 	    	    }  
-
+		*/
 		
 		
 		if (wf!=null) {
@@ -80,7 +84,7 @@ public class FixPunktTemplate extends Executor implements OnGesturePerformedList
 	public void onStart() {
 		super.onStart();
 
-		Log.d("nils","in onStart fixpunkter");
+		Log.d("nils","in onStart provyta_template");
 	
 	}
 
@@ -92,7 +96,8 @@ public class FixPunktTemplate extends Executor implements OnGesturePerformedList
 	}
 
 	public void execute(String name, String target) {
-
+		if (name.equals("template_function_export"))
+			gs.getDb().export("ruta",gs.getArtLista().getVariableInstance("Current_Ruta").getValue());
 	}
 
 

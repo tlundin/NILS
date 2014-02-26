@@ -12,6 +12,7 @@ public class WF_ClickableField_Selection extends WF_ClickableField {
 			WF_Context context, String id,boolean isVisible) {
 		super(headerT,descriptionT, context, id,
 				LayoutInflater.from(context.getContext()).inflate(R.layout.selection_field_normal,null,isVisible));
+		
 	}
 
 	@Override

@@ -24,10 +24,10 @@ import com.teraim.nils.Constants;
 import com.teraim.nils.FileLoadedCb;
 import com.teraim.nils.FileLoadedCb.ErrorCode;
 import com.teraim.nils.GlobalState;
-import com.teraim.nils.LoggerI;
 import com.teraim.nils.dynamic.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Table;
 import com.teraim.nils.dynamic.types.Table.ErrCode;
+import com.teraim.nils.log.LoggerI;
 
 /**
  * 
@@ -84,26 +84,25 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 	@Override
 	protected void onPostExecute(ErrorCode code) {
 
-		if (code == ErrorCode.newConfigVersionLoaded|| code == ErrorCode.bothFilesLoaded) {
+		if (code == ErrorCode.newVarPatternVersionLoaded||
+				code == ErrorCode.newConfigVersionLoaded|| 
+				code == ErrorCode.bothFilesLoaded) {
 			boolean ok= Tools.witeObjectToFile(ctx, myTable, Constants.CONFIG_FILES_DIR+Constants.CONFIG_FROZEN_FILE_ID);
 			if (!ok)
 				code = ErrorCode.ioError;
 			else {
-				ph.put(PersistenceHelper.CURRENT_VERSION_OF_CONFIG_FILE,fVersion);
-				o.addRow("");
-				o.addYellowText("Configuration file loaded. Version: "+fVersion);
+				if (code ==ErrorCode.bothFilesLoaded||code ==  ErrorCode.newConfigVersionLoaded)
+					o.addRow("");
+					o.addYellowText("Configuration file loaded. Version: "+fVersion);
+					ph.put(PersistenceHelper.CURRENT_VERSION_OF_CONFIG_FILE,fVersion);
+				if (code ==ErrorCode.bothFilesLoaded||code == ErrorCode.newVarPatternVersionLoaded) {
+					o.addRow("");
+					o.addYellowText("Varpattern file loaded. Version: "+vVersion);
+					ph.put(PersistenceHelper.CURRENT_VERSION_OF_VARPATTERN_FILE,vVersion);
+				}
 			}
 		}
-		if (code == ErrorCode.newVarPatternVersionLoaded|| code == ErrorCode.bothFilesLoaded) {
-			boolean ok= Tools.witeObjectToFile(ctx, myTable, Constants.CONFIG_FILES_DIR+Constants.CONFIG_FROZEN_FILE_ID);
-			if (!ok)
-				code = ErrorCode.ioError;
-			else {
-				ph.put(PersistenceHelper.CURRENT_VERSION_OF_VARPATTERN_FILE,vVersion);
-				o.addRow("");
-				o.addYellowText("Varpattern file loaded. Version: "+vVersion);
-			}
-		}
+		
 
 
 		cb.onFileLoaded(code);	
@@ -116,6 +115,7 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 		final String FileUrl = serverUrl+fileName;
 		final String VarUrl = serverUrl+"varpattern.csv";
 		boolean parseConfig=true,parseVarPattern=true;
+		
 		o.addRow("");
 		o.addYellowText("Now parsing variable configuration files. ");
 		o.addRow("Artlista URL: "+FileUrl);
@@ -158,13 +158,13 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 						br.close();
 						parseConfig = false;
 
-					}
+					} 
 					if (vVersion.equals(ph.get(PersistenceHelper.CURRENT_VERSION_OF_VARPATTERN_FILE))) {
 						o.addRow("No need to parse...no changes ");
 						br.close();
 						parseVarPattern = false;
-
-					}
+					} 
+					
 					if (!parseConfig && !parseVarPattern)
 						return ErrorCode.sameold;
 				}
@@ -322,7 +322,11 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 			o.addRedText(sw.toString());
 			return ErrorCode.ioError;			
 		}
-		
-		return ErrorCode.newConfigVersionLoaded;
+		if (parseConfig && parseVarPattern) 
+			return ErrorCode.bothFilesLoaded;
+		if (parseConfig)
+			return ErrorCode.newConfigVersionLoaded;
+		else 
+			return ErrorCode.newVarPatternVersionLoaded;
 	}
 }

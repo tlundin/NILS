@@ -13,9 +13,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.teraim.nils.Constants;
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.dynamic.types.Table;
 import com.teraim.nils.dynamic.types.Variable;
+import com.teraim.nils.utils.JSONExporter.Report;
 
 public class DbHelper extends SQLiteOpenHelper {
 
@@ -28,12 +30,67 @@ public class DbHelper extends SQLiteOpenHelper {
 	private static final String TABLE_VARIABLES = "variabler";
 	private static final String TABLE_AUDIT = "audit";
 
+	private static final String VALUE="value",TIMESTAMP="timestamp",LAG="lag",CREATOR="creator";
+	private static final String[] VAR_COLS = {VALUE,TIMESTAMP,LAG,CREATOR};
+	
 	private static final int NO_OF_KEYS = 10;
 	private final SQLiteDatabase db;
 	private final PersistenceHelper ph;
 
 	private final Map<String,String> keyColM = new HashMap<String,String>();
+	private Map<String,String> colKeyM = new HashMap<String,String>();
+
 	Context ctx;
+	
+	
+	//Helper class that wraps the Cursor.
+	public class DBColumnPicker {
+		Cursor c;
+		private static final String NAME = "var",VALUE="value",TIMESTAMP="timestamp",LAG="lag",CREATOR="author";
+		
+		public DBColumnPicker(Cursor c) {
+			this.c=c;
+		}
+		
+		public StoredVariableData getVariable() {
+			return new StoredVariableData(pick(NAME),pick(VALUE),pick(TIMESTAMP),pick(LAG),pick(CREATOR));
+		}
+		public Map<String,String> getKeyColumnValues() {
+			 Map<String,String> ret = new HashMap<String,String>();
+			 Set<String> keys = keyColM.keySet();
+			 String col=null;
+			 for(String key:keys) {
+				 col = keyColM.get(key);
+				 ret.put(key, pick(col));
+			 }
+			return ret; 
+		}
+		
+		private String pick(String key) {
+			return c.getString(c.getColumnIndex(key));
+		}
+		
+		public boolean moveToFirst() {
+			if (c==null)
+				return false;
+			else
+				return c.moveToFirst();
+		}
+		
+		public boolean next() {
+			boolean b = c.moveToNext();
+			if (!b)
+				c.close();
+			return b;
+		}
+		
+		public void close() {
+			c.close();
+		}
+		
+	}
+	
+	
 	public DbHelper(Context context,Table t, PersistenceHelper ph) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);  
 		ctx = context;
@@ -45,6 +102,7 @@ public class DbHelper extends SQLiteOpenHelper {
 			Log.d("nils","Table doesn't exist yet...postpone init");
 		}
 	}
+
 
 
 	public void init(ArrayList<String> keyParts) {
@@ -80,11 +138,12 @@ public class DbHelper extends SQLiteOpenHelper {
 					if (keyParts.get(i).isEmpty()) {
 						Log.d("nils","found empty keypart! Skipping");
 					} else {
-					String colId = "L"+(keyColM.size()+1);
-					//Add key to memory
-					keyColM.put(keyParts.get(i),colId);
-					//Persist new column identifier.
-					ph.put(colId, keyParts.get(i));
+						String colId = "L"+(keyColM.size()+1);
+						//Add key to memory
+						keyColM.put(keyParts.get(i),colId);
+						colKeyM.put(colId,keyParts.get(i));
+						//Persist new column identifier.
+						ph.put(colId, keyParts.get(i));
 					}
 				}
 
@@ -94,14 +153,14 @@ public class DbHelper extends SQLiteOpenHelper {
 		Set<String> s = keyColM.keySet();
 		for (String e:s)
 			Log.d("nils","Key: "+e+"Value:"+keyColM.get(e));
-		
-		
+
+
 	}
-	
+
 	public void speziale() {
 		//TODO: REMOVE
 		//Insert values for current.
-		
+
 		Variable v;
 		v=GlobalState.getInstance(ctx).getArtLista().getVariableInstance("current_year");	
 		this.insertVariable(v, "2014");
@@ -135,7 +194,7 @@ public class DbHelper extends SQLiteOpenHelper {
 				"lag TEXT, "+
 				"timestamp TEXT, "+
 				"author TEXT ) ";
-				
+
 		//audit table to keep track of all insert,updates and deletes. 
 		String CREATE_AUDIT_TABLE = "CREATE TABLE audit ( " +
 				"id INTEGER PRIMARY KEY AUTOINCREMENT, " + 
@@ -164,11 +223,61 @@ public class DbHelper extends SQLiteOpenHelper {
 	}
 
 
-	//Create update delete
+	public void exportAllData() {
+		Cursor c = db.query(TABLE_VARIABLES,null,
+				null,null,null,null,null,null);
+		if (c!=null) {
+
+			//"timestamp","lag","author"
+			Log.d("nils","Variables found in db:");
+			String L[] = new String[keyColM.size()];
+			String var,value,timeStamp,lag,author;
+			while (c.moveToNext()) {
+				var = c.getString(c.getColumnIndex("var"));
+				value = c.getString(c.getColumnIndex("value"));
+				timeStamp = c.getString(c.getColumnIndex("timestamp"));
+				lag = c.getString(c.getColumnIndex("lag"));
+				author = c.getString(c.getColumnIndex("author"));
+				for (int i=0;i<L.length;i++)
+					L[i]=c.getString(c.getColumnIndex("L"+(i+1)));	
+
+			}
+		}
+	}
+
+	//Export all rows that have Column = Value
+	public void export(String column,String key) {
+		Log.d("nils","Started exportRuta");
+		JSONExporter exporter = JSONExporter.getInstance(ctx);
+		String col = keyColM.get(column);
+		if (col==null)
+			Log.e("nils","Could not find column mapping to columnHeader "+column);
+		else {
+			String selection = col+"= ?";
+			String selectionArgs[] = {key};
+			Cursor c = db.query(TABLE_VARIABLES,null,selection,
+					selectionArgs,null,null,null,null);	
+			if (c!=null) {
+				Log.d("nils","Variables found in db for column "+column);
+				//Wrap the cursor in an object that understand how to pick it!
+				Report r = exporter.writeVariables(new DBColumnPicker(c));
+				if (r!=null) {
+				if (Tools.writeToFile(Constants.CONFIG_FILES_DIR+"json_"+column+"_"+key,r.result)) {
+					Log.d("nils","Exported json file succesfully");
+				} else
+					Log.d("nils","Export of json file failed");
+				} else
+					Log.e("nils", "Got NULL back from JSONwriter!");
+					
+			} else {
+				Log.e("nils","NO Variables found in db for column "+column+" with key value "+key);
+				
+			}
+		}
+	}
+
 
 	public void printAllVariables() {
-		ArrayList<Variable> ret = new ArrayList<Variable>();
-		//SQLiteDatabase db = this.getReadableDatabase();
 
 		Cursor c = db.query(TABLE_VARIABLES,null,
 				null,null,null,null,null,null);
@@ -178,15 +287,15 @@ public class DbHelper extends SQLiteOpenHelper {
 				Log.d("nils","VAR:"+c.getString(c.getColumnIndex("var"))+
 						"VALUE:"+c.getString(c.getColumnIndex("value"))+
 						"L1:"+c.getString(c.getColumnIndex("L1"))+
-					"L2:"+c.getString(c.getColumnIndex("L2"))+
-					"L3:"+	c.getString(c.getColumnIndex("L3"))+
-					"L4:"+	c.getString(c.getColumnIndex("L4"))+
-					"L5:"+	c.getString(c.getColumnIndex("L5"))+
-					"L6:"+	c.getString(c.getColumnIndex("L6"))+
-					"L7:"+	c.getString(c.getColumnIndex("L7"))+
-					"L8:"+	c.getString(c.getColumnIndex("L8"))+
-					"L9:"+	c.getString(c.getColumnIndex("L9"))+
-					"L10:"+	c.getString(c.getColumnIndex("L10")));
+						"L2:"+c.getString(c.getColumnIndex("L2"))+
+						"L3:"+	c.getString(c.getColumnIndex("L3"))+
+						"L4:"+	c.getString(c.getColumnIndex("L4"))+
+						"L5:"+	c.getString(c.getColumnIndex("L5"))+
+						"L6:"+	c.getString(c.getColumnIndex("L6"))+
+						"L7:"+	c.getString(c.getColumnIndex("L7"))+
+						"L8:"+	c.getString(c.getColumnIndex("L8"))+
+						"L9:"+	c.getString(c.getColumnIndex("L9"))+
+						"L10:"+	c.getString(c.getColumnIndex("L10")));
 			}
 		}
 		c.close();
@@ -249,46 +358,14 @@ public class DbHelper extends SQLiteOpenHelper {
 
 
 
-	/*
-	private long findRow(Variable var,SQLiteDatabase db) {
-		String selection = null;
-		String[] selectionArgs = null;
 
-		if (var.getType()==StorageType.ruta) {
-			selection = "var = ? and ruta = ?";
-			selectionArgs = new String[]{var.getVarId(),var.getRutId()};
-		} else if (var.getType()==StorageType.provyta) {
-			selection = "var = ? and ruta = ? and provyta = ?";
-			selectionArgs = new String[]{var.getVarId(),var.getRutId(), var.getProvytaId()};
-		} else if (var.getType()==StorageType.delyta) {
-			selection = "var = ? and ruta = ? and provyta = ? and delyta = ?";
-			selectionArgs = new String[]{var.getVarId(), var.getRutId(), var.getProvytaId(), var.getDelytaId()};
-		}
-
-
-		Cursor c = db.query(TABLE_VARIABLES,new String[]{"id"},
-				selection,selectionArgs,null,null,null,null);
-		// 3. if we got results get the first one
-		long id = -1;
-		if (c != null && c.moveToFirst()) {
-			String sid = c.getString(0);
-			//Log.d("nils","DBHelper: found variable on row with Id "+sid);
-			id = Long.parseLong(sid);
-
-		}
-		else 
-			;//Log.e("nils","DBHelper: Did not find variable on row with name "+var.getVarId());
-		c.close();
-		return id;
-	}
-	 */
 
 	public StoredVariableData getVariable(String name, Selection s) {
 
 		Cursor c = db.query(TABLE_VARIABLES,new String[]{"value","timestamp","lag","author"},
 				s.selection,s.selectionArgs,null,null,null,null);
 		if (c != null && c.moveToFirst() ) {
-			StoredVariableData sv = new StoredVariableData(c.getString(0),c.getString(1),c.getString(2),c.getString(3));
+			StoredVariableData sv = new StoredVariableData(name,c.getString(0),c.getString(1),c.getString(2),c.getString(3));
 
 			Log.d("nils","Found value and ts in db for "+name+" :"+sv.value+" "+sv.timeStamp);
 			c.close();
@@ -300,14 +377,15 @@ public class DbHelper extends SQLiteOpenHelper {
 	}
 
 	public class StoredVariableData {
-		public StoredVariableData(String value, String timestamp,
+		public StoredVariableData(String name,String value, String timestamp,
 				String lag, String author) {
 			this.timeStamp=timestamp;
 			this.value=value;
 			this.lagId=lag;
 			this.creator=author;
+			this.name=name;
 		}
-
+		public String name;
 		public String timeStamp;
 		public String value;
 		public String lagId;
@@ -331,7 +409,7 @@ public class DbHelper extends SQLiteOpenHelper {
 		c.close();
 		return null;
 	}
-	
+
 	public int getId(String name, Selection s) {
 		Log.d("nils","In getvalue with name "+name+" and selection "+s.selection+" and selectionargs "+print(s.selectionArgs));
 		Cursor c = db.query(TABLE_VARIABLES,new String[]{"id"},
@@ -382,7 +460,7 @@ public class DbHelper extends SQLiteOpenHelper {
 				values.put(column,value);
 				//Log.d("nils","Adding column "+column+" with value "+value);
 			}
-		} else 
+		}  
 			//Log.d("nils","Inserting global variable "+var.getId());
 		values.put("var", var.getId());
 		values.put("value", newValue);
@@ -391,14 +469,14 @@ public class DbHelper extends SQLiteOpenHelper {
 		values.put("author", ph.get(PersistenceHelper.USER_ID_KEY));
 		if (replace) 			
 			values.put("id", found);
-			
+
 		// 3. insert
 		long rId;
 		if (!replace) {
-		rId = db.insert(TABLE_VARIABLES, // table
-				null, //nullColumnHack
-				values
-				); 
+			rId = db.insert(TABLE_VARIABLES, // table
+					null, //nullColumnHack
+					values
+					); 
 		} else {
 			//Log.d("nils","REPLACING in INSERTX");
 			rId = db.replace(TABLE_VARIABLES, // table
@@ -438,18 +516,18 @@ public class DbHelper extends SQLiteOpenHelper {
 				String col;
 				selection="";
 				//1.find the matching column.
-				
+
 				for (String key:keySet.keySet()) {
 					col = keyColM.get(key);
 					selection+=col+"= ? and ";
-					
+
 				}
 				cachedSelArgs.put(keySet.keySet(), selection);
 
 			} 
 		}
 		selection+="var= ?";
-		
+
 		ret.selection=selection;	
 
 		//Log.d("nils","created new selection: "+selection);

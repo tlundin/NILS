@@ -108,7 +108,17 @@ public class FixytaView extends View {
 			if (focusMarker.hasPosition()) {
 				double alfa;
 				//Log.d("NILS","Blue has position");
-				if(focusMarker.getDistance()<realRadiusinMeter) {
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				if(focusMarker.getDistance()<=realRadiusinMeter) {
 					float ux = (float) (cx+focusMarker.x * oScaleF);
 					float uy = (float) (cy+focusMarker.y * oScaleF);
 					ux = ux - Marker.Pic_H/2;

@@ -19,6 +19,7 @@ import com.teraim.nils.utils.Tools;
 public abstract class WF_Not_ClickableField extends WF_ListEntry {
 	protected WF_Context myContext;
 	protected TextView myHeader;
+	protected String myDescription;
 	final LinearLayout outputContainer;
 	protected Map<Variable,LinearLayout> myOutputFields = new HashMap<Variable,LinearLayout>();
 
@@ -47,6 +48,8 @@ public abstract class WF_Not_ClickableField extends WF_ListEntry {
 		outputContainer = (LinearLayout)getWidget().findViewById(R.id.outputContainer);
 
 		myHeader.setText(myId);
+		
+		myDescription = descriptionT;
 	
 	
 	}
@@ -82,7 +85,7 @@ public abstract class WF_Not_ClickableField extends WF_ListEntry {
 	
 	
 	@Override
-	public void refreshValues() {
+	public void refreshOutputFields() {
 		//Log.d("nils","refreshoutput called on "+myHeader);
 		Iterator<Map.Entry<Variable,LinearLayout>> it = myOutputFields.entrySet().iterator();
 		while (it.hasNext()) {

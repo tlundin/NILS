@@ -17,10 +17,14 @@ import com.teraim.nils.dynamic.types.Delyta;
 import com.teraim.nils.dynamic.types.Provyta;
 import com.teraim.nils.dynamic.types.Ruta;
 import com.teraim.nils.dynamic.types.Table;
+import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.types.Workflow;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
 import com.teraim.nils.expr.Aritmetic;
 import com.teraim.nils.expr.Parser;
+import com.teraim.nils.log.DummyLogger;
+import com.teraim.nils.log.Logger;
+import com.teraim.nils.log.LoggerI;
 import com.teraim.nils.utils.DbHelper;
 import com.teraim.nils.utils.PersistenceHelper;
 import com.teraim.nils.utils.Tools;
@@ -87,9 +91,9 @@ public class GlobalState  {
 		//Parser for rules
 		parser = new Parser(this);
 		//Artlista
-		
+
 		artLista = new VariableConfiguration(this);	
-		
+
 		//Database Helper
 		Log.d("nils","artlista: "+artLista);
 		Log.d("nils","table: "+artLista.getTable());
@@ -151,7 +155,7 @@ public class GlobalState  {
 	 * 
 	 * Thawing of files to objects.
 	 */
-	
+
 	public Map<String,Workflow> thawWorkflows() {
 		Map<String,Workflow> ret = new HashMap<String,Workflow>();
 		List<Workflow> l = ((ArrayList<Workflow>)Tools.readObjectFromFile(myC,Constants.CONFIG_FILES_DIR+Constants.WF_FROZEN_FILE_ID));		
@@ -170,7 +174,7 @@ public class GlobalState  {
 		}
 		return ret;
 	}
-	
+
 	public Table thawTable() { 	
 		return ((Table)Tools.readObjectFromFile(myC,Constants.CONFIG_FILES_DIR+Constants.CONFIG_FROZEN_FILE_ID));		
 	}
@@ -202,30 +206,48 @@ public class GlobalState  {
 				getCurrentRuta().getId()+"/bilder";
 	} 
 
-	
-	public Ruta getCurrentRuta() {
-		return findRuta(ph.get(PersistenceHelper.CURRENT_RUTA_ID_KEY));
 
+	public Ruta getCurrentRuta() {
+		Variable v = artLista.getVariableInstance("Current_Ruta");
+		String va=null;
+		if (v!=null)
+			va = v.getValue();
+		if (va!=null)
+			return findRuta(va);
+		else
+			return null;
 	}
 
 	public Provyta getCurrentProvyta() {
-		Ruta r = getCurrentRuta();
-		if (r!=null) 
-			return r.findProvYta(ph.get(PersistenceHelper.CURRENT_PROVYTA_ID_KEY));
-		else
-			Log.e("nils","getCurrentprovyta returns null, since getCurrentRuta failed");
+		Variable v = artLista.getVariableInstance("Current_Provyta");
+		String va=null;
+		if (v!=null)
+			va = v.getValue();
+		if (va!=null) {
+			Ruta r = getCurrentRuta();
+			if (r!=null) 
+				return r.findProvYta(va);
+			else
+				Log.e("nils","getCurrentprovyta returns null, since getCurrentRuta failed");
+		}
 		return null;
 	}
 
 	public Delyta getCurrentDelyta() {
-		Provyta p = getCurrentProvyta();
-		if (p!=null) 
-			return p.findDelyta(ph.get(PersistenceHelper.CURRENT_DELYTA_ID_KEY));
-		else {
-			Log.e("nils","getCurrentdelyta returns null, since getCurrentProvyta failed");
-			Log.e("nils","Current provyta ID: "+ph.get(PersistenceHelper.CURRENT_PROVYTA_ID_KEY));
-			return null;
+		Variable v = artLista.getVariableInstance("Current_Delyta");
+		String va=null;
+		if (v!=null)
+			va = v.getValue();
+		if (va!=null) {
+			Provyta p = getCurrentProvyta();
+			if (p!=null) 
+				return p.findDelyta(ph.get(va));
+			else {
+				Log.e("nils","getCurrentdelyta returns null, since getCurrentProvyta failed");
+				return null;
+			}
 		}
+		return null;
 	}
 
 	public Ruta findRuta(String id) {
@@ -394,7 +416,7 @@ public class GlobalState  {
 			log.addRedText("Refresh failed - Table is missing. This is likely due to previous errors on startup");
 		}
 	}
-	
+
 
 	public LoggerI getLogger() {
 		return log;
@@ -411,13 +433,13 @@ public class GlobalState  {
 	public void createLogger() {
 		log = new Logger(this.getContext());
 	}
-	
+
 	public void removeLogger() {
 		log = new DummyLogger();
 	}
 
 
-	
+
 
 
 }

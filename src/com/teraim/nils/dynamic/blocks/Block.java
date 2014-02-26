@@ -2,7 +2,7 @@ package com.teraim.nils.dynamic.blocks;
 
 import java.io.Serializable;
 
-import com.teraim.nils.LoggerI;
+import com.teraim.nils.log.LoggerI;
 
 /**
  * Abstract base class Block
