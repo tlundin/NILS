@@ -25,14 +25,15 @@ import com.teraim.nils.utils.Tools;
 
 public class WF_DisplayValueField extends WF_Widget implements EventListener {
 
-	private String formula;
+	private String formula,format;
 	protected GlobalState gs;
 	protected Unit unit;
 	private Set<Entry<String,DataType>> myVariables;
 	boolean fail = false;
 	boolean stringT = false;
 
-	public WF_DisplayValueField(String id, View v, String formula,WF_Context ctx, Unit unit, String label, boolean isVisible) {
+	public WF_DisplayValueField(String id, View v, String formula,WF_Context ctx, Unit unit, 
+			String label, boolean isVisible,String format) {
 		super(id, v, isVisible,ctx);
 		((TextView)v.findViewById(R.id.header)).setText(label);
 		gs = GlobalState.getInstance(ctx.getContext());
@@ -191,7 +192,7 @@ public class WF_DisplayValueField extends WF_Widget implements EventListener {
 			o.addYellowText("Formula "+formula+" is not being calculated because of parse errors");
 			return;
 		}
-		((TextView)this.getWidget().findViewById(R.id.text)).setText(strRes+(unit==Unit.nd?"":Tools.getPrintedUnit(unit)));
+		((TextView)this.getWidget().findViewById(R.id.text)).setText(strRes+Tools.getPrintedUnit(unit));
 	
 	}
 

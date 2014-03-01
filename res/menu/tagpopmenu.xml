@@ -2,9 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
+        android:id="@+id/menu_goto"
+        android:icon="@drawable/ic_menu_goto"
+        android:showAsAction="ifRoom|withText"
+        android:title="Referens"/>
+    <item
         android:id="@+id/menu_info"
         android:icon="@android:drawable/ic_menu_info_details"
-        android:showAsAction="ifRoom|withText"
+        android:showAsAction="always|withText"
         android:title="Beskrivning"/>
     <item
         android:id="@+id/menu_delete"

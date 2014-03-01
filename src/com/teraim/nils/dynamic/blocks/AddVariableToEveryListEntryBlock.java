@@ -5,18 +5,19 @@ import com.teraim.nils.dynamic.workflow_realizations.WF_List;
 
 public class AddVariableToEveryListEntryBlock extends Block {
 
-	String target,variableSuffix;
+	String target,variableSuffix,format;
 	boolean displayOut;
 	private static final long serialVersionUID = 3621078864866872867L;
-
+	
 	
 	
 	public AddVariableToEveryListEntryBlock(String target,
-			String variableSuffix, boolean displayOut) {
+			String variableSuffix, boolean displayOut, String format) {
 		super();
 		this.target = target;
 		this.variableSuffix = variableSuffix;
 		this.displayOut = displayOut;
+		this.format = format;
 	}
 
 
@@ -31,7 +32,7 @@ public class AddVariableToEveryListEntryBlock extends Block {
 			o.addRow("");
 			o.addRedText("Couldn't find list with ID "+target+" in AddVariableToEveryListEntryBlock");
 		} else {
-			l.addVariableToEveryListEntry(variableSuffix, displayOut);
+			l.addVariableToEveryListEntry(variableSuffix, displayOut,format);
 		}
 	}
 }

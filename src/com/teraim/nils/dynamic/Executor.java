@@ -98,10 +98,10 @@ public abstract class Executor extends Fragment {
 		//Find out the name of the workflow to execute.
 		Bundle b = this.getArguments();
 		String name = b.getString("workflow_name");
-		if (name!=null) 
+		if (name!=null && name.length()>0) 
 			wf = gs.getWorkflow(name);
 
-		if (wf==null||name==null) {
+		if (wf==null&&name!=null&&name.length()>0) {
 			o.addRow("");
 			o.addRedText("Workflow "+name+" NOT found!");
 			new AlertDialog.Builder((Context)activity).setTitle("Ups!")

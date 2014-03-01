@@ -1,6 +1,7 @@
 package com.teraim.nils.ui;
 
-import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -12,7 +13,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
-import com.teraim.nils.dynamic.types.Delyta;
+import com.teraim.nils.dynamic.templates.TagTemplate.Delyta;
+import com.teraim.nils.dynamic.templates.TagTemplate.Segment;
 import com.teraim.nils.dynamic.types.Marker;
 import com.teraim.nils.dynamic.types.MovingMarker;
 import com.teraim.nils.utils.Geomatte;
@@ -36,8 +38,8 @@ public class ProvytaView extends View {
 
 	private Marker focusMarker;
 	private String msg = "";
+	private List<Delyta> delytor;
 
-	//private Path tag = new Path();
 
 
 	public ProvytaView(Context context, AttributeSet attrs, Marker focusMarker) {
@@ -76,23 +78,33 @@ public class ProvytaView extends View {
 
 
 
-	final double innerRealRadiusInMeter = 10;
-	final double midRealRadiusInMeter = 50;
-	final double realRadiusinMeter = 100;
-	double rScaleF=0,oScaleF=0;
+	final float innerRealRadiusInMeter = 10;
+	final float midRealRadiusInMeter = 50;
+	final float realRadiusinMeter = 100;
+	float rScaleF=0,oScaleF=0;
 
+	int indicatorLocation = 0;
+	
+	public void setIndicatorLocation(int deg) {
+		indicatorLocation = deg;
+		Log.d("nils","got "+deg);
+	}
+	
+	float margY = 20;
+	float r;
+	
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);			
-		int w = getWidth();
-		int h = getHeight();
+		float w = getWidth();
+		float h = getHeight();
 
-		double r;
-		int cy;
-		int cx;
-		r=(w>=h)?((h/2)-h*.1):((w/2)-w*.1);
+		
+		float cy;
+		float cx;
+		r=(float) ((w>=h)?((h/2)-h*.1):((w/2)-w*.1));
 		cx = w/2;
-		cy = h/2;
+		cy = (w/2+margY);//h/2;
 		//tag.lineTo(w-50,0);
 		//Log.d("NILS","w h r"+w+" "+h+" "+r);
 		oScaleF = r/realRadiusinMeter;
@@ -119,8 +131,8 @@ public class ProvytaView extends View {
 			canvas.drawCircle(cx, cy,(int)r, p);
 			rScaleF = r/innerRealRadiusInMeter;
 			canvas.drawText("10",(int)(cx+r)-15, cy, p);
-			if (delar !=null)
-				drawTag(canvas,cx,cy);
+			if (delytor != null && delytor.size()>0)
+				this.drawDelytor(canvas,cx,cy,(float)oScaleF);
 		}		
 
 		canvas.drawText("N",cx,(float)(h*.1), pl);
@@ -178,12 +190,36 @@ public class ProvytaView extends View {
 		msg = "Avst: "+String.valueOf(dist)+"m";
 	}
 
-	ArrayList<Delyta> delar = null;
-	public void setDelytor(ArrayList<Delyta> dy) {
-		delar = dy;
+	
+	
+	
+	private void drawDelytor(Canvas c, float cx, float cy, float oScaleF) {
+		float startX,startY,endX,endY;
+		for (Delyta d:delytor) {
+			
+			for (Segment s:d.getSegments()) {	
+				if (s.isArc)
+					continue;
+				Log.d("nils","New delyta with "+d.getSegments().size()+" segments");
+				//float mirror = margY+r*2;							
+					startX = cx+(s.start.x*oScaleF);
+					startY = cy+(s.start.y*oScaleF);
+					endX = cx+(s.end.x*oScaleF);
+					endY = cy+(s.end.y*oScaleF);				
+					Log.d("nils","Drawing Start: "+startX+","+startY+" End: "+endX+","+endY);					
+					c.drawLine(startX,startY,endX,endY, p);			
+				}
+			
+		}
 	}
+	
+	public void showDelytor(List<Delyta> delytor) {
+		this.delytor = delytor;
+		this.invalidate();
+	}
+	
 
-
+/*
 	public void drawTag(Canvas c,int cx,int cy) {
 
 		//		int tst[][] = {{100,288},{100,48},{100,120},{100,263}};
@@ -242,20 +278,8 @@ public class ProvytaView extends View {
 								c.drawLine(xy[i-1][0], xy[i-1][1],x,y, p);
 							}
 
-							/*if (isArc) {
-						float avgX = Math.abs((xy[i][0]+xy[i-1][0])/2);
-						float avgY = Math.abs((xy[i][1]+xy[i-1][1])/2);
-						Log.d("NILS","isArch i"+isArc+" "+i);
-						c.drawText(Integer.toString(i), avgX, avgY, p);
-					}
-							 */
-
-
-							/*if(i==0)
-						tag.moveTo(x, y);
-						else
-							tag.lineTo(x, y);
-							 */
+							
+							
 						}
 
 					}
@@ -269,7 +293,7 @@ public class ProvytaView extends View {
 
 	}
 
-
+*/
 
 
 	public void showUser(String deviceColor, Location arg0, double alfa,

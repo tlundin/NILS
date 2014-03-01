@@ -53,10 +53,6 @@ WF_Not_ClickableField implements EventListener {
 		return (LinearLayout)LayoutInflater.from(myContext.getContext()).inflate(R.layout.output_field_selection_element,null);
 	}
 
-	@Override
-	public String getFormattedText(Variable varId, String value) {
-		return value;
-	}
 
 
 	@Override
@@ -86,8 +82,13 @@ WF_Not_ClickableField implements EventListener {
 								sum++;
 							else {
 								String val=v.getValue();
-								if (val!=null && !val.isEmpty())
+								if (val!=null && !val.isEmpty()) {
+									try {
 									sum+=Long.parseLong(v.getValue());
+									} catch (NumberFormatException e) {
+										sum+=0;
+									}
+								}
 							}
 						}
 					} else

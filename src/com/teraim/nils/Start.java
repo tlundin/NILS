@@ -17,17 +17,14 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 
 import com.teraim.nils.FileLoadedCb.ErrorCode;
+import com.teraim.nils.dynamic.templates.TagTemplate;
 import com.teraim.nils.dynamic.types.Workflow;
 import com.teraim.nils.log.Logger;
 import com.teraim.nils.ui.DrawerMenuAdapter;
@@ -322,7 +319,7 @@ public class Start extends MenuActivity {
 
 	private void createDrawerMenu(String[] wfs) {
 
-		final String[] mainItems = {"Välj ruta","Hitta yta","Ta bilder och geo"};
+		final String[] mainItems = {"Välj ruta","Tåg och delytor","Ta bilder och geo"};
 
 		items.clear();
 		//Add "static" headers to menu.
@@ -389,15 +386,21 @@ public class Start extends MenuActivity {
 		mDrawerList.setItemChecked(position, true);
 		String wfId = mapItemsToName.get(position);
 
-
 		Workflow wf = gs.getWorkflow(wfId);
+
+	
 		// Create a new fragment and specify the  to show based on position
 		Fragment fragment=null;
 		if (wf!=null) 
 			fragment = wf.createFragment();
-
-		else
+		else {
+			//HACK TODO: REMOVE
+			if (position == 2) {
+				fragment = new TagTemplate();
+			}
+			else
 			fragment = new Fragment();
+		}
 		Bundle args = new Bundle();
 		args.putString("workflow_name", wfId);
 		fragment.setArguments(args);

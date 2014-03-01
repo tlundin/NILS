@@ -18,10 +18,10 @@ import com.teraim.nils.dynamic.workflow_abstracts.EventListener;
 public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,EventGenerator{
 
 	
-	
 	Map<String,WF_ClickableField_Selection> entryFields = new HashMap<String,WF_ClickableField_Selection>();
 	public WF_List_UpdateOnSaveEvent(String id, WF_Context ctx,List<List<String>> rows,boolean isVisible) {
 		super(id, ctx,rows,isVisible);
+		
 		ctx.addEventListener(this, EventType.onSave);
 		o = GlobalState.getInstance(ctx.getContext()).getLogger();
 		int index = 0;
@@ -39,7 +39,7 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 	}
 	
 	@Override 
-	public void addVariableToEveryListEntry(String varSuffix,boolean displayOut) {
+	public void addVariableToEveryListEntry(String varSuffix,boolean displayOut,String format) {
 		List<String>cRow;
 		Variable v;
 		String varID;
@@ -50,7 +50,7 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 				v = al.getVariableInstance(varID);
 				String entryLabel = al.getEntryLabel(cRow);
 				if (v!=null) {
-					entryFields.get(entryLabel).addVariable(v, displayOut);
+					entryFields.get(entryLabel).addVariable(v, displayOut,format);
 				}
 				else {
 					o.addRow("");
@@ -63,6 +63,7 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 
 	@Override
 	public void addEntriesFromRows(List<List<String>> rows) 	{
+		String format = null;
 		if (rows!=null) {
 			o.addRow("Adding "+rows.size()+" list entries (variables)");
 			int index = 0;
@@ -87,7 +88,7 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 							Log.d("nils","var added "+al.getVarLabel(r));
 							Variable v = al.getVariableInstance(al.getVarName(r));
 							if (v!=null)
-								listRow.addVariable(v,al.isDisplayInList(r));
+								listRow.addVariable(v,al.isDisplayInList(r),format);
 						}
 					}
 				}

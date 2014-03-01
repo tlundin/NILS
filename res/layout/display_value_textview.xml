@@ -8,7 +8,7 @@
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal" >
+    android:orientation="vertical" >
 
     <TextView
         android:id="@+id/header"
@@ -25,17 +25,15 @@
     android:id="@+id/text"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginRight="15dp"
-    android:background="@color/grey"
-    android:gravity="right"
+    android:layout_marginRight="15dp" 
+    android:layout_marginLeft="5dp" 
     android:text="30"
-    android:textSize="30sp" />
+    android:textSize="25sp" />
 </LinearLayout>
 
 <View
-    android:layout_width="fill_parent"
+    android:layout_width="wrap_content"
     android:layout_height="1dip"
-    android:layout_gravity="right"
     android:background="#000000" />
 </LinearLayout>
 

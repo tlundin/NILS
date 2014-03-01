@@ -24,15 +24,17 @@ public class CreateEntryFieldBlock extends Block {
 	Unit unit;
 	GlobalState gs;
 	boolean isVisible = false;
+	String format;
 	
 	public CreateEntryFieldBlock(String name, String label,
-			String postLabel,String containerId,boolean isVisible) {
+			String postLabel,String containerId,boolean isVisible,String format) {
 		super();
 		this.name = name;
 		this.label = label;
 		this.postLabel=postLabel;
 		this.containerId=containerId;
 		this.isVisible=isVisible;
+		this.format = format;
 	}
 
 	/**
@@ -68,7 +70,7 @@ public class CreateEntryFieldBlock extends Block {
 			o.addRedText("Variable "+name+" not found in definition file for CreateEntryBlock");
 		} else	{	
 			WF_ClickableField_Selection myField = new WF_ClickableField_Selection(label,al.getDescription(v.getBackingDataSet()),myContext,name,isVisible);
-			myField.addVariable(v, true);
+			myField.addVariable(v, true,format);
 			if(myContainer !=null) {
 				myContainer.add(myField);
 				myField.refreshInputFields();	

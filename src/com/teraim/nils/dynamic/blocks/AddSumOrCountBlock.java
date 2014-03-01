@@ -22,12 +22,13 @@ public  class AddSumOrCountBlock extends Block {
 	private static final long serialVersionUID = -4139158043307360229L;
 	String containerId, label, postLabel,myPattern, target,result;
 	WF_Not_ClickableField_SumAndCountOfVariables.Type type;
+	String format;
 	boolean isVisible = true;
 	private VariableConfiguration al;
 	public AddSumOrCountBlock(String containerId, String label,String postLabel,
 			String filter, String target,
 			WF_Not_ClickableField_SumAndCountOfVariables.Type sumOrCount,String result,
-			boolean isVisible) {
+			boolean isVisible, String format) {
 		this.containerId=containerId;
 		this.label=label;
 		this.myPattern=filter;
@@ -36,6 +37,7 @@ public  class AddSumOrCountBlock extends Block {
 		this.result = result;
 		this.postLabel = postLabel;
 		this.isVisible = isVisible;
+		this.format = format;
 		
 	}
 	
@@ -59,7 +61,7 @@ public  class AddSumOrCountBlock extends Block {
 				o.addRow("");
 				o.addRedText("Error in block_add_sum_of_selected_variables_display: missing variable for result parameter: "+result);
 			} else 
-				field.addVariable(v, true);			
+				field.addVariable(v, true,format);			
 		}
 		/*
 		

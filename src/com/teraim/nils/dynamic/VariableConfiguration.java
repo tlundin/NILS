@@ -128,6 +128,10 @@ public class VariableConfiguration {
 		return myTable.getElement("Beskrivning", row);
 	}
 	
+	public String getUrl(List<String> row) {
+		return myTable.getElement("Internet link", row);	
+	}
+
 	public boolean isDisplayInList(List<String> row) {
 		return false;
 	}
@@ -179,6 +183,8 @@ public class VariableConfiguration {
 		Log.e("nils","Couldn't find variable "+varId+" in getVariableInstance");
 		return null;
 	}
+
+	
 	
 	
 }

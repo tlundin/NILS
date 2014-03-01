@@ -6,6 +6,7 @@ import java.util.List;
 import android.app.Activity;
 import android.util.Log;
 import android.widget.LinearLayout;
+import android.widget.TableLayout.LayoutParams;
 
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.dynamic.VariableConfiguration;
@@ -30,6 +31,7 @@ public abstract class WF_List extends WF_Widget implements Sortable,Filterable {
 		super(id,new LinearLayout(ctx.getContext()),isVisible,ctx);	
 		myWidget = (LinearLayout)getWidget();
 		myWidget.setOrientation(LinearLayout.VERTICAL);
+		myWidget.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 		myContext = ctx;
 		al = GlobalState.getInstance(ctx.getContext()).getArtLista();
 		myRows = rows;
@@ -95,7 +97,7 @@ public abstract class WF_List extends WF_Widget implements Sortable,Filterable {
 
 	}
 
-	public abstract void addVariableToEveryListEntry(String varSuffix,boolean displayOut);
+	public abstract void addVariableToEveryListEntry(String varSuffix,boolean displayOut,String format);
 
 
 

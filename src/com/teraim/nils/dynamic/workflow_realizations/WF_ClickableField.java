@@ -2,6 +2,7 @@ package com.teraim.nils.dynamic.workflow_realizations;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -10,6 +11,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -50,7 +53,6 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 
 
 	public abstract LinearLayout getFieldLayout();
-	public abstract String getFormattedText(Variable varId, String value);
 
 	@Override
 	public Set<Variable> getAssociatedVariables() {
@@ -78,7 +80,17 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 	    // Called when the user selects a contextual menu item
 	    @Override
 	    public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
-	        switch (item.getItemId()) {
+	        List<String> row;
+			switch (item.getItemId()) {
+	        case R.id.menu_goto:
+	        	row = myVars.keySet().iterator().next().getBackingDataSet();
+	        	if (row!=null) {
+	        		String url = al.getUrl(row);
+	        		Intent browse = new Intent( Intent.ACTION_VIEW , Uri.parse(url));
+	        		browse.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+	        		gs.getContext().startActivity(browse);	        	
+	        	}
+	        	return true;	        
 	            case R.id.menu_delete:
 	            	for (View inf:myVars.values()) {
 						if (inf!=null) {
@@ -117,8 +129,8 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 
 	ActionMode mActionMode;
 
-	public  WF_ClickableField(final String myId,final String descriptionT, WF_Context context,String id, View view) {
-		super(myId,descriptionT,context,view,true);	
+	public  WF_ClickableField(final String myId,final String descriptionT, WF_Context context,String id, View view,boolean isVisible) {
+		super(myId,descriptionT,context,view,isVisible);	
 		gs = GlobalState.getInstance(context.getContext());
 		al = gs.getArtLista();
 		o = gs.getLogger();
@@ -205,7 +217,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 	}
 
 	@Override
-	public void addVariable(Variable var, boolean displayOut) {
+	public void addVariable(Variable var, boolean displayOut,String format) {
 
 
 		String varLabel = var.getLabel();
@@ -290,7 +302,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 				u.setText(" ("+Variable.getPrintedUnit()+")");
 			}
 			 */
-			myOutputFields.put(var,ll);
+			myOutputFields.put(var,new OutC(ll,format));
 			outputContainer.addView(ll);
 		}
 		refreshInputFields();

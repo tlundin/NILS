@@ -37,23 +37,7 @@ public class DefaultTemplate extends Executor {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.d("nils","In onCreate");
-		//The list of all rules currently not ok
-		//mAdapter = new ValidatorListAdapter(this,executedRules);
-/*		lv = (ListView)findViewById(R.id.validatorlist);
-		lv.setAdapter(mAdapter);		
-		lv.setOnItemClickListener(new OnItemClickListener(){
 
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1,
-					int index, long arg3) {
-				Iterator<Entry<Rule, Boolean>> it =executedRules.entrySet().iterator();
-				int i = 0; Entry<Rule, Boolean>e = null;
-				while (i++<=index&&it.hasNext())
-					e = it.next();
-				errorView.setText(e.getKey().getErrorMessage());
-			}});
-			
-*/
 		
 	}
 	

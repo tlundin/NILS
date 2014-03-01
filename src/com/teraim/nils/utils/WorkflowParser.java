@@ -323,7 +323,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 
 	private Block readBlockAddVariableToEveryListEntry(XmlPullParser parser) throws IOException, XmlPullParserException {
 		o.addRow("Parsing block: block_add_variable_to_every_list_entry...");
-		String target=null,variableSuffix=null;
+		String target=null,variableSuffix=null,format=null;
 		boolean displayOut=false;
 
 		parser.require(XmlPullParser.START_TAG, null,"block_add_variable_to_every_list_entry");
@@ -336,7 +336,10 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 			if (name.equals("target")) {
 				target = readText("target",parser);
 				o.addRow("LABEL: "+target);
-			} else if (name.equals("name")) {
+			} else if (name.equals("format")) {
+				format = readText("format",parser);
+				o.addRow("FORMAT: "+format);							
+			}else if (name.equals("name")) {
 				variableSuffix = readText("name",parser);
 				o.addRow("NAME: "+variableSuffix);							
 			} else if (name.equals("is_displayed")) {
@@ -348,13 +351,13 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 
 		}
 		return new 	AddVariableToEveryListEntryBlock(target,
-				variableSuffix, displayOut);
+				variableSuffix, displayOut,format);
 	}
 
 	private DisplayValueBlock readBlockCreateDisplayField(XmlPullParser parser)throws IOException, XmlPullParserException {
 		o.addRow("Parsing block: block_create_display_field...");
 		boolean isVisible = true;
-		String namn=null, formula = null, label=null,containerId=null;
+		String namn=null, formula = null, label=null,containerId=null,format = null;
 		Unit unit=null;	
 		parser.require(XmlPullParser.START_TAG, null,"block_create_display_field");
 		while (parser.next() != XmlPullParser.END_TAG) {
@@ -381,20 +384,23 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 			} else if (name.equals("is_visible")) {
 				isVisible = !readText("is_visible",parser).equals("false");
 				o.addRow("IS_VISIBLE: "+isVisible);	
-			} 
+			} else if (name.equals("format")) {
+				format = readText("format",parser);
+				o.addRow("FORMAT: "+format);	
+			}
 			else
 				skip(parser);
 
 		}
 		return new DisplayValueBlock(namn, label,unit,
-				formula,containerId,isVisible);
+				formula,containerId,isVisible,format);
 	}
 
 
 	private CreateEntryFieldBlock readBlockCreateEntryField(XmlPullParser parser)throws IOException, XmlPullParserException {
 		o.addRow("Parsing block: block_create_entry_field...");
 		boolean isVisible = true;
-		String namn=null, label=null,containerId=null,postLabel="";
+		String namn=null, label=null,containerId=null,postLabel="",format=null;
 		Unit unit = Unit.nd;		
 		parser.require(XmlPullParser.START_TAG, null,"block_create_entry_field");
 		while (parser.next() != XmlPullParser.END_TAG) {
@@ -417,11 +423,15 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 				isVisible = !readText("is_visible",parser).equals("false");
 				o.addRow("IS_VISIBLE: "+isVisible);	
 			} 
+			else if (name.equals("format")) {
+				format = readText("format",parser);
+				o.addRow("FORMAT: "+format);	
+			}
 			else
 				skip(parser);
 		}
 		return new CreateEntryFieldBlock(namn, label,
-				postLabel, containerId,isVisible);
+				postLabel, containerId,isVisible,format);
 	}
 
 	/**
@@ -498,7 +508,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 	 * @throws XmlPullParserException
 	 */
 	private AddSumOrCountBlock readBlockAddSelectionOrSum(XmlPullParser parser,boolean isCount) throws IOException, XmlPullParserException {
-		String containerName=null,label=null,postLabel = null,filter=null,target=null,result=null;
+		String containerName=null,label=null,postLabel = null,filter=null,target=null,result=null,format=null;
 		WF_Not_ClickableField_SumAndCountOfVariables.Type type;
 
 		boolean isVisible = true;
@@ -550,13 +560,16 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 				isVisible = !readText("is_visible",parser).equals("false");
 				o.addRow("IS_VISIBLE: "+isVisible);	
 			} 
-
+			else if (name.equals("format")) {
+				format = readText("format",parser);
+				o.addRow("FORMAT: "+format);	
+			}
 
 			else
 				skip(parser);
 
 		}
-		return new AddSumOrCountBlock(containerName,label,postLabel,filter,target,type,result,isVisible);
+		return new AddSumOrCountBlock(containerName,label,postLabel,filter,target,type,result,isVisible,format);
 	}	
 
 

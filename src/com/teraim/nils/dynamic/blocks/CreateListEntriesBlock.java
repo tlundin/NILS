@@ -44,6 +44,7 @@ public  class CreateListEntriesBlock extends Block {
 		this.filterName=filterName;
 		this.type=type;
 		this.isVisible=isVisible;
+
 	}
 
 	public void create(WF_Context myContext) {
