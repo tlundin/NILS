@@ -28,7 +28,7 @@ public class Variable implements Serializable {
 	//String value=null;
 	private String name=null;
 	private DataType myType=null;
-	private String myValue=null;
+	private String myValue=null,oldValue=null;
 
 	private Selection mySelection=null;
 	
@@ -59,6 +59,21 @@ public class Variable implements Serializable {
 	public void setValue(String value) {
 		myValue = value;
 		myDb.insertVariable(this,value);
+	}
+	
+	public void setValueWithoutCommit(String value) {
+		oldValue = myValue;
+		myValue = value;
+		
+	}
+	
+	public void commit() {
+		myDb.insertVariable(this, myValue);
+	}
+	
+	//Cancel can only be called after at setValueWithoutCommit.
+	public void cancel() {
+		myValue = oldValue;
 	}
 	
 	

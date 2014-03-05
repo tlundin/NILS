@@ -1,80 +1,49 @@
 package com.teraim.nils.dynamic.types;
 
-import java.util.ArrayList;
+public class Provyta {
 
-import com.teraim.nils.GlobalState;
+	public Provyta(String ytId, Ruta ruta) {
+		// TODO Auto-generated constructor stub
+	}
 
-public class Provyta  {
+	public void addDelyta(String delyteId, String[] raw) {
+		// TODO Auto-generated method stub
+		
+	}
 
-	private String id;
-	double N=0;
-	double E=0;
-	double lat=0;
-	double longh=0;
+	public void setSweRef(double parseDouble, double parseDouble2) {
+		// TODO Auto-generated method stub
+		
+	}
 
-	private ArrayList<Delyta>dy = new ArrayList<Delyta>();
-	private Ruta myParent;
+	public void setGPS(double parseDouble, double parseDouble2) {
+		// TODO Auto-generated method stub
+		
+	}
 
-	public Provyta(String id, Ruta parent) {
-		this.id = id;
-		myParent = parent;
+	public double getLat() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public double getLong() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public double getSweRefNorth() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public double getSweRefEast() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	public String getId() {
-		return id;
-	}
-
-	public Ruta getParent() {
-		return myParent;
-	}
-
-	public double[] getLatLong() {
-		double[] ret = new double[2];
-		ret[0]=lat;
-		ret[1]=longh;
-		return ret;
-	}
-	
-	public double[] getSweRef() {
-		double[] ret = new double[2];
-		ret[0]=N;
-		ret[1]=E;
-		return ret;		
-	}
-	public void setSweRef(double n, double e) {
-		N = n;
-		E = e;
-	}
-	public void setGPS(double lat, double longh) {
-		this.lat = lat;
-		this.longh = longh;
-	}
-
-	//ADD will add the delyta if new. Otherwise it will update the current value.
-	public void addDelyta(String delyteId, String[] raw) {
-
-		dy.add(new Delyta(delyteId,this,raw));
-	}
-
-	public Delyta findDelyta(String delyteId) {
-		for(Delyta d:dy)
-			if(d.getId().equals(delyteId))
-				return d;
+		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public ArrayList<Delyta>getDelytor() {
-		return dy;
-	}
-
-	public void updateDelyta(int index, String[] tag) {
-		Delyta d = dy.get(index);
-		d.setPoints(tag);
-	}
-
-
-
-	public GlobalState getContext() {
-		return myParent.getContext();
-	}
 }

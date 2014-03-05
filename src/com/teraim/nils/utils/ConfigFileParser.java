@@ -262,13 +262,16 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 							myTable.addRow(Arrays.asList(r));
 						} else {
 							elems = groups.get(pGroup);
+							String varPatternName = r[pNameIndex];
 							if (elems==null) {
-								Log.e("nils","Group "+pGroup+" in VarPattern, line#"+rowC+" does not exist in Config file.");
+								//If the variable has a group,add it 
+								Log.d("nils","Group "+pGroup+" in line#"+rowC+" does not exist in config file. Will use name: "+varPatternName);
+								myTable.addRow(Arrays.asList(r));
 							} else {
 								for (List<String>elem:elems) {
 									//Go through all rows in group. Generate variables.
 									String cFileNamePart = elem.get(nameIndex);
-									String varPatternName = r[pNameIndex];
+									
 									if (cFileNamePart == null||varPatternName==null) {
 										Log.e("nils","Either varPatternNamepart or configFile namepart evaluates to null at line#"+rowC+" in varpattern file");
 									} else {

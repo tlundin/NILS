@@ -82,11 +82,7 @@ public abstract class Executor extends Fragment {
 		//TODO: REMOVE
 		//Create fake hash if wf does not provide.
 		final Map<String,String>fakeHash = new HashMap<String,String>();
-		fakeHash.put("år", "2014");
-		fakeHash.put("ruta", "262");
-		fakeHash.put("provyta", "6");
-		fakeHash.put("delyta", "1");
-		myContext.setKeyHash(fakeHash);
+
 	}
 
 
@@ -208,7 +204,8 @@ public abstract class Executor extends Fragment {
 								Log.d("nils","Found empty or null pair");
 						} if (!err && !keyHash.isEmpty()) {
 							Log.d("nils","added keyhash to gs");
-							myContext.setKeyHash(keyHash);
+							//TODO IF we ever implement workflows as subroutines, this need change. Currently only one context.
+							gs.setKeyHash(keyHash);
 						}
 					}
 				}

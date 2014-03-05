@@ -19,6 +19,8 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.teraim.nils.GlobalState;
@@ -255,10 +257,10 @@ public class Tools {
 						//Skip IDs belonging to inner ytor.
 						if (id>12&&id<17)
 							continue;
-						if (ruta.addProvYta_rutdata(r[1],r[2],r[3],r[7],r[8])!=null)
+	//					if (ruta.addProvYta_rutdata(r[1],r[2],r[3],r[7],r[8])!=null)
 			;				//Log.d("NILS","added provyta with ID "+r[1]);
-						else
-							Log.d("NILS","discarded provyta with ID "+r[1]);
+	//					else
+		//					Log.d("NILS","discarded provyta with ID "+r[1]);
 
 					}
 				}
@@ -268,11 +270,14 @@ public class Tools {
 			//Calculate the distance between smallest and biggest x,y values
 			//This is done to be able to calculate the grid position.
 			Log.d("NILS","checking minmax...");
+			//TODO: HOW TO DO THIS ONE
+			/*
 			for (Ruta r:gs.getRutor()) {
 				Ruta.Sorted s = r.sort();
 				Log.d("NILS","Ruta with id "+r.getId()+" has minxy: "+s.getMin_E_sweref_99()+" "+s.getMin_N_sweref_99()+
 						" and maxXy: "+s.getMax_E_sweref_99()+" "+s.getMax_N_sweref_99());
 			}
+			*/
 		}
 
 
@@ -320,6 +325,13 @@ public class Tools {
 			return "";
 		else
 			return unit.name();
+	}
+
+	public static boolean isNetworkAvailable(Context ctx) {
+	    ConnectivityManager connectivityManager 
+	          = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+	    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
 	}
 
 

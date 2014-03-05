@@ -2,6 +2,7 @@ package com.teraim.nils.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -32,7 +33,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
 	private static final String VALUE="value",TIMESTAMP="timestamp",LAG="lag",CREATOR="creator";
 	private static final String[] VAR_COLS = {VALUE,TIMESTAMP,LAG,CREATOR};
-	
+
 	private static final int NO_OF_KEYS = 10;
 	private final SQLiteDatabase db;
 	private final PersistenceHelper ph;
@@ -41,56 +42,56 @@ public class DbHelper extends SQLiteOpenHelper {
 	private Map<String,String> colKeyM = new HashMap<String,String>();
 
 	Context ctx;
-	
-	
+
+
 	//Helper class that wraps the Cursor.
 	public class DBColumnPicker {
 		Cursor c;
 		private static final String NAME = "var",VALUE="value",TIMESTAMP="timestamp",LAG="lag",CREATOR="author";
-		
+
 		public DBColumnPicker(Cursor c) {
 			this.c=c;
 		}
-		
+
 		public StoredVariableData getVariable() {
 			return new StoredVariableData(pick(NAME),pick(VALUE),pick(TIMESTAMP),pick(LAG),pick(CREATOR));
 		}
 		public Map<String,String> getKeyColumnValues() {
-			 Map<String,String> ret = new HashMap<String,String>();
-			 Set<String> keys = keyColM.keySet();
-			 String col=null;
-			 for(String key:keys) {
-				 col = keyColM.get(key);
-				 ret.put(key, pick(col));
-			 }
+			Map<String,String> ret = new HashMap<String,String>();
+			Set<String> keys = keyColM.keySet();
+			String col=null;
+			for(String key:keys) {
+				col = keyColM.get(key);
+				ret.put(key, pick(col));
+			}
 			return ret; 
 		}
-		
+
 		private String pick(String key) {
 			return c.getString(c.getColumnIndex(key));
 		}
-		
+
 		public boolean moveToFirst() {
 			if (c==null)
 				return false;
 			else
 				return c.moveToFirst();
 		}
-		
+
 		public boolean next() {
 			boolean b = c.moveToNext();
 			if (!b)
 				c.close();
 			return b;
 		}
-		
+
 		public void close() {
 			c.close();
 		}
-		
+
 	}
-	
-	
+
+
 	public DbHelper(Context context,Table t, PersistenceHelper ph) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);  
 		ctx = context;
@@ -262,16 +263,16 @@ public class DbHelper extends SQLiteOpenHelper {
 				//Wrap the cursor in an object that understand how to pick it!
 				Report r = exporter.writeVariables(new DBColumnPicker(c));
 				if (r!=null) {
-				if (Tools.writeToFile(Constants.CONFIG_FILES_DIR+"json_"+column+"_"+key,r.result)) {
-					Log.d("nils","Exported json file succesfully");
-				} else
-					Log.d("nils","Export of json file failed");
+					if (Tools.writeToFile(Constants.CONFIG_FILES_DIR+"json_"+column+"_"+key,r.result)) {
+						Log.d("nils","Exported json file succesfully");
+					} else
+						Log.d("nils","Export of json file failed");
 				} else
 					Log.e("nils", "Got NULL back from JSONwriter!");
-					
+
 			} else {
 				Log.e("nils","NO Variables found in db for column "+column+" with key value "+key);
-				
+
 			}
 		}
 	}
@@ -392,6 +393,29 @@ public class DbHelper extends SQLiteOpenHelper {
 		public String creator;
 	}
 
+	public final static int MAX_RESULT_ROWS = 500;
+	public String[][] getValues(String[] columns,Selection s) {
+		Log.d("nils","In getvalues with columns "+columns+", selection "+s.selection+" and selectionargs "+print(s.selectionArgs));
+		//Get cached selectionArgs if exist.
+		//this.printAllVariables();
+		Cursor c = db.query(TABLE_VARIABLES,columns,
+				s.selection,s.selectionArgs,null,null,null,null);
+		if (c != null && c.moveToFirst()) {
+			String[][] ret = new String[MAX_RESULT_ROWS][c.getColumnCount()];
+			do {
+				Log.d("nils","Cursor count "+c.getCount()+" columns "+c.getColumnCount());
+				for (int i=0;i<c.getColumnCount();i++) {
+					Log.d("nils","Found values in db for "+columns[i]+" :"+c.getString(i));			
+				}
+			} while (c.moveToNext());	
+			return ret;
+		} 
+		Log.d("nils","Did NOT find value in db for "+columns.toString());
+		c.close();
+		return null;
+	}
+
+
 	public String getValue(String name, Selection s) {
 		Log.d("nils","In getvalue with name "+name+" and selection "+s.selection+" and selectionargs "+print(s.selectionArgs));
 		//Get cached selectionArgs if exist.
@@ -461,7 +485,7 @@ public class DbHelper extends SQLiteOpenHelper {
 				//Log.d("nils","Adding column "+column+" with value "+value);
 			}
 		}  
-			//Log.d("nils","Inserting global variable "+var.getId());
+		//Log.d("nils","Inserting global variable "+var.getId());
 		values.put("var", var.getId());
 		values.put("value", newValue);
 		values.put("lag",ph.get(PersistenceHelper.LAG_ID_KEY));
@@ -548,6 +572,50 @@ public class DbHelper extends SQLiteOpenHelper {
 		}
 		ret.selectionArgs=selectionArgs;
 		//Log.d("nils","CREATE SELECTION RETURNS: "+ret.selection+" "+print(ret.selectionArgs));
+		return ret;
+	}
+
+
+
+	public Selection createCoulmnSelection(Map<String, String> keySet) {
+		Selection ret = new Selection();
+		//Create selection String.
+
+		//If keyset is null, the variable is potentially global with only name as a key.
+		String selection="";
+		if (keySet!=null) {
+			selection = cachedSelArgs.get(keySet.keySet());
+			if (selection!=null) {
+				Log.d("nils","found cached selArgs: "+selection);
+			} else {
+				//Log.d("nils","selection null...creating");
+				//Does not exist...need to create.
+				String col;
+				selection="";
+				//1.find the matching column.
+				List<String>keys = new ArrayList<String>();
+				keys.addAll(keySet.keySet());
+				for (int i=0;i<keys.size();i++) {
+					String key = keys.get(i);
+					
+					col = keyColM.get(key);
+					selection+=col+"= ?"+((i < (keys.size()-1))?" and ":"");
+					
+					
+				}
+				
+				cachedSelArgs.put(keySet.keySet(), selection);
+
+			} 
+		}
+		ret.selection=selection;
+
+		String[] selectionArgs = new String[keySet.keySet().size()];
+		int c=0;
+		for (String key:keySet.keySet()) 		
+			selectionArgs[c++]=keySet.get(key);
+		ret.selectionArgs=selectionArgs;		
+		
 		return ret;
 	}
 

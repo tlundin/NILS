@@ -1,20 +1,35 @@
 package com.teraim.nils.dynamic.templates;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
+import android.view.View.OnKeyListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.GridLayout;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.teraim.nils.R;
 import com.teraim.nils.dynamic.Executor;
+import com.teraim.nils.dynamic.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Marker;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Container;
 import com.teraim.nils.ui.ProvytaView;
@@ -27,6 +42,11 @@ public class TagTemplate extends Executor {
 	private static final int MAX_PUNKTER = 8;
 	//Real radius in meter.
 	private static final int Rad = 100;
+
+	GridLayout gl;
+	Set<EditText> glContent = new HashSet<EditText>();
+
+	private static final int MAX_COL =10,MAX_ROWS=6;
 
 
 	public class Coord {
@@ -91,8 +111,14 @@ public class TagTemplate extends Executor {
 		float area = -1;
 		Coord mittpunkt;
 
-		public ErrCode create(List<Coord> raw) {			
-			if (raw == null)
+		public ErrCode create(List<Coord> raw) {	
+			Log.d("nils","Got coordinates: ");
+			String sue = "";
+			for (Coord c:raw) {
+				sue += "r: "+c.rikt+" a:"+c.avst+",";
+			}
+			Log.d("nils",sue);
+			if (raw == null||raw.size()==0)
 				return null;
 
 			if (raw.get(0).avst!=Rad||raw.get(raw.size()-1).avst!=Rad) {
@@ -120,9 +146,9 @@ public class TagTemplate extends Executor {
 			tag.add(new Segment(raw.get(raw.size()-1),raw.get(0),true));
 			//Calc area.
 			area = calcArea();
-			
+
 			mittpunkt = calcMittPunkt();
-			
+
 			return ErrCode.ok;
 		}
 
@@ -135,7 +161,7 @@ public class TagTemplate extends Executor {
 				Coord end = new Coord(100,mid+180);
 				end = mid + 180
 			}
-			*/
+			 */
 			return null;
 		}
 
@@ -186,6 +212,7 @@ public class TagTemplate extends Executor {
 	private ArrayList<WF_Container> myLayouts;
 	private ViewGroup myContainer;
 	private ProvytaView pyv;
+	private int numberOfColumns;
 
 	@Override
 	protected List<WF_Container> getContainers() {
@@ -199,22 +226,143 @@ public class TagTemplate extends Executor {
 
 	}
 
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
-		int[] buttonIds = new int[] {R.id.button1,R.id.button2,R.id.button3,R.id.button4,R.id.button5};
 		View v = inflater.inflate(R.layout.template_tag, container, false);	
 
 		final FrameLayout py = (FrameLayout)v.findViewById(R.id.circle);
-		
+		gl = (GridLayout)v.findViewById(R.id.gridLayout);
 		Marker man = new Marker(BitmapFactory.decodeResource(getResources(),R.drawable.icon_man));
 
 		pyv = new ProvytaView(activity, null, man);		
 
 		py.addView(pyv);
-		
-		
+
+		VariableConfiguration al = gs.getArtLista();
+		//Get all variables from group "delningstag".
+		List<List<String>> rows = al.getTable().getRowsContaining(VariableConfiguration.Col_Functional_Group,"delningstag");		
+
+		if (rows!=null) {
+			Log.d("nils","Found "+rows.size()+" variables in group delningståg");
+			//Pivot table so that each Tåg is a column.
+			numberOfColumns = rows.size();
+			String[][] tableElements = new String[MAX_COL][MAX_ROWS];
+			for (int i=0;i<numberOfColumns;i++) {
+				String tag = al.getVariableValue(al.getKeyChain(rows.get(i)), al.getVarName(rows.get(i)));
+				if (tag!=null&&tag.length()>0) {
+					String[] tagElems = tag.split("\\|");						
+					if (tagElems!=null) {
+						int index = 0;
+						boolean avst = true;
+						String ar = "";
+						for (String s:tagElems) {
+							if (avst) {
+								ar=s;
+								avst=false;
+							} else {
+								tableElements[i][index]=ar+","+s;
+								avst=true;
+								index++;
+							}								
+						}
+					}
+				}
+			}
+			//Add empty top corner at index 0.
+			gl.addView(new TextView(gs.getContext()),0);
+			//Add headers.
+			TextView h;
+			for (int i=0;i<numberOfColumns;i++)	{
+				h = (TextView)inflater.inflate(R.layout.header_tag_textview, null);
+				h.setText(al.getVarLabel(rows.get(i)));
+				gl.addView(h,i+1);
+			}
+			//while there are still some tåg with values, continue.
+			for (int i=0;i<MAX_ROWS;i++) {
+				//Add row header.
+				h = (TextView)inflater.inflate(R.layout.header_tag_textview, null);
+				h.setText((i+1)+"");
+				gl.addView(h,(i+1)*(numberOfColumns+1));
+				LinearLayout l; 
+				for (int j=0;j<numberOfColumns;j++) {
+					l = (LinearLayout)inflater.inflate(R.layout.edit_fields_tag, null);
+					gl.addView(l,j+1+(i+1)*(numberOfColumns+1));
+					final EditText avst = (EditText)l.findViewById(R.id.avst);
+					final EditText rikt = (EditText)l.findViewById(R.id.rikt);	
+					glContent.add(avst);
+					glContent.add(rikt);
+					String te = tableElements[j][i];
+					if (te!=null&&te.length()>0) {
+						String[] ar = te.split(",");				
+						avst.setText(ar[0]);
+						rikt.setText(ar[1]);
+						
+
+					}					
+				}
+			}
+			for (int i=1;i<(numberOfColumns+1);i++) {
+				for (int j=1;j<MAX_ROWS+1;j++) {
+					final int ii = i; final int jj=j;
+					final EditText et = ((EditText)((gl.getChildAt(j*(numberOfColumns+1)+i)).findViewById(R.id.rikt)));
+					et.setOnLongClickListener(new OnLongClickListener() {
+						
+						@Override
+						public boolean onLongClick(View v) {
+							et.setText("");
+							return true;
+						}
+					});
+					et.setOnKeyListener(new OnKeyListener() {
+						
+						@Override
+						public boolean onKey(View v, int keyCode, KeyEvent event) {
+							if (keyCode == KeyEvent.KEYCODE_TAB || keyCode == KeyEvent.KEYCODE_ENTER)
+								if (jj<MAX_ROWS) {
+									LinearLayout l2 = (LinearLayout)(gl.getChildAt((jj+1)*(numberOfColumns+1)+ii));
+									EditText avst = ((EditText)(l2).findViewById(R.id.avst));
+									avst.requestFocus();
+									return true;
+								}
+							return false;
+						}
+					});
+					et.addTextChangedListener(new TextWatcher() {
+						
+						@Override
+						public void onTextChanged(CharSequence s, int start, int before, int count) {
+							if (count==3) {
+								if (jj<MAX_ROWS) {
+									LinearLayout l2 = (LinearLayout)(gl.getChildAt((jj+1)*(numberOfColumns+1)+ii));
+									EditText avst = ((EditText)(l2).findViewById(R.id.avst));
+									avst.requestFocus();									
+								}
+							}
+						}
+						
+						@Override
+						public void beforeTextChanged(CharSequence s, int start, int count,
+								int after) {
+							// TODO Auto-generated method stub
+							
+						}
+						
+						@Override
+						public void afterTextChanged(Editable s) {
+							// TODO Auto-generated method stub
+							
+						}
+					});
+					
+				}
+			}
+			gl.getChildAt(numberOfColumns+2).requestFocus();
+		}
+
+		/*
 		int[][] t = { 
 
 				{100,233,0,360,64,322,100,47},
@@ -226,44 +374,10 @@ public class TagTemplate extends Executor {
 				{100,219,100,116},
 				{100,116,100,30},
 				{100,30,100,270}	
-		 		
+
 		};
-		List<Delyta> delytor=new ArrayList<Delyta>();
-
-		for (int d = 0;d<t.length;d++) {
-			int[]u = t[d];
-			Delyta delyta = new Delyta();
-			List<Coord> coords = new ArrayList<Coord>();
-			for (int i=0;i<u.length-1;i+=2) 
-				coords.add(new Coord(u[i],u[i+1]));
-			ErrCode e = delyta.create(coords);
-			if (e == ErrCode.ok) {
-				delytor.add(delyta);
-			} else 
-				Log.e("nils","Couldnt create delyta: "+e.name());
-		}		
-
-		final List<List <Delyta>> dy = new ArrayList<List<Delyta>>();
-		
-		List <Delyta> d1 = new ArrayList<Delyta>();
-		d1.add(delytor.get(0));
-		dy.add(d1);
-		List <Delyta> d2 = new ArrayList<Delyta>();
-		d2.add(delytor.get(1));
-		d2.add(delytor.get(2));
-		dy.add(d2);
-		List <Delyta> d3= new ArrayList<Delyta>();
-		d3.add(delytor.get(3));
-		d3.add(delytor.get(4));
-		dy.add(d3);
-		List <Delyta> d4= new ArrayList<Delyta>();
-		d4.add(delytor.get(5));
-		dy.add(d4);		
-		List <Delyta> d5= new ArrayList<Delyta>();
-		d5.add(delytor.get(6));
-		d5.add(delytor.get(7));
-		d5.add(delytor.get(8));
-		dy.add(d5);		
+		 */
+		/*	
 		Button[] button = new Button[5];
 		for (int i=0;i<5;i++) {
 			button[i]=(Button)v.findViewById(buttonIds[i]);
@@ -275,25 +389,113 @@ public class TagTemplate extends Executor {
 				}
 			});
 		}
+
+		 */
 		
+		Button ritaom = (Button)v.findViewById(R.id.redraw);
+		Button rensa = (Button)v.findViewById(R.id.rensa);
+		Button spara = (Button)v.findViewById(R.id.spara);
+
+		
+		ritaom.setOnClickListener(new OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				redrawTrains();
+			}
+		});
+		
+		rensa.setOnClickListener(new OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				new AlertDialog.Builder(TagTemplate.this.getActivity())
+			    .setTitle("Nyutlägg")
+			    .setMessage("Det här tar bort alla inmatade värden. Är du säker?")
+			    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+			        public void onClick(DialogInterface dialog, int which) { 
+			        	for(EditText et:glContent)
+							et.setText("");
+			        	redrawTrains();
+			        }
+			     })
+			    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+			        public void onClick(DialogInterface dialog, int which) { 
+			            // do nothing
+			        }
+			     })
+			    .setIcon(android.R.drawable.ic_dialog_alert)
+			     .show();
+				
+			}
+		});
+		spara.setOnClickListener(new OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				new AlertDialog.Builder(TagTemplate.this.getActivity())
+			    .setTitle("Spara")
+			    .setMessage("Det här sparar alla förändringar permanent. Är du säker?")
+			    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+			        public void onClick(DialogInterface dialog, int which) { 
+			        	
+			        }
+			     })
+			    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+			        public void onClick(DialogInterface dialog, int which) { 
+			            // do nothing
+			        }
+			     })
+			    .setIcon(android.R.drawable.ic_dialog_alert)
+			     .show();
+			}
+		});
 		return v;
 
 	}
 
-	/* (non-Javadoc)
-	 * @see android.app.Fragment#onStart()
-	 */
-	@Override
-	public void onStart() {
+	private void redrawTrains() {
+		List<Delyta> delytor=new ArrayList<Delyta>();
+		//Create train array.
+		for (int i=1;i<numberOfColumns+1;i++) {
+			int index = 0;
+			List<Coord> coords = new ArrayList<Coord>();
+			for (int j=1;j<MAX_ROWS+1;j++) {
+				LinearLayout ll = (LinearLayout)(gl.getChildAt(j*(numberOfColumns+1)+i));
+				EditText avst = ((EditText)(ll).findViewById(R.id.avst));
+				EditText rikt = ((EditText)(ll).findViewById(R.id.rikt));
+				String avS = avst.getText().toString();
+				String riS = rikt.getText().toString();
+				//If one of the values are empty - tag ends.
+				if (empty(avS)||empty(riS)) {
+					if (coords.size()>1) {
+						Delyta delyta = new Delyta();
+						ErrCode e = delyta.create(coords);
+						if (e == ErrCode.ok) {
+							delytor.add(delyta);
+
+						} else 
+							Log.e("nils","Couldnt create delyta: "+e.name());
+					}
+					break;
+				}
+				else {	
+					coords.add(new Coord(Integer.parseInt(avS),Integer.parseInt(riS)));
+					//t[i-1][index++] = Integer.parseInt(avS);
+					//t[i-1][index++] = Integer.parseInt(riS);
+				}
+			}
+		}
 
 
-		
+		//Draw.
 
-		
-		
-		super.onStart();
+
+
+		pyv.showDelytor(delytor);		
+
 	}
 
+	private boolean empty(String s) {
+		return s==null||s.length()==0;
+	}
 
 
 
@@ -310,7 +512,7 @@ public class TagTemplate extends Executor {
 	 */
 
 
-
+	
 
 
 

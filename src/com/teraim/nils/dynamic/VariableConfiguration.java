@@ -161,7 +161,7 @@ public class VariableConfiguration {
 		String[] keys = keyChain.split("\\|");
 		//find my keys in the current context.
 		vMap = new HashMap<String,String>();
-		Map<String, String> cMap = gs.getCurrentContext().getKeyHash();
+		Map<String, String> cMap = gs.getKeyHash();
 		for (String key:keys) {
 			String value = cMap.get(key);
 			if (value!=null) {
@@ -183,6 +183,8 @@ public class VariableConfiguration {
 		Log.e("nils","Couldn't find variable "+varId+" in getVariableInstance");
 		return null;
 	}
+
+
 
 	
 	

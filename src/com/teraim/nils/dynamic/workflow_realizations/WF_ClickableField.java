@@ -23,6 +23,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -39,6 +41,8 @@ import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.types.Variable.DataType;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 import com.teraim.nils.dynamic.workflow_abstracts.EventGenerator;
+import com.teraim.nils.utils.DbHelper.Selection;
+import com.teraim.nils.utils.Tools;
 
 public abstract class WF_ClickableField extends WF_Not_ClickableField implements  EventGenerator {
 
@@ -58,73 +62,77 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 	public Set<Variable> getAssociatedVariables() {
 		return myVars.keySet();
 	}
-	
+
 	private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
 
-	    // Called when the action mode is created; startActionMode() was called
-	    @Override
-	    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-	        // Inflate a menu resource providing context menu items
-	        MenuInflater inflater = mode.getMenuInflater();
-	        inflater.inflate(R.menu.tagpopmenu, menu);
-	        return true;
-	    }
+		// Called when the action mode is created; startActionMode() was called
+		@Override
+		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			// Inflate a menu resource providing context menu items
+			MenuInflater inflater = mode.getMenuInflater();
+			inflater.inflate(R.menu.tagpopmenu, menu);
 
-	    // Called each time the action mode is shown. Always called after onCreateActionMode, but
-	    // may be called multiple times if the mode is invalidated.
-	    @Override
-	    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-	        return false; // Return false if nothing is done
-	    }
+			return true;
+		}
 
-	    // Called when the user selects a contextual menu item
-	    @Override
-	    public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
-	        List<String> row;
+		// Called each time the action mode is shown. Always called after onCreateActionMode, but
+		// may be called multiple times if the mode is invalidated.
+		@Override
+		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+			MenuItem x = menu.getItem(0);
+			if (!Tools.isNetworkAvailable(gs.getContext()))
+				x.setVisible(false);
+			return false; // Return false if nothing is done
+		}
+
+		// Called when the user selects a contextual menu item
+		@Override
+		public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
+			List<String> row;
 			switch (item.getItemId()) {
-	        case R.id.menu_goto:
-	        	row = myVars.keySet().iterator().next().getBackingDataSet();
-	        	if (row!=null) {
-	        		String url = al.getUrl(row);
-	        		Intent browse = new Intent( Intent.ACTION_VIEW , Uri.parse(url));
-	        		browse.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-	        		gs.getContext().startActivity(browse);	        	
-	        	}
-	        	return true;	        
-	            case R.id.menu_delete:
-	            	for (View inf:myVars.values()) {
-						if (inf!=null) {
-							if (inf instanceof EditText)
-								((EditText)inf).setText("");
+			case R.id.menu_goto:
+				row = myVars.keySet().iterator().next().getBackingDataSet();
+				if (row!=null) {
+					String url = al.getUrl(row);
+					Intent browse = new Intent( Intent.ACTION_VIEW , Uri.parse(url));
+					browse.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					gs.getContext().startActivity(browse);	        	
+				}
+				return true;	        
+			case R.id.menu_delete:
+				for (View inf:myVars.values()) {
+					if (inf!=null) {
+						if (inf instanceof EditText)
+							((EditText)inf).setText("");
 
-						}
 					}
-					save();
-	                mode.finish(); // Action picked, so close the CAB
-	                return true;
-	            case R.id.menu_info:
-	            	new AlertDialog.Builder(myContext.getContext())
-	                .setTitle("Beskrivning")
-	                .setMessage(myDescription)
-	                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-	                    public void onClick(DialogInterface dialog, int which) { 
-	                    	mode.finish();
-	                    }
-	                 })
-	                .setIcon(android.R.drawable.ic_dialog_info)
-	                 .show();
-	            	
-	            	return true;
-	            default:
-	                return false;
-	        }
-	    }
+				}
+				save();
+				mode.finish(); // Action picked, so close the CAB
+				return true;
+			case R.id.menu_info:
+				new AlertDialog.Builder(myContext.getContext())
+				.setTitle("Beskrivning")
+				.setMessage(myDescription)
+				.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) { 
+						mode.finish();
+					}
+				})
+				.setIcon(android.R.drawable.ic_dialog_info)
+				.show();
 
-	    // Called when the user exits the action mode
-	    @Override
-	    public void onDestroyActionMode(ActionMode mode) {
-	        mActionMode = null;
-	    }
+				return true;
+			default:
+				return false;
+			}
+		}
+
+		// Called when the user exits the action mode
+		@Override
+		public void onDestroyActionMode(ActionMode mode) {
+			mActionMode = null;
+		}
 	};
 
 	ActionMode mActionMode;
@@ -148,17 +156,17 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 		getWidget().setOnLongClickListener(new OnLongClickListener(){
 			@Override
 			public boolean onLongClick(View v) {
-				
-				
-		        
-				if (mActionMode != null) {
-		            return false;
-		        }
 
-		        // Start the CAB using the ActionMode.Callback defined above
-		        mActionMode = ((Activity)myContext.getContext()).startActionMode(mActionModeCallback);
-		        WF_ClickableField.this.getWidget().setSelected(true);
-		        return true;
+
+
+				if (mActionMode != null) {
+					return false;
+				}
+
+				// Start the CAB using the ActionMode.Callback defined above
+				mActionMode = ((Activity)myContext.getContext()).startActionMode(mActionModeCallback);
+				WF_ClickableField.this.getWidget().setSelected(true);
+				return true;
 				/*
 				for (View inf:myVars.values()) {
 					if (inf!=null) {
@@ -169,12 +177,12 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 				}
 				save();
 				return true;
-				*/
+				 */
 			}
 		});
 
-		
-		
+
+
 
 
 
@@ -217,7 +225,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 	}
 
 	@Override
-	public void addVariable(Variable var, boolean displayOut,String format) {
+	public void addVariable(final Variable var, boolean displayOut,String format) {
 
 
 		String varLabel = var.getLabel();
@@ -244,55 +252,105 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 		case list:
 			//Get the list values
 			Table t = gs.getArtLista().getTable();
-			String options = t.getElement("List Values", var.getBackingDataSet());
+			String listValues = t.getElement("List Values", var.getBackingDataSet());
 			String[] opt = null;
-			if (options == null||options.isEmpty()) {
+			if (listValues == null||listValues.isEmpty()) {
 				o.addRow("");
 				o.addRedText("List Values empty for List variable "+varId);
 				opt = new String[] {""};
 			} else {
-				opt = options.split("\\|");
-				if (opt==null||opt.length<2) {
-					o.addRow("");
-					o.addRedText("Could not split List Values for variable "+varId+". Did you use '|' symbol??");					
-				}					
+				if (listValues.startsWith("@")) {
+					Log.d("nils","Found dynamic list definition..parsing");
+					String[] valuePairs = listValues.split("\\|");
+					if (valuePairs==null||valuePairs.length<2) {
+						o.addRow("");
+						o.addRedText("Could not split List Values for variable "+varId+". Did you use '|' symbol??");	
+						Log.e("nils","split failed on |");
+						if (valuePairs[0].equalsIgnoreCase("@col")) {
+							Log.d("nils","found column selector");
+							//Column to select.
+							String[] column = {valuePairs[1]};
+							//Any other columns part of key?
+							Map<String,String>keySet = new HashMap<String,String>();
+							if (valuePairs.length>=4) {
+								//yes..include these in search
+								for (int i=3;i<valuePairs.length;i+=2)
+									keySet.put(valuePairs[i], valuePairs[i+1]);
+							}
+							Selection s = gs.getDb().createCoulmnSelection(keySet);
+							String[][] values = gs.getDb().getValues(column, s);
+							if (values !=null) {
+								Log.d("nils","Got "+values.length+" results");
+								for (int i = 0; i<values.length;i++) {
+									String[] row = values[i];
+									opt[i]=row[0];
+								}
+							}
+
+						}
+
+					} else
+						Log.e("nils","List "+varId+" has strange parameters: "+listValues.toString());
+
+				} else 
+				{
+					Log.d("nils","Found static list definition..parsing");
+					opt = listValues.split("\\|");
+					if (opt==null||opt.length<2) {
+						o.addRow("");
+						o.addRedText("Could not split List Values for variable "+varId+". Did you use '|' symbol??");					
+					}					
+				}
+				//Add dropdown.
+				Log.d("nils","Adding spinner for label "+label);
+				//o.addRow("Adding spinner field for dy-variable with label "+label+", name "+varId+", type "+var.getType().name()+" and unit "+unit.name());
+				final Spinner spinner = (Spinner)LayoutInflater.from(myContext.getContext()).inflate(R.layout.edit_field_spinner, null);
+				ArrayAdapter<String> adapter = new ArrayAdapter<String>(myContext.getContext(), android.R.layout.simple_spinner_dropdown_item, opt);		
+				spinner.setAdapter(adapter);
+				inputContainer.addView(spinner);
+				myVars.put(var,spinner);
+				spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+				    @Override
+				    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+				        Log.d("nils","spinner changed value, presaving");
+				        var.setValueWithoutCommit((String)spinner.getItemAtPosition(position));
+				    }
+
+				    @Override
+				    public void onNothingSelected(AdapterView<?> parentView) {
+				       
+				    }
+
+				});
 			}
-			//Add dropdown.
-			Log.d("nils","Adding spinner for label "+label);
-			//o.addRow("Adding spinner field for dy-variable with label "+label+", name "+varId+", type "+var.getType().name()+" and unit "+unit.name());
-			final Spinner spinner = (Spinner)LayoutInflater.from(myContext.getContext()).inflate(R.layout.edit_field_spinner, null);
-			ArrayAdapter<String> adapter = new ArrayAdapter<String>(myContext.getContext(), android.R.layout.simple_spinner_dropdown_item, opt);		
-			spinner.setAdapter(adapter);
-			inputContainer.addView(spinner);
-			myVars.put(var,spinner);
-			break;
-		case text:
-			//o.addRow("Adding text field for dy-variable with label "+label+", name "+varId+", type "+var.getType().name()+" and unit "+unit.name());
-			View l = LayoutInflater.from(myContext.getContext()).inflate(R.layout.edit_field_text,null);
-			header = (TextView)l.findViewById(R.id.header);
-			header.setText(varLabel+" "+postLabel);
-			EditText etview = (EditText)l.findViewById(R.id.edit);
-			inputContainer.addView(l);
-			myVars.put(var,etview);			
-			break;
-		case numeric:
-			//o.addRow("Adding edit field for dy-variable with label "+label+", name "+varId+", type "+numType.name()+" and unit "+unit.name());
-			l = LayoutInflater.from(myContext.getContext()).inflate(R.layout.edit_field_numeric,null);
-			header = (TextView)l.findViewById(R.id.header);
-			etview = (EditText)l.findViewById(R.id.edit);
-			header.setText(varLabel+" ("+unit.name()+")"+" "+" "+postLabel);
-			//etview.setText(Tools.getPrintedUnit(unit));
-			inputContainer.addView(l);
-			myVars.put(var,etview);
+				break;
+			case text:
+				//o.addRow("Adding text field for dy-variable with label "+label+", name "+varId+", type "+var.getType().name()+" and unit "+unit.name());
+				View l = LayoutInflater.from(myContext.getContext()).inflate(R.layout.edit_field_text,null);
+				header = (TextView)l.findViewById(R.id.header);
+				header.setText(varLabel+" "+postLabel);
+				EditText etview = (EditText)l.findViewById(R.id.edit);
+				inputContainer.addView(l);
+				myVars.put(var,etview);			
+				break;
+			case numeric:
+				//o.addRow("Adding edit field for dy-variable with label "+label+", name "+varId+", type "+numType.name()+" and unit "+unit.name());
+				l = LayoutInflater.from(myContext.getContext()).inflate(R.layout.edit_field_numeric,null);
+				header = (TextView)l.findViewById(R.id.header);
+				etview = (EditText)l.findViewById(R.id.edit);
+				header.setText(varLabel+" ("+unit.name()+")"+" "+" "+postLabel);
+				//etview.setText(Tools.getPrintedUnit(unit));
+				inputContainer.addView(l);
+				myVars.put(var,etview);
 
-			break;
-		}
+				break;
+			}
 
 
-		if (displayOut) {
-			LinearLayout ll = getFieldLayout();
+			if (displayOut) {
+				LinearLayout ll = getFieldLayout();
 
-			/*
+				/*
 			 TextView o = (TextView)ll.findViewById(R.id.outputValueField);
 			TextView u = (TextView)ll.findViewById(R.id.outputUnitField);
 
@@ -301,108 +359,108 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 				o.setText(varLabel+": "+value);	
 				u.setText(" ("+Variable.getPrintedUnit()+")");
 			}
-			 */
-			myOutputFields.put(var,new OutC(ll,format));
-			outputContainer.addView(ll);
+				 */
+				myOutputFields.put(var,new OutC(ll,format));
+				outputContainer.addView(ll);
+			}
+			refreshInputFields();
+			refreshOutputFields();
 		}
-		refreshInputFields();
-		refreshOutputFields();
-	}
 
 
 
-	private void save() {
-		//for now only delytevariabler. 
-		Iterator<Map.Entry<Variable,View>> it = myVars.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry<Variable,View> pairs = (Map.Entry<Variable,View>)it.next();
-			Variable variable = pairs.getKey();
-			DataType type = variable.getType();
-			View view = pairs.getValue();
-			if (type == DataType.bool) {
-				//Get the yes radiobutton.
-				RadioGroup rb = (RadioGroup)view;
-				//If checked set value to True.
-				int id = rb.getCheckedRadioButtonId();
-				variable.setValue("1");
-				if (id == -1 || id == R.id.nej)
-					variable.setValue("0");
-			} else 
+		private void save() {
+			//for now only delytevariabler. 
+			Iterator<Map.Entry<Variable,View>> it = myVars.entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry<Variable,View> pairs = (Map.Entry<Variable,View>)it.next();
+				Variable variable = pairs.getKey();
+				DataType type = variable.getType();
+				View view = pairs.getValue();
+				if (type == DataType.bool) {
+					//Get the yes radiobutton.
+					RadioGroup rb = (RadioGroup)view;
+					//If checked set value to True.
+					int id = rb.getCheckedRadioButtonId();
+					variable.setValue("1");
+					if (id == -1 || id == R.id.nej)
+						variable.setValue("0");
+				} else 
 
-				if (type == DataType.numeric||
-				type == DataType.text){
-					EditText et = (EditText)view;
-					String txt = et.getText().toString();
-					if (txt.trim().length()>0)
-						variable.setValue(txt);
-					else
-						variable.deleteValue();
-				} else				
-					if (type == DataType.list) {
-						Spinner sp = (Spinner)view;
-						String s = (String)sp.getSelectedItem();
-						variable.setValue(s);
-					} 
+					if (type == DataType.numeric||
+					type == DataType.text){
+						EditText et = (EditText)view;
+						String txt = et.getText().toString();
+						if (txt.trim().length()>0)
+							variable.setValue(txt);
+						else
+							variable.deleteValue();
+					} else				
+						if (type == DataType.list) {
+							Spinner sp = (Spinner)view;
+							String s = (String)sp.getSelectedItem();
+							variable.setValue(s);
+						} 
+			}
+			myContext.registerEvent(new WF_Event_OnSave(this.getId()));
 		}
-		myContext.registerEvent(new WF_Event_OnSave(this.getId()));
-	}
 
-	@Override
-	public void refreshInputFields(){
-		DataType numType;
-		Log.d("nils","In refreshinputfields");
-		Set<Entry<Variable, View>> vars = myVars.entrySet();
-		for(Entry<Variable, View>entry:vars) {
-			Variable variable = entry.getKey();
-			String value = variable.getValue();
-			numType = variable.getType();
+		@Override
+		public void refreshInputFields(){
+			DataType numType;
+			Log.d("nils","In refreshinputfields");
+			Set<Entry<Variable, View>> vars = myVars.entrySet();
+			for(Entry<Variable, View>entry:vars) {
+				Variable variable = entry.getKey();
+				String value = variable.getValue();
+				numType = variable.getType();
 
-			View v = entry.getValue();
+				View v = entry.getValue();
 
-			if (numType == DataType.bool) {
-				RadioButton ja = (RadioButton)v.findViewById(R.id.ja);
-				RadioButton nej = (RadioButton)v.findViewById(R.id.nej);
-				if(value!=null) {
-					if(value == null||value.equals("1"))
-						ja.setEnabled(true);
-					else
-						nej.setEnabled(true);
-					ja.setChecked(true);
-				}
-			} else
-				if (numType == Variable.DataType.numeric||
-				numType ==DataType.text) {
-					EditText et = (EditText)v.findViewById(R.id.edit);
-					if (et!=null)
-						et.setText(value==null?"":value);
-					else
-						Log.d("nils","WF_Clickable:view was null in refreshinput");
-				} else
-					if (numType==DataType.list) {
-						Spinner sp = (Spinner)v;
-						String item = null;
-						if (sp.getAdapter().getCount()>0) {
-							if (value!=null) {								
-								for (int i=0;i<sp.getAdapter().getCount();i++) {
-									item = (String)sp.getAdapter().getItem(i);
-									if (item == null)
-										continue;
-									else
-										if (item.equals(value))
-											sp.setSelection(i);
-								}
-							}
-						} else {
-							o.addRow("");
-							o.addRedText("Empty spinner for variable "+v+". Check your variable configuration.");
-						}
-
+				if (numType == DataType.bool) {
+					RadioButton ja = (RadioButton)v.findViewById(R.id.ja);
+					RadioButton nej = (RadioButton)v.findViewById(R.id.nej);
+					if(value!=null) {
+						if(value == null||value.equals("1"))
+							ja.setEnabled(true);
+						else
+							nej.setEnabled(true);
+						ja.setChecked(true);
 					}
-		} 
+				} else
+					if (numType == Variable.DataType.numeric||
+					numType ==DataType.text) {
+						EditText et = (EditText)v.findViewById(R.id.edit);
+						if (et!=null)
+							et.setText(value==null?"":value);
+						else
+							Log.d("nils","WF_Clickable:view was null in refreshinput");
+					} else
+						if (numType==DataType.list) {
+							Spinner sp = (Spinner)v;
+							String item = null;
+							if (sp.getAdapter().getCount()>0) {
+								if (value!=null) {								
+									for (int i=0;i<sp.getAdapter().getCount();i++) {
+										item = (String)sp.getAdapter().getItem(i);
+										if (item == null)
+											continue;
+										else
+											if (item.equals(value))
+												sp.setSelection(i);
+									}
+								}
+							} else {
+								o.addRow("");
+								o.addRedText("Empty spinner for variable "+v+". Check your variable configuration.");
+							}
+
+						}
+			} 
+
+		}
 
 	}
-
-}
 
 
 

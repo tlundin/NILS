@@ -8,50 +8,51 @@
     <FrameLayout
         android:id="@+id/circle"
         android:layout_width="match_parent"
-        android:layout_height="500dp" >
+        android:layout_height="550dp" >
 
     </FrameLayout>
+    
+	<GridLayout 
+    android:id="@+id/gridLayout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:columnCount="6"
+    android:stretchMode="columnWidth" >
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="fill_vertical" >
+</GridLayout>
 
-        <Button
-            android:id="@+id/button1"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1" />
+   <RelativeLayout 
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
 
-        <Button
-            android:id="@+id/button2"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="2" />
+    <Button
+        android:id="@+id/redraw"
+        android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+         android:layout_toLeftOf="@+id/rensa"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="15dp"
+        android:text="Kalkylera delytor" />
+    
+    <Button
+        android:id="@+id/rensa"
+        android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/spara"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="15dp"
+        android:text="Nyutlägg" />
 
-        <Button
-            android:id="@+id/button3"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="3" />
-
-        <Button
-            android:id="@+id/button4"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="4" />
-
-        <Button
-            android:id="@+id/button5"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="5" />
-
-    </LinearLayout>
+   <Button
+        android:id="@+id/spara"
+        android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="15dp"
+        android:text="Spara ändringar" />
+</RelativeLayout>
     
 </LinearLayout>

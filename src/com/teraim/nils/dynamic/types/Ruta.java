@@ -2,30 +2,60 @@ package com.teraim.nils.dynamic.types;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.teraim.nils.GlobalState;
+import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
 
 public class Ruta {
 	private String myId;
 	//private Context ctx;
 	GlobalState gs;
 	private ArrayList<Provyta> provytor = new ArrayList<Provyta>();
+	
+	final Map<String,String>rutHash = new HashMap<String,String>();
 
 	public Ruta(GlobalState gs,String id) {
 		this.gs = gs;
 		myId = id;
+		
+		gs.setKeyHash(rutHash);	
+		rutHash.put("år", "2014");
+		rutHash.put("ruta", myId);
 	}
 
 	public String getId() {
 		return myId;
 	}
 
-	public void addDelYta(String provYteId,String delyteId,String[] raw) {
+	public void addDelYta(String provyteId,String delyteId,String[] raw) {
 
-		if (provYteId != null) {
+		if (provyteId != null && delyteId !=null) {
+			Log.d("nils","Adding tåg with "+raw.toString()+" and pyId: "+provyteId+" dyId: "+delyteId);
+			rutHash.put("provyta",provyteId);
+			rutHash.put("delyta",delyteId);
+			String varId = "tag"+delyteId;
+			Variable v = gs.getArtLista().getVariableInstance(varId);
+			
+			if (v==null) {
+				Log.e("nils","Error in configuration - no type def exists for variable "+varId);
+			} else {
+				String tag = null;
+				for (String r:raw) 
+					if (tag == null)
+						tag = r;
+					else
+						tag+= "|"+r;
+				v.setValue(tag);
+			}			
+		} else {
+			Log.e("nils","Either provyta or delyta id was null in AddDelyta, Ruta.class");
+		}
+			/*
 			Provyta _py = findProvYta(provYteId);
 			if (_py==null) {
 				Log.e("NILS","Provyta with id "+provYteId+" not  found in rutdata but found in delningsdata");
@@ -34,7 +64,8 @@ public class Ruta {
 
 			} else
 				_py.addDelyta(delyteId, raw);
-		}
+				*/
+		
 	}
 
 	public Provyta addProvYta_rutdata(String ytId, String north, String east, String lat, String longh) {
@@ -70,8 +101,8 @@ public class Ruta {
 		int i = 0;
 
 		for(Provyta y:provytor) {
-			lat[i]= y.lat;
-			lon[i]= y.longh;
+			lat[i]= y.getLat();
+			lon[i]= y.getLong();
 			//Log.d("NILS","SN: "+y.N+" SE: "+y.E);
 			i++;
 		}
@@ -91,8 +122,8 @@ public class Ruta {
 		public Sorted() {
 			int i = 0;
 			for(Provyta y:provytor) {
-				N[i]= y.N;
-				E[i]= y.E;
+				N[i]= y.getSweRefNorth();
+				E[i]= y.getSweRefEast();
 				//Log.d("NILS","SN: "+y.N+" SE: "+y.E);
 				i++;
 			}
@@ -132,7 +163,7 @@ public class Ruta {
 	public GlobalState getContext() {
 		return gs;
 	}
-	
+
 	
 
 

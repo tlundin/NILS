@@ -13,7 +13,6 @@ import android.util.Log;
 
 import com.teraim.nils.bluetooth.BluetoothRemoteDevice;
 import com.teraim.nils.dynamic.VariableConfiguration;
-import com.teraim.nils.dynamic.types.Delyta;
 import com.teraim.nils.dynamic.types.Provyta;
 import com.teraim.nils.dynamic.types.Ruta;
 import com.teraim.nils.dynamic.types.Table;
@@ -233,22 +232,8 @@ public class GlobalState  {
 		return null;
 	}
 
-	public Delyta getCurrentDelyta() {
-		Variable v = artLista.getVariableInstance("Current_Delyta");
-		String va=null;
-		if (v!=null)
-			va = v.getValue();
-		if (va!=null) {
-			Provyta p = getCurrentProvyta();
-			if (p!=null) 
-				return p.findDelyta(ph.get(va));
-			else {
-				Log.e("nils","getCurrentdelyta returns null, since getCurrentProvyta failed");
-				return null;
-			}
-		}
-		return null;
-	}
+
+
 
 	public Ruta findRuta(String id) {
 		//Log.d("nils","Findruta called with ID> "+id);
@@ -274,26 +259,7 @@ public class GlobalState  {
 
 
 
-	public ArrayList<Delyta> getDelytor(String rutId, String provyteId) {
-		Ruta r = findRuta(rutId);
-		if (r!=null) {
-			Log.d("NILS","found ruta "+ rutId);
-			Provyta p = r.findProvYta(provyteId);
-			if (p!=null) {
-				Log.d("NILS","Found provyta"+ provyteId);			
-				return (p.getDelytor());
-			} else {
-				Log.e("NILS","DID NOT FIND Provyta for id "+provyteId);
-				//TODO: Files must contains same provytor!
-				//Fix for now: Generate default if missing.
-				//p.addDelyta("1", null);
-				//r.addProvYta(provyteId, "1", null);
-				//return getDelytor(rutId,provyteId);
-			}
-		} else
-			Log.e("NILS","DID NOT FIND RUTA "+ rutId);
-		return null;
-	}
+	
 
 
 	/**************************************
@@ -438,6 +404,14 @@ public class GlobalState  {
 		log = new DummyLogger();
 	}
 
+	Map<String,String> myKeyHash;
+	public Map<String,String> getKeyHash() {
+		return myKeyHash;
+	}
+	
+	public void  setKeyHash(Map<String,String> h) { 
+		myKeyHash=h;
+	}
 
 
 

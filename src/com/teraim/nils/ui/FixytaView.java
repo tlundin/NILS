@@ -1,18 +1,18 @@
 package com.teraim.nils.ui;
 
 import java.util.ArrayList;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Typeface;
-import android.location.Location;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
-import com.teraim.nils.dynamic.types.Delyta;
+import com.teraim.nils.dynamic.templates.TagTemplate.Delyta;
 import com.teraim.nils.dynamic.types.Marker;
 import com.teraim.nils.dynamic.types.MovingMarker;
 import com.teraim.nils.utils.Geomatte;
@@ -156,83 +156,7 @@ public class FixytaView extends View {
 		msg = "Avst: "+String.valueOf(dist)+"m";
 	}
 
-	ArrayList<Delyta> delar = null;
-	public void setDelytor(ArrayList<Delyta> dy) {
-		delar = dy;
-	}
-
-
-	public void drawTag(Canvas c,int cx,int cy) {
-
-		//		int tst[][] = {{100,288},{100,48},{100,120},{100,263}};
-		int tst[][] = {{100,233},{000,360},{064,322},{100,047}};
-		//int tst[][] = {{100,261},{100,36},{100,98},{100,200}};
-		//int tst[][] = {{100,261},{100,36},{100,98},{100,200}};
-		//int pst[][][] = {{100,200,300}};
-		float xy[][] = new float[20][2];
-		tst = null;
-		//Are there any divisions of this Yta?
-		if(delar!=null&&delar.size()>0) {
-			//Log.d("NILS", "DELAR size is "+delar.size());
-			for (Delyta del:delar) {
-
-				//draw each 
-				if (del !=null) {
-					tst = del.getPoints();
-					//Log.d("NILS", "Tågets size is "+tst.length);
-
-					if (tst!=null && tst.length>1) {
-						for (int i=0;i<tst.length;i++) {
-							//avstånd från cirkelns mitt;
-							int avst = tst[i][0];
-							//Quit if null value
-							if (avst==-999)
-								break;
-							//Grad-riktning. 360 är för avstånd 0
-							int rikt = tst[i][1];
-							double rr = (rikt-90) * Math.PI/180;
-							int x = (int) (cx+ avst*oScaleF*(Math.cos(rr)));
-							int y = (int) (cy+ avst*oScaleF*(Math.sin(rr)));
-							//Log.d("NILS","avst "+avst+" rScaleF "+rScaleF+" rikt "+rikt+" radRikt "+rr+" cos: "+Math.cos(rr)+" sin:"+Math.sin(rr));
-							//Log.d("NILS","X: "+x+" Y:"+y);
-
-							//y = 2*r-y;
-							//x = x - 2*(x-r);
-							xy[i][0]=x;
-							xy[i][1]=y;
-							c.drawText(Integer.toString(i), x, y, p);
-							boolean isArc = (i>1)&&(tst[i][0]==tst[i-1][0]&&tst[i][0]==realRadiusinMeter);
-							//Log.d("NILS","I: "+i);
-							if( 
-									//om andra punkten
-									i==1
-									||
-									//...eller sista
-									((tst.length>1)&&(i==(tst.length-1)))
-									||
-									//..eller nästa är brytpunkt
-									tst[i+1][0]==-999
-									||
-									//...och det är inte en arc mellan...
-									((i>1)&&(isArc==false))
-									) {
-								//då ritar vi.
-								c.drawLine(xy[i-1][0], xy[i-1][1],x,y, p);
-							}
-
-						}
-
-					}
-				}
-
-			}
-		}else {
-			Log.e("NILS","no delyta in pos 0 for delar");
-			tst = null;
-		}
-
-	}
-
+	
 
 
 

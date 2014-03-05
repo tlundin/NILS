@@ -173,13 +173,6 @@ public class WF_Context {
 	}
 	
 	
-	Map<String,String> myKeyHash;
-	public Map<String,String> getKeyHash() {
-		return myKeyHash;
-	}
 	
-	public void  setKeyHash(Map<String,String> h) { 
-		myKeyHash=h;
-	}
 
 }
