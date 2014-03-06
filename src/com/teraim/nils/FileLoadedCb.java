@@ -5,6 +5,7 @@ public interface FileLoadedCb {
 	enum ErrorCode {
 		newConfigVersionLoaded,
 		newVarPatternVersionLoaded,
+		tagLoaded,
 		bothFilesLoaded,
 		notFound,
 		parseError,

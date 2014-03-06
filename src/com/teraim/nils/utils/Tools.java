@@ -14,6 +14,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -22,10 +24,13 @@ import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.dynamic.types.Numerable.Type;
 import com.teraim.nils.dynamic.types.Ruta;
+import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 
 public class Tools {
@@ -283,41 +288,29 @@ public class Tools {
 
 	
 	//scan csv file for Rutor. Create if needed.
-	public static void scanDelningsData(InputStream csvFile, GlobalState gs) {
-		InputStreamReader is = new InputStreamReader(csvFile);
-		BufferedReader br = new BufferedReader(is);
-		final int noPo = 16;
-		try {
-			String row;
-			String header = br.readLine();
-			Log.d("NILS",header);
-			//Find rutId etc
-			while((row = br.readLine())!=null) {
-				String  r[] = row.split("\t");
-				if (r!=null) {	
-					if (r[2]==null)
-						continue;
-					Ruta ruta = gs.findRuta(r[2]);
-					//if this is a new ruta, add it to the array
-					if (ruta!=null) {
-						//Extract the delningståg out from the data.
-						String[] points = new String[noPo];
-						System.arraycopy(r, 6, points, 0, noPo);
-						ruta.addDelYta(r[4],r[5],points);
-					}
-					//TODO: Add this as ELSE when the files match. 
-					//Currently only Rutor from Rutdata will matter.
-					/* ruta = new Ruta(r[2]);
-						rutor.add(ruta);
-					 */
 
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 	
+	public static Map<String,String> createKeyMap(String ...parameters) {
+		Map<String,String> ret = new HashMap<String,String>();
+		boolean colName = true;
+		String column=null;
+		if ((parameters.length & 1) != 0 ) {
+			Log.e("nils","createKeyMap needs an even number of arguments");
+			return null;
+		}
+			
+		for (String p:parameters) {
+			if (colName) {
+				colName = false;
+				column = p;
+			} else {
+				colName = true;
+				ret.put(column,p);
+			}
+		}
+		return ret;
+	}
+
 	public static String getPrintedUnit(Unit unit) {
 		if (unit == Unit.percentage)
 			return "%";
@@ -332,6 +325,15 @@ public class Tools {
 	          = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
 	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
 	    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+	}
+	
+	public static boolean isNumeric(String str)
+	{
+	    for (char c : str.toCharArray())
+	    {
+	        if (!Character.isDigit(c)) return false;
+	    }
+	    return true;
 	}
 
 

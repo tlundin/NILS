@@ -40,7 +40,7 @@
         
         
         <activity
-            android:name=".Start"
+            android:name="com.teraim.nils.non_generics.Start"
             android:screenOrientation="portrait"
             android:label="@string/title_activity_nils" >
             

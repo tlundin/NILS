@@ -1,11 +1,15 @@
 package com.teraim.nils.dynamic.workflow_realizations;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -137,8 +141,8 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 
 	ActionMode mActionMode;
 
-	public  WF_ClickableField(final String myId,final String descriptionT, WF_Context context,String id, View view,boolean isVisible) {
-		super(myId,descriptionT,context,view,isVisible);	
+	public  WF_ClickableField(final String label,final String descriptionT, WF_Context context,String id, View view,boolean isVisible) {
+		super(label,descriptionT,context,view,isVisible);	
 		gs = GlobalState.getInstance(context.getContext());
 		al = gs.getArtLista();
 		o = gs.getLogger();
@@ -192,7 +196,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 
 				//On click, create dialog 			
 				AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
-				alert.setTitle(myId);
+				alert.setTitle(label);
 				alert.setMessage(descriptionT);
 				refreshInputFields();
 
@@ -235,6 +239,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 		// Set an EditText view to get user input 
 		if (displayOut && virgin) {
 			virgin = false;
+			Log.d("nils","Setting key variable to "+varId);
 			super.setKeyRow(varId);
 		}
 
@@ -250,107 +255,57 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 			myVars.put(var,rbg);
 			break;
 		case list:
-			//Get the list values
-			Table t = gs.getArtLista().getTable();
-			String listValues = t.getElement("List Values", var.getBackingDataSet());
-			String[] opt = null;
-			if (listValues == null||listValues.isEmpty()) {
-				o.addRow("");
-				o.addRedText("List Values empty for List variable "+varId);
-				opt = new String[] {""};
-			} else {
-				if (listValues.startsWith("@")) {
-					Log.d("nils","Found dynamic list definition..parsing");
-					String[] valuePairs = listValues.split("\\|");
-					if (valuePairs==null||valuePairs.length<2) {
-						o.addRow("");
-						o.addRedText("Could not split List Values for variable "+varId+". Did you use '|' symbol??");	
-						Log.e("nils","split failed on |");
-						if (valuePairs[0].equalsIgnoreCase("@col")) {
-							Log.d("nils","found column selector");
-							//Column to select.
-							String[] column = {valuePairs[1]};
-							//Any other columns part of key?
-							Map<String,String>keySet = new HashMap<String,String>();
-							if (valuePairs.length>=4) {
-								//yes..include these in search
-								for (int i=3;i<valuePairs.length;i+=2)
-									keySet.put(valuePairs[i], valuePairs[i+1]);
-							}
-							Selection s = gs.getDb().createCoulmnSelection(keySet);
-							String[][] values = gs.getDb().getValues(column, s);
-							if (values !=null) {
-								Log.d("nils","Got "+values.length+" results");
-								for (int i = 0; i<values.length;i++) {
-									String[] row = values[i];
-									opt[i]=row[0];
-								}
-							}
-
-						}
-
-					} else
-						Log.e("nils","List "+varId+" has strange parameters: "+listValues.toString());
-
-				} else 
-				{
-					Log.d("nils","Found static list definition..parsing");
-					opt = listValues.split("\\|");
-					if (opt==null||opt.length<2) {
-						o.addRow("");
-						o.addRedText("Could not split List Values for variable "+varId+". Did you use '|' symbol??");					
-					}					
-				}
-				//Add dropdown.
 				Log.d("nils","Adding spinner for label "+label);
 				//o.addRow("Adding spinner field for dy-variable with label "+label+", name "+varId+", type "+var.getType().name()+" and unit "+unit.name());
 				final Spinner spinner = (Spinner)LayoutInflater.from(myContext.getContext()).inflate(R.layout.edit_field_spinner, null);
-				ArrayAdapter<String> adapter = new ArrayAdapter<String>(myContext.getContext(), android.R.layout.simple_spinner_dropdown_item, opt);		
+				ArrayAdapter<String> adapter = new ArrayAdapter<String>(myContext.getContext(), android.R.layout.simple_spinner_dropdown_item,new ArrayList<String>() );		
 				spinner.setAdapter(adapter);
 				inputContainer.addView(spinner);
 				myVars.put(var,spinner);
 				spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-				    @Override
-				    public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-				        Log.d("nils","spinner changed value, presaving");
-				        var.setValueWithoutCommit((String)spinner.getItemAtPosition(position));
-				    }
+					@Override
+					public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+						//Log.d("nils","spinner changed value, presaving");
+						//var.setValueWithoutCommit((String)spinner.getItemAtPosition(position));
+						refreshInputFields();
+					
+					}
 
-				    @Override
-				    public void onNothingSelected(AdapterView<?> parentView) {
-				       
-				    }
+					@Override
+					public void onNothingSelected(AdapterView<?> parentView) {
+
+					}
 
 				});
-			}
-				break;
-			case text:
-				//o.addRow("Adding text field for dy-variable with label "+label+", name "+varId+", type "+var.getType().name()+" and unit "+unit.name());
-				View l = LayoutInflater.from(myContext.getContext()).inflate(R.layout.edit_field_text,null);
-				header = (TextView)l.findViewById(R.id.header);
-				header.setText(varLabel+" "+postLabel);
-				EditText etview = (EditText)l.findViewById(R.id.edit);
-				inputContainer.addView(l);
-				myVars.put(var,etview);			
-				break;
-			case numeric:
-				//o.addRow("Adding edit field for dy-variable with label "+label+", name "+varId+", type "+numType.name()+" and unit "+unit.name());
-				l = LayoutInflater.from(myContext.getContext()).inflate(R.layout.edit_field_numeric,null);
-				header = (TextView)l.findViewById(R.id.header);
-				etview = (EditText)l.findViewById(R.id.edit);
-				header.setText(varLabel+" ("+unit.name()+")"+" "+" "+postLabel);
-				//etview.setText(Tools.getPrintedUnit(unit));
-				inputContainer.addView(l);
-				myVars.put(var,etview);
+			
+			break;
+		case text:
+			//o.addRow("Adding text field for dy-variable with label "+label+", name "+varId+", type "+var.getType().name()+" and unit "+unit.name());
+			View l = LayoutInflater.from(myContext.getContext()).inflate(R.layout.edit_field_text,null);
+			header = (TextView)l.findViewById(R.id.header);
+			header.setText(varLabel+" "+postLabel);
+			EditText etview = (EditText)l.findViewById(R.id.edit);
+			inputContainer.addView(l);
+			myVars.put(var,etview);			
+			break;
+		case numeric:
+			//o.addRow("Adding edit field for dy-variable with label "+label+", name "+varId+", type "+numType.name()+" and unit "+unit.name());
+			l = LayoutInflater.from(myContext.getContext()).inflate(R.layout.edit_field_numeric,null);
+			header = (TextView)l.findViewById(R.id.header);
+			etview = (EditText)l.findViewById(R.id.edit);
+			header.setText(varLabel+" ("+unit.name()+")"+" "+" "+postLabel);
+			//etview.setText(Tools.getPrintedUnit(unit));
+			inputContainer.addView(l);
+			myVars.put(var,etview);
 
-				break;
-			}
+			break;
+		}
 
 
-			if (displayOut) {
-				LinearLayout ll = getFieldLayout();
+		if (displayOut) {
+			LinearLayout ll = getFieldLayout();
 
-				/*
+			/*
 			 TextView o = (TextView)ll.findViewById(R.id.outputValueField);
 			TextView u = (TextView)ll.findViewById(R.id.outputUnitField);
 
@@ -359,108 +314,220 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 				o.setText(varLabel+": "+value);	
 				u.setText(" ("+Variable.getPrintedUnit()+")");
 			}
-				 */
-				myOutputFields.put(var,new OutC(ll,format));
-				outputContainer.addView(ll);
-			}
-			refreshInputFields();
-			refreshOutputFields();
+			 */
+			myOutputFields.put(var,new OutC(ll,format));
+			outputContainer.addView(ll);
 		}
+		refreshInputFields();
+		refreshOutputFields();
+	}
 
 
 
-		private void save() {
-			//for now only delytevariabler. 
-			Iterator<Map.Entry<Variable,View>> it = myVars.entrySet().iterator();
-			while (it.hasNext()) {
-				Map.Entry<Variable,View> pairs = (Map.Entry<Variable,View>)it.next();
-				Variable variable = pairs.getKey();
-				DataType type = variable.getType();
-				View view = pairs.getValue();
-				if (type == DataType.bool) {
-					//Get the yes radiobutton.
-					RadioGroup rb = (RadioGroup)view;
-					//If checked set value to True.
-					int id = rb.getCheckedRadioButtonId();
-					variable.setValue("1");
-					if (id == -1 || id == R.id.nej)
-						variable.setValue("0");
-				} else 
+	private void save() {
+		//for now only delytevariabler. 
+		Iterator<Map.Entry<Variable,View>> it = myVars.entrySet().iterator();
+		while (it.hasNext()) {
+			Map.Entry<Variable,View> pairs = (Map.Entry<Variable,View>)it.next();
+			Variable variable = pairs.getKey();
+			DataType type = variable.getType();
+			View view = pairs.getValue();
+			if (type == DataType.bool) {
+				//Get the yes radiobutton.
+				RadioGroup rb = (RadioGroup)view;
+				//If checked set value to True.
+				int id = rb.getCheckedRadioButtonId();
+				variable.setValue("1");
+				if (id == -1 || id == R.id.nej)
+					variable.setValue("0");
+			} else 
 
-					if (type == DataType.numeric||
-					type == DataType.text){
-						EditText et = (EditText)view;
-						String txt = et.getText().toString();
-						if (txt.trim().length()>0)
-							variable.setValue(txt);
-						else
-							variable.deleteValue();
-					} else				
-						if (type == DataType.list) {
-							Spinner sp = (Spinner)view;
-							String s = (String)sp.getSelectedItem();
-							variable.setValue(s);
-						} 
-			}
-			myContext.registerEvent(new WF_Event_OnSave(this.getId()));
+				if (type == DataType.numeric||
+				type == DataType.text){
+					EditText et = (EditText)view;
+					String txt = et.getText().toString();
+					if (txt.trim().length()>0)
+						variable.setValue(txt);
+					else
+						variable.deleteValue();
+				} else				
+					if (type == DataType.list) {
+						Spinner sp = (Spinner)view;
+						String s = (String)sp.getSelectedItem();
+						variable.setValue(s);
+					} 
 		}
+		myContext.registerEvent(new WF_Event_OnSave(this.getId()));
+	}
 
-		@Override
-		public void refreshInputFields(){
-			DataType numType;
-			Log.d("nils","In refreshinputfields");
-			Set<Entry<Variable, View>> vars = myVars.entrySet();
-			for(Entry<Variable, View>entry:vars) {
-				Variable variable = entry.getKey();
-				String value = variable.getValue();
-				numType = variable.getType();
+	@Override
+	public void refreshInputFields(){
+		DataType numType;
+		Log.d("nils","In refreshinputfields");
+		Set<Entry<Variable, View>> vars = myVars.entrySet();
+		for(Entry<Variable, View>entry:vars) {
+			Variable variable = entry.getKey();
+			String value = variable.getValue();
+			numType = variable.getType();
 
-				View v = entry.getValue();
+			View v = entry.getValue();
 
-				if (numType == DataType.bool) {
-					RadioButton ja = (RadioButton)v.findViewById(R.id.ja);
-					RadioButton nej = (RadioButton)v.findViewById(R.id.nej);
-					if(value!=null) {
-						if(value == null||value.equals("1"))
-							ja.setEnabled(true);
-						else
-							nej.setEnabled(true);
-						ja.setChecked(true);
-					}
+			if (numType == DataType.bool) {
+				RadioButton ja = (RadioButton)v.findViewById(R.id.ja);
+				RadioButton nej = (RadioButton)v.findViewById(R.id.nej);
+				if(value!=null) {
+					if(value == null||value.equals("1"))
+						ja.setEnabled(true);
+					else
+						nej.setEnabled(true);
+					ja.setChecked(true);
+				}
+			} else
+				if (numType == Variable.DataType.numeric||
+				numType ==DataType.text) {
+					EditText et = (EditText)v.findViewById(R.id.edit);
+					if (et!=null)
+						et.setText(value==null?"":value);
+					else
+						Log.d("nils","WF_Clickable:view was null in refreshinput");
 				} else
-					if (numType == Variable.DataType.numeric||
-					numType ==DataType.text) {
-						EditText et = (EditText)v.findViewById(R.id.edit);
-						if (et!=null)
-							et.setText(value==null?"":value);
-						else
-							Log.d("nils","WF_Clickable:view was null in refreshinput");
-					} else
-						if (numType==DataType.list) {
-							Spinner sp = (Spinner)v;
-							String item = null;
-							if (sp.getAdapter().getCount()>0) {
-								if (value!=null) {								
-									for (int i=0;i<sp.getAdapter().getCount();i++) {
-										item = (String)sp.getAdapter().getItem(i);
-										if (item == null)
-											continue;
-										else
-											if (item.equals(value))
-												sp.setSelection(i);
-									}
-								}
-							} else {
-								o.addRow("");
-								o.addRedText("Empty spinner for variable "+v+". Check your variable configuration.");
+					if (numType==DataType.list) {
+						Spinner sp = (Spinner)v;
+						
+						//Get the list values
+						Table t = gs.getArtLista().getTable();
+						String listValues = t.getElement("List Values", variable.getBackingDataSet());
+						String[] opt = null;
+						if (listValues == null||listValues.isEmpty()) {
+							o.addRow("");
+							o.addRedText("List Values empty for List variable "+variable.getId());
+							opt = new String[] {"No list values in configuration file"};
+						} else {
+							if (listValues.startsWith("@")) {
+								Log.d("nils","Found dynamic list definition..parsing");
+								String[] valuePairs = listValues.split("\\|");
+								if (valuePairs.length>0) {
+									String [] columnSelector = valuePairs[0].split("=");
+									String[] column;
+									boolean error = false;
+									if (columnSelector[0].equalsIgnoreCase("@col")) {
+										Log.d("nils","found column selector");
+										//Column to select.
+										String dbColName = gs.getDb().getColumnName(columnSelector[1]);
+										if (dbColName!=null) {
+											Log.d("nils","Real Column name for "+columnSelector[1]+" is "+dbColName);
+											column = new String[1];
+											column[0]=dbColName;
+										} else {
+											Log.d("nils","Column referenced in List definition for variable "+variable.getLabel()+" not found: "+columnSelector[1]);
+											o.addRow("");
+											o.addRedText("Column referenced in List definition for variable "+variable.getLabel()+" not found: "+columnSelector[1]);
+											error = true;
+											break;
+										}
+										if (!error) {
+										//Any other columns part of key?
+										Map<String,String>keySet = new HashMap<String,String>();
+										if (valuePairs.length>1) {
+											//yes..include these in search
+											Log.d("nils","found additional keys...");
+											String[] keyPair;							
+											for (int i=1;i<valuePairs.length;i++) {
+												keyPair = valuePairs[i].split("=");
+												if (keyPair!=null && keyPair.length==2) {
+													String valx=al.getVariableValue(null,keyPair[1]);
+													if (valx!=null) 										
+														keySet.put(keyPair[0], valx);
+													else {
+														Log.e("nils","The variable used for dynamic list "+variable.getLabel()+" is not returning a value");
+														o.addRow("");
+														o.addRedText("The variable used for dynamic list "+variable.getLabel()+" is not returning a value");
+													}
+												} else {
+													Log.d("nils","Keypair error: "+keyPair);
+													o.addRow("");
+													o.addRedText("Keypair referenced in List definition for variable "+variable.getLabel()+" cannot be read: "+keyPair);
+												}
+											}
+											
+										} else 
+											Log.d("nils","no additional keys..only column");
+											Selection s = gs.getDb().createCoulmnSelection(keySet);
+											List<String[]> values = gs.getDb().getValues(column, s);
+											if (values !=null) {
+												Log.d("nils","Got "+values.size()+" results");
+												//Remove duplicates and sort.
+												SortedSet<String> ss = new TreeSet<String>(new Comparator<String>(){
+									                public int compare(String a, String b){
+									                    return Integer.parseInt(a)-Integer.parseInt(b);
+									                }}						                         
+									        );
+												for (int i = 0; i<values.size();i++) 
+													ss.add(values.get(i)[0]);
+												opt = new String[ss.size()];
+												int i = 0; 
+												Iterator<String> it = ss.iterator();
+												while (it.hasNext()) {
+													opt[i++]=it.next();
+												}
+											}
+										} else
+											opt=new String[]{"Config Error...please check your list definitions for variable "+variable.getLabel()};
+
+
+									} else
+										Log.e("nils","List "+variable.getId()+" has too few parameters: "+listValues.toString());
+								} else
+									Log.e("nils","List "+variable.getId()+" has strange parameters: "+listValues.toString());
+
+							} else 
+							{
+								Log.d("nils","Found static list definition..parsing");
+								opt = listValues.split("\\|");
+								if (opt==null||opt.length<2) {
+									o.addRow("");
+									o.addRedText("Could not split List Values for variable "+variable.getId()+". Did you use '|' symbol??");					
+								}					
 							}
-
+							
+							//Add dropdown.
+							if (opt==null)
+								Log.e("nils","OPT IS STILL NULL!!!");
+							else {
+								for (int i=0;i<opt.length;i++) {
+									Log.d("nils","OPT "+i+":"+opt[i]);
+								}
+							}
+							
 						}
-			} 
+						((ArrayAdapter<String>)sp.getAdapter()).clear();
+						((ArrayAdapter<String>)sp.getAdapter()).addAll(opt);
+						
+						String item = null;
+						if (sp.getAdapter().getCount()>0) {
+							if (value!=null) {								
+								for (int i=0;i<sp.getAdapter().getCount();i++) {
+									item = (String)sp.getAdapter().getItem(i);
+									if (item == null)
+										continue;
+									else
+										if (item.equals(value))
+											sp.setSelection(i);
+								}
+							}
+						} else {
+							o.addRow("");
+							o.addRedText("Empty spinner for variable "+v+". Check your variable configuration.");
+						}
 
-		}
+					}
+		} 
 
 	}
+
+	
+	
+}
 
 
 

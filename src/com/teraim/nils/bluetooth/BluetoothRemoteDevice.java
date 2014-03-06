@@ -33,13 +33,13 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.teraim.nils.Constants;
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
 import com.teraim.nils.R.drawable;
 import com.teraim.nils.R.string;
 import com.teraim.nils.exceptions.BluetoothDeviceExtra;
 import com.teraim.nils.exceptions.BluetoothDevicesNotPaired;
+import com.teraim.nils.non_generics.Constants;
 
 public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 

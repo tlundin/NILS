@@ -71,7 +71,7 @@ public abstract class WF_List extends WF_Widget implements Sortable,Filterable {
 
 	int intC=0;
 	public void draw() {
-		Log.e("draw","DRAW CALLED "+ (++intC)+" times");
+		Log.e("draw","DRAW CALLED "+ (++intC)+" times from list"+this.getId());
 		filteredList = list;
 		if (myFilters != null) {			
 			List<Listable> listx = new ArrayList<Listable>(list);

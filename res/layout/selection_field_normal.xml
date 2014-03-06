@@ -33,7 +33,7 @@
              android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="horizontal" >
-        </LinearLayout>>
+        </LinearLayout>
     </LinearLayout>
 
 <View

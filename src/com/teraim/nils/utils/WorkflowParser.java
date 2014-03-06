@@ -16,7 +16,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.util.Xml;
 
-import com.teraim.nils.Constants;
 import com.teraim.nils.FileLoadedCb;
 import com.teraim.nils.FileLoadedCb.ErrorCode;
 import com.teraim.nils.GlobalState;
@@ -40,6 +39,7 @@ import com.teraim.nils.dynamic.workflow_realizations.WF_Not_ClickableField_SumAn
 import com.teraim.nils.exceptions.EvalException;
 import com.teraim.nils.exceptions.SameOldException;
 import com.teraim.nils.log.LoggerI;
+import com.teraim.nils.non_generics.Constants;
 
 /**
  * 

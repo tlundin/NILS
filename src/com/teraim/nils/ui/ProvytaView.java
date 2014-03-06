@@ -13,10 +13,10 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
-import com.teraim.nils.dynamic.templates.TagTemplate.Delyta;
-import com.teraim.nils.dynamic.templates.TagTemplate.Segment;
 import com.teraim.nils.dynamic.types.Marker;
 import com.teraim.nils.dynamic.types.MovingMarker;
+import com.teraim.nils.non_generics.DelyteManager.Delyta;
+import com.teraim.nils.non_generics.DelyteManager.Segment;
 import com.teraim.nils.utils.Geomatte;
 
 /**
@@ -218,6 +218,10 @@ public class ProvytaView extends View {
 		this.invalidate();
 	}
 	
+	public void removeDelytor() {
+		showDelytor(null);
+	}
+	
 
 /*
 	public void drawTag(Canvas c,int cx,int cy) {
@@ -317,6 +321,9 @@ public class ProvytaView extends View {
 	public void showWaiting() {
 		msg = "Väntar på GPS";
 	}
+
+
+	
 
 
 

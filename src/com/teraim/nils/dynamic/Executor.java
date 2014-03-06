@@ -99,20 +99,7 @@ public abstract class Executor extends Fragment {
 
 		if (wf==null&&name!=null&&name.length()>0) {
 			o.addRow("");
-			o.addRedText("Workflow "+name+" NOT found!");
-			new AlertDialog.Builder((Context)activity).setTitle("Ups!")
-			.setMessage("Kan tyvärr inte hitta workflow med namn: '"+name+"'. Kan det vara en felstavning?")
-			.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface arg0, int arg1) {
-
-				}})
-				.show();				
-
-			String heck[] = gs.getWorkflowNames();
-			o.addRow("Following workflows found: ");
-			for (int i = 0 ; i< heck.length; i++)
-				o.addRow("Workflow "+i+": "+heck[i]);
+			o.addYellowText("Workflow "+name+" NOT found!");
 			return null;
 		} else {
 			o.addRow("*******EXECUTING: "+name);

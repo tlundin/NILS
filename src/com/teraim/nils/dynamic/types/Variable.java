@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.util.Log;
+
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 import com.teraim.nils.utils.DbHelper;
@@ -61,6 +63,7 @@ public class Variable implements Serializable {
 		myDb.insertVariable(this,value);
 	}
 	
+	/*
 	public void setValueWithoutCommit(String value) {
 		oldValue = myValue;
 		myValue = value;
@@ -75,6 +78,7 @@ public class Variable implements Serializable {
 	public void cancel() {
 		myValue = oldValue;
 	}
+	*/
 	
 	
 	public String getId() {

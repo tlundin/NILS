@@ -14,10 +14,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.teraim.nils.Constants;
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.dynamic.types.Table;
 import com.teraim.nils.dynamic.types.Variable;
+import com.teraim.nils.non_generics.Constants;
 import com.teraim.nils.utils.JSONExporter.Report;
 
 public class DbHelper extends SQLiteOpenHelper {
@@ -158,21 +158,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
 	}
 
-	public void speziale() {
-		//TODO: REMOVE
-		//Insert values for current.
-
-		Variable v;
-		v=GlobalState.getInstance(ctx).getArtLista().getVariableInstance("current_year");	
-		this.insertVariable(v, "2014");
-		v=GlobalState.getInstance(ctx).getArtLista().getVariableInstance("current_ruta");
-		this.insertVariable(v, "3");
-		v=GlobalState.getInstance(ctx).getArtLista().getVariableInstance("current_provyta");
-		this.insertVariable(v, "2");
-		v=GlobalState.getInstance(ctx).getArtLista().getVariableInstance("current_delyta");
-		this.insertVariable(v, "2");
-
-	}
+	
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
@@ -368,7 +354,7 @@ public class DbHelper extends SQLiteOpenHelper {
 		if (c != null && c.moveToFirst() ) {
 			StoredVariableData sv = new StoredVariableData(name,c.getString(0),c.getString(1),c.getString(2),c.getString(3));
 
-			Log.d("nils","Found value and ts in db for "+name+" :"+sv.value+" "+sv.timeStamp);
+			//Log.d("nils","Found value and ts in db for "+name+" :"+sv.value+" "+sv.timeStamp);
 			c.close();
 			return sv;
 		} 
@@ -394,18 +380,35 @@ public class DbHelper extends SQLiteOpenHelper {
 	}
 
 	public final static int MAX_RESULT_ROWS = 500;
-	public String[][] getValues(String[] columns,Selection s) {
-		Log.d("nils","In getvalues with columns "+columns+", selection "+s.selection+" and selectionargs "+print(s.selectionArgs));
+	public List<String[]> getValues(String[] columns,Selection s) {
+		Log.d("nils","In getvalues with columns "+columns.toString()+", selection "+s.selection+" and selectionargs "+print(s.selectionArgs));
 		//Get cached selectionArgs if exist.
 		//this.printAllVariables();
 		Cursor c = db.query(TABLE_VARIABLES,columns,
 				s.selection,s.selectionArgs,null,null,null,null);
 		if (c != null && c.moveToFirst()) {
-			String[][] ret = new String[MAX_RESULT_ROWS][c.getColumnCount()];
+			List<String[]> ret = new ArrayList<String[]>();
+			String[] row;
 			do {
+				row = new String[c.getColumnCount()];
 				Log.d("nils","Cursor count "+c.getCount()+" columns "+c.getColumnCount());
+				boolean nullRow = true;
 				for (int i=0;i<c.getColumnCount();i++) {
-					Log.d("nils","Found values in db for "+columns[i]+" :"+c.getString(i));			
+					Log.d("nils","Found values in db for "+columns[i]+" :"+c.getString(i));				
+					if (c.getString(i)==null) {
+						Log.e("nils","Null!!");
+					} else {
+						if (c.getString(i).equalsIgnoreCase("null"))
+							Log.e("nils","StringNull!!");					
+						row[i]=c.getString(i);
+						nullRow = false;
+					}
+					
+				}
+				if (!nullRow) {
+					Log.d("nils","found row not null");
+					//only add row if one of the values is not null.
+					ret.add(row);
 				}
 			} while (c.moveToNext());	
 			return ret;
@@ -423,9 +426,9 @@ public class DbHelper extends SQLiteOpenHelper {
 		Cursor c = db.query(TABLE_VARIABLES,new String[]{"value"},
 				s.selection,s.selectionArgs,null,null,null,null);
 		if (c != null && c.moveToFirst()) {
-			Log.d("nils","Cursor count "+c.getCount()+" columns "+c.getColumnCount());
+			//Log.d("nils","Cursor count "+c.getCount()+" columns "+c.getColumnCount());
 			String value = c.getString(0);
-			Log.d("nils","Found value in db for "+name+" :"+value);
+			//Log.d("nils","Found value in db for "+name+" :"+value);
 			c.close();
 			return value;
 		} 
@@ -435,7 +438,7 @@ public class DbHelper extends SQLiteOpenHelper {
 	}
 
 	public int getId(String name, Selection s) {
-		Log.d("nils","In getvalue with name "+name+" and selection "+s.selection+" and selectionargs "+print(s.selectionArgs));
+		Log.d("nils","In getId with name "+name+" and selection "+s.selection+" and selectionargs "+print(s.selectionArgs));
 		Cursor c = db.query(TABLE_VARIABLES,new String[]{"id"},
 				s.selection,s.selectionArgs,null,null,null,null);
 		if (c != null && c.moveToFirst()) {
@@ -456,7 +459,7 @@ public class DbHelper extends SQLiteOpenHelper {
 			return "NULL";
 		String ret="";
 		for(int i=0;i<selectionArgs.length;i++)
-			ret+=(i+": "+selectionArgs[i]);
+			ret+=(i+": "+selectionArgs[i]+" ");
 		return ret;
 	}
 
@@ -617,6 +620,14 @@ public class DbHelper extends SQLiteOpenHelper {
 		ret.selectionArgs=selectionArgs;		
 		
 		return ret;
+	}
+
+
+
+	public String getColumnName(String colId) {
+		if (colId==null||colId.length()==0)
+			return null;
+		return keyColM.get(colId);
 	}
 
 

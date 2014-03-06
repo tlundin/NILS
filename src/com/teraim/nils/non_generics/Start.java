@@ -1,9 +1,11 @@
-package com.teraim.nils;
+package com.teraim.nils.non_generics;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
+import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
@@ -22,9 +24,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import com.teraim.nils.FileLoadedCb;
+import com.teraim.nils.GlobalState;
+import com.teraim.nils.R;
 import com.teraim.nils.FileLoadedCb.ErrorCode;
+import com.teraim.nils.R.drawable;
+import com.teraim.nils.R.id;
+import com.teraim.nils.R.layout;
+import com.teraim.nils.R.string;
 import com.teraim.nils.dynamic.templates.TagTemplate;
+import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.types.Workflow;
 import com.teraim.nils.log.Logger;
 import com.teraim.nils.ui.DrawerMenuAdapter;
@@ -35,6 +47,7 @@ import com.teraim.nils.ui.LoginConsoleFragment;
 import com.teraim.nils.ui.MenuActivity;
 import com.teraim.nils.utils.ConfigFileParser;
 import com.teraim.nils.utils.PersistenceHelper;
+import com.teraim.nils.utils.TagFileParser;
 import com.teraim.nils.utils.WorkflowParser;
 
 public class Start extends MenuActivity {
@@ -52,7 +65,7 @@ public class Start extends MenuActivity {
 	private SparseArray<String>mapItemsToName;
 	//	private ArrayList<String> rutItems;
 	//	private ArrayList<String> wfItems;
-	private enum State {INITIAL, WF_LOADED, CONF_LOADED, VALIDATE,POST_INIT};
+	private enum State {INITIAL, TAG_LOADED,WF_LOADED, CONF_LOADED, VALIDATE,POST_INIT};
 	private LoginConsoleFragment loginFragment;
 	private Logger loginConsole;
 	private State myState=null;
@@ -67,7 +80,7 @@ public class Start extends MenuActivity {
 		//This is the frame for all pages, defining the Action bar and Navigation menu.
 		setContentView(R.layout.naviframe);
 
-		
+
 		loginConsole = new Logger(this);
 
 		//create subfolders. Copy assets..
@@ -83,10 +96,10 @@ public class Start extends MenuActivity {
 		gs.createLogger();
 		//TODO:REMOVE
 		ph = gs.getPersistence();
-		
+
 		//write down version..quickly! :)
 		ph.put(PersistenceHelper.CURRENT_VERSION_OF_PROGRAM, NILS_VERSION);
-		
+
 		//drawer items
 		items = new ArrayList<DrawerMenuItem>();
 
@@ -183,7 +196,7 @@ public class Start extends MenuActivity {
 		}
 	}
 
-	private boolean doRefresh=false;
+	private boolean doRefresh=false,tagSuccess=false;
 
 
 	private void loader(State state,ErrorCode errCode) {
@@ -202,7 +215,7 @@ public class Start extends MenuActivity {
 			}).execute(this);
 			break;
 
-
+		case TAG_LOADED:
 		case WF_LOADED:
 		case CONF_LOADED:
 			switch(errCode) {
@@ -239,6 +252,10 @@ public class Start extends MenuActivity {
 				loginConsole.addRow("");
 				loginConsole.addRedText("Please check the name of your configuration files under the Wrench menu.");
 				break;
+			case tagLoaded:
+				loginConsole.addGreenText("[OK]");
+				tagSuccess = true;
+				break;
 
 			}	
 			if (state==State.WF_LOADED) {
@@ -251,9 +268,35 @@ public class Start extends MenuActivity {
 					}
 				}
 						).execute(this);
-			} else
+			} else if(state==State.CONF_LOADED)
 				loader(State.VALIDATE,ErrorCode.whatever);
-			break;
+			else if(state==State.TAG_LOADED) {
+				String[] wfs = gs.getWorkflowNames();
+				loginConsole.addRow("Found "+wfs.length+" workflows.");
+				loginConsole.addRow("Start program in Drawer menu to the left.");
+				gs.getLogger().addRow("Initialization done");
+				gs.getLogger().addRow("************************************************");
+				new Handler().postDelayed(new Runnable() {
+
+					@Override
+					public void run() {
+						mDrawerLayout.openDrawer(Gravity.LEFT);
+					}}, 1000);
+
+
+				//We know the workflows. We can create the menu.
+				createDrawerMenu(wfs);
+				adapter.notifyDataSetChanged();
+				myState = State.POST_INIT;
+				loginConsole.draw();
+				//init current year.
+				Variable v = gs.getArtLista().getVariableInstance("Current_Year");
+				if (v!=null)
+					v.setValue(Calendar.getInstance().get(Calendar.YEAR)+"");
+				
+			}
+				
+		break;
 
 		case VALIDATE:
 			//If a new version has been loaded and frozen, refresh global state.
@@ -275,44 +318,58 @@ public class Start extends MenuActivity {
 				loginConsole.addRedText("[A required column is missing from "+ph.get(PersistenceHelper.CONFIG_LOCATION)+"]");
 				break;
 			case ok:
-				loginConsole.addGreenText("[OK]");					
+				loginConsole.addGreenText("[OK]");	
+				loginConsole.addRow("TÅG loaded: ");
+				if (!ph.getB(PersistenceHelper.TAG_DATA_HAS_BEEN_READ)) {	
+					loginConsole.draw();
+					final Dialog dialog = new Dialog(this);
+	                dialog.setContentView(R.layout.tag_load);
+	                dialog.setTitle("Loading Tåg..please standby");
+	                dialog.setCanceledOnTouchOutside(false);
+	                dialog.show();
+	                ProgressBar pb = (ProgressBar)dialog.findViewById(R.id.tag_progress_bar);
+	                TextView tv = (TextView)dialog.findViewById(R.id.tag_progress_text);       	                
+	                  (new TagFileParser(pb,tv,new FileLoadedCb() {
+	    				@Override
+	    				public void onFileLoaded(ErrorCode errCode) {
+	    					dialog.dismiss();
+	    					if (errCode == ErrorCode.tagLoaded)
+	    						ph.put(PersistenceHelper.TAG_DATA_HAS_BEEN_READ,true);
+	    					loader(State.TAG_LOADED,errCode);
+	    				            
+	    				}
+	    				})).execute(gs);
+	                 
+				} else {
+					loader(State.TAG_LOADED,ErrorCode.tagLoaded);
+				}
+				/*
+				if (!success) {
+					Log.e("nils","scandelningsdata failed");
+					ec = GlobalState.ErrorCode.tagdata_not_found;
+					loginConsole.addRedText("[Tågdata corrupt or not found]");
+				} else 
+					loginConsole.addGreenText("[OK]");
+*/
 				break;
-
 			}
 			//Get workflows
-			if (ec == GlobalState.ErrorCode.ok) {
-
-				String[] wfs = gs.getWorkflowNames();
-				loginConsole.addRow("Found "+wfs.length+" workflows.");
-				loginConsole.addRow("Start program in Drawer menu to the left.");
-				gs.getLogger().addRow("Initialization done");
-				gs.getLogger().addRow("************************************************");
-				new Handler().postDelayed(new Runnable() {
-
-					@Override
-					public void run() {
-						mDrawerLayout.openDrawer(Gravity.LEFT);
-					}}, 1000);
-
-
-				//We know the workflows. We can create the menu.
-				createDrawerMenu(wfs);
-				adapter.notifyDataSetChanged();
-				myState = State.POST_INIT;
-			} else {
+			if (ec != GlobalState.ErrorCode.ok) {
 				loginConsole.addRow("");
 				loginConsole.addRedText("Program cannot start because of previous errors. Please correct your configuration");					
+				loginConsole.draw();
 			}
+			break;	
+			} 
 
-			loginConsole.draw();
-			//TODO:REMOVE
-			gs.getDb().speziale();
-			break;
+			
+			
+	
 
 
 		}
-		//TODO: Potentially add logtext to global logtext...
-	}
+	
+	
 
 
 
@@ -388,7 +445,7 @@ public class Start extends MenuActivity {
 
 		Workflow wf = gs.getWorkflow(wfId);
 
-	
+
 		// Create a new fragment and specify the  to show based on position
 		Fragment fragment=null;
 		if (wf!=null) 
@@ -399,7 +456,7 @@ public class Start extends MenuActivity {
 				fragment = new TagTemplate();
 			}
 			else
-			fragment = new Fragment();
+				fragment = new Fragment();
 		}
 		Bundle args = new Bundle();
 		args.putString("workflow_name", wfId);
@@ -441,7 +498,7 @@ public class Start extends MenuActivity {
 		Log.d("Strand","Checking if this is first time use...");
 		boolean first = (ph.get(PersistenceHelper.FIRST_TIME_KEY).equals(PersistenceHelper.UNDEFINED));
 
-
+		
 		if (first) {
 			ph.put(PersistenceHelper.FIRST_TIME_KEY,"NotEmpty");
 			Log.d("Strand","Yes..executing  first time init");
@@ -466,13 +523,13 @@ public class Start extends MenuActivity {
 		if (ph.get(PersistenceHelper.SERVER_URL).equals(PersistenceHelper.UNDEFINED))
 			ph.put(PersistenceHelper.SERVER_URL, "www.teraim.com");
 		if (ph.get(PersistenceHelper.BUNDLE_LOCATION).equals(PersistenceHelper.UNDEFINED))
-			ph.put(PersistenceHelper.BUNDLE_LOCATION, "nb_terje.xml");
+			ph.put(PersistenceHelper.BUNDLE_LOCATION, "nilsbundle3.xml");
 		if (ph.get(PersistenceHelper.CONFIG_LOCATION).equals(PersistenceHelper.UNDEFINED))
 			ph.put(PersistenceHelper.CONFIG_LOCATION, "configv2.csv");
 		ph.put(PersistenceHelper.DEVELOPER_SWITCH,true);
 		ph.put(PersistenceHelper.VERSION_CONTROL_SWITCH_OFF, true);
 
-		
+
 
 		//copy the configuration files into the root dir.
 		//copyAssets();

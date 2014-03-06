@@ -12,6 +12,7 @@ import com.teraim.nils.GlobalState.ErrorCode;
 import com.teraim.nils.dynamic.types.Table;
 import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
+import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
 import com.teraim.nils.utils.Tools;
 
 
@@ -138,10 +139,11 @@ public class VariableConfiguration {
 
 	Map<String,Variable>varCache = new HashMap<String,Variable>();
 	
-	public String getVariableValue(String keyChain, String varId) {
-		return new Variable(varId,null,null,null,gs).getValue();
+	public String getVariableValue(Map<String, String> keyChain, String varId) {
+		return new Variable(varId,null,null,keyChain,gs).getValue();
 
 	}
+	
 	
 	//Create a variable with the current context and the variable's keychain.
 	public Variable getVariableInstance(String varId) {	
@@ -161,7 +163,7 @@ public class VariableConfiguration {
 		String[] keys = keyChain.split("\\|");
 		//find my keys in the current context.
 		vMap = new HashMap<String,String>();
-		Map<String, String> cMap = gs.getKeyHash();
+		Map<String, String> cMap = gs.getCurrentKeyHash();
 		for (String key:keys) {
 			String value = cMap.get(key);
 			if (value!=null) {
@@ -182,6 +184,16 @@ public class VariableConfiguration {
 		} 
 		Log.e("nils","Couldn't find variable "+varId+" in getVariableInstance");
 		return null;
+	}
+
+	public Map<String,String> createStandardKeyMap() {
+		String currentYear = getVariableValue(null,"Current_Year");
+		String currentRuta = getVariableValue(null,"Current_Ruta");
+		String currentProvyta = getVariableValue(null,"Current_Provyta");		
+		String currentDelyta = getVariableValue(null,"Current_Delyta");		
+		if (currentRuta == null||currentProvyta==null||currentDelyta==null)
+			return null;
+		return Tools.createKeyMap("year",currentYear,"ruta",currentRuta,"provyta",currentProvyta,"delyta",currentDelyta);
 	}
 
 

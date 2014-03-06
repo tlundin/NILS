@@ -1,6 +1,7 @@
 package com.teraim.nils;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import com.teraim.nils.expr.Parser;
 import com.teraim.nils.log.DummyLogger;
 import com.teraim.nils.log.Logger;
 import com.teraim.nils.log.LoggerI;
+import com.teraim.nils.non_generics.Constants;
 import com.teraim.nils.utils.DbHelper;
 import com.teraim.nils.utils.PersistenceHelper;
 import com.teraim.nils.utils.Tools;
@@ -60,7 +62,8 @@ public class GlobalState  {
 	public enum ErrorCode {
 		ok,
 		missing_required_column,
-		file_not_found, workflows_not_found
+		file_not_found, workflows_not_found,
+		tagdata_not_found,parse_error
 	}
 
 	public String TEXT_LARGE;
@@ -100,7 +103,6 @@ public class GlobalState  {
 		myWfs = thawWorkflows();		
 		db.printAllVariables();
 		Tools.scanRutData(ctx.getResources().openRawResource(R.raw.rutdata_v3),this);
-		Tools.scanDelningsData(ctx.getResources().openRawResource(R.raw.delningsdata),this);	
 
 	}
 
@@ -405,13 +407,20 @@ public class GlobalState  {
 	}
 
 	Map<String,String> myKeyHash;
-	public Map<String,String> getKeyHash() {
+	public Map<String,String> getCurrentKeyHash() {
 		return myKeyHash;
 	}
+	
 	
 	public void  setKeyHash(Map<String,String> h) { 
 		myKeyHash=h;
 	}
+
+	public String getYear() {
+		return Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+	}
+	
+	
 
 
 

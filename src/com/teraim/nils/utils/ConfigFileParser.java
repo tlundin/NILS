@@ -20,7 +20,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.teraim.nils.Constants;
 import com.teraim.nils.FileLoadedCb;
 import com.teraim.nils.FileLoadedCb.ErrorCode;
 import com.teraim.nils.GlobalState;
@@ -28,6 +27,7 @@ import com.teraim.nils.dynamic.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Table;
 import com.teraim.nils.dynamic.types.Table.ErrCode;
 import com.teraim.nils.log.LoggerI;
+import com.teraim.nils.non_generics.Constants;
 
 /**
  * 

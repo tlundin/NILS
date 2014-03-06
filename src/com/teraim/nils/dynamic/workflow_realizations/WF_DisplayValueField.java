@@ -192,7 +192,9 @@ public class WF_DisplayValueField extends WF_Widget implements EventListener {
 			o.addYellowText("Formula "+formula+" is not being calculated because of parse errors");
 			return;
 		}
-		((TextView)this.getWidget().findViewById(R.id.text)).setText(strRes+Tools.getPrintedUnit(unit));
+		((TextView)this.getWidget().findViewById(R.id.outputValueField)).setText(strRes);
+		((TextView)this.getWidget().findViewById(R.id.outputUnitField)).setText(Tools.getPrintedUnit(unit));
+		
 	
 	}
 

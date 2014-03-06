@@ -1,7 +1,5 @@
 package com.teraim.nils.ui;
 
-import java.util.ArrayList;
-
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -9,10 +7,8 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
-import com.teraim.nils.dynamic.templates.TagTemplate.Delyta;
 import com.teraim.nils.dynamic.types.Marker;
 import com.teraim.nils.dynamic.types.MovingMarker;
 import com.teraim.nils.utils.Geomatte;
