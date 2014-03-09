@@ -9,6 +9,7 @@ import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -28,13 +29,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.teraim.nils.FileLoadedCb;
+import com.teraim.nils.FileLoadedCb.ErrorCode;
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
-import com.teraim.nils.FileLoadedCb.ErrorCode;
-import com.teraim.nils.R.drawable;
-import com.teraim.nils.R.id;
-import com.teraim.nils.R.layout;
-import com.teraim.nils.R.string;
+import com.teraim.nils.dynamic.templates.FotoTemplate;
 import com.teraim.nils.dynamic.templates.TagTemplate;
 import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.types.Workflow;
@@ -52,7 +50,7 @@ import com.teraim.nils.utils.WorkflowParser;
 
 public class Start extends MenuActivity {
 
-	private final String NILS_VERSION = "0.16";
+	private final String NILS_VERSION = "0.18";
 
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
@@ -293,10 +291,10 @@ public class Start extends MenuActivity {
 				Variable v = gs.getArtLista().getVariableInstance("Current_Year");
 				if (v!=null)
 					v.setValue(Calendar.getInstance().get(Calendar.YEAR)+"");
-				
+
 			}
-				
-		break;
+
+			break;
 
 		case VALIDATE:
 			//If a new version has been loaded and frozen, refresh global state.
@@ -323,23 +321,23 @@ public class Start extends MenuActivity {
 				if (!ph.getB(PersistenceHelper.TAG_DATA_HAS_BEEN_READ)) {	
 					loginConsole.draw();
 					final Dialog dialog = new Dialog(this);
-	                dialog.setContentView(R.layout.tag_load);
-	                dialog.setTitle("Loading Tåg..please standby");
-	                dialog.setCanceledOnTouchOutside(false);
-	                dialog.show();
-	                ProgressBar pb = (ProgressBar)dialog.findViewById(R.id.tag_progress_bar);
-	                TextView tv = (TextView)dialog.findViewById(R.id.tag_progress_text);       	                
-	                  (new TagFileParser(pb,tv,new FileLoadedCb() {
-	    				@Override
-	    				public void onFileLoaded(ErrorCode errCode) {
-	    					dialog.dismiss();
-	    					if (errCode == ErrorCode.tagLoaded)
-	    						ph.put(PersistenceHelper.TAG_DATA_HAS_BEEN_READ,true);
-	    					loader(State.TAG_LOADED,errCode);
-	    				            
-	    				}
-	    				})).execute(gs);
-	                 
+					dialog.setContentView(R.layout.tag_load);
+					dialog.setTitle("Loading Tåg..please standby");
+					dialog.setCanceledOnTouchOutside(false);
+					dialog.show();
+					ProgressBar pb = (ProgressBar)dialog.findViewById(R.id.tag_progress_bar);
+					TextView tv = (TextView)dialog.findViewById(R.id.tag_progress_text);       	                
+					(new TagFileParser(pb,tv,new FileLoadedCb() {
+						@Override
+						public void onFileLoaded(ErrorCode errCode) {
+							dialog.dismiss();
+							if (errCode == ErrorCode.tagLoaded)
+								ph.put(PersistenceHelper.TAG_DATA_HAS_BEEN_READ,true);
+							loader(State.TAG_LOADED,errCode);
+
+						}
+					})).execute(gs);
+
 				} else {
 					loader(State.TAG_LOADED,ErrorCode.tagLoaded);
 				}
@@ -350,7 +348,7 @@ public class Start extends MenuActivity {
 					loginConsole.addRedText("[Tågdata corrupt or not found]");
 				} else 
 					loginConsole.addGreenText("[OK]");
-*/
+				 */
 				break;
 			}
 			//Get workflows
@@ -360,16 +358,16 @@ public class Start extends MenuActivity {
 				loginConsole.draw();
 			}
 			break;	
-			} 
-
-			
-			
-	
+		} 
 
 
-		}
-	
-	
+
+
+
+
+	}
+
+
 
 
 
@@ -454,9 +452,12 @@ public class Start extends MenuActivity {
 			//HACK TODO: REMOVE
 			if (position == 2) {
 				fragment = new TagTemplate();
-			}
-			else
-				fragment = new Fragment();
+			} else
+				if (position == 3) {
+					fragment = new FotoTemplate();
+				}
+				else
+					fragment = new Fragment();
 		}
 		Bundle args = new Bundle();
 		args.putString("workflow_name", wfId);
@@ -498,7 +499,7 @@ public class Start extends MenuActivity {
 		Log.d("Strand","Checking if this is first time use...");
 		boolean first = (ph.get(PersistenceHelper.FIRST_TIME_KEY).equals(PersistenceHelper.UNDEFINED));
 
-		
+
 		if (first) {
 			ph.put(PersistenceHelper.FIRST_TIME_KEY,"NotEmpty");
 			Log.d("Strand","Yes..executing  first time init");
@@ -517,6 +518,11 @@ public class Start extends MenuActivity {
 		File folder = new File(Constants.CONFIG_FILES_DIR);
 		if(!folder.mkdirs())
 			Log.e("NILS","Failed to create config root folder");
+		folder = new File(Constants.PIC_ROOT_DIR);
+		if(!folder.mkdirs())
+			Log.e("NILS","Failed to create pic root folder");
+		
+		
 		ph.put(PersistenceHelper.CURRENT_VERSION_OF_CONFIG_FILE, PersistenceHelper.UNDEFINED);
 		ph.put(PersistenceHelper.CURRENT_VERSION_OF_WF_BUNDLE, PersistenceHelper.UNDEFINED);
 		//Set defaults if none.
@@ -533,6 +539,19 @@ public class Start extends MenuActivity {
 
 		//copy the configuration files into the root dir.
 		//copyAssets();
+	}
+
+
+
+
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onActivityResult(int, int, android.content.Intent)
+	 */
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		Log.d("nils","GETZZZZ");
+		// TODO Auto-generated method stub
+		super.onActivityResult(requestCode, resultCode, data);
 	}
 
 

@@ -107,7 +107,7 @@ public abstract class WF_Not_ClickableField extends WF_ListEntry {
 			String value = varId.getValue();
 			if (value!=null&&!value.isEmpty()) {
 				o.setText(getFormattedText(varId,value,pairs.getValue().format));	
-				u.setText(Tools.getPrintedUnit(varId.getUnit()));
+				u.setText(varId.getPrintedUnit());
 			}
 			else {
 				o.setText("");

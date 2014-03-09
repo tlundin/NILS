@@ -105,8 +105,8 @@ public class VariableConfiguration {
 	}
 
 
-	public Unit getUnit(List<String> row) {
-		return Tools.convertToUnit(row.get(fromNameToColumn.get(requiredColumns.get(UNIT))));
+	public String getUnit(List<String> row) {
+		return row.get(fromNameToColumn.get(requiredColumns.get(UNIT)));
 	}
 
 	public List<String> getCompleteVariableDefinition(String varName) {
@@ -194,6 +194,14 @@ public class VariableConfiguration {
 		if (currentRuta == null||currentProvyta==null||currentDelyta==null)
 			return null;
 		return Tools.createKeyMap("year",currentYear,"ruta",currentRuta,"provyta",currentProvyta,"delyta",currentDelyta);
+	}
+
+	public String getCurrentRuta() {
+		return getVariableValue(null,"Current_Ruta");
+	}
+	
+	public String getCurrentProvyta() {
+		return getVariableValue(null,"Current_Provyta");
 	}
 
 

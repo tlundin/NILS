@@ -12,6 +12,7 @@ import com.teraim.nils.dynamic.types.Workflow.Unit;
 import com.teraim.nils.utils.DbHelper;
 import com.teraim.nils.utils.DbHelper.Selection;
 import com.teraim.nils.utils.DbHelper.StoredVariableData;
+import com.teraim.nils.utils.Tools;
 
 public class Variable implements Serializable {
 
@@ -40,7 +41,7 @@ public class Variable implements Serializable {
 
 	private List<String> myRow;
 
-	private Unit myUnit;
+	private String myStringUnit;
 	
 	public enum DataType {
 		numeric,bool,list,text
@@ -92,8 +93,14 @@ public class Variable implements Serializable {
 		return keyChain;
 	}
 	
+	
 	public Unit getUnit() {
-		return myUnit;
+		return Tools.convertToUnit(myStringUnit);
+	}
+	
+	
+	public String getPrintedUnit() {
+		return myStringUnit;
 	}
 	
 	public DataType getType() {
@@ -114,7 +121,7 @@ public class Variable implements Serializable {
 		if (row!=null) {
 			myRow = row;
 			myType = gs.getArtLista().getnumType(row);		
-			myUnit = gs.getArtLista().getUnit(row);
+			myStringUnit = gs.getArtLista().getUnit(row);
 		}		
 		this.keyChain=keyChain;		
 		myDb = gs.getDb();

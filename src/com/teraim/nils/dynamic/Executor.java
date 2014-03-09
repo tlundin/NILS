@@ -7,10 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -41,6 +39,7 @@ import com.teraim.nils.dynamic.workflow_realizations.WF_List;
 import com.teraim.nils.exceptions.RuleException;
 import com.teraim.nils.expr.SyntaxException;
 import com.teraim.nils.log.LoggerI;
+import com.teraim.nils.utils.AddVariableToEntryFieldBlock;
 
 /*
  * Executes workflow blocks. Child classes define layouts and other specialized behavior
@@ -268,6 +267,13 @@ public abstract class Executor extends Fragment {
 				o.addYellowText("BlockCreateListEntriesFromFieldList found");
 				BlockCreateListEntriesFromFieldList bl = (BlockCreateListEntriesFromFieldList)b;
 				bl.create(myContext);
+			}
+			else if (b instanceof AddVariableToEntryFieldBlock) {
+				o.addRow("");
+				o.addYellowText("AddVariableToEntryFieldBlock found");
+				AddVariableToEntryFieldBlock bl = (AddVariableToEntryFieldBlock)b;
+				bl.create(myContext);
+				
 			}
 
 		}

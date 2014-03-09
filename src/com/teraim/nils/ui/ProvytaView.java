@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
+import android.graphics.Point;
 import android.graphics.Typeface;
 import android.location.Location;
 import android.util.AttributeSet;
@@ -15,8 +16,8 @@ import android.view.View;
 
 import com.teraim.nils.dynamic.types.Marker;
 import com.teraim.nils.dynamic.types.MovingMarker;
-import com.teraim.nils.non_generics.DelyteManager.Delyta;
-import com.teraim.nils.non_generics.DelyteManager.Segment;
+import com.teraim.nils.dynamic.types.Segment;
+import com.teraim.nils.non_generics.Delyta;
 import com.teraim.nils.utils.Geomatte;
 
 /**
@@ -196,18 +197,23 @@ public class ProvytaView extends View {
 	private void drawDelytor(Canvas c, float cx, float cy, float oScaleF) {
 		float startX,startY,endX,endY;
 		for (Delyta d:delytor) {
-			
 			for (Segment s:d.getSegments()) {	
 				if (s.isArc)
 					continue;
-				Log.d("nils","New delyta with "+d.getSegments().size()+" segments");
 				//float mirror = margY+r*2;							
 					startX = cx+(s.start.x*oScaleF);
 					startY = cy+(s.start.y*oScaleF);
 					endX = cx+(s.end.x*oScaleF);
 					endY = cy+(s.end.y*oScaleF);				
 					Log.d("nils","Drawing Start: "+startX+","+startY+" End: "+endX+","+endY);					
-					c.drawLine(startX,startY,endX,endY, p);			
+					c.drawLine(startX,startY,endX,endY, p);		
+					Point numPos = d.getNumberPos();
+					if (numPos!=null) {
+						float nx = cx+(numPos.x*oScaleF);
+						float ny = cy+(numPos.y*oScaleF);
+						Log.d("nils","Drawing number at: "+nx+","+ny);
+						c.drawText(d.getId()+"", nx, ny, px);
+					}
 				}
 			
 		}

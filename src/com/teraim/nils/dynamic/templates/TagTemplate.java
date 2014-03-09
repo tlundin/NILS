@@ -25,11 +25,11 @@ import com.teraim.nils.R;
 import com.teraim.nils.dynamic.Executor;
 import com.teraim.nils.dynamic.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Marker;
+import com.teraim.nils.dynamic.types.Segment;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Container;
+import com.teraim.nils.non_generics.Delyta;
 import com.teraim.nils.non_generics.DelyteManager;
 import com.teraim.nils.non_generics.DelyteManager.Coord;
-import com.teraim.nils.non_generics.DelyteManager.Delyta;
-import com.teraim.nils.non_generics.DelyteManager.Segment;
 import com.teraim.nils.ui.ProvytaView;
 import com.teraim.nils.utils.Tools;
 
@@ -92,6 +92,7 @@ public class TagTemplate extends Executor {
 		gs.setKeyHash(al.createStandardKeyMap());
 
 		dym.generateFromCurrentContext();
+		dym.analyze();
 
 		drawEmptyTable();
 
@@ -195,7 +196,7 @@ public class TagTemplate extends Executor {
 	}
 
 
-	
+
 	/*
 	private final OnTouchListener hav = new OnTouchListener() {
 	    @Override
@@ -206,18 +207,18 @@ public class TagTemplate extends Executor {
 	        return false;
 	    }
 	};
-	*/
-	
+	 */
+
 	private final OnFocusChangeListener hav = new OnFocusChangeListener() {
-	    @Override
-	    public void onFocusChange(View v, boolean hasFocus) {
-	        if(hasFocus)
-	        	if (!Tools.isNumeric(((EditText)v).getText().toString()))
+		@Override
+		public void onFocusChange(View v, boolean hasFocus) {
+			if(hasFocus)
+				if (!Tools.isNumeric(((EditText)v).getText().toString()))
 					((EditText)v).setText("");
-	    }
+		}
 	};
-	
-	
+
+
 
 	private void drawEmptyTable() {
 		Log.d("nils","In drawEmptyTable");
@@ -281,7 +282,7 @@ public class TagTemplate extends Executor {
 							return false;
 						}
 					});
-					*/
+					 */
 
 
 				}					
@@ -297,22 +298,24 @@ public class TagTemplate extends Executor {
 		Log.d("nils","In fillTable");
 		List<Segment> tag;
 		int row =1; int col=1;
-		for (Delyta dy:dym.getDelytor()) {		
-			tag = dy.getSegments();
-			for (Segment s:tag) {
-				setElement((LinearLayout)(gl.getChildAt(col+row*COLS)),s.start);
-				row++;
-				if (row>=ROWS) {
-					Log.e("nils","Overflow in table. Too many rows");
+		for (Delyta dy:dym.getDelytor()) {	
+			if (!dy.isBackground()) {
+				tag = dy.getSegments();
+				for (Segment s:tag) {
+					setElement((LinearLayout)(gl.getChildAt(col+row*COLS)),s.start);
+					row++;
+					if (row>=ROWS) {
+						Log.e("nils","Overflow in table. Too many rows");
+						break;
+					}
+				}
+				row=1;
+				if (col<COLS) 
+					col++;
+				else {
+					Log.e("nils","Overflow in table. Too many delytor!");
 					break;
 				}
-			}
-			row=1;
-			if (col<COLS) 
-				col++;
-			else {
-				Log.e("nils","Overflow in table. Too many delytor!");
-				break;
 			}
 		}
 	}
@@ -336,7 +339,7 @@ public class TagTemplate extends Executor {
 			return null;
 		int avstI = Integer.parseInt(avstS);
 		int riktI = Integer.parseInt(riktS);
-		return dym.new Coord(avstI,riktI);
+		return new Coord(avstI,riktI);
 	}
 
 
@@ -354,10 +357,14 @@ public class TagTemplate extends Executor {
 				else
 					tagCoordinateList.add(c);
 			}
-			DelyteManager.ErrCode ec = dym.addUnknownTag(tagCoordinateList);
-			if (ec == null||ec!=DelyteManager.ErrCode.ok)
-				Log.e("nils","Tåg in column "+col+" is broken");
+			if (tagCoordinateList.size()>1) {
+				DelyteManager.ErrCode ec = dym.addUnknownTag(tagCoordinateList);
+				if (ec == null||ec!=DelyteManager.ErrCode.ok)
+					Log.e("nils","Tåg in column "+col+" is broken");
+			} 
+			tagCoordinateList.clear();
 		}
+		dym.analyze();
 	}
 
 	/*

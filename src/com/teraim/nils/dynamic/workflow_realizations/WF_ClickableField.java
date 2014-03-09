@@ -233,7 +233,6 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 
 
 		String varLabel = var.getLabel();
-		String postLabel = "";
 		String varId = var.getId();
 
 		// Set an EditText view to get user input 
@@ -243,13 +242,14 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 			super.setKeyRow(varId);
 		}
 
-		Unit unit = var.getUnit();
+		Log.d("nils","Adding variable "+varLabel);
+		String unit = var.getPrintedUnit();
 		switch (var.getType()) {
 		case bool:
 			//o.addRow("Adding boolean dy-variable with label "+label+", name "+varId+", type "+var.getType().name()+" and unit "+unit.name());
 			View view = LayoutInflater.from(myContext.getContext()).inflate(R.layout.ja_nej_radiogroup,null);
 			TextView header = (TextView)view.findViewById(R.id.header);
-			header.setText(varLabel+" "+postLabel);
+			header.setText(varLabel);
 			RadioGroup rbg = (RadioGroup)view.findViewById(R.id.radioG);
 			inputContainer.addView(view);
 			myVars.put(var,rbg);
@@ -283,7 +283,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 			//o.addRow("Adding text field for dy-variable with label "+label+", name "+varId+", type "+var.getType().name()+" and unit "+unit.name());
 			View l = LayoutInflater.from(myContext.getContext()).inflate(R.layout.edit_field_text,null);
 			header = (TextView)l.findViewById(R.id.header);
-			header.setText(varLabel+" "+postLabel);
+			header.setText(varLabel+" "+unit);
 			EditText etview = (EditText)l.findViewById(R.id.edit);
 			inputContainer.addView(l);
 			myVars.put(var,etview);			
@@ -293,7 +293,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 			l = LayoutInflater.from(myContext.getContext()).inflate(R.layout.edit_field_numeric,null);
 			header = (TextView)l.findViewById(R.id.header);
 			etview = (EditText)l.findViewById(R.id.edit);
-			header.setText(varLabel+" ("+unit.name()+")"+" "+" "+postLabel);
+			header.setText(varLabel+" ("+unit+")");
 			//etview.setText(Tools.getPrintedUnit(unit));
 			inputContainer.addView(l);
 			myVars.put(var,etview);

@@ -1,14 +1,18 @@
 package com.teraim.nils.non_generics;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import android.util.Log;
 
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.dynamic.VariableConfiguration;
+import com.teraim.nils.dynamic.types.Segment;
 import com.teraim.nils.utils.Tools;
 
 
@@ -20,12 +24,12 @@ public class DelyteManager {
 	GlobalState gs;
 	VariableConfiguration al;
 	private List<Delyta> myDelytor = new ArrayList<Delyta>();
-	private static final int Rad = 100;
 	private static final int MAX_DELYTEID = 5;
 
 
+
 	//helper classes
-	public class Coord {
+	public static class Coord {
 		public float x;
 		public float y;	
 		public final int avst,rikt;
@@ -42,18 +46,7 @@ public class DelyteManager {
 		}
 	}
 
-	public class Segment {
-		public Coord start,end;
-		public boolean isArc;
-		public Segment(Coord start, Coord end, boolean isArc) {
-			super();
-			this.start = start;
-			this.end = end;
-			this.isArc = isArc;
-		}
-
-	}
-
+	
 
 	public enum ErrCode {
 		TooShort,
@@ -61,114 +54,208 @@ public class DelyteManager {
 		ok
 	}
 
-	public class Delyta {
-		List<Segment> tag;
-		int delNr = -1;
-		float area = -1;
-		Coord mittpunkt;
 
-		public ErrCode create(List<Coord> raw) {	
-			Log.d("nils","Got coordinates: ");
-			String sue = "";
-			if (raw == null||raw.size()==0)
-				return null;
-			for (Coord c:raw) {
-				sue += "r: "+c.rikt+" a:"+c.avst+",";
-			}
-			Log.d("nils",sue);
+	public void analyze() {
+		//Find the background
+		calcRemainingYta();
+		//Sort south - west and give each a delyteID
+		assignDelyteId();
+		//Find coordinates where to put the numbers.
+		findNumberCoord();
+	}
 
-			if (raw.get(0).avst!=Rad||raw.get(raw.size()-1).avst!=Rad) {
-				Log.d("nils","Start eller slutpunkt ligger inte på radien");
-				return ErrCode.EndOrStartNotOnRadius;
-			}
-			if (raw.size()<2) {
-				Log.d("nils","För kort tåg! Tåg måste ha fler än två punkter.");
-				return ErrCode.TooShort;
-			}
-			tag = new ArrayList<Segment>();
-			//First is never an arc.
-			Coord start,end;
-			boolean isArc=false,previousWasArc = true;
-			for (int i =0 ; i<raw.size()-1;i++) {	
-				Log.d("nils","start: ("+raw.get(i).avst+","+raw.get(i).rikt+")");
-				Log.d("nils","end: ("+raw.get(i+1).avst+","+raw.get(i+1).rikt+")");
-				start = raw.get(i);
-				end = raw.get(i+1);	
-				isArc = (start.avst==Rad && end.avst==Rad && !previousWasArc);
-				previousWasArc = isArc;					
-				tag.add(new Segment(start,end,isArc));
-			}
-			//close the loop End -> Start. IsArc is always true.
-			tag.add(new Segment(raw.get(raw.size()-1),raw.get(0),true));
-			//Calc area.
-			area = calcArea();
-
-			mittpunkt = calcMittPunkt();
-
-			return ErrCode.ok;
-		}
-
-		private Coord calcMittPunkt() {
-			//take midpoint of all segments. 
-			/*
-			for (Segment s:tag) {
-				float mid = s.end.rikt - s.start.rikt / 2;
-				Coord start = new Coord(100,mid);
-				Coord end = new Coord(100,mid+180);
-				end = mid + 180
-			}
-			 */
-			return null;
-		}
-
-		public List<Segment> getSegments() {
-			return tag;
-		}
-
-		public float calcArea() {
-			List<Coord> areaC=new ArrayList<Coord>();
-			//Area is calculated using Euler. 
-			for (Segment s:tag) {
-				//If not arc, add.
-				if (!s.isArc) {
-					areaC.add(s.start);
-					areaC.add(s.end);
+	private void findNumberCoord() {
+		//Find where to put the number.
+		
+		List<Segment> cTag;
+		for (Delyta d:myDelytor) {
+			
+			
+			cTag = d.getSegments();
+			//Just a simple arc?
+			if (cTag.size()==2) {
+				//Put in middle of pyramid.
+				Segment arc,line;
+				if (cTag.get(0).isArc) {
+					arc = cTag.get(0);
+					line = cTag.get(1);
+				} else {
+					arc = cTag.get(1);
+					line = cTag.get(0);
 				}
+				float midPx = midP(line.start.x,line.end.x);
+				float midPy = midP(line.start.y,line.end.y);
+				
+				Coord midB = new Coord((arc.start.rikt-arc.end.rikt) / 2,Delyta.Rad);
+				//Use midpoint.
+				float mX = midP(midPx,midB.x);
+			    float mY = midP(midPy,midB.y);
+			    Log.d("nils","MX MY: "+mX+" "+mY);
+			    
+			    d.setNumberPos(mX,mY);
+			}
+			
+			
+		}
+		
+		
+		//If its a normal arc, put it in the center of the Pyramid.
+		
+	}
+	private float midP(float s,float e) {
+		return (s+e)/2;
+	}
+
+	private void assignDelyteId() {
+		int delyteIdC = 1;
+		int backId = -1;
+		SortedSet<Delyta> s = new TreeSet<Delyta>(new Comparator<Delyta>() {
+
+			@Override
+			public int compare(Delyta lhs, Delyta rhs) {
+				return (int)(lhs.mySouth==rhs.mySouth?lhs.myWest-rhs.myWest:lhs.mySouth-rhs.mySouth);
+			}});
+		
+		Log.d("nils","IN SORTOS");
+		printDelytor();
+		s.addAll(myDelytor);
+		
+		
+		Log.d("nils","Mydelyor has "+myDelytor.size()+" delytor");
+		Log.d("nils","Sorted ytor according to south/west has "+s.size()+" delytor");
+		for (Delyta d:s) {
+			d.setId(delyteIdC);
+			if (d.isBackground()) {
+				Log.d("nils","found background piece...");
+				if (backId!=-1)
+					d.setId(backId);
 				else
-					addArcCoords(areaC,s.start,s.end);					
+					backId = delyteIdC;
 			}
-			//Now use euler to calc area.
-			float T=0; 
-			int p,n;
-			for (int i=0;i<areaC.size();i++) {
-				p = i==0?areaC.size()-1:i-1;
-				n = i==(areaC.size()-1)?0:i+1;
-				T+= areaC.get(i).x*(areaC.get(n).y-areaC.get(p).y);
+			Log.d("nils",
+					"Assigned ID "+d.getId()+" to delyta with first segment S:"+d.getSegments().get(0).start.rikt+" E:"+d.getSegments().get(0).end.rikt+" isArc: "+d.getSegments().get(0).isArc);
+
+			delyteIdC++;
+		}
+	}
+
+	private final List<Segment> freeArcs = new ArrayList<Segment>();
+
+	private void calcRemainingYta() {
+		freeArcs.clear();
+		SortedSet<Segment> sortedArcs = new TreeSet<Segment>(new Comparator<Segment>(){
+			@Override
+			public int compare(Segment lhs, Segment rhs) {
+				return lhs.start.rikt-rhs.start.rikt;
+			}});
+		//Sort arcs. Save in set.
+		for(Delyta d:myDelytor)
+			for (Segment s:d.tag) {
+				if (!s.isArc)
+					continue;
+				else {
+					Log.d("nils","In free arc, adding arc piece S:"+s.start.rikt+" E:"+s.end.rikt);
+					sortedArcs.add(s);
+				}
 			}
-			Log.d("nils","Area calculate to be "+T/2);
-			return T/2;
+		if (sortedArcs.isEmpty()) {
+			Log.d("nils","NO FREE ARC!");
+		} else {
+			//A free arc is an arc that stretches between the end of an existing arc, and the beginning of the next.
+			Segment x = sortedArcs.last();
+			Log.d("nils","number of arcs: "+sortedArcs.size());
+			for (Segment s:sortedArcs) {
+				freeArcs.add(new Segment(x.end,s.start,true));
+				x=s;
+			}
+		}
+		List<List<Segment>>missingPieces = new ArrayList<List<Segment>>();
+		List<Segment>bgPoly;
+		Set<Segment>noArcs = new HashSet<Segment>();
+		//Extract all segments that are not arcs.
+		for(Delyta d:myDelytor) {
+			for (Segment s:d.tag) {
+				if (s.isArc)
+					continue;
+				else
+					noArcs.add(s);
+			}
 		}
 
-		//should be coordinates on the radius. with grad running 0..359. 
-		private void addArcCoords(List<Coord> areaC, Coord start, Coord end) {
-			int rikt;
-			int i = start.rikt;
-			Log.d("nils","Stratos: "+start.rikt+" endos: "+end.rikt);
-			while (i!=end.rikt) {
-				i=(i+1)%360;			
-				rikt = start.rikt+i;
-				areaC.add(new Coord(Rad,rikt));
-				//Log.d("nils",""+i);
+
+		Log.d("nils","Free arcs: ");
+		for(Segment s:freeArcs) {
+			Log.d("nils","S: "+s.start.rikt+" E:"+s.end.rikt);
+			bgPoly = new ArrayList<Segment>();
+			//Add the free arc but reversed! 
+			bgPoly.add(new Segment(s.start,s.end,true));
+			//Begin from the end piece (in reverse = start)
+			Coord currentCoord = s.end;
+			//we want to find the line that  ends here and goes to our start. when we reach there it is done.
+			Coord end = s.start;
+			boolean notDone = true;
+			while (notDone) {
+				//Find corresponding "real" Segment.
+				boolean noLuck = true;
+				Log.d("nils","Tåg has "+sortedArcs.size()+" elements");
+				for (Segment se:noArcs) {
+					Log.d("nils","Comparing current: "+currentCoord.rikt+" with "+se.end.rikt);
+					if (currentCoord.rikt == se.end.rikt) {
+						Log.d("nils","Found END MATCH!");
+						//Add the reversed segment.
+						bgPoly.add(new Segment(se.end,se.start,se.isArc));
+
+						if (se.isArc)
+							Log.e("nils","In DelyteManager,calcRemYta..segment seems to be arc...should not happen");
+						currentCoord = se.start;
+						if (currentCoord.rikt==end.rikt) {
+							Log.d("nils","Done, found end");
+							missingPieces.add(bgPoly);
+							notDone = false;
+							noLuck = false;
+							break;
+						} else {							
+							noLuck = false;
+							break;
+						}
+
+					} 
+
+				}
+				if (noLuck) {
+					Log.e("nils","went thorough all without finding coord...should not happen.");
+					notDone=false;
+				}
 			}
 		}
+			//Here we should have all missing polygons.
+			Log.d("nils","found "+missingPieces.size()+" polygons");
+			//Build delytor.
+			for (List<Segment> ls:missingPieces) {
+				Delyta d = new Delyta();
+				d.createFromSegments(ls);
+				myDelytor.add(d);
+			}
+			Log.d("nils","myDelytor now contains "+myDelytor.size()+" delytor.");
+			printDelytor();
+		
 
-		public void setId(int delyteID) {
-			delNr=delyteID;
-		}
+		//Using the free arcs as starting point, build the missing delyta.
+
 	}
 
 
 
+
+
+	private void printDelytor() {
+		for (Delyta d:myDelytor) {
+			Log.d("nils","DELYTA ID: "+d.getId()+" isbg: "+d.isBackground()+" WEST: "+d.myWest+" SOUTH: "+d.mySouth);
+			for(Segment s:d.getSegments()) {
+				Log.d("nils","S: "+s.start.rikt+" E:"+s.end.rikt+" isArc: "+s.isArc);
+			}
+		}
+	}
 
 	public DelyteManager(GlobalState gs) {
 		this.gs = gs;
@@ -177,13 +264,14 @@ public class DelyteManager {
 
 
 	public void generateFromCurrentContext() {
-		
+
 		loadKnownDelytor(al.getVariableValue(null,"Current_Ruta"),al.getVariableValue(null,"Current_Provyta"));
-		
+
 	}
 
 
 	public void clear() {
+		Log.d("nils","Calling mydelytor.clear()");
 		myDelytor.clear();
 	}
 
@@ -203,12 +291,12 @@ public class DelyteManager {
 				myDelytor.add(delyta);
 			} 
 		}
-	
+
 		Log.d("nils","found "+myDelytor.size()+" tåg");
-			
-		
+
+
 	}
-	
+
 	public ErrCode addUnknownTag(List<Coord> tagCoordinateList) {
 		Delyta delyta = new Delyta();
 		ErrCode ec = delyta.create(tagCoordinateList);
@@ -229,7 +317,7 @@ public class DelyteManager {
 				avst =Integer.parseInt(tagElems[j]);
 				rikt =Integer.parseInt(tagElems[j+1]);
 				tagCoordinateList.add(new Coord(avst,rikt));
-				
+
 			}
 			Delyta delyta = new Delyta();
 			ErrCode ec = delyta.create(tagCoordinateList);
@@ -245,4 +333,7 @@ public class DelyteManager {
 	public List<Delyta> getDelytor() {
 		return myDelytor;
 	}
+
+
+
 }

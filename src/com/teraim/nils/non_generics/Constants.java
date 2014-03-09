@@ -29,6 +29,7 @@ public class Constants {
 	//Root for NILS
 	public final static String NILS_ROOT_DIR = path+"/nils/";
 	public final static String CONFIG_FILES_DIR = NILS_ROOT_DIR + "config/";
+	public static final String PIC_ROOT_DIR = NILS_ROOT_DIR + "pics/";
 	//public static String NILS_BASE_DIR = "/nils";
 	public static String UNDEFINED = "undefined";
 
@@ -53,6 +54,8 @@ public class Constants {
 	public static final String CONFIG_FROZEN_FILE_ID = "artlista";
 
 	public static final int KEY_LENGTH = 10;
+
+
 
 	
 	public static UUID getmyUUID() {
