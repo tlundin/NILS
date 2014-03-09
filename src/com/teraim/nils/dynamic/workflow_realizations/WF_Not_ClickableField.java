@@ -6,14 +6,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.teraim.nils.R;
 import com.teraim.nils.dynamic.types.Variable;
-import com.teraim.nils.ui.FlowLayout;
-import com.teraim.nils.utils.Tools;
 
 public abstract class WF_Not_ClickableField extends WF_ListEntry {
 	protected WF_Context myContext;
@@ -105,9 +104,17 @@ public abstract class WF_Not_ClickableField extends WF_ListEntry {
 			TextView o = (TextView)ll.findViewById(R.id.outputValueField);
 			TextView u = (TextView)ll.findViewById(R.id.outputUnitField);			
 			String value = varId.getValue();
+			Log.d("nils","In refreshoutputfield for variable "+varId.getId()+" with value "+varId.getValue());
+			if (ll.getParent()==null) {
+				Log.e("NILS","PARENT MISSING");
+			}else {
+				if (ll.getParent().getParent()==null) {
+					Log.e("NILS","GRANDPARENT MISSING");
+				}
+			}
 			if (value!=null&&!value.isEmpty()) {
 				o.setText(getFormattedText(varId,value,pairs.getValue().format));	
-				u.setText(varId.getPrintedUnit());
+				u.setText(varId.getPrintedUnit());				
 			}
 			else {
 				o.setText("");

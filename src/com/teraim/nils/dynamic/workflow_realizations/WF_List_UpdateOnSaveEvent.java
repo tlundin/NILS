@@ -19,24 +19,32 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 
 	
 	Map<String,WF_ClickableField_Selection> entryFields = new HashMap<String,WF_ClickableField_Selection>();
+	int index = 0;
 	public WF_List_UpdateOnSaveEvent(String id, WF_Context ctx,List<List<String>> rows,boolean isVisible) {
 		super(id, ctx,rows,isVisible);
 		
 		ctx.addEventListener(this, EventType.onSave);
 		o = GlobalState.getInstance(ctx.getContext()).getLogger();
-		int index = 0;
 		
 		for (List<String>r:rows) {
-			String entryLabel = al.getEntryLabel(r);
-			if (entryFields.get(entryLabel)==null) 	{	
-				WF_ClickableField_Selection entryF = new WF_ClickableField_Selection(entryLabel,al.getDescription(r),myContext,"C_F_"+index++,true);
-				list.add(entryF);	
-				entryFields.put(entryLabel, entryF);
-			}
-			else
+			if (!addEntryField(r))
 				break;
 		}
 	}
+	
+	private boolean addEntryField(List<String>r) {
+		String entryLabel = al.getEntryLabel(r);
+		if (entryFields.get(entryLabel)==null) 	{	
+			WF_ClickableField_Selection entryF = new WF_ClickableField_Selection(entryLabel,al.getDescription(r),myContext,"C_F_"+index++,true);
+			list.add(entryF);	
+			entryFields.put(entryLabel, entryF);
+			return true;
+		}
+		else
+			return false;
+	}
+	
+	
 	
 	@Override 
 	public void addVariableToEveryListEntry(String varSuffix,boolean displayOut,String format) {
@@ -61,6 +69,40 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 		}
 	}
 
+	@Override
+	public void addFieldListEntry(String listEntryID,String label,String description) {		
+		WF_ClickableField_Selection entryF = new WF_ClickableField_Selection(label,description,myContext,this.getId()+listEntryID,true);
+		list.add(entryF);	
+		entryFields.put(this.getId()+listEntryID, entryF);
+
+		
+	}
+	
+	@Override
+	public boolean addVariableToListEntry(String varNameSuffix,String targetField,
+				String format, boolean displayOut) {
+		String tfName = this.getId()+targetField;
+		WF_ClickableField_Selection ef = entryFields.get(tfName);
+		if (ef==null) {
+			Log.e("nils","Didnt find entry field "+tfName);
+			o.addRow("");
+			o.addRedText("Did NOT find entryfield referred to as "+tfName);
+			return false;
+		}
+		String vName = targetField+"_"+varNameSuffix;
+		Variable v = al.getVariableInstance(vName);
+		if (v==null) {
+			Log.e("nils","Didnt find vriable "+vName+" in AddVariableToList");
+			o.addRow("");
+			o.addRedText("Did NOT find variable referred to as "+vName+" in AddVariableToList");
+			return false;
+		}
+		ef.addVariable(v, displayOut,format);
+		return true;
+		
+	}
+	
+	
 	@Override
 	public void addEntriesFromRows(List<List<String>> rows) 	{
 		String format = null;
@@ -107,6 +149,11 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 		}
 		myContext.registerEvent(new WF_Event_OnRedraw(this.getId()));
 	}
+
+	
+
+	
+	
 
 	
 

@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import android.graphics.Point;
 import android.util.Log;
 
 import com.teraim.nils.GlobalState;
@@ -83,16 +84,31 @@ public class DelyteManager {
 					arc = cTag.get(1);
 					line = cTag.get(0);
 				}
-				float midPx = midP(line.start.x,line.end.x);
-				float midPy = midP(line.start.y,line.end.y);
+				int dist;
+				int arcMid,nyR;
+				if (arc.start.rikt>arc.end.rikt) {
+					dist = Delyta.rDist(arc.end.rikt,arc.start.rikt);
+					arcMid =  (dist/2);
+					nyR = arc.start.rikt-arcMid;
+					if (nyR<0)
+						nyR=360+nyR;
+					Log.d("nils","Start more: "+nyR);
+				}
+				else {
+					dist = Delyta.rDist(arc.end.rikt,arc.start.rikt);
+					arcMid =  (dist/2);
+					nyR = arc.start.rikt-arcMid;
+					if (nyR<0)
+						nyR=360+nyR;
+					Log.d("nils","Start less: "+nyR);
+				}
 				
-				Coord midB = new Coord((arc.start.rikt-arc.end.rikt) / 2,Delyta.Rad);
-				//Use midpoint.
-				float mX = midP(midPx,midB.x);
-			    float mY = midP(midPy,midB.y);
-			    Log.d("nils","MX MY: "+mX+" "+mY);
+				
+					
+				
+				Coord m = new Coord(85,nyR);
 			    
-			    d.setNumberPos(mX,mY);
+			    d.setNumberPos(m.x,m.y);
 			}
 			
 			

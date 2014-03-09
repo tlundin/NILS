@@ -50,7 +50,7 @@ import com.teraim.nils.utils.WorkflowParser;
 
 public class Start extends MenuActivity {
 
-	private final String NILS_VERSION = "0.18";
+	private final String NILS_VERSION = "0.20";
 
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
@@ -80,7 +80,6 @@ public class Start extends MenuActivity {
 
 
 		loginConsole = new Logger(this);
-
 		//create subfolders. Copy assets..
 		if (this.initIfFirstTime()) {		
 			loginConsole.addRow("First time use...creating folders");
@@ -177,7 +176,7 @@ public class Start extends MenuActivity {
 			loginConsole.clear();
 			loginConsole.addRow("NILS VERSION ");
 			loginConsole.addYellowText("["+NILS_VERSION+"]");
-			loginConsole.addRow("New features: Expressions. DisplayValue Field.");
+			loginConsole.addRow("New features: Take Pictures, Delyte-calculation etc");
 
 
 			//If network, go and check for new files.

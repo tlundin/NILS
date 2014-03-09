@@ -17,8 +17,11 @@ import android.widget.Toast;
 
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
+import com.teraim.nils.dynamic.blocks.AddEntryToFieldListBlock;
 import com.teraim.nils.dynamic.blocks.AddSumOrCountBlock;
+import com.teraim.nils.dynamic.blocks.AddVariableToEntryFieldBlock;
 import com.teraim.nils.dynamic.blocks.AddVariableToEveryListEntryBlock;
+import com.teraim.nils.dynamic.blocks.AddVariableToListEntry;
 import com.teraim.nils.dynamic.blocks.Block;
 import com.teraim.nils.dynamic.blocks.BlockCreateListEntriesFromFieldList;
 import com.teraim.nils.dynamic.blocks.ButtonBlock;
@@ -39,7 +42,6 @@ import com.teraim.nils.dynamic.workflow_realizations.WF_List;
 import com.teraim.nils.exceptions.RuleException;
 import com.teraim.nils.expr.SyntaxException;
 import com.teraim.nils.log.LoggerI;
-import com.teraim.nils.utils.AddVariableToEntryFieldBlock;
 
 /*
  * Executes workflow blocks. Child classes define layouts and other specialized behavior
@@ -272,6 +274,20 @@ public abstract class Executor extends Fragment {
 				o.addRow("");
 				o.addYellowText("AddVariableToEntryFieldBlock found");
 				AddVariableToEntryFieldBlock bl = (AddVariableToEntryFieldBlock)b;
+				bl.create(myContext);
+				
+			}
+			else if (b instanceof AddVariableToListEntry) {
+				o.addRow("");
+				o.addYellowText("AddVariableToEntryFieldBlock found");
+				AddVariableToListEntry bl = (AddVariableToListEntry)b;
+				bl.create(myContext);
+				
+			}
+			else if (b instanceof AddEntryToFieldListBlock) {
+				o.addRow("");
+				o.addYellowText("AddEntryToFieldListBlock found");
+				AddEntryToFieldListBlock bl = (AddEntryToFieldListBlock)b;
 				bl.create(myContext);
 				
 			}

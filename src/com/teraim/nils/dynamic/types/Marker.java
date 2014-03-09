@@ -3,6 +3,8 @@ package com.teraim.nils.dynamic.types;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import com.teraim.nils.non_generics.DelyteManager.Coord;
+
 public class Marker {
 	public final static float Pic_H = 32;
 	public int x,y;
@@ -36,8 +38,9 @@ public class Marker {
 		dist = Integer.parseInt(avst);
 		riktning = Integer.parseInt(rikt);
 		
-		x=(int)(dist*Math.cos(riktning*0.0174532925));
-		y=(int)(dist*Math.sin(riktning*0.0174532925));
+		Coord c = new Coord (dist,riktning);
+		x = (int)c.x;
+		y = (int)c.y;
 	}
 }
 

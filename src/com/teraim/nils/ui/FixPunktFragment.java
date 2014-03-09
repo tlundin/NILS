@@ -28,10 +28,11 @@ import com.teraim.nils.dynamic.types.Variable;
 
 public class FixPunktFragment extends Fragment implements OnGesturePerformedListener {
 
-	final String[] variables = new String[] {"FixPunkt1.avstand",
-		"FixPunkt1.riktning","FixPunkt2.avstand",
-		"FixPunkt2.riktning","FixPunkt3.avstand",
-		"FixPunkt3.riktning"};
+	final String[] variables = new String[] {"fixpunkter_FixPunkt1_avstand",
+		"fixpunkter_FixPunkt1_riktning","fixpunkter_FixPunkt2_avstand",
+		"fixpunkter_FixPunkt2_riktning","fixpunkter_FixPunkt3_avstand",
+		"fixpunkter_FixPunkt3_riktning",
+	};
 	final Set<FixPunkt>fixPunkter=new HashSet<FixPunkt>();
 	GlobalState gs;
 	private GestureLibrary gestureLib;

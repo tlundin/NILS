@@ -91,8 +91,8 @@ public class Delyta {
 		
 		for (Segment s:tag) {
 			if (s.isArc) {
-				int endToPoleDist = pDist(s.end.rikt - Pole.rikt);
-				int endToStartDist = pDist(s.end.rikt - s.start.rikt);
+				int endToPoleDist = pDist(s.end.rikt,Pole.rikt);
+				int endToStartDist = pDist(s.end.rikt,s.start.rikt);
 				if (endToPoleDist < endToStartDist) {				
 					Log.d("nils","This arc goes through pole");
 					max=0;
@@ -133,11 +133,17 @@ public class Delyta {
 		return max;
 	}
 
-	private int pDist(int i) {
-		if (i>0)
-			return i;
-		else 
-			return 360-i;
+	public static int pDist(int from, int to) {
+		if (to <= from)
+			return from-to;
+		else
+			return from+360-to;
+	}
+	public static int rDist(int from, int to) {
+		if (to >= from)
+			return to-from;
+		else
+			return to+360-from;
 	}
 
 	public List<Segment> getSegments() {

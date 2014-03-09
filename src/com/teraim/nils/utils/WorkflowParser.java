@@ -19,9 +19,12 @@ import android.util.Xml;
 import com.teraim.nils.FileLoadedCb;
 import com.teraim.nils.FileLoadedCb.ErrorCode;
 import com.teraim.nils.GlobalState;
+import com.teraim.nils.dynamic.blocks.AddEntryToFieldListBlock;
 import com.teraim.nils.dynamic.blocks.AddRuleBlock;
 import com.teraim.nils.dynamic.blocks.AddSumOrCountBlock;
+import com.teraim.nils.dynamic.blocks.AddVariableToEntryFieldBlock;
 import com.teraim.nils.dynamic.blocks.AddVariableToEveryListEntryBlock;
+import com.teraim.nils.dynamic.blocks.AddVariableToListEntry;
 import com.teraim.nils.dynamic.blocks.Block;
 import com.teraim.nils.dynamic.blocks.BlockCreateListEntriesFromFieldList;
 import com.teraim.nils.dynamic.blocks.ButtonBlock;
@@ -258,7 +261,13 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 			else if (name.equals("block_add_variable_to_every_list_entry"))
 				blocks.add(readBlockAddVariableToEveryListEntry(parser));
 			else if (name.equals("block_add_variable_to_entry_field"))
-				blocks.add(readBlockAddVariableToEntryField(parser));			
+				blocks.add(readBlockAddVariableToEntryField(parser));	
+			else if (name.equals("block_add_entry_to_field_list")) 
+				blocks.add(readBlockAddEntryToFieldList(parser));
+			else if (name.equals("block_add_variable_to_list_entry")) 
+				blocks.add(readBlockAddVariableToListEntry(parser));
+
+
 			else				
 				skip(parser);
 
@@ -271,8 +280,87 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 		return blocks;
 	}
 
-	
-	
+
+
+	private Block readBlockAddVariableToListEntry(XmlPullParser parser) throws IOException, XmlPullParserException {
+		o.addRow("Parsing block: block_add_variable_to_list_entry...");
+		boolean isVisible = true;
+		String targetList= null,targetField= null,namn=null,format= null; 
+		parser.require(XmlPullParser.START_TAG, null,"block_add_variable_to_list_entry");
+		while (parser.next() != XmlPullParser.END_TAG) {
+			if (parser.getEventType() != XmlPullParser.START_TAG) {
+				continue;
+			}
+			String name= parser.getName();
+
+			if (name.equals("name")) {
+				namn = readText("name",parser);
+				o.addRow("NAME: "+namn);			
+			} else if (name.equals("target_list")) {
+				targetList = readText("target_list",parser);
+				o.addRow("TARGETLIST: "+targetList);
+			}
+			else if (name.equals("target_field")) {
+				targetField = readText("target_field",parser);
+				o.addRow("TARGETFIELD: "+targetField);
+			} 
+			else if (name.equals("is_displayed")) {
+				isVisible = !readText("is_displayed",parser).equals("false");
+				o.addRow("IS_VISIBLE: "+isVisible);	
+			} 
+			else if (name.equals("format")) {
+				format = readText("format",parser);
+				o.addRow("FORMAT: "+format);	
+			}
+			else
+				skip(parser);
+		}
+		return new AddVariableToListEntry(namn,
+				targetList,targetField, isVisible,format);	
+
+	}
+
+
+
+
+	private Block readBlockAddEntryToFieldList(XmlPullParser parser) throws IOException, XmlPullParserException {
+		o.addRow("Parsing block: block_add_entry_to_field_list...");
+
+		String target= null,namn= null,label=null,description=null;
+		parser.require(XmlPullParser.START_TAG, null,"block_add_entry_to_field_list");
+		while (parser.next() != XmlPullParser.END_TAG) {
+			if (parser.getEventType() != XmlPullParser.START_TAG) {
+				continue;
+			}
+			String name= parser.getName();
+
+			if (name.equals("name")) {
+				namn = readText("name",parser);
+				o.addRow("NAME: "+namn);	
+
+			} else if (name.equals("target")) {
+				target = readText("target",parser);
+				o.addRow("TARGET: "+target);
+			} 
+
+			else if (name.equals("label")) {
+				label = readText("label",parser);
+				o.addRow("LABEL: "+label);	
+			}
+			else if (name.equals("description")) {
+				description = readText("description",parser);
+				o.addRow("DESCRIPTION: "+label);	
+			}
+			else if (name.equals("target")) {
+				target = readText("target",parser);
+				o.addRow("TARGET: "+target);	
+			}
+			else
+				skip(parser);
+		}
+		return new AddEntryToFieldListBlock(namn,target,label,description);
+	}
+
 	private Block readBlockAddVariableToEntryField(XmlPullParser parser) throws IOException, XmlPullParserException {
 		o.addRow("Parsing block: block_add_variable_to_entry_field...");
 		boolean isVisible = true;
@@ -284,15 +372,15 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 			}
 			String name= parser.getName();
 
-			 if (name.equals("name")) {
+			if (name.equals("name")) {
 				namn = readText("name",parser);
 				o.addRow("NAME: "+namn);			
 			} else if (name.equals("target")) {
 				target = readText("target",parser);
 				o.addRow("TARGET: "+target);
 			} 
-			else if (name.equals("is_visible")) {
-				isVisible = !readText("is_visible",parser).equals("false");
+			else if (name.equals("is_displayed")) {
+				isVisible = !readText("is_displayed",parser).equals("false");
 				o.addRow("IS_VISIBLE: "+isVisible);	
 			} 
 			else if (name.equals("format")) {
@@ -350,7 +438,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 
 		}
 		return new BlockCreateListEntriesFromFieldList(namn, type,
-				containerId,selectionPattern,selectionField);
+				containerId,selectionPattern,selectionField,keyField);
 	}
 
 
@@ -443,7 +531,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 			}
 			String name= parser.getName();
 
-		    if (name.equals("name")) {
+			if (name.equals("name")) {
 				namn = readText("name",parser);
 				o.addRow("NAME: "+namn);			
 			} else if (name.equals("container_name")) {

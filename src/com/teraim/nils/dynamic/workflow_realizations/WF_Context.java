@@ -123,6 +123,11 @@ public class WF_Context {
 				if (c!=null)
 					c.removeAll();
 			}
+		if (lists.size()!=0) {
+			lists.clear();
+			containers.clear();
+			drawables.clear();
+		}
 	}
 
 	//draws all containers traversing the tree.

@@ -143,6 +143,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 
 	public  WF_ClickableField(final String label,final String descriptionT, WF_Context context,String id, View view,boolean isVisible) {
 		super(label,descriptionT,context,view,isVisible);	
+		Log.e("nils ","Creating WF_ClickableField: "+label+" "+id);
 		gs = GlobalState.getInstance(context.getContext());
 		al = gs.getArtLista();
 		o = gs.getLogger();
@@ -160,8 +161,6 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 		getWidget().setOnLongClickListener(new OnLongClickListener(){
 			@Override
 			public boolean onLongClick(View v) {
-
-
 
 				if (mActionMode != null) {
 					return false;
@@ -267,7 +266,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 					public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 						//Log.d("nils","spinner changed value, presaving");
 						//var.setValueWithoutCommit((String)spinner.getItemAtPosition(position));
-						refreshInputFields();
+	
 					
 					}
 
@@ -316,8 +315,10 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 			}
 			 */
 			myOutputFields.put(var,new OutC(ll,format));
+			
 			outputContainer.addView(ll);
 		}
+
 		refreshInputFields();
 		refreshOutputFields();
 	}

@@ -16,16 +16,17 @@ import com.teraim.nils.dynamic.workflow_realizations.WF_TimeOrder_Sorter;
 
 public class BlockCreateListEntriesFromFieldList extends Block {
 
-	String id,type,containerId,selectionPattern,selectionField;
+	String id,type,containerId,selectionPattern,selectionField,keyField;
 	boolean isVisible = true;
 	public BlockCreateListEntriesFromFieldList(String namn, String type,
-			String containerId, String selectionPattern, String selectionField) {
+			String containerId, String selectionPattern, String selectionField,String keyField) {
 		super();
 		this.id = namn;
 		this.type = type;
 		this.containerId = containerId;
 		this.selectionPattern = selectionPattern;
 		this.selectionField = selectionField;
+		this.keyField = keyField;
 
 	}
 

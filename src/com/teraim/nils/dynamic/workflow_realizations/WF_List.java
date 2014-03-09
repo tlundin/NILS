@@ -98,10 +98,9 @@ public abstract class WF_List extends WF_Widget implements Sortable,Filterable {
 	}
 
 	public abstract void addVariableToEveryListEntry(String varSuffix,boolean displayOut,String format);
-
-
-
-
-
+	public abstract void addFieldListEntry(String listEntryID, 
+			String label, String description);
+	public abstract boolean addVariableToListEntry(String varNameSuffix,String targetField,
+			String format, boolean isVisible);
 
 }

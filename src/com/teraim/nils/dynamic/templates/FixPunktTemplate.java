@@ -112,7 +112,7 @@ public class FixPunktTemplate extends Executor implements OnGesturePerformedList
 	  			ft.addToBackStack(null);
 	  			ft.commit(); 
 	  		} else 
-				Toast.makeText(getActivity(), "bättre kan du", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getActivity(), "Fel håll", Toast.LENGTH_SHORT).show();
 	  			
 	      }
 	    }		
