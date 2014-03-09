@@ -290,6 +290,15 @@ public class Start extends MenuActivity {
 				Variable v = gs.getArtLista().getVariableInstance("Current_Year");
 				if (v!=null)
 					v.setValue(Calendar.getInstance().get(Calendar.YEAR)+"");
+				v = gs.getArtLista().getVariableInstance("Current_Ruta");
+				if (v.getValue()==null)
+					v.setValue("1");
+				v = gs.getArtLista().getVariableInstance("Current_Provyta");
+				if (v.getValue()==null)
+					v.setValue("2");
+				v = gs.getArtLista().getVariableInstance("Current_Delyta");
+				if (v.getValue()==null)
+					v.setValue("100");
 
 			}
 

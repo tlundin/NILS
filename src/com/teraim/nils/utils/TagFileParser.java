@@ -20,7 +20,7 @@ public class TagFileParser extends AsyncTask<GlobalState ,Integer,ErrorCode>{
 
 
 
-	public static final int approxLines = 4536;
+	public static final int approxLines = 704;
 	ProgressBar pb;
 	TextView tv;
 	FileLoadedCb cb;
@@ -50,7 +50,7 @@ public class TagFileParser extends AsyncTask<GlobalState ,Integer,ErrorCode>{
 		GlobalState gs = params[0];
 
 		try {
-			InputStreamReader is = new InputStreamReader(gs.getContext().getResources().openRawResource(R.raw.delningspunkter_2));
+			InputStreamReader is = new InputStreamReader(gs.getContext().getResources().openRawResource(R.raw.delningspunkter_short));
 			BufferedReader br = new BufferedReader(is);
 			String row;
 			String header = br.readLine();

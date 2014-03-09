@@ -3,12 +3,12 @@ package com.teraim.nils.non_generics;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import android.graphics.Point;
 import android.util.Log;
 
 import com.teraim.nils.GlobalState;
@@ -47,7 +47,7 @@ public class DelyteManager {
 		}
 	}
 
-	
+
 
 	public enum ErrCode {
 		TooShort,
@@ -67,56 +67,72 @@ public class DelyteManager {
 
 	private void findNumberCoord() {
 		//Find where to put the number.
-		
+
 		List<Segment> cTag;
 		for (Delyta d:myDelytor) {
-			
-			
+
+
 			cTag = d.getSegments();
 			//Just a simple arc?
-			if (cTag.size()==2) {
+			Set<Segment>arcs=new HashSet<Segment>();
+			for (Segment s:cTag) {
+				if (s.isArc)
+					arcs.add(s);
+			}
+			Iterator<Segment> it = arcs.iterator();
+			if (arcs.size()==1) {				
 				//Put in middle of pyramid.
-				Segment arc,line;
-				if (cTag.get(0).isArc) {
-					arc = cTag.get(0);
-					line = cTag.get(1);
-				} else {
-					arc = cTag.get(1);
-					line = cTag.get(0);
-				}
+				Segment arc=it.next();
 				int dist;
 				int arcMid,nyR;
-				if (arc.start.rikt>arc.end.rikt) {
-					dist = Delyta.rDist(arc.end.rikt,arc.start.rikt);
-					arcMid =  (dist/2);
-					nyR = arc.start.rikt-arcMid;
-					if (nyR<0)
-						nyR=360+nyR;
+				dist = Delyta.rDist(arc.start.rikt,arc.end.rikt);
+				arcMid =  (dist/2);
+				nyR = arc.start.rikt+arcMid;
+				if (nyR>360)
+					nyR=360-nyR;
+				if (arc.start.rikt>arc.end.rikt) 
 					Log.d("nils","Start more: "+nyR);
-				}
-				else {
-					dist = Delyta.rDist(arc.end.rikt,arc.start.rikt);
-					arcMid =  (dist/2);
-					nyR = arc.start.rikt-arcMid;
-					if (nyR<0)
-						nyR=360+nyR;
+				else
 					Log.d("nils","Start less: "+nyR);
-				}
-				
-				
-					
-				
+
+				Log.d("nils","DIST: "+dist);
 				Coord m = new Coord(85,nyR);
-			    
-			    d.setNumberPos(m.x,m.y);
+
+				d.setNumberPos(m.x,m.y);
+			} else if (arcs.size()==2) {
+				
+				Segment arc1=it.next();
+				Segment arc2=it.next();
+				
+				int dist1 = Delyta.rDist(arc1.start.rikt,arc1.end.rikt);
+				int dist2 = Delyta.rDist(arc2.start.rikt,arc2.end.rikt);
+				int mid1 = dist1/2;
+				int mid2 = dist2/2;
+				
+				int nyR1 = arc1.start.rikt+mid1;
+				if (nyR1>360)
+					nyR1=360-nyR1;
+				int nyR2 = arc2.start.rikt+mid2;
+				if (nyR2>360)
+					nyR2=360-nyR2;
+				
+				int dist = Delyta.rDist(nyR1,nyR2);
+				int arcMid =  (dist/2);
+				int nyR = nyR1+arcMid;
+				if (nyR>360)
+					nyR=360-nyR;
+				double x = 100 * Math.cos(nyR);
+				double y = 100 * Math.sin(nyR1);
+				d.setNumberPos((int)x,(int)y);
 			}
 			
-			
+
+
 		}
-		
-		
+
+
 		//If its a normal arc, put it in the center of the Pyramid.
-		
+
 	}
 	private float midP(float s,float e) {
 		return (s+e)/2;
@@ -131,12 +147,12 @@ public class DelyteManager {
 			public int compare(Delyta lhs, Delyta rhs) {
 				return (int)(lhs.mySouth==rhs.mySouth?lhs.myWest-rhs.myWest:lhs.mySouth-rhs.mySouth);
 			}});
-		
+
 		Log.d("nils","IN SORTOS");
 		printDelytor();
 		s.addAll(myDelytor);
-		
-		
+
+
 		Log.d("nils","Mydelyor has "+myDelytor.size()+" delytor");
 		Log.d("nils","Sorted ytor according to south/west has "+s.size()+" delytor");
 		for (Delyta d:s) {
@@ -244,17 +260,17 @@ public class DelyteManager {
 				}
 			}
 		}
-			//Here we should have all missing polygons.
-			Log.d("nils","found "+missingPieces.size()+" polygons");
-			//Build delytor.
-			for (List<Segment> ls:missingPieces) {
-				Delyta d = new Delyta();
-				d.createFromSegments(ls);
-				myDelytor.add(d);
-			}
-			Log.d("nils","myDelytor now contains "+myDelytor.size()+" delytor.");
-			printDelytor();
-		
+		//Here we should have all missing polygons.
+		Log.d("nils","found "+missingPieces.size()+" polygons");
+		//Build delytor.
+		for (List<Segment> ls:missingPieces) {
+			Delyta d = new Delyta();
+			d.createFromSegments(ls);
+			myDelytor.add(d);
+		}
+		Log.d("nils","myDelytor now contains "+myDelytor.size()+" delytor.");
+		printDelytor();
+
 
 		//Using the free arcs as starting point, build the missing delyta.
 
