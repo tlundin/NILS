@@ -8,6 +8,7 @@ import java.util.Map;
 import android.util.Log;
 
 import com.teraim.nils.GlobalState;
+import com.teraim.nils.dynamic.types.Variable.DataType;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 import com.teraim.nils.utils.DbHelper;
 import com.teraim.nils.utils.DbHelper.Selection;
@@ -133,6 +134,10 @@ public class Variable implements Serializable {
 	public void deleteValue() {
 		myDb.deleteVariable(name, mySelection);
 		myValue=null;
+	}
+
+	public void setType(DataType type) {
+		myType = type;
 	}
 
 

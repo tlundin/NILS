@@ -1,4 +1,4 @@
-package com.teraim.nils.non_generics;
+package com.teraim.nils.dynamic.types;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,19 +6,18 @@ import java.util.List;
 import android.graphics.Point;
 import android.util.Log;
 
-import com.teraim.nils.dynamic.types.Segment;
+import com.teraim.nils.non_generics.DelyteManager;
 import com.teraim.nils.non_generics.DelyteManager.Coord;
 import com.teraim.nils.non_generics.DelyteManager.ErrCode;
 
 public class Delyta {
 
-	List<Segment> tag;
+	public List<Segment> tag;
 	static final int Rad = 100;
 	int delNr = -1;
 	float area = -1;
 	boolean background = false;
-	float mySouth;
-	float myWest;
+	public float mySouth, myWest;
 	private static final Coord South = new Coord(100,180);
 	private static final Coord West = new Coord(100,90);
 	private static final float NO_VALUE = -9999999;

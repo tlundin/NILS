@@ -35,7 +35,7 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 	private boolean addEntryField(List<String>r) {
 		String entryLabel = al.getEntryLabel(r);
 		if (entryFields.get(entryLabel)==null) 	{	
-			WF_ClickableField_Selection entryF = new WF_ClickableField_Selection(entryLabel,al.getDescription(r),myContext,"C_F_"+index++,true);
+			WF_ClickableField_Selection entryF = new WF_ClickableField_Selection(entryLabel,al.getBeskrivning(r),myContext,"C_F_"+index++,true);
 			list.add(entryF);	
 			entryFields.put(entryLabel, entryF);
 			return true;
@@ -47,7 +47,7 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 	
 	
 	@Override 
-	public void addVariableToEveryListEntry(String varSuffix,boolean displayOut,String format) {
+	public void addVariableToEveryListEntry(String varSuffix,boolean displayOut,String format,boolean isVisible) {
 		List<String>cRow;
 		Variable v;
 		String varID;
@@ -58,7 +58,7 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 				v = al.getVariableInstance(varID);
 				String entryLabel = al.getEntryLabel(cRow);
 				if (v!=null) {
-					entryFields.get(entryLabel).addVariable(v, displayOut,format);
+					entryFields.get(entryLabel).addVariable(v, displayOut,format,isVisible);
 				}
 				else {
 					o.addRow("");
@@ -79,8 +79,8 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 	}
 	
 	@Override
-	public boolean addVariableToListEntry(String varNameSuffix,String targetField,
-				String format, boolean displayOut) {
+	public boolean addVariableToListEntry(String varNameSuffix,boolean displayOut,String targetField,
+				String format, boolean isVisible) {
 		String tfName = this.getId()+targetField;
 		WF_ClickableField_Selection ef = entryFields.get(tfName);
 		if (ef==null) {
@@ -97,7 +97,7 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 			o.addRedText("Did NOT find variable referred to as "+vName+" in AddVariableToList");
 			return false;
 		}
-		ef.addVariable(v, displayOut,format);
+		ef.addVariable(v, displayOut,format,isVisible);
 		return true;
 		
 	}
@@ -119,7 +119,7 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 						//C_F_+index is the ID for the element.
 						//TODO: ID is a bit hacked here..
 						
-						listRow = new WF_ClickableField_Selection(al.getEntryLabel(r),al.getDescription(r),myContext,"C_F_"+index,true);
+						listRow = new WF_ClickableField_Selection(al.getEntryLabel(r),al.getBeskrivning(r),myContext,"C_F_"+index,true);
 						list.add(listRow);	
 					} 
 					if (!al.getAction(r).equals("add")&&!al.getAction(r).equals("create"))
@@ -130,7 +130,7 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 							Log.d("nils","var added "+al.getVarLabel(r));
 							Variable v = al.getVariableInstance(al.getVarName(r));
 							if (v!=null)
-								listRow.addVariable(v,al.isDisplayInList(r),format);
+								listRow.addVariable(v,al.isDisplayInList(r),format,true);
 						}
 					}
 				}

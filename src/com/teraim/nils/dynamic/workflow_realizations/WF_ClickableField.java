@@ -40,6 +40,8 @@ import android.widget.TextView;
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
 import com.teraim.nils.dynamic.VariableConfiguration;
+import com.teraim.nils.dynamic.types.SpinnerDefinition;
+import com.teraim.nils.dynamic.types.SpinnerDefinition.SpinnerElement;
 import com.teraim.nils.dynamic.types.Table;
 import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.types.Variable.DataType;
@@ -54,13 +56,18 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 
 	final LinearLayout inputContainer;
 
-	protected Map<Variable,View> myVars = new HashMap<Variable,View>();
+	private Map<Variable,View> myVars = new HashMap<Variable,View>();
 
 	private GlobalState gs;
 	private VariableConfiguration al;
-
+	private static boolean HIDE=false,SHOW=true;
+	private Map<Variable,String[]>values=new HashMap<Variable,String[]>();
 
 	public abstract LinearLayout getFieldLayout();
+
+	private final SpinnerDefinition sd;
+	; 
+
 
 	@Override
 	public Set<Variable> getAssociatedVariables() {
@@ -92,10 +99,9 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 		// Called when the user selects a contextual menu item
 		@Override
 		public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
-			List<String> row;
+			List<String> row = myVars.keySet().iterator().next().getBackingDataSet();
 			switch (item.getItemId()) {
 			case R.id.menu_goto:
-				row = myVars.keySet().iterator().next().getBackingDataSet();
 				if (row!=null) {
 					String url = al.getUrl(row);
 					Intent browse = new Intent( Intent.ACTION_VIEW , Uri.parse(url));
@@ -104,28 +110,39 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 				}
 				return true;	        
 			case R.id.menu_delete:
-				for (View inf:myVars.values()) {
-					if (inf!=null) {
-						if (inf instanceof EditText)
-							((EditText)inf).setText("");
-
-					}
+				Iterator<Map.Entry<Variable,View>> it = myVars.entrySet().iterator();
+				while (it.hasNext()) {
+					Map.Entry<Variable,View> pairs = (Map.Entry<Variable,View>)it.next();
+					Variable variable = pairs.getKey();
+					DataType type = variable.getType();
+					View view = pairs.getValue();
+					if (type == DataType.numeric||
+						type == DataType.text){
+							EditText etview = (EditText)view.findViewById(R.id.edit);
+							etview.setText("");
+						} else				
+							if (type == DataType.list) {
+								Spinner sp = (Spinner)view;
+								sp.setSelection(-1);
+							} 
 				}
 				save();
+				refreshOutputFields();
 				mode.finish(); // Action picked, so close the CAB
 				return true;
 			case R.id.menu_info:
-				new AlertDialog.Builder(myContext.getContext())
-				.setTitle("Beskrivning")
-				.setMessage(myDescription)
-				.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) { 
-						mode.finish();
-					}
-				})
-				.setIcon(android.R.drawable.ic_dialog_info)
-				.show();
-
+				if (row!=null) {
+					new AlertDialog.Builder(myContext.getContext())
+					.setTitle("Beskrivning")
+					.setMessage(al.getVariableDescription(row))
+					.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) { 
+							mode.finish();
+						}
+					})
+					.setIcon(android.R.drawable.ic_dialog_info)
+					.show();
+				}
 				return true;
 			default:
 				return false;
@@ -145,6 +162,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 		super(label,descriptionT,context,view,isVisible);	
 		Log.e("nils ","Creating WF_ClickableField: "+label+" "+id);
 		gs = GlobalState.getInstance(context.getContext());
+		sd = gs.getSpinnerDefinitions();
 		al = gs.getArtLista();
 		o = gs.getLogger();
 		//SpannableString content = new SpannableString(headerT);
@@ -228,20 +246,25 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 	}
 
 	@Override
-	public void addVariable(final Variable var, boolean displayOut,String format) {
+	public void addVariable(final Variable var, boolean displayOut,String format,boolean isVisible) {
 
 
 		String varLabel = var.getLabel();
 		String varId = var.getId();
-
+		List<SpinnerElement> curElems=null;
 		// Set an EditText view to get user input 
 		if (displayOut && virgin) {
 			virgin = false;
 			Log.d("nils","Setting key variable to "+varId);
 			super.setKeyRow(varId);
 		}
-
-		Log.d("nils","Adding variable "+varLabel);
+		if (var.getType()==null) {
+			o.addRow("");
+			o.addRedText("VARIABLE "+var.getId()+" HAS NO TYPE. TYPE ASSUMED TO BE NUMERIC");
+			var.setType(DataType.numeric);
+		}
+		Log.d("nils","Adding variable "+varLabel+" of type "+var.getType().name());
+		Log.d("nils","var backing row: "+var.getBackingDataSet().toString());
 		String unit = var.getPrintedUnit();
 		switch (var.getType()) {
 		case bool:
@@ -249,53 +272,146 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 			View view = LayoutInflater.from(myContext.getContext()).inflate(R.layout.ja_nej_radiogroup,null);
 			TextView header = (TextView)view.findViewById(R.id.header);
 			header.setText(varLabel);
-			RadioGroup rbg = (RadioGroup)view.findViewById(R.id.radioG);
 			inputContainer.addView(view);
-			myVars.put(var,rbg);
+			myVars.put(var,view);
 			break;
 		case list:
-				Log.d("nils","Adding spinner for label "+label);
-				//o.addRow("Adding spinner field for dy-variable with label "+label+", name "+varId+", type "+var.getType().name()+" and unit "+unit.name());
-				final Spinner spinner = (Spinner)LayoutInflater.from(myContext.getContext()).inflate(R.layout.edit_field_spinner, null);
-				ArrayAdapter<String> adapter = new ArrayAdapter<String>(myContext.getContext(), android.R.layout.simple_spinner_dropdown_item,new ArrayList<String>() );		
-				spinner.setAdapter(adapter);
-				inputContainer.addView(spinner);
-				myVars.put(var,spinner);
-				spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-					@Override
-					public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-						//Log.d("nils","spinner changed value, presaving");
-						//var.setValueWithoutCommit((String)spinner.getItemAtPosition(position));
-	
-					
+			Log.d("nils","Adding spinner for label "+label);
+			//o.addRow("Adding spinner field for dy-variable with label "+label+", name "+varId+", type "+var.getType().name()+" and unit "+unit.name());
+			final Spinner spinner = (Spinner)LayoutInflater.from(myContext.getContext()).inflate(R.layout.edit_field_spinner, null);
+			ArrayAdapter<String> adapter = new ArrayAdapter<String>(myContext.getContext(), android.R.layout.simple_spinner_dropdown_item,new ArrayList<String>() );		
+			spinner.setAdapter(adapter);
+			inputContainer.addView(spinner);
+			myVars.put(var,spinner);
+			String[] opt=null;
+			String listValues = al.getTable().getElement("List Values", var.getBackingDataSet());
+			//Parse 
+			if (listValues.startsWith("@file")) {
+				Log.d("nils","Found complex spinner");
+				if (sd ==null) {
+					o.addRow("");
+					o.addRedText("Spinner definition NULL in workflow! Spinner cannot be created!");
+
+				} else {
+					List<SpinnerElement> elems = sd.get(var.getId());
+					int i = 0;
+					opt = new String[elems.size()];
+					for (SpinnerElement se:elems) {
+						Log.d("nils","Spinner element: "+se.opt);
+						opt[i++] = se.opt;
 					}
+					spinner.setTag(R.string.u1,var.getId());
+					spinner.post(new Runnable() {
+						@Override
+						public void run() {
+							spinner.setSelection(0);
+						}
+					});
+				}
+			} 
+			else 
+				if (listValues.startsWith("@col")) {
+					spinner.setTag("dynamic");
+				}
+				else
+				{
+					Log.d("nils","Found static list definition..parsing");
+					opt = listValues.split("\\|");
+					if (opt==null||opt.length<2) {
+						o.addRow("");
+						o.addRedText("Could not split List Values for variable "+var.getId()+". Did you use '|' symbol??");					
+					} else {
 
-					@Override
-					public void onNothingSelected(AdapterView<?> parentView) {
-
+						if (opt[0].contains("=")) {
+							Log.d("nils","found static list with value pairs");
+							//we have a value. 
+							String[] val = new String[opt.length];
+							int c = 0;
+							String tmp[];
+							for (String s:opt) {
+								s=s.replace("{", "");
+								s=s.replace("}", "");								
+								tmp = s.split("=");
+								if (tmp==null||tmp.length!=2) {
+									Log.e("nils","found corrupt element: "+s);
+									o.addRow("");
+									o.addRedText("One of the elements in list "+var.getId()+"has a corrupt element. Comma missing?");
+								} else {
+									val[c]=tmp[1];
+									opt[c]=tmp[0];							
+								}
+								c++;
+							}
+							values.put(var, val);
+						}
 					}
+				}
+			if (opt!=null) {
+				for (int i=0;i<opt.length;i++) 
+					Log.d("nils","OPT "+i+":"+opt[i]);				
+				adapter.addAll(opt);
 
-				});
-			
+			}
+			else
+				Log.e("nils","Couldnt add elements to spinner - opt was null in WF_ClickableField");
+
+
+			spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+					//Check if this spinner has side effects.
+					List<SpinnerElement> ems = sd.get((String)spinner.getTag(R.string.u1));
+					List<String> curMapping = (List<String>)spinner.getTag(R.string.u2);
+					if (ems!=null) {
+						SpinnerElement e = ems.get(position);
+						Log.d("nils","In onItemSelected. Spinner Element is "+e.opt+" with variables "+e.varMapping.toString());
+						if (e.varMapping!=null) {
+							//hide the views for the last selected.
+							hideOrShowViews(curMapping,HIDE);
+							hideOrShowViews(e.varMapping,SHOW);
+							spinner.setTag(R.string.u2,e.varMapping);
+						}
+					}
+				}
+
+				private void hideOrShowViews(List<String> varIds,
+						boolean mode) {
+					if (varIds == null||varIds.size()==0)
+						return;
+					for (String varId:varIds) {
+						if (varId!=null) {
+							for(Variable v:myVars.keySet()) {
+								if (v.getId().equals(varId.trim())) 
+									myVars.get(v).setVisibility(mode?View.VISIBLE:View.GONE);							
+							}
+						}
+					}
+				}
+
+				@Override
+				public void onNothingSelected(AdapterView<?> parentView) {
+
+				}
+
+			});
+
 			break;
 		case text:
 			//o.addRow("Adding text field for dy-variable with label "+label+", name "+varId+", type "+var.getType().name()+" and unit "+unit.name());
 			View l = LayoutInflater.from(myContext.getContext()).inflate(R.layout.edit_field_text,null);
 			header = (TextView)l.findViewById(R.id.header);
 			header.setText(varLabel+" "+unit);
-			EditText etview = (EditText)l.findViewById(R.id.edit);
 			inputContainer.addView(l);
-			myVars.put(var,etview);			
+			myVars.put(var,l);			
 			break;
 		case numeric:
 			//o.addRow("Adding edit field for dy-variable with label "+label+", name "+varId+", type "+numType.name()+" and unit "+unit.name());
 			l = LayoutInflater.from(myContext.getContext()).inflate(R.layout.edit_field_numeric,null);
 			header = (TextView)l.findViewById(R.id.header);
-			etview = (EditText)l.findViewById(R.id.edit);
 			header.setText(varLabel+" ("+unit+")");
 			//etview.setText(Tools.getPrintedUnit(unit));
 			inputContainer.addView(l);
-			myVars.put(var,etview);
+			myVars.put(var,l);
 
 			break;
 		}
@@ -314,10 +430,14 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 				u.setText(" ("+Variable.getPrintedUnit()+")");
 			}
 			 */
-			myOutputFields.put(var,new OutC(ll,format));
-			
+			myOutputFields.put(var,new OutC(ll,format));			
 			outputContainer.addView(ll);
+
+
 		}
+		if (!isVisible) 
+			myVars.get(var).setVisibility(View.GONE);
+		
 
 		refreshInputFields();
 		refreshOutputFields();
@@ -334,19 +454,18 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 			DataType type = variable.getType();
 			View view = pairs.getValue();
 			if (type == DataType.bool) {
-				//Get the yes radiobutton.
-				RadioGroup rb = (RadioGroup)view;
+				//Get the yes radiobutton.				
+				RadioGroup rbg = (RadioGroup)view.findViewById(R.id.radioG);
 				//If checked set value to True.
-				int id = rb.getCheckedRadioButtonId();
+				int id = rbg.getCheckedRadioButtonId();
 				variable.setValue("1");
 				if (id == -1 || id == R.id.nej)
 					variable.setValue("0");
 			} else 
-
 				if (type == DataType.numeric||
 				type == DataType.text){
-					EditText et = (EditText)view;
-					String txt = et.getText().toString();
+					EditText etview = (EditText)view.findViewById(R.id.edit);
+					String txt = etview.getText().toString();
 					if (txt.trim().length()>0)
 						variable.setValue(txt);
 					else
@@ -354,8 +473,16 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 				} else				
 					if (type == DataType.list) {
 						Spinner sp = (Spinner)view;
-						String s = (String)sp.getSelectedItem();
-						variable.setValue(s);
+						int s = sp.getSelectedItemPosition();
+						String v[] = values.get(variable);
+						if (v!=null) {
+							if (s>0&&s<v.length) 						
+								variable.setValue(v[s]);
+							else
+								variable.deleteValue();
+						}
+						else
+							variable.setValue((String)sp.getSelectedItem());
 					} 
 		}
 		myContext.registerEvent(new WF_Event_OnSave(this.getId()));
@@ -393,40 +520,34 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 						Log.d("nils","WF_Clickable:view was null in refreshinput");
 				} else
 					if (numType==DataType.list) {
-						Spinner sp = (Spinner)v;
-						
-						//Get the list values
-						Table t = gs.getArtLista().getTable();
-						String listValues = t.getElement("List Values", variable.getBackingDataSet());
 						String[] opt = null;
-						if (listValues == null||listValues.isEmpty()) {
-							o.addRow("");
-							o.addRedText("List Values empty for List variable "+variable.getId());
-							opt = new String[] {"No list values in configuration file"};
-						} else {
-							if (listValues.startsWith("@")) {
-								Log.d("nils","Found dynamic list definition..parsing");
-								String[] valuePairs = listValues.split("\\|");
-								if (valuePairs.length>0) {
-									String [] columnSelector = valuePairs[0].split("=");
-									String[] column;
-									boolean error = false;
-									if (columnSelector[0].equalsIgnoreCase("@col")) {
-										Log.d("nils","found column selector");
-										//Column to select.
-										String dbColName = gs.getDb().getColumnName(columnSelector[1]);
-										if (dbColName!=null) {
-											Log.d("nils","Real Column name for "+columnSelector[1]+" is "+dbColName);
-											column = new String[1];
-											column[0]=dbColName;
-										} else {
-											Log.d("nils","Column referenced in List definition for variable "+variable.getLabel()+" not found: "+columnSelector[1]);
-											o.addRow("");
-											o.addRedText("Column referenced in List definition for variable "+variable.getLabel()+" not found: "+columnSelector[1]);
-											error = true;
-											break;
-										}
-										if (!error) {
+						Spinner sp = (Spinner)v;
+						String tag = (String) sp.getTag();
+						if (tag!=null && tag.equals("dynamic")) {
+							//Get the list values
+							String listValues = al.getTable().getElement("List Values", variable.getBackingDataSet());
+							Log.d("nils","Found dynamic list definition..parsing");
+							String[] valuePairs = listValues.split("\\|");
+							if (valuePairs.length>0) {
+								String [] columnSelector = valuePairs[0].split("=");
+								String[] column;
+								boolean error = false;
+								if (columnSelector[0].equalsIgnoreCase("@col")) {
+									Log.d("nils","found column selector");
+									//Column to select.
+									String dbColName = gs.getDb().getColumnName(columnSelector[1]);
+									if (dbColName!=null) {
+										Log.d("nils","Real Column name for "+columnSelector[1]+" is "+dbColName);
+										column = new String[1];
+										column[0]=dbColName;
+									} else {
+										Log.d("nils","Column referenced in List definition for variable "+variable.getLabel()+" not found: "+columnSelector[1]);
+										o.addRow("");
+										o.addRedText("Column referenced in List definition for variable "+variable.getLabel()+" not found: "+columnSelector[1]);
+										error = true;
+										break;
+									}
+									if (!error) {
 										//Any other columns part of key?
 										Map<String,String>keySet = new HashMap<String,String>();
 										if (valuePairs.length>1) {
@@ -450,84 +571,73 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 													o.addRedText("Keypair referenced in List definition for variable "+variable.getLabel()+" cannot be read: "+keyPair);
 												}
 											}
-											
+
 										} else 
 											Log.d("nils","no additional keys..only column");
-											Selection s = gs.getDb().createCoulmnSelection(keySet);
-											List<String[]> values = gs.getDb().getValues(column, s);
-											if (values !=null) {
-												Log.d("nils","Got "+values.size()+" results");
-												//Remove duplicates and sort.
-												SortedSet<String> ss = new TreeSet<String>(new Comparator<String>(){
-									                public int compare(String a, String b){
-									                    return Integer.parseInt(a)-Integer.parseInt(b);
-									                }}						                         
-									        );
-												for (int i = 0; i<values.size();i++) 
-													ss.add(values.get(i)[0]);
-												opt = new String[ss.size()];
-												int i = 0; 
-												Iterator<String> it = ss.iterator();
-												while (it.hasNext()) {
-													opt[i++]=it.next();
-												}
+										Selection s = gs.getDb().createCoulmnSelection(keySet);
+										List<String[]> values = gs.getDb().getValues(column, s);
+										if (values !=null) {
+											Log.d("nils","Got "+values.size()+" results");
+											//Remove duplicates and sort.
+											SortedSet<String> ss = new TreeSet<String>(new Comparator<String>(){
+												public int compare(String a, String b){
+													return Integer.parseInt(a)-Integer.parseInt(b);
+												}}						                         
+													);
+											for (int i = 0; i<values.size();i++) 
+												ss.add(values.get(i)[0]);
+											opt = new String[ss.size()];
+											int i = 0; 
+											Iterator<String> it = ss.iterator();
+											while (it.hasNext()) {
+												opt[i++]=it.next();
 											}
-										} else
-											opt=new String[]{"Config Error...please check your list definitions for variable "+variable.getLabel()};
-
-
+										}
 									} else
-										Log.e("nils","List "+variable.getId()+" has too few parameters: "+listValues.toString());
-								} else
-									Log.e("nils","List "+variable.getId()+" has strange parameters: "+listValues.toString());
+										opt=new String[]{"Config Error...please check your list definitions for variable "+variable.getLabel()};
 
-							} else 
-							{
-								Log.d("nils","Found static list definition..parsing");
-								opt = listValues.split("\\|");
-								if (opt==null||opt.length<2) {
-									o.addRow("");
-									o.addRedText("Could not split List Values for variable "+variable.getId()+". Did you use '|' symbol??");					
-								}					
-							}
-							
+
+								} else
+									Log.e("nils","List "+variable.getId()+" has too few parameters: "+listValues.toString());
+							} else
+								Log.e("nils","List "+variable.getId()+" has strange parameters: "+listValues.toString());
+
 							//Add dropdown.
 							if (opt==null)
 								Log.e("nils","OPT IS STILL NULL!!!");
 							else {
-								for (int i=0;i<opt.length;i++) {
-									Log.d("nils","OPT "+i+":"+opt[i]);
-								}
-							}
-							
-						}
-						((ArrayAdapter<String>)sp.getAdapter()).clear();
-						((ArrayAdapter<String>)sp.getAdapter()).addAll(opt);
-						
-						String item = null;
-						if (sp.getAdapter().getCount()>0) {
-							if (value!=null) {								
-								for (int i=0;i<sp.getAdapter().getCount();i++) {
-									item = (String)sp.getAdapter().getItem(i);
-									if (item == null)
-										continue;
-									else
-										if (item.equals(value))
-											sp.setSelection(i);
-								}
-							}
-						} else {
-							o.addRow("");
-							o.addRedText("Empty spinner for variable "+v+". Check your variable configuration.");
-						}
 
-					}
-		} 
+								((ArrayAdapter<String>)sp.getAdapter()).clear();
+								((ArrayAdapter<String>)sp.getAdapter()).addAll(opt);
+								String item = null;
+								if (sp.getAdapter().getCount()>0) {
+									if (value!=null) {								
+										for (int i=0;i<sp.getAdapter().getCount();i++) {
+											item = (String)sp.getAdapter().getItem(i);
+											if (item == null)
+												continue;
+											else
+												if (item.equals(value))
+													sp.setSelection(i);
+										}
+									}
+								} else {
+									o.addRow("");
+									o.addRedText("Empty spinner for variable "+v+". Check your variable configuration.");
+								}
+							}
+						} 
+
+
+
+
+
+					} 
+
+		}
+
 
 	}
-
-	
-	
 }
 
 

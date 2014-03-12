@@ -15,18 +15,19 @@ public class AddVariableToListEntry extends Block {
 	 * 
 	 */
 	private static final long serialVersionUID = -2748537558779469614L;
-	boolean isVisible = true;
+	boolean isVisible = true,isDisplayed=false;
 	String targetField,targetList,format,varNameSuffix;
 	GlobalState gs;
 	
 	public AddVariableToListEntry(String varNameSuffix,
-			String targetList,String targetField, boolean isVisible,String format) {
+			String targetList,String targetField, boolean isDisplayed,String format,boolean isVisible) {
 		super();
 		this.isVisible = isVisible;
 		this.targetField = targetField;
 		this.targetList = targetList;
 		this.format = format;
 		this.varNameSuffix=varNameSuffix;
+		this.isDisplayed=isDisplayed;
 	} 
 
 
@@ -38,7 +39,7 @@ public class AddVariableToListEntry extends Block {
 		WF_List l= myContext.getList(targetList);
 			if (l!=null) {
 				Log.d("nils","Found entry field in AddVariableToListEntry");
-				boolean added = l.addVariableToListEntry(varNameSuffix,targetField,format,isVisible);
+				boolean added = l.addVariableToListEntry(varNameSuffix,isDisplayed,targetField,format,isVisible);
 				if (!added) {
 					Log.e("nils","Didn't find list entry"+targetField+ " in AddVariableToListEntry");
 				}

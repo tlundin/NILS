@@ -14,10 +14,10 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
+import com.teraim.nils.dynamic.types.Delyta;
 import com.teraim.nils.dynamic.types.Marker;
 import com.teraim.nils.dynamic.types.MovingMarker;
 import com.teraim.nils.dynamic.types.Segment;
-import com.teraim.nils.non_generics.Delyta;
 import com.teraim.nils.utils.Geomatte;
 
 /**

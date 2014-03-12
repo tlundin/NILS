@@ -284,7 +284,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 
 	private Block readBlockAddVariableToListEntry(XmlPullParser parser) throws IOException, XmlPullParserException {
 		o.addRow("Parsing block: block_add_variable_to_list_entry...");
-		boolean isVisible = true;
+		boolean isVisible = true,isDisplayed = false;
 		String targetList= null,targetField= null,namn=null,format= null; 
 		parser.require(XmlPullParser.START_TAG, null,"block_add_variable_to_list_entry");
 		while (parser.next() != XmlPullParser.END_TAG) {
@@ -305,9 +305,13 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 				o.addRow("TARGETFIELD: "+targetField);
 			} 
 			else if (name.equals("is_displayed")) {
-				isVisible = !readText("is_displayed",parser).equals("false");
-				o.addRow("IS_VISIBLE: "+isVisible);	
+				isDisplayed = !readText("is_displayed",parser).equals("false");
+				o.addRow("IS_DISPLAYED: "+isDisplayed);	
 			} 
+			else if (name.equals("is_visible")) {
+				isVisible = !readText("is_visible",parser).equals("false");
+				o.addRow("IS_VISIBLE: "+isVisible);	
+			}
 			else if (name.equals("format")) {
 				format = readText("format",parser);
 				o.addRow("FORMAT: "+format);	
@@ -316,7 +320,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 				skip(parser);
 		}
 		return new AddVariableToListEntry(namn,
-				targetList,targetField, isVisible,format);	
+				targetList,targetField, isDisplayed,format,isVisible);	
 
 	}
 
@@ -363,7 +367,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 
 	private Block readBlockAddVariableToEntryField(XmlPullParser parser) throws IOException, XmlPullParserException {
 		o.addRow("Parsing block: block_add_variable_to_entry_field...");
-		boolean isVisible = true;
+		boolean isVisible = true,isDisplayed=false;
 		String target= null,namn= null,format= null; 
 		parser.require(XmlPullParser.START_TAG, null,"block_add_variable_to_entry_field");
 		while (parser.next() != XmlPullParser.END_TAG) {
@@ -380,9 +384,13 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 				o.addRow("TARGET: "+target);
 			} 
 			else if (name.equals("is_displayed")) {
-				isVisible = !readText("is_displayed",parser).equals("false");
-				o.addRow("IS_VISIBLE: "+isVisible);	
+				isDisplayed = !readText("is_displayed",parser).equals("false");
+				o.addRow("IS_DISPLAYED: "+isDisplayed);	
 			} 
+			else if (name.equals("is_visible")) {
+				isVisible = !readText("is_visible",parser).equals("false");
+				o.addRow("IS_VISIBLE: "+isVisible);	
+			}
 			else if (name.equals("format")) {
 				format = readText("format",parser);
 				o.addRow("FORMAT: "+format);	
@@ -390,7 +398,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 			else
 				skip(parser);
 		}
-		return new AddVariableToEntryFieldBlock(target,namn,isVisible,format);
+		return new AddVariableToEntryFieldBlock(target,namn,isDisplayed,format,isVisible);
 	}
 	private Block readBlockCreateListEntriesFromFieldList(XmlPullParser parser) throws IOException, XmlPullParserException {
 		o.addRow("Parsing block: block_create_list_entries_from_field_list...");
@@ -446,7 +454,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 	private Block readBlockAddVariableToEveryListEntry(XmlPullParser parser) throws IOException, XmlPullParserException {
 		o.addRow("Parsing block: block_add_variable_to_every_list_entry...");
 		String target=null,variableSuffix=null,format=null;
-		boolean displayOut=false;
+		boolean displayOut=false,isVisible=true;
 
 		parser.require(XmlPullParser.START_TAG, null,"block_add_variable_to_every_list_entry");
 		while (parser.next() != XmlPullParser.END_TAG) {
@@ -467,13 +475,16 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 			} else if (name.equals("is_displayed")) {
 				displayOut = readText("is_displayed",parser).trim().equals("true");
 				o.addRow("IS_DISPLAYED: "+displayOut);			
+			} else if (name.equals("is_visible")) {
+				isVisible = readText("is_visible",parser).trim().equals("true");
+				o.addRow("IS_VISIBLE: "+isVisible);			
 			} 
 			else
 				skip(parser);
 
 		}
 		return new 	AddVariableToEveryListEntryBlock(target,
-				variableSuffix, displayOut,format);
+				variableSuffix, displayOut,format,isVisible);
 	}
 
 	private DisplayValueBlock readBlockCreateDisplayField(XmlPullParser parser)throws IOException, XmlPullParserException {

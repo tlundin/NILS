@@ -13,6 +13,7 @@ import android.util.Log;
 
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.dynamic.VariableConfiguration;
+import com.teraim.nils.dynamic.types.Delyta;
 import com.teraim.nils.dynamic.types.Segment;
 import com.teraim.nils.utils.Tools;
 

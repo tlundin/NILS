@@ -64,7 +64,7 @@ public abstract class WF_Not_ClickableField extends WF_ListEntry {
 
 	}
 
-	public void addVariable(Variable var, boolean displayOut, String format) {
+	public void addVariable(Variable var, boolean displayOut, String format, boolean isVisible) {
 
 		String varId = var.getId();
 		if (displayOut && virgin) {

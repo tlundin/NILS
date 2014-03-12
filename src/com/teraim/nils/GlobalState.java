@@ -16,6 +16,7 @@ import com.teraim.nils.bluetooth.BluetoothRemoteDevice;
 import com.teraim.nils.dynamic.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Provyta;
 import com.teraim.nils.dynamic.types.Ruta;
+import com.teraim.nils.dynamic.types.SpinnerDefinition;
 import com.teraim.nils.dynamic.types.Table;
 import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.types.Workflow;
@@ -53,6 +54,8 @@ public class GlobalState  {
 	private VariableConfiguration artLista=null;
 	//Map workflows into a hash with name as key.
 	private Map<String,Workflow> myWfs; 
+	//Spinner definitions
+	private SpinnerDefinition mySpinnerDef;
 	//Cash for ruta/Provyta/Delyta..
 	private ArrayList<Ruta> rutor = new ArrayList<Ruta>();
 
@@ -87,7 +90,7 @@ public class GlobalState  {
 		ph = new PersistenceHelper(sp);
 		//Logger. Note that logger must be initialized with a TextView when used! 
 		if (ph.getB(PersistenceHelper.DEVELOPER_SWITCH))
-			createLogger();
+			log = new Logger(this.getContext());
 		else
 			removeLogger();
 		//Parser for rules
@@ -97,10 +100,9 @@ public class GlobalState  {
 		artLista = new VariableConfiguration(this);	
 
 		//Database Helper
-		Log.d("nils","artlista: "+artLista);
-		Log.d("nils","table: "+artLista.getTable());
 		db = new DbHelper(ctx,artLista.getTable(),ph);
 		myWfs = thawWorkflows();		
+
 		db.printAllVariables();
 		Tools.scanRutData(ctx.getResources().openRawResource(R.raw.rutdata_v3),this);
 
@@ -128,6 +130,18 @@ public class GlobalState  {
 	/*Singletons available for all classes
 	 * 
 	 */
+	public SpinnerDefinition getSpinnerDefinitions() {
+		return mySpinnerDef;
+	}
+	
+	public void setSpinnerDefinitions(SpinnerDefinition sd) {
+		if (sd!=null)
+			Log.d("nils","SetSpinnerDef called with "+sd.size()+" spinners");
+		else 
+			Log.e("nils","Spinnerdef null!!!");
+		mySpinnerDef=sd;
+	}
+	
 	public PersistenceHelper getPersistence() {
 		return ph;
 	}

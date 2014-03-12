@@ -55,7 +55,11 @@ public class Constants {
 
 	public static final int KEY_LENGTH = 10;
 
+	public static final String WF_FROZEN_SPINNER_ID = "spinnerdefinitions";
 
+	public static final String SPINNER_DEF_URL = "http://www.teraim.com/spinnerdef.csv";
+
+	
 
 	
 	public static UUID getmyUUID() {

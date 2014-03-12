@@ -29,10 +29,10 @@ public class VariableConfiguration {
 	
 	
 	
-	public static List<String>requiredColumns=Arrays.asList(Col_Variable_Keys,Col_Functional_Group,Col_Variable_Name,Col_Variable_Label,Type,"Unit","List Values");
+	public static List<String>requiredColumns=Arrays.asList(Col_Variable_Keys,Col_Functional_Group,Col_Variable_Name,Col_Variable_Label,Type,"Unit","List Values","Description");
 
 	
-	private static int KEY_CHAIN=0,FUNCTIONAL_GROUP=1,VARIABLE_NAME=2,VARIABLE_LABEL=3,TYPE=4,UNIT=5,LIST_VALUES=6;
+	private static int KEY_CHAIN=0,FUNCTIONAL_GROUP=1,VARIABLE_NAME=2,VARIABLE_LABEL=3,TYPE=4,UNIT=5,LIST_VALUES=6,DESCRIPTION=7;
 	
 	Map<String,Integer>fromNameToColumn = new HashMap<String,Integer>();
 
@@ -83,6 +83,10 @@ public class VariableConfiguration {
 		return row.get(fromNameToColumn.get(requiredColumns.get(VARIABLE_LABEL)));
 	}
 	
+	public CharSequence getVariableDescription(List<String> row) {		
+		return row.get(fromNameToColumn.get(requiredColumns.get(DESCRIPTION)));
+	}
+	
 	public String getKeyChain(List<String> row) {
 		return row.get(fromNameToColumn.get(requiredColumns.get(KEY_CHAIN)));		
 	}
@@ -92,15 +96,21 @@ public class VariableConfiguration {
 	}
 	public Variable.DataType getnumType(List<String> row) {
 		String type = row.get(fromNameToColumn.get(requiredColumns.get(TYPE)));
-		if (type!=null) {
-		type.trim();
-		return type.equals("number")?
-				Variable.DataType.numeric:(type.equals("boolean")?
-				Variable.DataType.bool:(type.equals("list")?
-				Variable.DataType.list:(type.equals("numeric")?
-				Variable.DataType.numeric:
-				Variable.DataType.text)));
+		if (type!=null) {		
+		if (type.equals("number"))
+			return Variable.DataType.numeric;
+		else if (type.equals("boolean"))
+			return Variable.DataType.bool;
+		else if (type.equals("list"))
+			return Variable.DataType.list;
+		else if (type.equals("text"))
+			return Variable.DataType.text;
+		else
+			Log.e("nils","TYPE NOT KNOWN: "+type);
 		}
+		Log.e("nils","TYPE NULL?: "+type);
+		
+		
 		return null;
 	}
 
@@ -125,9 +135,12 @@ public class VariableConfiguration {
 		return res;
 	}
 	
-	public String getDescription(List<String> row) {
-		return myTable.getElement("Beskrivning", row);
+	public String getBeskrivning(List<String> row) {
+		String b = myTable.getElement("Beskrivning", row);
+		return (b==null?"":b);
 	}
+	
+
 	
 	public String getUrl(List<String> row) {
 		return myTable.getElement("Internet link", row);	
@@ -203,6 +216,8 @@ public class VariableConfiguration {
 	public String getCurrentProvyta() {
 		return getVariableValue(null,"Current_Provyta");
 	}
+
+	
 
 
 

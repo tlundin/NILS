@@ -14,15 +14,16 @@ public class AddVariableToEntryFieldBlock extends Block {
 	 * 
 	 */
 	private static final long serialVersionUID = -7978000865030730562L;
-	boolean displayOut;
+	boolean displayOut,isVisible;
 	String target,namn,format;
 	GlobalState gs;
 	
-	public AddVariableToEntryFieldBlock(String target,String namn,boolean displayOut,String format) {
+	public AddVariableToEntryFieldBlock(String target,String namn,boolean displayOut,String format,boolean isVisible) {
 		this.target=target;
 		this.namn=namn;
 		this.displayOut=displayOut;
 		this.format = format;
+		this.isVisible=isVisible;
 	}
 	
 	public void create(WF_Context myContext) {
@@ -37,7 +38,8 @@ public class AddVariableToEntryFieldBlock extends Block {
 			
 		} else {
 			Variable var = al.getVariableInstance(namn);
-			myField.addVariable(var, displayOut, format);
+			if (var!=null)
+				myField.addVariable(var, displayOut, format,isVisible);
 		}
 		
 	}

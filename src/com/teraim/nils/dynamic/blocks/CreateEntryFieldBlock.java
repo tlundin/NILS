@@ -65,10 +65,12 @@ public class CreateEntryFieldBlock extends Block {
 		Variable v = al.getVariableInstance(name);
 		if (v == null) {
 			o.addRow("");
-			o.addRedText("Variable "+name+" not found in definition file for CreateEntryBlock");
+			o.addRedText("Variable "+name+" referenced in block_create_entry_field not found.");
 		} else	{	
-			WF_ClickableField_Selection myField = new WF_ClickableField_Selection(v.getLabel(),al.getDescription(v.getBackingDataSet()),myContext,name,isVisible);
-			myField.addVariable(v, isVisible,format);
+			WF_ClickableField_Selection myField = new WF_ClickableField_Selection(v.getLabel(),al.getBeskrivning(v.getBackingDataSet()),myContext,name,isVisible);
+			Log.d("nils", "In CreateEntryField.Description: "+al.getBeskrivning(v.getBackingDataSet()));
+			Log.d("nils","Backing data: "+v.getBackingDataSet().toString());
+			myField.addVariable(v, true,format,true);
 			myContext.addDrawable(v.getId(), myField);
 			if(myContainer !=null) {
 				myContainer.add(myField);

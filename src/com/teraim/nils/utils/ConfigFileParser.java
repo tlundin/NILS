@@ -11,6 +11,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +25,7 @@ import com.teraim.nils.FileLoadedCb;
 import com.teraim.nils.FileLoadedCb.ErrorCode;
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.dynamic.VariableConfiguration;
+import com.teraim.nils.dynamic.types.SpinnerDefinition;
 import com.teraim.nils.dynamic.types.Table;
 import com.teraim.nils.dynamic.types.Table.ErrCode;
 import com.teraim.nils.log.LoggerI;
@@ -48,6 +50,9 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 	String vVersion = null;
 	Table myTable=null;
 	LoggerI o;
+	
+	
+	final static int VAR_PATTERN_ROW_LENGTH = 8;
 
 
 
@@ -78,7 +83,11 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 			serverUrl = "http://"+serverUrl;
 			o.addRow("server url name missing http header...adding");		
 		}
-		return parse(serverUrl,ph.get(PersistenceHelper.CONFIG_LOCATION));
+		ErrorCode retValue = parse(serverUrl,ph.get(PersistenceHelper.CONFIG_LOCATION));
+		
+		GlobalState.getInstance(ctx).setSpinnerDefinitions(Tools.scanSpinerDef(ctx, o));
+		
+		return retValue;
 	}
 
 	@Override
@@ -111,6 +120,8 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 
 	//Creates the ArtLista arteface from a configuration file.
 
+	
+	
 	public ErrorCode parse(String serverUrl, String fileName) {
 		final String FileUrl = serverUrl+fileName;
 		final String VarUrl = serverUrl+"varpattern.csv";
@@ -248,7 +259,7 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 				//Scan through VarPattern to generate variables.
 				Log.d("nils","Starting scan of varPattern");
 				String r[];
-				final int VAR_PATTERN_ROW_LENGTH = 7;
+				
 				List<List<String>> elems;
 				while((row = br2.readLine())!=null) {
 					r =row.split(",",-1);
@@ -259,14 +270,15 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 						Log.d("nils","found group name: "+pGroup);
 						if (pGroup==null || pGroup.trim().length()==0) {
 							Log.d("nils","found variable "+r[pNameIndex]+" in varpattern");
-							myTable.addRow(Arrays.asList(r));
+							myTable.addRow(trimmed(r));
 						} else {
 							elems = groups.get(pGroup);
 							String varPatternName = r[pNameIndex];
 							if (elems==null) {
 								//If the variable has a group,add it 
 								Log.d("nils","Group "+pGroup+" in line#"+rowC+" does not exist in config file. Will use name: "+varPatternName);
-								myTable.addRow(Arrays.asList(r));
+								
+								myTable.addRow(trimmed(r));
 							} else {
 								for (List<String>elem:elems) {
 									//Go through all rows in group. Generate variables.
@@ -281,7 +293,7 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 										List<String>elemCopy = new ArrayList<String>(elem);
 										elemCopy.remove(nameIndex);
 										elemCopy.remove(groupIndex);
-										List<String>varPatternL = new ArrayList<String>(Arrays.asList(r));
+										List<String>varPatternL = new ArrayList<String>(trimmed(r));
 										varPatternL.addAll(elemCopy);
 										//Replace name column with full name.
 										varPatternL.set(pNameIndex, fullVarName);
@@ -332,4 +344,15 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 		else 
 			return ErrorCode.newVarPatternVersionLoaded;
 	}
+
+
+
+	private List<String> trimmed(String[] r) {
+		ArrayList<String> ret = new ArrayList<String>();
+		for(int i=0;i<VAR_PATTERN_ROW_LENGTH;i++)
+			ret.add(r[i]);
+		return ret;
+	}
+	
+	
 }

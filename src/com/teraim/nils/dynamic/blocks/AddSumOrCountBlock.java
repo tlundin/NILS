@@ -61,7 +61,7 @@ public  class AddSumOrCountBlock extends Block {
 				o.addRow("");
 				o.addRedText("Error in block_add_sum_of_selected_variables_display: missing variable for result parameter: "+result);
 			} else 
-				field.addVariable(v, true,format);			
+				field.addVariable(v, true,format,true);			
 		}
 		/*
 		
