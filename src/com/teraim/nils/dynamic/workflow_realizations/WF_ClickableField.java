@@ -117,14 +117,20 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 					DataType type = variable.getType();
 					View view = pairs.getValue();
 					if (type == DataType.numeric||
-						type == DataType.text){
-							EditText etview = (EditText)view.findViewById(R.id.edit);
-							etview.setText("");
-						} else				
-							if (type == DataType.list) {
-								Spinner sp = (Spinner)view;
-								sp.setSelection(-1);
-							} 
+							type == DataType.text){
+						EditText etview = (EditText)view.findViewById(R.id.edit);
+						etview.setText("");
+					} else				
+						if (type == DataType.list) {
+							LinearLayout sl = (LinearLayout)view;
+							Spinner sp = (Spinner)sl.findViewById(R.id.spinner);
+							if (sp.getTag(R.string.u1)!=null) {
+								TextView descr = (TextView)sl.findViewById(R.id.extendedDescr);
+								descr.setText("");
+							}
+							sp.setSelection(-1);
+
+						} 
 				}
 				save();
 				refreshOutputFields();
@@ -251,7 +257,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 
 		String varLabel = var.getLabel();
 		String varId = var.getId();
-		List<SpinnerElement> curElems=null;
+
 		// Set an EditText view to get user input 
 		if (displayOut && virgin) {
 			virgin = false;
@@ -278,38 +284,47 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 		case list:
 			Log.d("nils","Adding spinner for label "+label);
 			//o.addRow("Adding spinner field for dy-variable with label "+label+", name "+varId+", type "+var.getType().name()+" and unit "+unit.name());
-			final Spinner spinner = (Spinner)LayoutInflater.from(myContext.getContext()).inflate(R.layout.edit_field_spinner, null);
+			LinearLayout sl = (LinearLayout)LayoutInflater.from(myContext.getContext()).inflate(R.layout.edit_field_spinner, null);
+			final TextView sHeader = (TextView) sl.findViewById(R.id.header);
+			final TextView sDescr = (TextView) sl.findViewById(R.id.extendedDescr);
+			final Spinner spinner =(Spinner) sl.findViewById(R.id.spinner);
 			ArrayAdapter<String> adapter = new ArrayAdapter<String>(myContext.getContext(), android.R.layout.simple_spinner_dropdown_item,new ArrayList<String>() );		
 			spinner.setAdapter(adapter);
-			inputContainer.addView(spinner);
-			myVars.put(var,spinner);
+			inputContainer.addView(sl);			
+			myVars.put(var,sl);
 			String[] opt=null;
+			String[] val=null;
+			sHeader.setText(var.getLabel());			
 			String listValues = al.getTable().getElement("List Values", var.getBackingDataSet());
 			//Parse 
 			if (listValues.startsWith("@file")) {
 				Log.d("nils","Found complex spinner");
 				if (sd ==null) {
 					o.addRow("");
-					o.addRedText("Spinner definition NULL in workflow! Spinner cannot be created!");
-
+					o.addRedText("Spinner definition file has not loaded. Spinners cannot be created!");
 				} else {
 					List<SpinnerElement> elems = sd.get(var.getId());
-					int i = 0;
-					opt = new String[elems.size()];
-					for (SpinnerElement se:elems) {
-						Log.d("nils","Spinner element: "+se.opt);
-						opt[i++] = se.opt;
-					}
-					spinner.setTag(R.string.u1,var.getId());
-					spinner.post(new Runnable() {
-						@Override
-						public void run() {
-							spinner.setSelection(0);
+					if (elems == null) {
+						Log.e("nils","No spinner elements for variable "+var.getId());
+						Log.e("nils","backing row: "+var.getBackingDataSet());
+						o.addRow("");
+						o.addRedText("Complex Spinner variable "+var.getId()+" is not defining any elements in the configuration file" );
+
+					} else {
+						int i = 0;
+						opt = new String[elems.size()];
+						val = new String[elems.size()];
+						for (SpinnerElement se:elems) {
+							Log.d("nils","Spinner element: "+se.opt);
+							opt[i] = se.opt;
+							val[i++] = se.value;
 						}
-					});
+						spinner.setTag(R.string.u1,var.getId());
+						values.put(var, val);
+					}
 				}
 			} 
-			else 
+			else {
 				if (listValues.startsWith("@col")) {
 					spinner.setTag("dynamic");
 				}
@@ -325,7 +340,8 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 						if (opt[0].contains("=")) {
 							Log.d("nils","found static list with value pairs");
 							//we have a value. 
-							String[] val = new String[opt.length];
+							Log.d("nils","List found is "+listValues+"...opt has "+opt.length+" elements.");
+							val = new String[opt.length];
 							int c = 0;
 							String tmp[];
 							for (String s:opt) {
@@ -346,14 +362,19 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 						}
 					}
 				}
+			}
 			if (opt!=null) {
-				for (int i=0;i<opt.length;i++) 
-					Log.d("nils","OPT "+i+":"+opt[i]);				
-				adapter.addAll(opt);
 
+				adapter.addAll(opt);
+				Log.d("nils","Adapter has "+adapter.getCount()+" elements");
+				adapter.notifyDataSetChanged();
+				
+				
+				
 			}
 			else
 				Log.e("nils","Couldnt add elements to spinner - opt was null in WF_ClickableField");
+
 
 
 			spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
@@ -370,6 +391,8 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 							hideOrShowViews(curMapping,HIDE);
 							hideOrShowViews(e.varMapping,SHOW);
 							spinner.setTag(R.string.u2,e.varMapping);
+							sDescr.setText(e.descr);
+							Log.e("nils","DESCR TEXT SET TO "+e.descr);
 						}
 					}
 				}
@@ -381,8 +404,17 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 					for (String varId:varIds) {
 						if (varId!=null) {
 							for(Variable v:myVars.keySet()) {
-								if (v.getId().equals(varId.trim())) 
-									myVars.get(v).setVisibility(mode?View.VISIBLE:View.GONE);							
+								if (v.getId().equals(varId.trim()))  {
+									View gView = myVars.get(v);
+									gView.setVisibility(mode?View.VISIBLE:View.GONE);
+									if (gView instanceof LinearLayout) {
+										EditText et =(EditText) gView.findViewById(R.id.edit);
+										if (et!=null && mode==HIDE) {
+											Log.e("nils","Setting view text to empty for "+v.getId());
+											et.setText("");
+										}
+									} 
+								}
 							}
 						}
 					}
@@ -437,7 +469,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 		}
 		if (!isVisible) 
 			myVars.get(var).setVisibility(View.GONE);
-		
+
 
 		refreshInputFields();
 		refreshOutputFields();
@@ -472,11 +504,12 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 						variable.deleteValue();
 				} else				
 					if (type == DataType.list) {
-						Spinner sp = (Spinner)view;
+						LinearLayout sl = (LinearLayout)view;
+						Spinner sp = (Spinner)sl.findViewById(R.id.spinner);
 						int s = sp.getSelectedItemPosition();
 						String v[] = values.get(variable);
 						if (v!=null) {
-							if (s>0&&s<v.length) 						
+							if (s>=0&&s<v.length) 						
 								variable.setValue(v[s]);
 							else
 								variable.deleteValue();
@@ -513,6 +546,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 			} else
 				if (numType == Variable.DataType.numeric||
 				numType ==DataType.text) {
+					Log.d("nils","refreshing edittext with varid "+variable.getId());
 					EditText et = (EditText)v.findViewById(R.id.edit);
 					if (et!=null)
 						et.setText(value==null?"":value);
@@ -521,9 +555,19 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 				} else
 					if (numType==DataType.list) {
 						String[] opt = null;
-						Spinner sp = (Spinner)v;
+						Spinner sp = (Spinner)v.findViewById(R.id.spinner);
 						String tag = (String) sp.getTag();
-						if (tag!=null && tag.equals("dynamic")) {
+						
+						String val[] = values.get(variable);
+						if (val!=null) {
+							for (int i=0;i<val.length;i++) {
+								if (val[i].equals(variable.getValue()))
+									sp.setSelection(i);
+							}
+						}
+
+						
+						else if (tag!=null && tag.equals("dynamic")) {
 							//Get the list values
 							String listValues = al.getTable().getElement("List Values", variable.getBackingDataSet());
 							Log.d("nils","Found dynamic list definition..parsing");

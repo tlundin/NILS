@@ -38,6 +38,7 @@ public class BlockCreateListEntriesFromFieldList extends Block {
 		WF_List myList; 
 		VariableConfiguration al = GlobalState.getInstance(myContext.getContext()).getArtLista();
 		List<List<String>>rows = al.getTable().getRowsContaining(selectionField, selectionPattern);
+		Log.d("nils","Number of rows in CreateEntrieFromList "+rows.size());
 		if (rows==null||rows.size()==0) {
 			o.addRow("");
 			o.addRedText("Selectionfield: "+selectionField+" selectionPattern: "+selectionPattern+" returns zero rows! List cannot be created");

@@ -251,7 +251,7 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 				Collections.addAll(cheaderL,configFileHeaderS); 
 				cheaderL.remove(VariableConfiguration.Col_Functional_Group);
 				cheaderL.remove(VariableConfiguration.Col_Variable_Name);
-				List<String> vheaderL = new ArrayList<String>(Arrays.asList(varPatternHeaderS));
+				List<String> vheaderL = new ArrayList<String>(trimmed(varPatternHeaderS));
 				vheaderL.addAll(cheaderL);
 				myTable = new Table(vheaderL,0,pNameIndex);
 
@@ -353,6 +353,5 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 			ret.add(r[i]);
 		return ret;
 	}
-	
 	
 }

@@ -20,7 +20,7 @@ import android.widget.TextView;
 
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
-import com.teraim.nils.bluetooth.BluetoothRemoteDevice;
+import com.teraim.nils.bluetooth.BluetoothConnectionService;
 import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.log.LoggerI;
 import com.teraim.nils.utils.PersistenceHelper;
@@ -59,10 +59,10 @@ public class MenuActivity extends Activity {
 			};
 		//Listen for bluetooth events.
 			IntentFilter filter = new IntentFilter();
-			filter.addAction(BluetoothRemoteDevice.SYNK_SERVICE_STARTED);
-			filter.addAction(BluetoothRemoteDevice.SYNK_SERVICE_STOPPED);
-			filter.addAction(BluetoothRemoteDevice.SYNK_SERVICE_CONNECTED);
-			filter.addAction(BluetoothRemoteDevice.SYNK_SERVICE_CONNECTED);
+			filter.addAction(BluetoothConnectionService.SYNK_SERVICE_STARTED);
+			filter.addAction(BluetoothConnectionService.SYNK_SERVICE_STOPPED);
+			filter.addAction(BluetoothConnectionService.SYNK_SERVICE_CONNECTED);
+			filter.addAction(BluetoothConnectionService.SYNK_SERVICE_CONNECTED);
 			
 		this.registerReceiver(brr, filter);
 		//Listen for Service started/stopped event.
@@ -163,8 +163,8 @@ public class MenuActivity extends Activity {
 					//This will also turn off the server as a side effect.
 					//Intent intent = new Intent();
 					//intent.setAction(BluetoothAdapter.ACTION_STATE_CHANGED);
-					Intent intent = new Intent(getBaseContext(),BluetoothRemoteDevice.class);
-					if (gs.getSyncStatus()==BluetoothRemoteDevice.SYNK_STOPPED) {
+					Intent intent = new Intent(getBaseContext(),BluetoothConnectionService.class);
+					if (gs.getSyncStatus()==BluetoothConnectionService.SYNK_STOPPED) {
 						startService(intent);
 						//Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 				        //startActivity(enableBtIntent);
@@ -219,7 +219,7 @@ public class MenuActivity extends Activity {
 		case 2:
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle("Synkronisering")
-			.setMessage("Vill du "+(gs.getSyncStatus()==BluetoothRemoteDevice.SYNK_STOPPED?"slå på ":"stänga av ")+"synkroniseringen?").setPositiveButton("Ja", dialogClickListener)
+			.setMessage("Vill du "+(gs.getSyncStatus()==BluetoothConnectionService.SYNK_STOPPED?"slå på ":"stänga av ")+"synkroniseringen?").setPositiveButton("Ja", dialogClickListener)
 			.setNegativeButton("Nej", dialogClickListener).show();
 			break;
 

@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.gesture.GestureOverlayView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/gesture_overlay"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-
-    <LinearLayout
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,26 +11,12 @@
             android:baselineAligned="false"
             android:orientation="horizontal" >
 
-            <LinearLayout
+          	<LinearLayout
+                android:id="@+id/Description"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="0.5"
+                 android:layout_weight="0.5"
                 android:orientation="vertical" >
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:textStyle="bold" />
-
-                <FrameLayout
-                    android:id="@+id/Description"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"/>
-
             </LinearLayout>
 
             <View
@@ -72,5 +53,3 @@
             </LinearLayout>
         </ScrollView>
     </LinearLayout>
-
-</android.gesture.GestureOverlayView>

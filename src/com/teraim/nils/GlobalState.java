@@ -12,7 +12,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.teraim.nils.bluetooth.BluetoothRemoteDevice;
+import com.teraim.nils.bluetooth.BluetoothConnectionService;
 import com.teraim.nils.dynamic.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Provyta;
 import com.teraim.nils.dynamic.types.Ruta;
@@ -60,7 +60,7 @@ public class GlobalState  {
 	private ArrayList<Ruta> rutor = new ArrayList<Ruta>();
 
 	//Global state for sync.
-	private int syncStatus=BluetoothRemoteDevice.SYNK_STOPPED;	
+	private int syncStatus=BluetoothConnectionService.SYNK_STOPPED;	
 
 	public enum ErrorCode {
 		ok,
@@ -288,11 +288,11 @@ public class GlobalState  {
 
 	public String getSyncStatusS() {
 		switch (syncStatus) {
-		case BluetoothRemoteDevice.SYNK_STOPPED:
+		case BluetoothConnectionService.SYNK_STOPPED:
 			return "AV";
-		case BluetoothRemoteDevice.SYNK_SEARCHING:
+		case BluetoothConnectionService.SYNK_SEARCHING:
 			return "SÖKER";
-		case BluetoothRemoteDevice.SYNK_RUNNING:
+		case BluetoothConnectionService.SYNK_RUNNING:
 			return "PÅ";
 		default:
 			return "?";
@@ -304,11 +304,11 @@ public class GlobalState  {
 	}
 
 	public void sendParameter(Context ctx,String key,String value,int scope) {
-		if (syncStatus == BluetoothRemoteDevice.SYNK_RUNNING)
-			BluetoothRemoteDevice.getSingleton().sendParameter(key, value, scope);
-		else if (syncStatus == BluetoothRemoteDevice.SYNK_STOPPED)
+		if (syncStatus == BluetoothConnectionService.SYNK_RUNNING)
+			BluetoothConnectionService.getSingleton().sendParameter(key, value, scope);
+		else if (syncStatus == BluetoothConnectionService.SYNK_STOPPED)
 		{
-			Intent intent = new Intent(ctx,BluetoothRemoteDevice.class);
+			Intent intent = new Intent(ctx,BluetoothConnectionService.class);
 			ctx.startService(intent);
 		}
 		//Otherwise ongoing sync. just wait?
@@ -432,6 +432,17 @@ public class GlobalState  {
 
 	public String getYear() {
 		return Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+	}
+
+	public boolean isMaster() {
+		String m;
+		if ((m = ph.get(PersistenceHelper.DEVICE_COLOR_KEY)).equals(PersistenceHelper.UNDEFINED)) {
+				ph.put(PersistenceHelper.DEVICE_COLOR_KEY, "Mästare");
+				return true;
+		}
+		else
+			return m.equals("Mästare");
+
 	}
 	
 	

@@ -22,6 +22,7 @@ public class SpinnerDefinition implements Serializable {
 		public SpinnerElement(String val,String opt,String vars,String descr) {
 			value = val;
 			this.opt = opt;
+			this.descr=descr;
 			if (vars!=null&&!vars.isEmpty()) {
 				String[] v = vars.split("\\|");
 				for (String s:v) 

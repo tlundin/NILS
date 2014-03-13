@@ -287,6 +287,7 @@ public class Start extends MenuActivity {
 				myState = State.POST_INIT;
 				loginConsole.draw();
 				//init current year.
+				
 				Variable v = gs.getArtLista().getVariableInstance("Current_Year");
 				if (v!=null)
 					v.setValue(Calendar.getInstance().get(Calendar.YEAR)+"");
@@ -540,6 +541,7 @@ public class Start extends MenuActivity {
 			ph.put(PersistenceHelper.BUNDLE_LOCATION, "nilsbundle3.xml");
 		if (ph.get(PersistenceHelper.CONFIG_LOCATION).equals(PersistenceHelper.UNDEFINED))
 			ph.put(PersistenceHelper.CONFIG_LOCATION, "configv2.csv");
+
 		ph.put(PersistenceHelper.DEVELOPER_SWITCH,true);
 		ph.put(PersistenceHelper.VERSION_CONTROL_SWITCH_OFF, true);
 

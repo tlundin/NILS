@@ -4,9 +4,10 @@ xmlns:android="http://schemas.android.com/apk/res/android" >
 <PreferenceCategory android:title="Allmänt">
     android:title="Allmänt" 
  <ListPreference 
-     android:key="deviceColor"
+     android:key="device_type"
      android:entryValues="@array/deviceTypes" 
      android:title="Dosans Typ" 
+     android:defaultValue="Mästare"
      android:entries="@array/deviceTypes" />
 
 <EditTextPreference

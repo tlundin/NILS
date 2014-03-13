@@ -34,14 +34,24 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 	
 	private boolean addEntryField(List<String>r) {
 		String entryLabel = al.getEntryLabel(r);
+		if (entryLabel==null||entryLabel.length()==0) {
+			Log.d("nils","Skipping empty entrylabel");
+			return true;
+		}
+		Log.d("nils","ADD EntryField with label "+entryLabel);
 		if (entryFields.get(entryLabel)==null) 	{	
 			WF_ClickableField_Selection entryF = new WF_ClickableField_Selection(entryLabel,al.getBeskrivning(r),myContext,"C_F_"+index++,true);
 			list.add(entryF);	
 			entryFields.put(entryLabel, entryF);
+			Log.d("nils","ADDed "+entryLabel);
+		
 			return true;
 		}
-		else
+		else {
+			Log.d("nils","Entryfield for "+entryLabel+" already exist");
 			return false;
+		}
+			
 	}
 	
 	
@@ -58,7 +68,12 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 				v = al.getVariableInstance(varID);
 				String entryLabel = al.getEntryLabel(cRow);
 				if (v!=null) {
-					entryFields.get(entryLabel).addVariable(v, displayOut,format,isVisible);
+					Log.d("nils","Couldn't find EntryField with label key"+entryLabel);
+
+					if (entryFields.get(entryLabel)==null)
+						Log.e("nils","SHIIT "+entryLabel);
+					else
+						entryFields.get(entryLabel).addVariable(v, displayOut,format,isVisible);
 				}
 				else {
 					o.addRow("");

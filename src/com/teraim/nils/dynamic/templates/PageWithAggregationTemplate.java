@@ -35,14 +35,14 @@ public class PageWithAggregationTemplate extends Executor {
 			Bundle savedInstanceState) {
 		myContext.onResume();
 		myLayouts = new ArrayList<WF_Container>();
-		Log.d("nils","in onCreateView of fixpunkt_template");
+		Log.d("nils","in onCreateView of Template PAGE with AGGregation");
 		myContainer = container;
-		View v = inflater.inflate(R.layout.template_fixpunkt_wf, container, false);	
+		View v = inflater.inflate(R.layout.template_page_with_agg_wf, container, false);	
 		WF_Container root = new WF_Container("root", (LinearLayout)v.findViewById(R.id.root), null);
 		myLayouts.add(root);
 		myLayouts.add(new WF_Container("Field_panel_1", (LinearLayout)v.findViewById(R.id.fieldList), root));
 		myLayouts.add(new WF_Container("Aggregation_panel_3", (LinearLayout)v.findViewById(R.id.aggregates), root));
-		myLayouts.add(new WF_Container("Description_panel_2", (FrameLayout)v.findViewById(R.id.Description), root));
+		myLayouts.add(new WF_Container("Description_panel_2", (LinearLayout)v.findViewById(R.id.Description), root));
 		myContext.addContainers(getContainers());
 		if (wf!=null) {
 			run();

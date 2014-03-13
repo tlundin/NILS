@@ -35,17 +35,16 @@ import android.widget.Toast;
 
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
-import com.teraim.nils.R.drawable;
-import com.teraim.nils.R.string;
 import com.teraim.nils.exceptions.BluetoothDeviceExtra;
 import com.teraim.nils.exceptions.BluetoothDevicesNotPaired;
+import com.teraim.nils.log.LoggerI;
 import com.teraim.nils.non_generics.Constants;
 
-public class BluetoothRemoteDevice extends Service implements RemoteDevice {
+public class BluetoothConnectionService extends Service implements RemoteDevice {
 
 
 
-	private static BluetoothRemoteDevice me =null;
+	private static BluetoothConnectionService me =null;
 	private static BluetoothAdapter mBluetoothAdapter=BluetoothAdapter.getDefaultAdapter();
 	//final Activity mActivity;
 
@@ -81,8 +80,8 @@ public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 	private IBinder iBinder = new LocalBinder();
 
 	public class LocalBinder extends Binder {
-		BluetoothRemoteDevice getBinder() {
-			return BluetoothRemoteDevice.this;
+		BluetoothConnectionService getBinder() {
+			return BluetoothConnectionService.this;
 		}
 	}
 
@@ -90,27 +89,37 @@ public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 	private BroadcastReceiver brr=null;
 	//Try pinging five times. Before giving up.
 	private int pingC = 5;
-	private GlobalState global;
+	private GlobalState gs;
+	private LoggerI o;
+	private MessageHandlerI myHandler;
 	@Override
 	public void onCreate() {
 		
-		global = GlobalState.getInstance(this);
+		gs = GlobalState.getInstance(this);
+		
+		myHandler = gs.isMaster()?new MasterMessageHandler(gs):new SlaveMessageHandler(gs);
+		
+		
+				
+		
+		o = gs.getLogger();
 		Log.d("NILS","Service on create");
+		o.addRow("BlueTooth service starting up");
 		me = this;
 		mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 		
-		global.setSyncStatus(SYNK_SEARCHING);
+		gs.setSyncStatus(SYNK_SEARCHING);
 		//showNotification();
 		brr = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context ctx, Intent intent) {
 				final String action = intent.getAction();
 				//If message fails, try to ping until sister replies.
-				if (action.equals(BluetoothRemoteDevice.SYNK_SERVICE_SERVER_CONNECT_FAIL)) {
+				if (action.equals(BluetoothConnectionService.SYNK_SERVICE_SERVER_CONNECT_FAIL)) {
 					Toast.makeText(me, "Förlorade kontakten med andra dosan", Toast.LENGTH_LONG).show();
 					stop();
 				}
-				else if (action.equals(BluetoothRemoteDevice.SYNK_SERVICE_CLIENT_CONNECT_FAIL)) {
+				else if (action.equals(BluetoothConnectionService.SYNK_SERVICE_CLIENT_CONNECT_FAIL)) {
 					//Try to ping again in a while if still running.
 					new Handler().postDelayed(new Runnable() {
 						public void run() {
@@ -127,7 +136,7 @@ public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 				}
 
 				
-				else if (action.equals(BluetoothRemoteDevice.SYNK_SERVICE_MESSAGE_RECEIVED))
+				else if (action.equals(BluetoothConnectionService.SYNK_SERVICE_MESSAGE_RECEIVED))
 					Toast.makeText(me, intent.getStringExtra("MSG"), Toast.LENGTH_LONG).show();
 				else if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
 					final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,
@@ -135,6 +144,7 @@ public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 					switch (state) {
 					case BluetoothAdapter.STATE_OFF:
 						Log.d("BT","Bluetooth off");
+						
 						stop();
 						break;
 					case BluetoothAdapter.STATE_TURNING_OFF:
@@ -156,10 +166,10 @@ public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 			//When bluetooth runs, call start server. Then try to ping the server.
 			IntentFilter ifi = new IntentFilter();
 			ifi.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
-			ifi.addAction(BluetoothRemoteDevice.SYNK_SERVICE_CLIENT_CONNECT_FAIL);
-			ifi.addAction(BluetoothRemoteDevice.SYNK_SERVICE_SERVER_CONNECT_FAIL);
-			ifi.addAction(BluetoothRemoteDevice.SYNK_SERVICE_STOPPED);
-			ifi.addAction(BluetoothRemoteDevice.SYNK_SERVICE_MESSAGE_RECEIVED);
+			ifi.addAction(BluetoothConnectionService.SYNK_SERVICE_CLIENT_CONNECT_FAIL);
+			ifi.addAction(BluetoothConnectionService.SYNK_SERVICE_SERVER_CONNECT_FAIL);
+			ifi.addAction(BluetoothConnectionService.SYNK_SERVICE_STOPPED);
+			ifi.addAction(BluetoothConnectionService.SYNK_SERVICE_MESSAGE_RECEIVED);
 			
 			this.registerReceiver(brr, ifi);
 			
@@ -173,7 +183,7 @@ public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 				ba.enable();
 			else {
 				startServer();
-				ping();
+				//ping();
 			}
 			
 	
@@ -210,7 +220,7 @@ public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 		connected_T=null;
 		if(BluetoothAdapter.getDefaultAdapter().isEnabled())
 			BluetoothAdapter.getDefaultAdapter().disable();
-		global.setSyncStatus(SYNK_STOPPED);
+		gs.setSyncStatus(SYNK_STOPPED);
 		Intent intent = new Intent();
 		intent.setAction(SYNK_SERVICE_STOPPED);
 		this.sendBroadcast(intent);
@@ -235,7 +245,7 @@ public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 		.getNotification();
 		// The PendingIntent to launch our activity if the user selects this notification
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-				new Intent(this, BluetoothRemoteDevice.class), 0);
+				new Intent(this, BluetoothConnectionService.class), 0);
 
 		// Set the info for the views that show in the notification panel.
 		noti.setLatestEventInfo(this, "absolutely no idea what this should be",
@@ -245,18 +255,7 @@ public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 		mNM.notify(NOTIFICATION, noti);
 	}
 
-	public static Bitmap drawableToBitmap (Drawable drawable) {
-		if (drawable instanceof BitmapDrawable) {
-			return ((BitmapDrawable)drawable).getBitmap();
-		}
-
-		Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Config.ARGB_8888);
-		Canvas canvas = new Canvas(bitmap); 
-		drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-		drawable.draw(canvas);
-
-		return bitmap;
-	}
+	
 
 	public void stop() {
 		this.stopSelf();
@@ -295,7 +294,7 @@ public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 		Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
 		BluetoothDevice pair;
 		if (pairedDevices.isEmpty()) {
-			Log.e("NILS","DIDNT FIND ANY PAIRED DEVICE");
+			Log.e("NILS","Didn't find any paired device.");
 			
 			throw new BluetoothDevicesNotPaired();
 		}
@@ -399,7 +398,7 @@ public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 			Log.d("NILS","Wrote "+msg+" to socket");
 		}
 		//Send a message that service is now connected.
-		global.setSyncStatus(SYNK_RUNNING);
+		gs.setSyncStatus(SYNK_RUNNING);
 		Intent intent = new Intent();
 		intent.setAction(SYNK_SERVICE_CONNECTED);
 		this.sendBroadcast(intent);
@@ -529,6 +528,7 @@ public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 		private final ObjectOutputStream obj_out;
 		private final ObjectInputStream obj_in;
 		private Context mContext;
+
 		public ConnectedThread(Context ctx, BluetoothSocket socket) {
 			mContext = ctx;
 			mmSocket = socket;
@@ -612,6 +612,7 @@ public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 
 			}
 			else if (o instanceof Ping) {
+				myHandler.handleMessage(o);
 				intent.setAction(SYNK_PING_MESSAGE_RECEIVED);
 			}
 			mContext.sendBroadcast(intent);
@@ -654,24 +655,7 @@ public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 
 	}
 
-	/*
-		String header;
-		switch (Scope) {
-		case SCOPE_DELYTA:
-			header = "D";
-			break;
-		case SCOPE_PROVYTA:
-			header = "P";
-			break;
-		case SCOPE_RUTA:
-			header = "R";
-			break;
-		default:
-			header = "@";
-		}
-		send(header+key+"zzz"+value);
-	}
-	 */
+	
 	@Override
 	public void sendMessage(String msg) {
 		send(msg);
@@ -695,7 +679,7 @@ public class BluetoothRemoteDevice extends Service implements RemoteDevice {
 			} catch (BluetoothDevicesNotPaired e) {
 				Toast.makeText(getBaseContext(),"No bounded (paired) device found",Toast.LENGTH_LONG).show();
 				Intent intent = new Intent();
-				intent.setAction(BluetoothRemoteDevice.SYNK_NO_BONDED_DEVICE);
+				intent.setAction(BluetoothConnectionService.SYNK_NO_BONDED_DEVICE);
 				sendBroadcast(intent);
 			} catch (BluetoothDeviceExtra e) {
 				// TODO Auto-generated catch block

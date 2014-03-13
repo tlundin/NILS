@@ -83,7 +83,7 @@ public class VariableConfiguration {
 		return row.get(fromNameToColumn.get(requiredColumns.get(VARIABLE_LABEL)));
 	}
 	
-	public CharSequence getVariableDescription(List<String> row) {		
+	public String getVariableDescription(List<String> row) {		
 		return row.get(fromNameToColumn.get(requiredColumns.get(DESCRIPTION)));
 	}
 	
@@ -97,7 +97,7 @@ public class VariableConfiguration {
 	public Variable.DataType getnumType(List<String> row) {
 		String type = row.get(fromNameToColumn.get(requiredColumns.get(TYPE)));
 		if (type!=null) {		
-		if (type.equals("number"))
+		if (type.equals("number")||type.equals("numeric"))
 			return Variable.DataType.numeric;
 		else if (type.equals("boolean"))
 			return Variable.DataType.bool;
@@ -132,11 +132,16 @@ public class VariableConfiguration {
 		//If this is a non-art variable, use varlabel instead.
 		if (res==null) 
 			res =this.getVarLabel(row);
+		if (res == null)
+			Log.e("nils","getEntryLabel failed to find a Label for row: "+row.toString());
 		return res;
 	}
 	
 	public String getBeskrivning(List<String> row) {
 		String b = myTable.getElement("Beskrivning", row);
+		if(b==null) 
+			b = this.getVariableDescription(row);
+		
 		return (b==null?"":b);
 	}
 	
