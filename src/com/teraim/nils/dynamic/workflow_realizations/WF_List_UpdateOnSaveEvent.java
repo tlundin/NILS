@@ -38,12 +38,12 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 			Log.d("nils","Skipping empty entrylabel");
 			return true;
 		}
-		Log.d("nils","ADD EntryField with label "+entryLabel);
+		//Log.d("nils","ADD EntryField with label "+entryLabel);
 		if (entryFields.get(entryLabel)==null) 	{	
 			WF_ClickableField_Selection entryF = new WF_ClickableField_Selection(entryLabel,al.getBeskrivning(r),myContext,"C_F_"+index++,true);
 			list.add(entryF);	
 			entryFields.put(entryLabel, entryF);
-			Log.d("nils","ADDed "+entryLabel);
+			//Log.d("nils","ADDed "+entryLabel);
 		
 			return true;
 		}
@@ -68,7 +68,7 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 				v = al.getVariableInstance(varID);
 				String entryLabel = al.getEntryLabel(cRow);
 				if (v!=null) {
-					Log.d("nils","Couldn't find EntryField with label key"+entryLabel);
+					//Log.d("nils","Couldn't find EntryField with label key"+entryLabel);
 
 					if (entryFields.get(entryLabel)==null)
 						Log.e("nils","SHIIT "+entryLabel);

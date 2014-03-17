@@ -90,6 +90,7 @@ public class VariableConfiguration {
 	
 	public boolean getVarIsLocal(List<String> row) {
 		String s= row.get(fromNameToColumn.get(requiredColumns.get(LOCAL)));
+		Log.d("nils","getvarislocal uses string "+s);
 		if (s==null||s.length()==0||!s.equalsIgnoreCase("x"))
 			return false;
 		else
@@ -181,7 +182,7 @@ public class VariableConfiguration {
 		String varLabel =null;
 		List<String> row = this.getCompleteVariableDefinition(varId);
 		if (row!=null) {
-		Log.d("nils","Fetching keychain from row "+row);
+		//Log.d("nils","Fetching keychain from row "+row);
 		String keyChain = this.getKeyChain(row);
 		varLabel = this.getVarLabel(row);
 		//Log.d("nils","getVariableInstance for "+varId+" with keychain "+keyChain);

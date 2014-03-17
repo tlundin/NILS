@@ -69,12 +69,7 @@ public class GlobalState  {
 	//Global state for sync.
 	private int syncStatus=BluetoothConnectionService.SYNK_STOPPED;	
 
-	public enum ErrorCode {
-		ok,
-		missing_required_column,
-		file_not_found, workflows_not_found,
-		tagdata_not_found,parse_error
-	}
+	
 
 	public String TEXT_LARGE;
 
@@ -305,7 +300,8 @@ public class GlobalState  {
 			return "PÅ";
 		case BluetoothConnectionService.SYNC_RUNNING:
 			return "AKTIV";
-
+		case BluetoothConnectionService.SYNC_DONE:
+			return "OK";
 		default:
 			return "?";
 		}
@@ -471,10 +467,38 @@ public class GlobalState  {
 		else
 			myHandler = new SlaveMessageHandler(this);
 	}
+	
+	public enum ErrorCode {
+		ok,
+		missing_required_column,
+		file_not_found, workflows_not_found,
+		tagdata_not_found,parse_error,
+		missing_lag_id,
+		missing_user_id,
+		current_ruta_not_set,
+		current_provyta_not_set,
+		no_handler_available
+		
+	}
+	
+	public boolean syncIsActive() {
+		return (syncStatus == BluetoothConnectionService.SYNC_READY_TO_ROCK ||
+				syncStatus == BluetoothConnectionService.SYNC_DONE);
+	}
 
-	public boolean syncIsAllowed() {
-		return (myHandler !=null && getArtLista().getVariableValue(null, "Current_Ruta")!=null &&
-				getArtLista().getVariableValue(null, "Current_Provyta")!=null);
+	public ErrorCode syncIsAllowed() {
+		if (ph.get(PersistenceHelper.LAG_ID_KEY).equals(PersistenceHelper.UNDEFINED))
+			return ErrorCode.missing_lag_id;
+		else if (ph.get(PersistenceHelper.USER_ID_KEY).equals(PersistenceHelper.UNDEFINED))
+			return ErrorCode.missing_user_id;
+		else if (myHandler ==null)
+			return ErrorCode.no_handler_available;
+		else if (isMaster()&&getArtLista().getVariableValue(null, "Current_Ruta")==null)
+			return ErrorCode.current_ruta_not_set;
+		else if (isMaster()&&getArtLista().getVariableValue(null, "Current_Provyta")==null)
+			return ErrorCode.current_provyta_not_set;
+		else 
+			return ErrorCode.ok;
 	}
 	
 	

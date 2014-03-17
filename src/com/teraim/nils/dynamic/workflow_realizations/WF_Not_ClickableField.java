@@ -106,7 +106,7 @@ public abstract class WF_Not_ClickableField extends WF_ListEntry {
 			TextView u = (TextView)ll.findViewById(R.id.outputUnitField);			
 			String value = varId.getValue();
 			
-			Log.d("nils","In refreshoutputfield for variable "+varId.getId()+" with value "+varId.getValue());
+			//Log.d("nils","In refreshoutputfield for variable "+varId.getId()+" with value "+varId.getValue());
 			
 			if (value!=null&&!value.isEmpty()) {
 				o.setText(getFormattedText(varId,value,pairs.getValue().format));	

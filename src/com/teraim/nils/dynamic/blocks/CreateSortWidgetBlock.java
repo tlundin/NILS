@@ -58,7 +58,7 @@ public class CreateSortWidgetBlock extends Block {
 			o.addRedText("Warning: No container defined for component ListSortingBlock: "+containerId);
 		}
 		
-		Log.d("nils","Sort target is "+target);
+		//Log.d("nils","Sort target is "+target);
 		targetList = ctx.getFilterable(target);
 		if (targetList == null) {
 			o.addRow("");

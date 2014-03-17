@@ -8,10 +8,8 @@ import java.util.List;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -34,8 +32,6 @@ import com.teraim.nils.FileLoadedCb;
 import com.teraim.nils.FileLoadedCb.ErrorCode;
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
-import com.teraim.nils.bluetooth.BluetoothConnectionService;
-import com.teraim.nils.bluetooth.Ping;
 import com.teraim.nils.dynamic.templates.FotoTemplate;
 import com.teraim.nils.dynamic.templates.TagTemplate;
 import com.teraim.nils.dynamic.types.Variable;
@@ -54,7 +50,7 @@ import com.teraim.nils.utils.WorkflowParser;
 
 public class Start extends MenuActivity {
 
-	private final String NILS_VERSION = "0.20";
+	private final String NILS_VERSION = "0.30";
 
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
@@ -304,6 +300,11 @@ public class Start extends MenuActivity {
 				v = gs.getArtLista().getVariableInstance("Current_Delyta");
 				if (v.getValue()==null)
 					v.setValue("100");
+				if(ph.get(PersistenceHelper.LAG_ID_KEY).equals(PersistenceHelper.UNDEFINED))
+					ph.put(PersistenceHelper.LAG_ID_KEY, "Skogsmullarna");
+				if(ph.get(PersistenceHelper.USER_ID_KEY).equals(PersistenceHelper.UNDEFINED))
+					ph.put(PersistenceHelper.USER_ID_KEY, "Mulle");
+				
 
 			}
 
@@ -388,20 +389,6 @@ public class Start extends MenuActivity {
 	@Override
 	protected void onResume() {
 		Log.d("nils","Gets to onResume");
-/*		if (!gs.isMaster()) {
-			BroadcastReceiver brr = new BroadcastReceiver() {
-				@Override
-				public void onReceive(Context ctx, Intent intent) {
-						Log.d("nils","Broadcastreceiver called in onResume!");
-			
-				}
-			};
-			IntentFilter filter = new IntentFilter();
-			filter.addAction(BluetoothConnectionService.SYNK_SERVICE_MESSAGE_RECEIVED);
-		}
-		if (gs.getSyncStatus() == BluetoothConnectionService.SYNK_RUNNING)
-			BluetoothConnectionService.getSingleton().send(new Ping());
-			*/
 		super.onResume();
 		
 	}

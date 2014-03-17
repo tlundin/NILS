@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.google.android.gms.internal.ga;
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
+import com.teraim.nils.GlobalState.ErrorCode;
 import com.teraim.nils.bluetooth.BluetoothConnectionService;
 import com.teraim.nils.bluetooth.SyncRequest;
 import com.teraim.nils.log.LoggerI;
@@ -50,23 +51,20 @@ public class MenuActivity extends Activity {
 		ph = gs.getPersistence();
 		
 		brr = new BroadcastReceiver() {
-			AlertDialog add = null;
 			@Override
 			public void onReceive(Context ctx, Intent intent) {
 					Log.d("nils", "received "+intent.getAction()+" in MenuActivity BroadcastReceiver");
-					if (intent.getAction().equals(BluetoothConnectionService.SYNK_SERVICE_MESSAGE_RECEIVED)) {
-						Log.d("nils","recieved message");
-					}
-					else if (intent.getAction().equals(BluetoothConnectionService.SYNK_INITIATE)) {
-						gs.setSyncStatus(BluetoothConnectionService.SYNC_RUNNING);
-						gs.sendMessage(new SyncRequest());
-					}
-					
+
+					 if (intent.getAction().equals(BluetoothConnectionService.SYNK_SERVICE_CONNECTED)||
+							 intent.getAction().equals(BluetoothConnectionService.SYNK_SERVICE_STOPPED)) {
+						 
+					 }
 					else if (intent.getAction().equals(BluetoothConnectionService.SYNK_NO_BONDED_DEVICE)) {
 						new AlertDialog.Builder(MenuActivity.this)
 					    .setTitle("Blåtandsproblem")
 					    .setMessage("För att synkroniseringen ska fungera måste dosorna bindas via blåtandsmenyn. Vill du göra det nu?") 
 					    .setIcon(android.R.drawable.ic_dialog_alert)
+					    .setCancelable(false)
 					    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 							
 							@Override
@@ -84,6 +82,23 @@ public class MenuActivity extends Activity {
 						.show();
 						
 					}
+					else if (intent.getAction().equals(BluetoothConnectionService.SAME_SAME_SYNDROME)) {
+						new AlertDialog.Builder(MenuActivity.this)
+					    .setTitle("Båda samma")
+					    .setMessage("Båda dosorna är konfigurerade likadant. En måste byta till mästare/slav under skiftnyckels-menyn.") 
+					    .setIcon(android.R.drawable.ic_dialog_alert)
+					    .setCancelable(false)
+					    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+							
+							@Override
+							public void onClick(DialogInterface dialog, int which)  {
+								
+							}
+							
+						})
+						.show();
+					}
+					btInitDone();
 					me.refreshStatusRow();
 				}
 				
@@ -96,6 +111,8 @@ public class MenuActivity extends Activity {
 			filter.addAction(BluetoothConnectionService.SYNK_SERVICE_CONNECTED);
 			filter.addAction(BluetoothConnectionService.SYNK_NO_BONDED_DEVICE);
 			filter.addAction(BluetoothConnectionService.SYNK_INITIATE);
+			filter.addAction(BluetoothConnectionService.SYNK_COMPLETE);
+			filter.addAction(BluetoothConnectionService.SAME_SAME_SYNDROME);
 			
 		this.registerReceiver(brr, filter);
 		//Listen for Service started/stopped event.
@@ -183,6 +200,10 @@ public class MenuActivity extends Activity {
 
 	}
 
+	private boolean BTInProgress=false;
+	private void btInitDone() {
+		BTInProgress=false;
+	}
 	
 	private boolean MenuChoice(MenuItem item) {
 
@@ -199,18 +220,21 @@ public class MenuActivity extends Activity {
 					Intent intent = new Intent(getBaseContext(),BluetoothConnectionService.class);
 					if (gs.getSyncStatus()==BluetoothConnectionService.SYNK_STOPPED) {
 						//Check that synk can start.
-						
-						if (gs.syncIsAllowed())
+						ErrorCode err = gs.syncIsAllowed();
+						if (err == ErrorCode.ok) {
+							Log.d("nils","Trying to start bt-service");
 							startService(intent);
+						}
 						else {							
 							new AlertDialog.Builder(MenuActivity.this)
-						    .setTitle("Synkning inte tillåten!")
-						    .setMessage("För att synkroniseringen ska fungera måste du först mata in värden för ruta och provyta.") 
+						    .setTitle("Synkning kan inte genomföras just nu.")
+						    .setMessage("Felkod: "+err.name()) 
 						    .setIcon(android.R.drawable.ic_dialog_alert)
+						    .setCancelable(false)
 						    .setPositiveButton(R.string.iunderstand, new DialogInterface.OnClickListener() {						
 								@Override
 								public void onClick(DialogInterface dialog, int which)  {
-									
+									btInitDone();
 								}
 								
 							})				 
@@ -229,6 +253,7 @@ public class MenuActivity extends Activity {
 					break;
 
 				case DialogInterface.BUTTON_NEGATIVE:
+					btInitDone();
 					break;
 				}
 			}
@@ -267,12 +292,15 @@ public class MenuActivity extends Activity {
 			
 		break;
 		case 2:
+			if (!BTInProgress) {
+			BTInProgress=true;
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle("Synkronisering")
 			.setMessage("Vill du "+(gs.getSyncStatus()==BluetoothConnectionService.SYNK_STOPPED?"slå på ":"stänga av ")+"synkroniseringen?").setPositiveButton("Ja", dialogClickListener)
-			.setNegativeButton("Nej", dialogClickListener).show();
+			.setNegativeButton("Nej", dialogClickListener).show()
+			.setCanceledOnTouchOutside(false);
+			}
 			break;
-
 		case 0:
 		case 3:
 			Intent intent = new Intent(getBaseContext(),ConfigMenu.class);

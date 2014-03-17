@@ -166,7 +166,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 
 	public  WF_ClickableField(final String label,final String descriptionT, WF_Context context,String id, View view,boolean isVisible) {
 		super(label,descriptionT,context,view,isVisible);	
-		Log.e("nils ","Creating WF_ClickableField: "+label+" "+id);
+		//Log.e("nils ","Creating WF_ClickableField: "+label+" "+id);
 		gs = GlobalState.getInstance(context.getContext());
 		sd = gs.getSpinnerDefinitions();
 		al = gs.getArtLista();
@@ -269,8 +269,8 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 			o.addRedText("VARIABLE "+var.getId()+" HAS NO TYPE. TYPE ASSUMED TO BE NUMERIC");
 			var.setType(DataType.numeric);
 		}
-		Log.d("nils","Adding variable "+varLabel+" of type "+var.getType().name());
-		Log.d("nils","var backing row: "+var.getBackingDataSet().toString());
+		//Log.d("nils","Adding variable "+varLabel+" of type "+var.getType().name());
+		//Log.d("nils","var backing row: "+var.getBackingDataSet().toString());
 		String unit = var.getPrintedUnit();
 		switch (var.getType()) {
 		case bool:
@@ -490,9 +490,14 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 				RadioGroup rbg = (RadioGroup)view.findViewById(R.id.radioG);
 				//If checked set value to True.
 				int id = rbg.getCheckedRadioButtonId();
-				variable.setValue("1");
-				if (id == -1 || id == R.id.nej)
+				
+				if (id == -1 || id == R.id.nej) {
 					variable.setValue("0");
+				}
+				else {
+					Log.e("nils","RADIO POSITIVE");
+					variable.setValue("1");
+				}
 			} else 
 				if (type == DataType.numeric||
 				type == DataType.text){
@@ -524,7 +529,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 	@Override
 	public void refreshInputFields(){
 		DataType numType;
-		Log.d("nils","In refreshinputfields");
+		//Log.d("nils","In refreshinputfields");
 		Set<Entry<Variable, View>> vars = myVars.entrySet();
 		for(Entry<Variable, View>entry:vars) {
 			Variable variable = entry.getKey();
@@ -537,16 +542,15 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 				RadioButton ja = (RadioButton)v.findViewById(R.id.ja);
 				RadioButton nej = (RadioButton)v.findViewById(R.id.nej);
 				if(value!=null) {
-					if(value == null||value.equals("1"))
-						ja.setEnabled(true);
+					if(value.equals("1")) 
+						ja.setChecked(true);
 					else
-						nej.setEnabled(true);
-					ja.setChecked(true);
+						nej.setChecked(true);				
 				}
 			} else
 				if (numType == Variable.DataType.numeric||
 				numType ==DataType.text) {
-					Log.d("nils","refreshing edittext with varid "+variable.getId());
+					//Log.d("nils","refreshing edittext with varid "+variable.getId());
 					EditText et = (EditText)v.findViewById(R.id.edit);
 					if (et!=null)
 						et.setText(value==null?"":value);

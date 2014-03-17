@@ -57,13 +57,17 @@ public class BluetoothConnectionService extends Service implements RemoteDevice 
 	public final static String SYNK_PING_MESSAGE_RECEIVED = "com.teraim.nils.ping";
 	public final static String SYNK_NO_BONDED_DEVICE = "com.teraim.nils.binderror";
 	public static final String SYNK_INITIATE = "com.teraim.nils.synkinitiate";
-	
+	public static final String SYNK_COMPLETE = "com.teraim.nils.synk_complete";
+	public static final String SAME_SAME_SYNDROME = "com.teraim.nils.master_syndrome";
+
+
 
 
 	public final static int SYNK_SEARCHING = 0;
 	public final static int SYNC_READY_TO_ROCK = 1;
 	public final static int SYNK_STOPPED = 2;
 	public static final int SYNC_RUNNING = 3;
+	public static final int SYNC_DONE = 4;
 
 	
 
@@ -119,6 +123,9 @@ public class BluetoothConnectionService extends Service implements RemoteDevice 
 					Toast.makeText(me, "Förlorade kontakten med andra dosan", Toast.LENGTH_LONG).show();
 					stop();
 				}
+				else if (action.equals(BluetoothConnectionService.SAME_SAME_SYNDROME)) {
+					pingC=0;
+				}
 				else if (action.equals(BluetoothConnectionService.SYNK_SERVICE_CLIENT_CONNECT_FAIL)) {
 					//Try to ping again in a while if still running.
 					new Handler().postDelayed(new Runnable() {
@@ -129,15 +136,13 @@ public class BluetoothConnectionService extends Service implements RemoteDevice 
 								ping();
 							} else
 								//after five attempts, stop the sync, and shutdown bluetooth.
-								me.stop();
+								stop();
 						}
 					}, PING_DELAY);
 					
 				}
 
 				
-				else if (action.equals(BluetoothConnectionService.SYNK_SERVICE_MESSAGE_RECEIVED))
-					Toast.makeText(me, intent.getStringExtra("MSG"), Toast.LENGTH_LONG).show();
 				else if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
 					final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,
 							BluetoothAdapter.ERROR);
@@ -169,8 +174,7 @@ public class BluetoothConnectionService extends Service implements RemoteDevice 
 			ifi.addAction(BluetoothConnectionService.SYNK_SERVICE_CLIENT_CONNECT_FAIL);
 			ifi.addAction(BluetoothConnectionService.SYNK_SERVICE_SERVER_CONNECT_FAIL);
 			ifi.addAction(BluetoothConnectionService.SYNK_SERVICE_STOPPED);
-			ifi.addAction(BluetoothConnectionService.SYNK_SERVICE_MESSAGE_RECEIVED);
-			
+			ifi.addAction(BluetoothConnectionService.SAME_SAME_SYNDROME);
 			this.registerReceiver(brr, ifi);
 			
 			
@@ -193,7 +197,7 @@ public class BluetoothConnectionService extends Service implements RemoteDevice 
 	private void ping() {
 		//Send a ping to see if we can connect straight away.
 		Log.d("NILS","Sending ping");
-		send(new Ping());
+		send(gs.isMaster()?new MasterPing():new SlavePing());
 	}
 
 

@@ -6,7 +6,7 @@ import java.io.Serializable;
  * @author Terje
  *
  */
-public class Ping implements Serializable {
+public class MasterPing implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	

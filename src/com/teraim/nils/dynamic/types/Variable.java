@@ -128,6 +128,7 @@ public class Variable implements Serializable {
 			myType = gs.getArtLista().getnumType(row);		
 			myStringUnit = gs.getArtLista().getUnit(row);
 			isLocal = gs.getArtLista().getVarIsLocal(row)||Variable.isHistorical(keyChain);
+			Log.d("nils","Var isLocal: "+isLocal);
 		}		
 		this.keyChain=keyChain;		
 		myDb = gs.getDb();
@@ -137,14 +138,16 @@ public class Variable implements Serializable {
 	}
 
 	private static boolean isHistorical(Map<String, String> kc) {
-		if (kc==null)
+		if (kc==null) {
+			Log.d("nils","No keychain - cannot be historical");
 			return false;
+		}
 		String year = kc.get(VariableConfiguration.KEY_YEAR);
 		if (year == null||year.length()==0) {
 			Log.e("nils","year key missing in variable. Will assume current year");
 			return false;
 		}
-		if (!year.equals(Calendar.getInstance().get(Calendar.YEAR))) {
+		if (!year.equals(Integer.toString(Calendar.getInstance().get(Calendar.YEAR)))) {
 			Log.d("nils","Historical value!");
 			return true;
 		}

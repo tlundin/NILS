@@ -34,7 +34,7 @@ public abstract class WF_ListEntry extends WF_Widget implements Listable,Compara
 			myVar = al.getVariableInstance(key);
 			if (myVar!=null) {
 				keyRow = myVar.getBackingDataSet();		
-				Log.d("nils","Calling setKeyRow for "+keyRow.toString());
+				//Log.d("nils","Calling setKeyRow for "+keyRow.toString());
 				label = al.getEntryLabel(keyRow);
 			}
 	}

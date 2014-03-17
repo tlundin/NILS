@@ -71,13 +71,13 @@ WF_Not_ClickableField implements EventListener {
 		Long sum=Long.valueOf(0);
 		for (Listable l:targetList.getList()) {
 			Set<Variable> vars = l.getAssociatedVariables();
-			Log.d("nils","now in matchandrecalculate with list "+vars.size());
+			//Log.d("nils","now in matchandrecalculate with list "+vars.size());
 			if (vars!=null && !vars.isEmpty()) {
 				for (Variable v:vars) {
 					if (v.getId().matches(myPattern)) {
-						Log.e("nils","SUM AND COUNT: Found match! "+v.getId());				
+						//Log.e("nils","SUM AND COUNT: Found match! "+v.getId());				
 						if (v.getValue()!=null) {
-							Log.d("nils","VALUE: "+v.getValue());
+							//Log.d("nils","VALUE: "+v.getValue());
 							if (myType == Type.count)
 								sum++;
 							else {

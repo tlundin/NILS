@@ -12,11 +12,11 @@ xmlns:android="http://schemas.android.com/apk/res/android" >
 
 <EditTextPreference
             android:key="lag_id"
-            android:title="Lag" 
+            android:title="Ange Lag" 
             android:summary="Lagets benämning"
             android:dialogTitle="Lag"
             android:dialogMessage="Lagets benämning"    
-            android:defaultValue="Lag 1" />
+    />
 <EditTextPreference 
     android:dialogTitle="Ange namn" 
     android:title="Användarens namn" 

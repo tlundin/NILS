@@ -20,12 +20,20 @@ public class SlaveMessageHandler extends MessageHandler {
 			Variable provyta = gs.getArtLista().getVariableInstance("Current_Provyta");
 			ruta.setValue(p.ruta);
 			provyta.setValue(p.provyta);
-			Log.d("nils","Got PONG message!!");
-			sendEvent(BluetoothConnectionService.SYNK_INITIATE);
+			Log.d("nils","Got PONG message!!");			
+			gs.setSyncStatus(BluetoothConnectionService.SYNC_RUNNING);
+			sendEvent(BluetoothConnectionService.SYNK_INITIATE);			
+			gs.sendMessage(new SyncRequest());
+			
 		} else if (message instanceof SyncEntry[]) {
-			Log.d("nils","SYNCDATA RECEIVED!!");
-			SyncEntry[] ses = (SyncEntry[])message;
-			gs.getDb().synchronise(ses);
+			triggerTransfer();
+		}
+		//SYNC_COMPLETE
+		else if (message instanceof SyncComplete) {
+			gs.setSyncStatus(BluetoothConnectionService.SYNC_DONE);
+			sendEvent(BluetoothConnectionService.SYNK_COMPLETE);			
+		} else if (message instanceof SlavePing) {
+			sendEvent(BluetoothConnectionService.SAME_SAME_SYNDROME);
 		}
 	}
 

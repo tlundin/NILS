@@ -17,6 +17,8 @@ import android.widget.Toast;
 
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
+import com.teraim.nils.bluetooth.BluetoothConnectionService;
+import com.teraim.nils.bluetooth.SyncRequest;
 import com.teraim.nils.dynamic.blocks.AddEntryToFieldListBlock;
 import com.teraim.nils.dynamic.blocks.AddSumOrCountBlock;
 import com.teraim.nils.dynamic.blocks.AddVariableToEntryFieldBlock;
@@ -85,10 +87,31 @@ public abstract class Executor extends Fragment {
 		final Map<String,String>fakeHash = new HashMap<String,String>();
 
 	}
+	
+	
 
 
 
 
+	/* (non-Javadoc)
+	 * @see android.app.Fragment#onStop()
+	 */
+	@Override
+	public void onStop() {
+		//check if ok to sync.
+		if (gs.syncIsAllowed()==GlobalState.ErrorCode.ok &&
+				gs.syncIsActive()) {
+			Log.d("nils","GETTZZZZZZ");
+			gs.setSyncStatus(BluetoothConnectionService.SYNC_RUNNING);
+			gs.sendMessage(new SyncRequest());			
+		} 
+		
+		
+		super.onStop();
+	}
+	
+	
+	
 	protected Workflow getFlow() {
 		Workflow wf=null;
 

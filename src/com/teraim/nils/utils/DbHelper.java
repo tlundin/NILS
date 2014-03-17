@@ -1,9 +1,13 @@
 package com.teraim.nils.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -24,7 +28,7 @@ import com.teraim.nils.utils.JSONExporter.Report;
 public class DbHelper extends SQLiteOpenHelper {
 
 	// Database Version
-	private static final int DATABASE_VERSION = 4;
+	private static final int DATABASE_VERSION = 5;
 	// Database Name
 	private static final String DATABASE_NAME = "Nils";
 
@@ -32,8 +36,9 @@ public class DbHelper extends SQLiteOpenHelper {
 	private static final String TABLE_VARIABLES = "variabler";
 	private static final String TABLE_AUDIT = "audit";
 
-	private static final String VALUE="value",TIMESTAMP="timestamp",LAG="lag",CREATOR="creator";
-	private static final String[] VAR_COLS = {VALUE,TIMESTAMP,LAG,CREATOR};
+	private static final String VALUE="value",TIMESTAMP="timestamp",LAG="lag",AUTHOR="author";
+	private static final String[] VAR_COLS = new String[] { TIMESTAMP, AUTHOR, LAG, VALUE };
+	private static final Set<String> MY_VALUES_SET = new HashSet<String>(Arrays.asList(VAR_COLS));
 
 	private static final int NO_OF_KEYS = 10;
 	private final SQLiteDatabase db;
@@ -351,7 +356,7 @@ public class DbHelper extends SQLiteOpenHelper {
 				s.selectionArgs); //selections args
 
 		if(aff==0) 
-			Log.e("nils","Couldn't delete "+name+" from database. Not found. Sel: "+s.selection+" Args: "+s.selectionArgs.toString());
+			Log.e("nils","Couldn't delete "+name+" from database. Not found. Sel: "+s.selection+" Args: "+print(s.selectionArgs));
 		else 
 			Log.d("deleted", name);
 
@@ -362,19 +367,40 @@ public class DbHelper extends SQLiteOpenHelper {
 		boolean notDone = false;
 		//package the value array.
 		String dd = "";
-		for (String d:s.selectionArgs)
-			dd+=d+"|";
+		if (s.selectionArgs!=null) {
+			for (int i = 0; i<s.selectionArgs.length-1;i++)
+				dd+=s.selectionArgs[i]+"|";
+			dd+=s.selectionArgs[s.selectionArgs.length-1];
+		} else
+			dd=null;
 		//store
 		storeAuditEntry("D",s.selection+","+dd);
 		Log.d("nils",dd);
 	}
+
 	private void insertAuditEntry(ContentValues values) {
 
 		//long aff = db.insert(TABLE_AUDIT, null, values);
 		Log.d("nils","In audit insert");
-		if (values!=null)
-			Log.d("nils",values.toString());
-		storeAuditEntry("I",values.toString());
+		if (values!=null) {
+			Log.d("nils","VALUES: "+values.toString());
+			Set<Entry<String, Object>> s=values.valueSet();
+			Iterator itr = s.iterator();
+
+			Log.d("DatabaseSync", "ContentValue Length :: " +values.size());
+			String res="";
+			while(itr.hasNext())
+			{
+				Map.Entry me = (Map.Entry)itr.next(); 
+				String key = me.getKey().toString();
+				String value =  me.getValue().toString();
+				res+=key+"="+value+(itr.hasNext()?"|":"");
+
+			}
+			Log.d("nils","STRING RESULT: "+res);
+			storeAuditEntry("I",res);
+		}
+
 	} 
 
 	private void storeAuditEntry(String action, String changes) {
@@ -563,31 +589,38 @@ public class DbHelper extends SQLiteOpenHelper {
 			//If this variable is not local, store the action for synchronization.
 			if (!isLocal)
 				insertAuditEntry(values);
+			else
+				Log.d("nils","Variable "+var.getId()+" not inserted in Audit: local");
 		}
 	}
 
 
-
+	long maxStamp = 0;
 	public SyncEntry[] getChanges() {
 
 		String timestamp = ph.get(PersistenceHelper.TIME_OF_LAST_CHANGE);
-
+		if (timestamp==null||timestamp.equals(PersistenceHelper.UNDEFINED))
+			timestamp = "0";
+		Log.d("nils","Time of last change is "+timestamp+" in getChanges (dbHelper)");
 		int cn = 0;
 		Cursor c = db.query(TABLE_AUDIT,null,
-				"timestamp > ?",new String[] {timestamp},null,null,null,null);
+				"timestamp > ?",new String[] {timestamp},null,null,"timestamp asc",null);
 		if (c != null && c.getCount()>0 && c.moveToFirst()) {
 			SyncEntry[] sa = new SyncEntry[c.getCount()];
 			String entryStamp,action,changes;
+			maxStamp=0;
 			do {
 				action = 	 c.getString(c.getColumnIndex("action"));
 				changes =	 c.getString(c.getColumnIndex("changes"));
 				entryStamp = c.getString(c.getColumnIndex("timestamp"));
+				long es = Long.parseLong(entryStamp);
+				if (es>maxStamp)
+					maxStamp=es;
 				sa[cn] = new SyncEntry(action,changes,entryStamp);
 				Log.d("nils","Added sync entry : "+action+" changes: "+changes+" index: "+cn);
 				cn++;				
 			} while(c.moveToNext());
-			//TODO:
-			//ph.put(PersistenceHelper.TIME_OF_LAST_CHANGE, entryStamp);
+
 			return sa;
 
 		} else 
@@ -613,9 +646,9 @@ public class DbHelper extends SQLiteOpenHelper {
 		String selection="";
 		if (keySet!=null) {
 			selection = cachedSelArgs.get(keySet.keySet());
-			if (selection!=null) {
-				Log.d("nils","found cached selArgs: "+selection);
-			} else {
+			if (selection==null) {
+				//Log.d("nils","found cached selArgs: "+selection);
+
 				//Log.d("nils","selection null...creating");
 				//Does not exist...need to create.
 				String col;
@@ -709,67 +742,119 @@ public class DbHelper extends SQLiteOpenHelper {
 	}
 
 
-	
-	/*
-	private void insertDeleteAuditEntry(Selection s) {
-		boolean notDone = false;
-		//package the value array.
-		String dd = "";
-		for (String d:s.selectionArgs)
-			dd+=d+"|";
-		//store
-		storeAuditEntry("D",s.selection+","+dd);
-		Log.d("nils",dd);
-	}
-	private void insertAuditEntry(ContentValues values) {
 
-		//long aff = db.insert(TABLE_AUDIT, null, values);
-		Log.d("nils","In audit insert");
-		if (values!=null)
-			Log.d("nils",values.toString());
-		storeAuditEntry("I",values.toString());
-	} 
-*/
+
 
 	public void synchronise(SyncEntry[] ses) {
 		String changes;
-		for (SyncEntry s:ses) {
+		Log.d("nils","In Synchronize with "+ses.length+" arguments");
+		for (SyncEntry s:ses) {		
 			changes = s.getChanges();
-			String ch[];
 			if (s.isInsert()) {
+				Map<String, String> keySet=null; 
 				ContentValues cv = new ContentValues();
-				ch = changes.split(" ");
+				String ch[] = changes.split("\\|");
 				String[] pair;
-				long myId=-11;
+				boolean found=false; String name = null;
+				int c=0;
 				for (String vPair:ch) {
 					pair = vPair.split("=");
-					if (pair!=null && pair.length==2) {					
+					if (pair!=null) {	
+						if (pair.length==1) {
+							String k = pair[0];
+							pair = new String[2];
+							pair[0] = k;
+							pair[1] = "";
+						}
+						Log.d("nils","Pair "+(c++)+": Key:"+pair[0]+" Value: "+pair[1]);
 						if (pair[0].equals("id")) {						
-							Log.d("nils","found ID parameter: "+myId);
-						} else
-							cv.put(pair[0],pair[1]);
+							Log.d("nils","discarding ID parameter ");
+						} else {
+							//build keychain.
+
+							if (pair[0].equals("var")) {
+								name = pair[1];
+							} else if (!partOfValues(pair[0])) {
+								if (keySet == null)
+									keySet = new HashMap<String, String>();
+								keySet.put(pair[0],pair[1]);
+							}
+
+							//cv contains all elements, except id.
+							cv.put(pair[0],pair[1]);													
+						}					
 					}
 					else {
 						Log.e("nils","Something not good in synchronize (dbHelper). A valuepair was either null or not 2 long: "+vPair);
 					}
-						
-				}
-				//now there should be ContentValues that can be inserted.
-				/*long rId = db.replace(TABLE_VARIABLES, // table
-						null, //nullColumnHack
-						cv
-						); 	
-			
 
+				}
+				//Try find the vairable.
+				if (keySet == null) 
+					Log.d("nils","Keyset was null");
+				Selection sel = this.createSelection(keySet, name);
+				int id = this.getId(name, sel);
+				long rId=-1;
+				if (id==-1) {
+					Log.d("nils","Vairable doesn't exist. Inserting..");
+					//now there should be ContentValues that can be inserted.
+					rId = db.insert(TABLE_VARIABLES, // table
+							null, //nullColumnHack
+							cv
+							); 	
+
+
+				} else {
+					Log.d("nils","Vairable exists! Replacing..");
+					cv.put("id", id);
+					rId = db.replace(TABLE_VARIABLES, // table
+							null, //nullColumnHack
+							cv
+							); 	
+
+					if (rId!=id) 
+						Log.e("nils","CRY FOUL!!! New Id not equal to found! "+" ID: "+id+" RID: "+rId);
+				}
 				if (rId==-1) 
 					Log.e("nils","Could not insert row "+cv.toString());
-					*/
-				Log.d("nils","Insert row: "+cv.toString());
+
+				else
+					Log.d("nils","Insert row: "+cv.toString());
+			} else {
+				//If delete.
+
+				String selection;
+				String[] pair = changes.split(",");
+				if (pair==null||pair.length!=2) {
+					Log.e("nils","Something wrong with Delete in Synchronize: "+changes);
+				} else {
+					selection = pair[0];
+					String[] selectionArgs = pair[1].split("\\|");
+					if (selectionArgs == null||selectionArgs.length<2) {
+						Log.d("nils","something wrong with Delete selectionArgs: "+changes);
+					} else {
+						Selection sel = new Selection();
+						sel.selection=selection;
+						sel.selectionArgs=selectionArgs;
+						this.deleteVariable("abrakadabra", sel);
+					}
+				}
 			}
-			
+
 		}
+
 	}
 
+	private boolean partOfValues(String key) {
+		return (MY_VALUES_SET.contains(key));		
+	}
+
+	public void syncDone() {
+		if (maxStamp!=0)
+			ph.put(PersistenceHelper.TIME_OF_LAST_CHANGE, Long.toString(maxStamp));
+		else
+			Log.d("nils","maxstamp 0");
+	}
 
 
 }

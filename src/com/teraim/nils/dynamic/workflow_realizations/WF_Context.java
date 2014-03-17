@@ -101,7 +101,7 @@ public class WF_Context {
 
 
 	public Container getContainer(String id) {
-		Log.d("nils","GetContainer. looking for container "+id);
+		//Log.d("nils","GetContainer. looking for container "+id);
 		if (id==null || id.length()==0) {
 			Log.d("nils","Container: null. Defaulting to root.");
 			id = "root";

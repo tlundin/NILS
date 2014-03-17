@@ -13,23 +13,27 @@ public class MasterMessageHandler extends MessageHandler {
 		vc = gs.getArtLista();
 	}
 
-	
+
 
 	@Override
 	public void handleSpecialized(Object message) {
-		if (message instanceof Ping) {
+		if (message instanceof SlavePing) {
 			Log.d("nils","Sending pong");
+			o.addRow("[--->PING]");
 			Pong pong = new Pong();
 			pong.ruta=vc.getVariableValue(null,"Current_Ruta");
 			pong.provyta=vc.getVariableValue(null,"Current_Provyta");
 			gs.sendMessage(pong);
-		} else if (message instanceof SyncRequest) {
-			gs.setSyncStatus(BluetoothConnectionService.SYNC_RUNNING);
-			SyncEntry[] changes = gs.getDb().getChanges();			
-			Log.d("nils","Syncrequest received in Master. Sending "+changes.toString());
-			gs.sendMessage(changes);
+			o.addRow("[PONG-->]");
+		} else if (message instanceof SyncEntry[]) {			
+			gs.setSyncStatus(BluetoothConnectionService.SYNC_DONE);
+			sendEvent(BluetoothConnectionService.SYNK_COMPLETE);			
+			gs.sendMessage(new SyncComplete());
+		} else if (message instanceof MasterPing) {
+			sendEvent(BluetoothConnectionService.SAME_SAME_SYNDROME);
+			
 		}
-		
+
 	}
 
 }
