@@ -14,6 +14,8 @@ public interface RemoteDevice  {
 	public void getParameter(String key) ;
 
 	void sendParameter(String key, String value, int MsgType);
+
+	public void send(Object o);
 		
 	
 }

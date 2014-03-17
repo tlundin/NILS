@@ -6,13 +6,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.teraim.nils.bluetooth.BluetoothConnectionService;
+import com.teraim.nils.bluetooth.MasterMessageHandler;
+import com.teraim.nils.bluetooth.MessageHandler;
+import com.teraim.nils.bluetooth.SlaveMessageHandler;
 import com.teraim.nils.dynamic.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Provyta;
 import com.teraim.nils.dynamic.types.Ruta;
@@ -58,6 +64,7 @@ public class GlobalState  {
 	private SpinnerDefinition mySpinnerDef;
 	//Cash for ruta/Provyta/Delyta..
 	private ArrayList<Ruta> rutor = new ArrayList<Ruta>();
+	private MessageHandler myHandler;
 
 	//Global state for sync.
 	private int syncStatus=BluetoothConnectionService.SYNK_STOPPED;	
@@ -103,9 +110,11 @@ public class GlobalState  {
 		db = new DbHelper(ctx,artLista.getTable(),ph);
 		myWfs = thawWorkflows();		
 
-		db.printAllVariables();
+		db.printAuditVariables();
 		Tools.scanRutData(ctx.getResources().openRawResource(R.raw.rutdata_v3),this);
 
+		myHandler = isMaster()?new MasterMessageHandler(this):new SlaveMessageHandler(this);
+		
 	}
 
 
@@ -292,8 +301,11 @@ public class GlobalState  {
 			return "AV";
 		case BluetoothConnectionService.SYNK_SEARCHING:
 			return "SÖKER";
-		case BluetoothConnectionService.SYNK_RUNNING:
+		case BluetoothConnectionService.SYNC_READY_TO_ROCK:
 			return "PÅ";
+		case BluetoothConnectionService.SYNC_RUNNING:
+			return "AKTIV";
+
 		default:
 			return "?";
 		}
@@ -303,13 +315,15 @@ public class GlobalState  {
 		syncStatus = status;
 	}
 
-	public void sendParameter(Context ctx,String key,String value,int scope) {
-		if (syncStatus == BluetoothConnectionService.SYNK_RUNNING)
-			BluetoothConnectionService.getSingleton().sendParameter(key, value, scope);
-		else if (syncStatus == BluetoothConnectionService.SYNK_STOPPED)
-		{
-			Intent intent = new Intent(ctx,BluetoothConnectionService.class);
-			ctx.startService(intent);
+	public void sendMessage(Object message) {
+
+		if (syncStatus == BluetoothConnectionService.SYNK_STOPPED)	{
+			Log.d("nils","Sync fail in sendmessage! BT is stopped");
+			Toast.makeText(getContext(), "Failed to send message - no connection", Toast.LENGTH_SHORT).show();		
+		}
+		else {
+			Log.d("nils","Message is being sent now..");
+			BluetoothConnectionService.getSingleton().send(message);
 		}
 		//Otherwise ongoing sync. just wait?
 
@@ -421,6 +435,8 @@ public class GlobalState  {
 	}
 
 	Map<String,String> myKeyHash;
+
+
 	public Map<String,String> getCurrentKeyHash() {
 		return myKeyHash;
 	}
@@ -443,6 +459,22 @@ public class GlobalState  {
 		else
 			return m.equals("Mästare");
 
+	}
+
+	public MessageHandler getHandler() {
+		return myHandler;
+	}
+
+	public void setMaster(boolean master) {
+		if (master)
+			myHandler = new MasterMessageHandler(this);
+		else
+			myHandler = new SlaveMessageHandler(this);
+	}
+
+	public boolean syncIsAllowed() {
+		return (myHandler !=null && getArtLista().getVariableValue(null, "Current_Ruta")!=null &&
+				getArtLista().getVariableValue(null, "Current_Provyta")!=null);
 	}
 	
 	

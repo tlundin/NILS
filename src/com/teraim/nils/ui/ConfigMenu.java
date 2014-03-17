@@ -32,7 +32,7 @@ public class ConfigMenu extends PreferenceActivity {
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
-
+			
 			// Load the preferences from an XML resource
 			addPreferencesFromResource(R.xml.myprefs);
 			//Set default values for the prefs.
@@ -42,7 +42,7 @@ public class ConfigMenu extends PreferenceActivity {
 			EditTextPreference epref = (EditTextPreference) findPreference(PersistenceHelper.LAG_ID_KEY);
 			epref.setSummary(epref.getText());
 
-			ListPreference color = (ListPreference)findPreference("deviceColor");
+			ListPreference color = (ListPreference)findPreference(PersistenceHelper.DEVICE_COLOR_KEY);
 			color.setSummary(color.getValue());
 
 			epref = (EditTextPreference) findPreference(PersistenceHelper.USER_ID_KEY);
@@ -104,7 +104,7 @@ public class ConfigMenu extends PreferenceActivity {
 					
 				} else
 					if (key.equals(PersistenceHelper.CONFIG_LOCATION)) {
-						Log.d("nils","Bundle file changed. Removing version check");
+						Log.d("nils","Config location changed. Removing version check");
 						GlobalState.getInstance(this.getActivity()).getPersistence().put(PersistenceHelper.CURRENT_VERSION_OF_CONFIG_FILE, PersistenceHelper.UNDEFINED);					
 					}
 
@@ -113,6 +113,16 @@ public class ConfigMenu extends PreferenceActivity {
 			else if (pref instanceof ListPreference) {
 				ListPreference letp = (ListPreference) pref;
 				pref.setSummary(letp.getValue());
+				if (letp.getKey().equals(PersistenceHelper.DEVICE_COLOR_KEY)) {
+					if (letp.getValue().equals("Mästare")) {
+						Log.d("nils","Changed to MASTER");
+						GlobalState.getInstance(this.getActivity()).setMaster(true);
+					}
+					else {
+						Log.d("nils","Value is "+letp.getValue());
+						GlobalState.getInstance(this.getActivity()).setMaster(false);
+					}
+				}
 				
 			}
 			else if (pref instanceof CheckBoxPreference) {

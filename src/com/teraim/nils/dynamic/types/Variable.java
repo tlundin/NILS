@@ -1,6 +1,7 @@
 package com.teraim.nils.dynamic.types;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.Map;
 import android.util.Log;
 
 import com.teraim.nils.GlobalState;
+import com.teraim.nils.dynamic.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Variable.DataType;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 import com.teraim.nils.utils.DbHelper;
@@ -43,6 +45,8 @@ public class Variable implements Serializable {
 	private List<String> myRow;
 
 	private String myStringUnit;
+
+	private boolean isLocal;
 	
 	public enum DataType {
 		numeric,bool,list,text
@@ -62,9 +66,9 @@ public class Variable implements Serializable {
 	
 	public void setValue(String value) {
 		myValue = value;
-		myDb.insertVariable(this,value);
+		myDb.insertVariable(this,value,isLocal);
 	}
-	
+
 	/*
 	public void setValueWithoutCommit(String value) {
 		oldValue = myValue;
@@ -123,12 +127,28 @@ public class Variable implements Serializable {
 			myRow = row;
 			myType = gs.getArtLista().getnumType(row);		
 			myStringUnit = gs.getArtLista().getUnit(row);
+			isLocal = gs.getArtLista().getVarIsLocal(row)||Variable.isHistorical(keyChain);
 		}		
 		this.keyChain=keyChain;		
 		myDb = gs.getDb();
 		mySelection = myDb.createSelection(keyChain,name);
 		myLabel = label;
 		myValue = myDb.getValue(name,mySelection);
+	}
+
+	private static boolean isHistorical(Map<String, String> kc) {
+		if (kc==null)
+			return false;
+		String year = kc.get(VariableConfiguration.KEY_YEAR);
+		if (year == null||year.length()==0) {
+			Log.e("nils","year key missing in variable. Will assume current year");
+			return false;
+		}
+		if (!year.equals(Calendar.getInstance().get(Calendar.YEAR))) {
+			Log.d("nils","Historical value!");
+			return true;
+		}
+		return false;
 	}
 
 	public void deleteValue() {

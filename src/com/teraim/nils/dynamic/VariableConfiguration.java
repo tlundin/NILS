@@ -23,16 +23,17 @@ public class VariableConfiguration {
 	public static String Col_Variable_Keys = "Key Chain";
 	public static String Type = "Type";
 	public static String Col_Functional_Group = "Funktionell grupp";
+	public static String Col_Variable_Local = "Local";
 	
-		
+	public final static String KEY_YEAR = "år";
 	
 	
 	
 	
-	public static List<String>requiredColumns=Arrays.asList(Col_Variable_Keys,Col_Functional_Group,Col_Variable_Name,Col_Variable_Label,Type,"Unit","List Values","Description");
+	public static List<String>requiredColumns=Arrays.asList(Col_Variable_Keys,Col_Functional_Group,Col_Variable_Name,Col_Variable_Label,Type,"Unit","List Values","Description",Col_Variable_Local);
 
 	
-	private static int KEY_CHAIN=0,FUNCTIONAL_GROUP=1,VARIABLE_NAME=2,VARIABLE_LABEL=3,TYPE=4,UNIT=5,LIST_VALUES=6,DESCRIPTION=7;
+	private static int KEY_CHAIN=0,FUNCTIONAL_GROUP=1,VARIABLE_NAME=2,VARIABLE_LABEL=3,TYPE=4,UNIT=5,LIST_VALUES=6,DESCRIPTION=7,LOCAL=8;
 	
 	Map<String,Integer>fromNameToColumn = new HashMap<String,Integer>();
 
@@ -86,6 +87,15 @@ public class VariableConfiguration {
 	public String getVariableDescription(List<String> row) {		
 		return row.get(fromNameToColumn.get(requiredColumns.get(DESCRIPTION)));
 	}
+	
+	public boolean getVarIsLocal(List<String> row) {
+		String s= row.get(fromNameToColumn.get(requiredColumns.get(LOCAL)));
+		if (s==null||s.length()==0||!s.equalsIgnoreCase("x"))
+			return false;
+		else
+			return true;
+	}
+
 	
 	public String getKeyChain(List<String> row) {
 		return row.get(fromNameToColumn.get(requiredColumns.get(KEY_CHAIN)));		
@@ -211,7 +221,7 @@ public class VariableConfiguration {
 		String currentDelyta = getVariableValue(null,"Current_Delyta");		
 		if (currentRuta == null||currentProvyta==null||currentDelyta==null)
 			return null;
-		return Tools.createKeyMap("year",currentYear,"ruta",currentRuta,"provyta",currentProvyta,"delyta",currentDelyta);
+		return Tools.createKeyMap(KEY_YEAR,currentYear,"ruta",currentRuta,"provyta",currentProvyta,"delyta",currentDelyta);
 	}
 
 	public String getCurrentRuta() {

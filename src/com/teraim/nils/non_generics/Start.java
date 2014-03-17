@@ -8,8 +8,10 @@ import java.util.List;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -32,6 +34,8 @@ import com.teraim.nils.FileLoadedCb;
 import com.teraim.nils.FileLoadedCb.ErrorCode;
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
+import com.teraim.nils.bluetooth.BluetoothConnectionService;
+import com.teraim.nils.bluetooth.Ping;
 import com.teraim.nils.dynamic.templates.FotoTemplate;
 import com.teraim.nils.dynamic.templates.TagTemplate;
 import com.teraim.nils.dynamic.types.Variable;
@@ -176,7 +180,7 @@ public class Start extends MenuActivity {
 			loginConsole.clear();
 			loginConsole.addRow("NILS VERSION ");
 			loginConsole.addYellowText("["+NILS_VERSION+"]");
-			loginConsole.addRow("New features: Take Pictures, Delyte-calculation etc");
+			loginConsole.addRow("New features: Synchronization");
 
 
 			//If network, go and check for new files.
@@ -377,6 +381,30 @@ public class Start extends MenuActivity {
 	}
 
 
+
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onResume()
+	 */
+	@Override
+	protected void onResume() {
+		Log.d("nils","Gets to onResume");
+/*		if (!gs.isMaster()) {
+			BroadcastReceiver brr = new BroadcastReceiver() {
+				@Override
+				public void onReceive(Context ctx, Intent intent) {
+						Log.d("nils","Broadcastreceiver called in onResume!");
+			
+				}
+			};
+			IntentFilter filter = new IntentFilter();
+			filter.addAction(BluetoothConnectionService.SYNK_SERVICE_MESSAGE_RECEIVED);
+		}
+		if (gs.getSyncStatus() == BluetoothConnectionService.SYNK_RUNNING)
+			BluetoothConnectionService.getSingleton().send(new Ping());
+			*/
+		super.onResume();
+		
+	}
 
 
 

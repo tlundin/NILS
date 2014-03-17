@@ -438,7 +438,7 @@ public class Tools {
 			Log.d("nils","spinnerheader: "+header);
 			String curId=null;
 			while((row = br.readLine())!=null) {
-				Log.d("nils","SPINNING ROW: "+row);
+				//Log.d("nils","SPINNING ROW: "+row);
 				String[]  r = row.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)",-1);
 				if (r.length<noOfRequiredColumns) {
 					Log.d("nils","TOO SHORT ROW on line in spinnerdef file."+rowC);

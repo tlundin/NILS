@@ -52,7 +52,7 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 	LoggerI o;
 	
 	
-	final static int VAR_PATTERN_ROW_LENGTH = 8;
+	final static int VAR_PATTERN_ROW_LENGTH = 9;
 
 
 
@@ -267,11 +267,11 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 						Log.e("nils","found null or too short row at "+rowC+" in config file");
 					} else {			
 						String pGroup = r[pGroupIndex];
-						Log.d("nils","found group name: "+pGroup);
 						if (pGroup==null || pGroup.trim().length()==0) {
-							Log.d("nils","found variable "+r[pNameIndex]+" in varpattern");
+							//Log.d("nils","found variable "+r[pNameIndex]+" in varpattern");
 							myTable.addRow(trimmed(r));
 						} else {
+							Log.d("nils","found group name: "+pGroup);
 							elems = groups.get(pGroup);
 							String varPatternName = r[pNameIndex];
 							if (elems==null) {
@@ -297,7 +297,7 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 										varPatternL.addAll(elemCopy);
 										//Replace name column with full name.
 										varPatternL.set(pNameIndex, fullVarName);
-										Log.d("nils","Generated variable with values "+varPatternL.toString());
+										//Log.d("nils","Generated variable with values "+varPatternL.toString());
 										ErrCode err = myTable.addRow(varPatternL);
 										if (err!=ErrCode.ok) {
 											switch (err) {

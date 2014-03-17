@@ -18,10 +18,11 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.gms.internal.ga;
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
 import com.teraim.nils.bluetooth.BluetoothConnectionService;
-import com.teraim.nils.dynamic.types.Variable;
+import com.teraim.nils.bluetooth.SyncRequest;
 import com.teraim.nils.log.LoggerI;
 import com.teraim.nils.utils.PersistenceHelper;
 
@@ -49,9 +50,40 @@ public class MenuActivity extends Activity {
 		ph = gs.getPersistence();
 		
 		brr = new BroadcastReceiver() {
+			AlertDialog add = null;
 			@Override
 			public void onReceive(Context ctx, Intent intent) {
-					Log.d("nils","Broadcastreceiver refresh statusrow!");
+					Log.d("nils", "received "+intent.getAction()+" in MenuActivity BroadcastReceiver");
+					if (intent.getAction().equals(BluetoothConnectionService.SYNK_SERVICE_MESSAGE_RECEIVED)) {
+						Log.d("nils","recieved message");
+					}
+					else if (intent.getAction().equals(BluetoothConnectionService.SYNK_INITIATE)) {
+						gs.setSyncStatus(BluetoothConnectionService.SYNC_RUNNING);
+						gs.sendMessage(new SyncRequest());
+					}
+					
+					else if (intent.getAction().equals(BluetoothConnectionService.SYNK_NO_BONDED_DEVICE)) {
+						new AlertDialog.Builder(MenuActivity.this)
+					    .setTitle("Blåtandsproblem")
+					    .setMessage("För att synkroniseringen ska fungera måste dosorna bindas via blåtandsmenyn. Vill du göra det nu?") 
+					    .setIcon(android.R.drawable.ic_dialog_alert)
+					    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+							
+							@Override
+							public void onClick(DialogInterface dialog, int which)  {
+								Intent intentBluetooth = new Intent();
+							    intentBluetooth.setAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
+							    startActivity(intentBluetooth); 
+							}
+							
+						})
+						.setNegativeButton(android.R.string.no,new DialogInterface.OnClickListener() {
+							
+							@Override
+							public void onClick(DialogInterface dialog, int which) {}} ) 
+						.show();
+						
+					}
 					me.refreshStatusRow();
 				}
 				
@@ -62,7 +94,8 @@ public class MenuActivity extends Activity {
 			filter.addAction(BluetoothConnectionService.SYNK_SERVICE_STARTED);
 			filter.addAction(BluetoothConnectionService.SYNK_SERVICE_STOPPED);
 			filter.addAction(BluetoothConnectionService.SYNK_SERVICE_CONNECTED);
-			filter.addAction(BluetoothConnectionService.SYNK_SERVICE_CONNECTED);
+			filter.addAction(BluetoothConnectionService.SYNK_NO_BONDED_DEVICE);
+			filter.addAction(BluetoothConnectionService.SYNK_INITIATE);
 			
 		this.registerReceiver(brr, filter);
 		//Listen for Service started/stopped event.
@@ -113,7 +146,7 @@ public class MenuActivity extends Activity {
 
 		for(int c=0;c<mnu.length-1;c++) {
 			mnu[c]=menu.add(0,c,c,"");
-			mnu[c].setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);	
+			mnu[c].setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);	
 
 		}
 		mnu[mnu.length-1]=menu.add(0,mnu.length-1,mnu.length-1,"");
@@ -132,10 +165,10 @@ public class MenuActivity extends Activity {
 		p = gs.getArtLista().getVariableValue(null,"Current_Ruta");
 		String pid = p==null?"?":p;
 		String rid = r==null?"?":r;
-		mnu[c++].setTitle("Ruta/Provyta: "+rid+"/"+pid);
+		mnu[c++].setTitle("R/PY "+rid+"/"+pid);
 		mnu[c++].setTitle("LOG");
-		mnu[c++].setTitle("Synkning: "+gs.getSyncStatusS());
-		
+		mnu[c++].setTitle("SYNK "+gs.getSyncStatusS());
+	
 		//mnu[c++].setTitle("Användare: "+gs.getPersistence().get(PersistenceHelper.USER_ID_KEY));
 		//mnu[c++].setTitle("Typ: "+gs.getDeviceType());
 		if(!ph.getB(PersistenceHelper.DEVELOPER_SWITCH)) {
@@ -165,7 +198,24 @@ public class MenuActivity extends Activity {
 					//intent.setAction(BluetoothAdapter.ACTION_STATE_CHANGED);
 					Intent intent = new Intent(getBaseContext(),BluetoothConnectionService.class);
 					if (gs.getSyncStatus()==BluetoothConnectionService.SYNK_STOPPED) {
-						startService(intent);
+						//Check that synk can start.
+						
+						if (gs.syncIsAllowed())
+							startService(intent);
+						else {							
+							new AlertDialog.Builder(MenuActivity.this)
+						    .setTitle("Synkning inte tillåten!")
+						    .setMessage("För att synkroniseringen ska fungera måste du först mata in värden för ruta och provyta.") 
+						    .setIcon(android.R.drawable.ic_dialog_alert)
+						    .setPositiveButton(R.string.iunderstand, new DialogInterface.OnClickListener() {						
+								@Override
+								public void onClick(DialogInterface dialog, int which)  {
+									
+								}
+								
+							})				 
+							.show();							
+						}
 						//Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 				        //startActivity(enableBtIntent);
 						//intent.putExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.STATE_OFF);

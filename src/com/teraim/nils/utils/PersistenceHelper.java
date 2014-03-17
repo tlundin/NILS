@@ -13,7 +13,7 @@ public class PersistenceHelper {
 	public static final String USER_ID_KEY = "user_id";
 	public static final String LAG_ID_KEY = "lag_id";
 	public static final String MITTPUNKT_KEY = "mittpunkt";
-	public static final String DEVICE_COLOR_KEY = "deviceColor";
+	public static final String DEVICE_COLOR_KEY = "device_type";
 	public static final String CONFIG_LOCATION = "config_name";
 	public static final String BUNDLE_LOCATION = "bundle_name";
 	public static final String SERVER_URL = "server_location";
@@ -25,6 +25,7 @@ public class PersistenceHelper {
 	public static final String VERSION_CONTROL_SWITCH_OFF = "no_version_control";
 	public static final String CURRENT_VERSION_OF_VARPATTERN_FILE = "current_version_varpattern";
 	public static final String TAG_DATA_HAS_BEEN_READ = "tagdata_read";
+	public static final String TIME_OF_LAST_CHANGE = "kakkadua";
 
 	SharedPreferences sp;
 	
@@ -46,9 +47,12 @@ public class PersistenceHelper {
 		sp.edit().putBoolean(key,value).commit();
 	}
 	
+	
 	public boolean getB(String key) {
 		return sp.getBoolean(key, false);
 	}
+	
+	
 	
 
 

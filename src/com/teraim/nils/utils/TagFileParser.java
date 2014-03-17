@@ -14,6 +14,7 @@ import com.teraim.nils.FileLoadedCb;
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.FileLoadedCb.ErrorCode;
 import com.teraim.nils.R;
+import com.teraim.nils.dynamic.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Variable;
 
 public class TagFileParser extends AsyncTask<GlobalState ,Integer,ErrorCode>{
@@ -80,7 +81,7 @@ public class TagFileParser extends AsyncTask<GlobalState ,Integer,ErrorCode>{
 						String varId = "TAG";
 
 						Variable v=null; 
-						Map<String,String>keys = Tools.createKeyMap("år",year,"ruta",rutaID,"provyta",provytaID,"delyta",delytaID);
+						Map<String,String>keys = Tools.createKeyMap(VariableConfiguration.KEY_YEAR,year,"ruta",rutaID,"provyta",provytaID,"delyta",delytaID);
 						if (keys!=null  && provytaID !=null && rutaID !=null && delytaID != null) {
 							gs.setKeyHash(keys);
 							v = gs.getArtLista().getVariableInstance(varId);

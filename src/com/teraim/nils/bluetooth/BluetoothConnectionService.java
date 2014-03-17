@@ -56,10 +56,15 @@ public class BluetoothConnectionService extends Service implements RemoteDevice 
 	public final static String SYNK_SERVICE_SERVER_CONNECT_FAIL = "com.teraim.nils.synk_lost_connect";
 	public final static String SYNK_PING_MESSAGE_RECEIVED = "com.teraim.nils.ping";
 	public final static String SYNK_NO_BONDED_DEVICE = "com.teraim.nils.binderror";
+	public static final String SYNK_INITIATE = "com.teraim.nils.synkinitiate";
+	
+
 
 	public final static int SYNK_SEARCHING = 0;
-	public final static int SYNK_RUNNING = 1;
+	public final static int SYNC_READY_TO_ROCK = 1;
 	public final static int SYNK_STOPPED = 2;
+	public static final int SYNC_RUNNING = 3;
+
 	
 
 	//Ping_delay
@@ -91,17 +96,12 @@ public class BluetoothConnectionService extends Service implements RemoteDevice 
 	private int pingC = 5;
 	private GlobalState gs;
 	private LoggerI o;
-	private MessageHandlerI myHandler;
+
+	private boolean serverStarted;
 	@Override
 	public void onCreate() {
 		
-		gs = GlobalState.getInstance(this);
-		
-		myHandler = gs.isMaster()?new MasterMessageHandler(gs):new SlaveMessageHandler(gs);
-		
-		
-				
-		
+		gs = GlobalState.getInstance(this);		
 		o = gs.getLogger();
 		Log.d("NILS","Service on create");
 		o.addRow("BlueTooth service starting up");
@@ -183,7 +183,7 @@ public class BluetoothConnectionService extends Service implements RemoteDevice 
 				ba.enable();
 			else {
 				startServer();
-				//ping();
+				ping();
 			}
 			
 	
@@ -202,6 +202,8 @@ public class BluetoothConnectionService extends Service implements RemoteDevice 
 		Log.i("LocalService", "Received start id " + startId + ": " + intent);
 		// We want this service to continue running until it is explicitly
 		// stopped, so return sticky.
+		//if server already started, try to connect.
+		
 		return START_STICKY;
 	}
 
@@ -224,7 +226,11 @@ public class BluetoothConnectionService extends Service implements RemoteDevice 
 		Intent intent = new Intent();
 		intent.setAction(SYNK_SERVICE_STOPPED);
 		this.sendBroadcast(intent);
+		try {
 		this.unregisterReceiver(brr);
+		} catch (IllegalArgumentException e) {
+			Log.d("nils","unregisterReceiver - dropping exception");
+		}
 	}
 
 
@@ -363,7 +369,7 @@ public class BluetoothConnectionService extends Service implements RemoteDevice 
 					try {
 						mmServerSocket.close();
 					} catch (IOException e) {
-
+						e.printStackTrace();
 					}
 					break;
 				}
@@ -385,7 +391,7 @@ public class BluetoothConnectionService extends Service implements RemoteDevice 
 
 
 	private void manageConnectedSocket(BluetoothSocket socket) {  	
-		connected_T = new ConnectedThread(getApplicationContext(),socket);
+		connected_T = new ConnectedThread(gs,socket);
 		connected_T.start();
 		Log.d("NILS","connected thread started.");
 		//if any delayed messages - send them.
@@ -398,7 +404,7 @@ public class BluetoothConnectionService extends Service implements RemoteDevice 
 			Log.d("NILS","Wrote "+msg+" to socket");
 		}
 		//Send a message that service is now connected.
-		gs.setSyncStatus(SYNK_RUNNING);
+		gs.setSyncStatus(SYNC_READY_TO_ROCK);
 		Intent intent = new Intent();
 		intent.setAction(SYNK_SERVICE_CONNECTED);
 		this.sendBroadcast(intent);
@@ -527,10 +533,10 @@ public class BluetoothConnectionService extends Service implements RemoteDevice 
 		//private final OutputStream mmOutStream;
 		private final ObjectOutputStream obj_out;
 		private final ObjectInputStream obj_in;
-		private Context mContext;
+		private GlobalState gs;
 
-		public ConnectedThread(Context ctx, BluetoothSocket socket) {
-			mContext = ctx;
+		public ConnectedThread(GlobalState gs, BluetoothSocket socket) {
+			this.gs=gs;
 			mmSocket = socket;
 			InputStream tmpIn = null;
 			OutputStream tmpOut = null;
@@ -575,12 +581,14 @@ public class BluetoothConnectionService extends Service implements RemoteDevice 
 					}
 					// Send the obtained bytes to the UI activity
 					//mHandler.obtainMessage(MESSAGE_READ, -1, -1, o).sendToTarget();
-					sendToUI(o);
+					MessageHandler mh = gs.getHandler();
+					if (mh!=null)
+						mh.handleMessage(o);
 
 				} catch (IOException e) {
 					Intent intent = new Intent();
 					intent.setAction(SYNK_SERVICE_SERVER_CONNECT_FAIL);
-					mContext.sendBroadcast(intent);
+					gs.getContext().sendBroadcast(intent);
 					break;
 				}
 
@@ -597,27 +605,7 @@ public class BluetoothConnectionService extends Service implements RemoteDevice 
 			}
 		}
 
-		private void sendToUI(Object o) {
-			Intent intent = new Intent();
 
-			if (o instanceof Parameter) {
-				intent.setAction(SYNK_SERVICE_MESSAGE_RECEIVED);
-				Parameter par = (Parameter)o;
-				Log.d("Parameter","Key "+par.mkey+" Val: "+par.mvalue);
-				intent.putExtra("MSG","Received parameter: "+par.mkey+" value: "+par.mvalue);
-			}
-			else if (o instanceof String) {
-				intent.setAction(SYNK_SERVICE_MESSAGE_RECEIVED);
-				intent.putExtra("MSG",(String)o);
-
-			}
-			else if (o instanceof Ping) {
-				myHandler.handleMessage(o);
-				intent.setAction(SYNK_PING_MESSAGE_RECEIVED);
-			}
-			mContext.sendBroadcast(intent);
-
-		}
 
 		/* Call this from the main activity to shutdown the connection */
 
@@ -650,11 +638,6 @@ public class BluetoothConnectionService extends Service implements RemoteDevice 
 		send(new Parameter(key,value));
 	}
 
-
-	public void push(Object obj) {
-
-	}
-
 	
 	@Override
 	public void sendMessage(String msg) {
@@ -680,7 +663,10 @@ public class BluetoothConnectionService extends Service implements RemoteDevice 
 				Toast.makeText(getBaseContext(),"No bounded (paired) device found",Toast.LENGTH_LONG).show();
 				Intent intent = new Intent();
 				intent.setAction(BluetoothConnectionService.SYNK_NO_BONDED_DEVICE);
+				gs.setSyncStatus(SYNK_STOPPED);
+				
 				sendBroadcast(intent);
+				BluetoothConnectionService.this.onDestroy();
 			} catch (BluetoothDeviceExtra e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
