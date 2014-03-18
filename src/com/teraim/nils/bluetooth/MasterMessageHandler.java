@@ -18,19 +18,12 @@ public class MasterMessageHandler extends MessageHandler {
 	@Override
 	public void handleSpecialized(Object message) {
 		if (message instanceof SlavePing) {
-			Log.d("nils","Sending pong");
-			o.addRow("[--->PING]");
-			Pong pong = new Pong();
-			pong.ruta=vc.getVariableValue(null,"Current_Ruta");
-			pong.provyta=vc.getVariableValue(null,"Current_Provyta");
-			gs.sendMessage(pong);
-			o.addRow("[PONG-->]");
-		} else if (message instanceof SyncEntry[]) {			
-			gs.setSyncStatus(BluetoothConnectionService.SYNC_DONE);
-			sendEvent(BluetoothConnectionService.SYNK_COMPLETE);			
-			gs.sendMessage(new SyncComplete());
-		} else if (message instanceof MasterPing) {
-			sendEvent(BluetoothConnectionService.SAME_SAME_SYNDROME);
+			Log.d("nils","Received Ping from Slave");
+			o.addRow("[--->PING]");			
+			gs.triggerTransfer();
+			
+		}  else if (message instanceof MasterPing) {
+			gs.sendEvent(BluetoothConnectionService.SAME_SAME_SYNDROME);
 			
 		}
 

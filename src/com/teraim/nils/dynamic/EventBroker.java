@@ -5,17 +5,25 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 
+import com.teraim.nils.GlobalState;
 import com.teraim.nils.dynamic.workflow_abstracts.Event;
 import com.teraim.nils.dynamic.workflow_abstracts.Event.EventType;
 import com.teraim.nils.dynamic.workflow_abstracts.EventListener;
+import com.teraim.nils.dynamic.workflow_realizations.WF_Event_OnSave;
+import com.teraim.nils.non_generics.Constants;
 
 public class EventBroker {
 
 	Map<EventType,List<EventListener>> eventListeners= new HashMap<EventType,List<EventListener>>();
+	private Context ctx;
 	
-	
+	public EventBroker(Context ctx) {
+		this.ctx=ctx;
+	}
 
 	public void registerEventListener(EventType et,EventListener el) {
 		
@@ -38,6 +46,14 @@ public class EventBroker {
 		for(EventListener el:els)
 			el.onEvent(e);
 		}
+		if (e instanceof WF_Event_OnSave && e.getProvider()!=Constants.SYNC_ID) {
+			Log.d("nils","Save event...sending delayed sync request");
+			new Handler().postDelayed(new Runnable() {
+				public void run() {
+					GlobalState.getInstance(ctx).triggerTransfer();
+				}
+			}, 2000);
+		} 
 	}
 	
 }

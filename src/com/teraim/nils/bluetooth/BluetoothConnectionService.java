@@ -57,9 +57,9 @@ public class BluetoothConnectionService extends Service implements RemoteDevice 
 	public final static String SYNK_PING_MESSAGE_RECEIVED = "com.teraim.nils.ping";
 	public final static String SYNK_NO_BONDED_DEVICE = "com.teraim.nils.binderror";
 	public static final String SYNK_INITIATE = "com.teraim.nils.synkinitiate";
-	public static final String SYNK_COMPLETE = "com.teraim.nils.synk_complete";
 	public static final String SAME_SAME_SYNDROME = "com.teraim.nils.master_syndrome";
-	public static final String SYNK_SUCCESFUL = "com.teraim.nils.sync_succesful";
+	public static final String SYNK_DATA_RECEIVED = "com.teraim.nils.synk_data_received";
+	public static final String SYNK_DATA_TRANSFER_DONE = "com.teraim.nils.sync_data_transfer_done";
 
 
 
@@ -69,7 +69,6 @@ public class BluetoothConnectionService extends Service implements RemoteDevice 
 	public final static int SYNC_READY_TO_ROCK = 1;
 	public final static int SYNK_STOPPED = 2;
 	public static final int SYNC_RUNNING = 3;
-	public static final int SYNC_DONE = 4;
 
 	
 
@@ -127,6 +126,7 @@ public class BluetoothConnectionService extends Service implements RemoteDevice 
 				}
 				else if (action.equals(BluetoothConnectionService.SAME_SAME_SYNDROME)) {
 					pingC=0;
+					stop();
 				}
 				else if (action.equals(BluetoothConnectionService.SYNK_SERVICE_CLIENT_CONNECT_FAIL)) {
 					//Try to ping again in a while if still running.
@@ -199,7 +199,8 @@ public class BluetoothConnectionService extends Service implements RemoteDevice 
 	private void ping() {
 		//Send a ping to see if we can connect straight away.
 		Log.d("NILS","Sending ping");
-		send(gs.isMaster()?new MasterPing():new SlavePing());
+		send(gs.isMaster()?new MasterPing(gs.getArtLista().getVariableValue(null,"Current_Ruta"),
+		gs.getArtLista().getVariableValue(null,"Current_Provyta")):new SlavePing());
 	}
 
 
@@ -473,6 +474,7 @@ public class BluetoothConnectionService extends Service implements RemoteDevice 
 	 */
 
 	final static int MESSAGE_READ = 1;
+
 
 
 	private class ClientConnectThread extends Thread {

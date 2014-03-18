@@ -50,7 +50,7 @@ import com.teraim.nils.utils.WorkflowParser;
 
 public class Start extends MenuActivity {
 
-	private final String NILS_VERSION = "0.30";
+	private final String NILS_VERSION = "0.31";
 
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
@@ -124,8 +124,6 @@ public class Start extends MenuActivity {
 		// Set the list's click listener
 		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
-
-		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerToggle = new ActionBarDrawerToggle(
 				this,                  /* host Activity */
 				mDrawerLayout,         /* DrawerLayout object */

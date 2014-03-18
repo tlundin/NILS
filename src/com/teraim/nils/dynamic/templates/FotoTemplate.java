@@ -35,6 +35,7 @@ import com.teraim.nils.dynamic.Executor;
 import com.teraim.nils.dynamic.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Container;
+import com.teraim.nils.dynamic.workflow_realizations.WF_Event_OnSave;
 import com.teraim.nils.non_generics.Constants;
 import com.teraim.nils.utils.Geomatte;
 import com.teraim.nils.utils.ImageHandler;
@@ -326,6 +327,7 @@ public class FotoTemplate extends Executor implements OnGesturePerformedListener
 			w.setValue(cords[0]+"");
 			gpsT.setText("Startpunkt satt till:\nN: "+cords[0]+" Ö: "+cords[1]);
 			fixed=true;
+			myContext.registerEvent(new WF_Event_OnSave("fototemplate"));
 			return true;
 		} else {
 			gpsT.setText("Kan inte sätta ett värde! Ingen GPS signal.");

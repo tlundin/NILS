@@ -179,7 +179,7 @@ public class TagTemplate extends Executor {
 				.setMessage("Det här sparar alla förändringar permanent. Är du säker?")
 				.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) { 
-
+						//Save 
 					}
 				})
 				.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {

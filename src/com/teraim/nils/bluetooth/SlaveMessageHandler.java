@@ -14,27 +14,19 @@ public class SlaveMessageHandler extends MessageHandler {
 
 	@Override
 	public void handleSpecialized(Object message) {
-		if (message instanceof Pong) {
-			Pong p = (Pong)message;		
+		if (message instanceof MasterPing) {
+			MasterPing p = (MasterPing)message;		
 			Variable ruta = gs.getArtLista().getVariableInstance("Current_Ruta");
 			Variable provyta = gs.getArtLista().getVariableInstance("Current_Provyta");
-			ruta.setValue(p.ruta);
-			provyta.setValue(p.provyta);
-			Log.d("nils","Got PONG message!!");			
-			gs.setSyncStatus(BluetoothConnectionService.SYNC_RUNNING);
-			sendEvent(BluetoothConnectionService.SYNK_INITIATE);			
-			gs.sendMessage(new SyncRequest());
+			ruta.setValue(p.getRuta());
+			provyta.setValue(p.getProvyta());
+			Log.d("nils","Got MasterPong");			
+			gs.triggerTransfer();
 			
-		} else if (message instanceof SyncEntry[]) {
-			triggerTransfer();
-		}
-		//SYNC_COMPLETE
-		else if (message instanceof SyncComplete) {
-			gs.setSyncStatus(BluetoothConnectionService.SYNC_DONE);
-			sendEvent(BluetoothConnectionService.SYNK_COMPLETE);
-			
-		} else if (message instanceof SlavePing) {
-			sendEvent(BluetoothConnectionService.SAME_SAME_SYNDROME);
+		} 
+		
+		 else if (message instanceof SlavePing) {
+			gs.sendEvent(BluetoothConnectionService.SAME_SAME_SYNDROME);
 		}
 	}
 

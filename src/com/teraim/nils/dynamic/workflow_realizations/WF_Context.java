@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
+import com.teraim.nils.GlobalState;
 import com.teraim.nils.dynamic.EventBroker;
 import com.teraim.nils.dynamic.Executor;
 import com.teraim.nils.dynamic.workflow_abstracts.Container;
@@ -33,7 +34,7 @@ public class WF_Context {
 	public WF_Context(Context ctx,Executor e,int rootContainerId) {
 		this.ctx=ctx;
 		myTemplate = e;
-		eventBroker = new EventBroker();
+		eventBroker = new EventBroker(ctx);
 		this.rootContainerId=rootContainerId;
 		this.drawables=new HashMap<String,Drawable>();
 	}

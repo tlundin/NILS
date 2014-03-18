@@ -34,14 +34,14 @@ import com.teraim.nils.utils.PersistenceHelper;
  */
 public class MenuActivity extends Activity {
 
-	
+
 	private BroadcastReceiver brr;
 	private GlobalState gs;
 	private PersistenceHelper ph;
-	
-		
-		
-		
+
+
+
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);	
@@ -49,107 +49,111 @@ public class MenuActivity extends Activity {
 
 		gs = GlobalState.getInstance(this);
 		ph = gs.getPersistence();
-		
 		brr = new BroadcastReceiver() {
+			boolean inSameSame=false;
 			@Override
 			public void onReceive(Context ctx, Intent intent) {
-					Log.d("nils", "received "+intent.getAction()+" in MenuActivity BroadcastReceiver");
+				Log.d("nils", "received "+intent.getAction()+" in MenuActivity BroadcastReceiver");
 
-					 if (intent.getAction().equals(BluetoothConnectionService.SYNK_SERVICE_CONNECTED)||
-							 intent.getAction().equals(BluetoothConnectionService.SYNK_SERVICE_STOPPED)) {
-						 
-					 }
-					else if (intent.getAction().equals(BluetoothConnectionService.SYNK_NO_BONDED_DEVICE)) {
-						new AlertDialog.Builder(MenuActivity.this)
-					    .setTitle("Blåtandsproblem")
-					    .setMessage("För att synkroniseringen ska fungera måste dosorna bindas via blåtandsmenyn. Vill du göra det nu?") 
-					    .setIcon(android.R.drawable.ic_dialog_alert)
-					    .setCancelable(false)
-					    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-							
-							@Override
-							public void onClick(DialogInterface dialog, int which)  {
-								Intent intentBluetooth = new Intent();
-							    intentBluetooth.setAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
-							    startActivity(intentBluetooth); 
-							}
-							
-						})
-						.setNegativeButton(android.R.string.no,new DialogInterface.OnClickListener() {
-							
-							@Override
-							public void onClick(DialogInterface dialog, int which) {}} ) 
-						.show();
-						
-					}
-					else if (intent.getAction().equals(BluetoothConnectionService.SAME_SAME_SYNDROME)) {
-						new AlertDialog.Builder(MenuActivity.this)
-					    .setTitle("Båda samma")
-					    .setMessage("Båda dosorna är konfigurerade likadant. En måste byta till mästare/slav under skiftnyckels-menyn.") 
-					    .setIcon(android.R.drawable.ic_dialog_alert)
-					    .setCancelable(false)
-					    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-							
-							@Override
-							public void onClick(DialogInterface dialog, int which)  {
-								
-							}
-							
-						})
-						.show();
-					}
-					btInitDone();
-					me.refreshStatusRow();
+				if (intent.getAction().equals(BluetoothConnectionService.SYNK_SERVICE_CONNECTED)||
+						intent.getAction().equals(BluetoothConnectionService.SYNK_SERVICE_STOPPED)) {
+
 				}
-				
-				
-			};
+				else if (intent.getAction().equals(BluetoothConnectionService.SYNK_NO_BONDED_DEVICE)) {
+					new AlertDialog.Builder(MenuActivity.this)
+					.setTitle("Blåtandsproblem")
+					.setMessage("För att synkroniseringen ska fungera måste dosorna bindas via blåtandsmenyn. Vill du göra det nu?") 
+					.setIcon(android.R.drawable.ic_dialog_alert)
+					.setCancelable(false)
+					.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which)  {
+							Intent intentBluetooth = new Intent();
+							intentBluetooth.setAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
+							startActivity(intentBluetooth); 
+						}
+
+					})
+					.setNegativeButton(android.R.string.no,new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {}} ) 
+						.show();
+
+				}
+				else if (intent.getAction().equals(BluetoothConnectionService.SAME_SAME_SYNDROME)) {
+
+					if (!inSameSame) {
+						inSameSame=true;
+						new AlertDialog.Builder(MenuActivity.this)
+						.setTitle("Båda samma")
+						.setMessage("Båda dosorna är konfigurerade likadant. En måste byta till mästare/slav under skiftnyckels-menyn.") 
+						.setIcon(android.R.drawable.ic_dialog_alert)
+						.setCancelable(false)
+						.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which)  {
+								inSameSame = false;
+							}
+
+						})
+						.show();
+					}
+				}
+				btInitDone();
+				me.refreshStatusRow();
+			}
+
+
+		};
 		//Listen for bluetooth events.
-			IntentFilter filter = new IntentFilter();
-			filter.addAction(BluetoothConnectionService.SYNK_SERVICE_STARTED);
-			filter.addAction(BluetoothConnectionService.SYNK_SERVICE_STOPPED);
-			filter.addAction(BluetoothConnectionService.SYNK_SERVICE_CONNECTED);
-			filter.addAction(BluetoothConnectionService.SYNK_NO_BONDED_DEVICE);
-			filter.addAction(BluetoothConnectionService.SYNK_INITIATE);
-			filter.addAction(BluetoothConnectionService.SYNK_COMPLETE);
-			filter.addAction(BluetoothConnectionService.SAME_SAME_SYNDROME);
-			
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(BluetoothConnectionService.SYNK_SERVICE_STARTED);
+		filter.addAction(BluetoothConnectionService.SYNK_SERVICE_STOPPED);
+		filter.addAction(BluetoothConnectionService.SYNK_SERVICE_CONNECTED);
+		filter.addAction(BluetoothConnectionService.SYNK_NO_BONDED_DEVICE);
+		filter.addAction(BluetoothConnectionService.SYNK_INITIATE);
+		filter.addAction(BluetoothConnectionService.SYNK_DATA_RECEIVED);
+		filter.addAction(BluetoothConnectionService.SAME_SAME_SYNDROME);
+		filter.addAction(BluetoothConnectionService.SYNK_DATA_TRANSFER_DONE);
+
 		this.registerReceiver(brr, filter);
 		//Listen for Service started/stopped event.
-	
+
 	}
 
 
-	
 
-	
+
+
 	public void onDestroy()
 	{
 		super.onDestroy();
 		Log.d("NILS", "In the onDestroy() event");
-		
+
 		//Stop listening for bluetooth events.
 		this.unregisterReceiver(brr);
 
 	}
 
-	
-	
+
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
 		CreateMenu(menu);
 		return true;
 	}
-	
+
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-	    super.onPrepareOptionsMenu(menu);
-	   refreshStatusRow();
-	    return true;
+		super.onPrepareOptionsMenu(menu);
+		refreshStatusRow();
+		return true;
 	}
-	
-	
+
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
@@ -185,7 +189,7 @@ public class MenuActivity extends Activity {
 		mnu[c++].setTitle("R/PY "+rid+"/"+pid);
 		mnu[c++].setTitle("LOG");
 		mnu[c++].setTitle("SYNK "+gs.getSyncStatusS());
-	
+
 		//mnu[c++].setTitle("Användare: "+gs.getPersistence().get(PersistenceHelper.USER_ID_KEY));
 		//mnu[c++].setTitle("Typ: "+gs.getDeviceType());
 		if(!ph.getB(PersistenceHelper.DEVELOPER_SWITCH)) {
@@ -196,7 +200,7 @@ public class MenuActivity extends Activity {
 			Log.d("nils","devswitch on");
 			mnu[1].setVisible(true);
 		}
-		
+
 
 	}
 
@@ -204,10 +208,10 @@ public class MenuActivity extends Activity {
 	private void btInitDone() {
 		BTInProgress=false;
 	}
-	
+
 	private boolean MenuChoice(MenuItem item) {
 
-	
+
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -227,21 +231,21 @@ public class MenuActivity extends Activity {
 						}
 						else {							
 							new AlertDialog.Builder(MenuActivity.this)
-						    .setTitle("Synkning kan inte genomföras just nu.")
-						    .setMessage("Felkod: "+err.name()) 
-						    .setIcon(android.R.drawable.ic_dialog_alert)
-						    .setCancelable(false)
-						    .setPositiveButton(R.string.iunderstand, new DialogInterface.OnClickListener() {						
+							.setTitle("Synkning kan inte genomföras just nu.")
+							.setMessage("Felkod: "+err.name()) 
+							.setIcon(android.R.drawable.ic_dialog_alert)
+							.setCancelable(false)
+							.setPositiveButton(R.string.iunderstand, new DialogInterface.OnClickListener() {						
 								@Override
 								public void onClick(DialogInterface dialog, int which)  {
 									btInitDone();
 								}
-								
+
 							})				 
 							.show();							
 						}
 						//Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-				        //startActivity(enableBtIntent);
+						//startActivity(enableBtIntent);
 						//intent.putExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.STATE_OFF);
 					}
 
@@ -258,47 +262,47 @@ public class MenuActivity extends Activity {
 				}
 			}
 		};
-		
+
 		switch (item.getItemId()) {
-			
-		
+
+
 		case 1:
 			final Dialog dialog = new Dialog(this);
-            dialog.setContentView(R.layout.log_dialog_popup);
-            dialog.setTitle("Session Log");
-            final TextView tv=(TextView)dialog.findViewById(R.id.logger);
-            Typeface type=Typeface.createFromAsset(getAssets(),
-    		        "clacon.ttf");
-    		tv.setTypeface(type);
-            final LoggerI log = gs.getLogger();
-            log.setOutputView(tv);
-            //trigger redraw.
-            log.draw();
-            Button close=(Button)dialog.findViewById(R.id.log_close);
-            dialog.show();
-            close.setOnClickListener(new OnClickListener() {
+			dialog.setContentView(R.layout.log_dialog_popup);
+			dialog.setTitle("Session Log");
+			final TextView tv=(TextView)dialog.findViewById(R.id.logger);
+			Typeface type=Typeface.createFromAsset(getAssets(),
+					"clacon.ttf");
+			tv.setTypeface(type);
+			final LoggerI log = gs.getLogger();
+			log.setOutputView(tv);
+			//trigger redraw.
+			log.draw();
+			Button close=(Button)dialog.findViewById(R.id.log_close);
+			dialog.show();
+			close.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					dialog.dismiss();
 				}
 			});
-            Button clear = (Button)dialog.findViewById(R.id.log_clear);
-            clear.setOnClickListener(new OnClickListener() {
+			Button clear = (Button)dialog.findViewById(R.id.log_clear);
+			clear.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					log.clear();
 				}
 			});
-			
-		break;
+
+			break;
 		case 2:
 			if (!BTInProgress) {
-			BTInProgress=true;
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle("Synkronisering")
-			.setMessage("Vill du "+(gs.getSyncStatus()==BluetoothConnectionService.SYNK_STOPPED?"slå på ":"stänga av ")+"synkroniseringen?").setPositiveButton("Ja", dialogClickListener)
-			.setNegativeButton("Nej", dialogClickListener).show()
-			.setCanceledOnTouchOutside(false);
+				BTInProgress=true;
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle("Synkronisering")
+				.setMessage("Vill du "+(gs.getSyncStatus()==BluetoothConnectionService.SYNK_STOPPED?"slå på ":"stänga av ")+"synkroniseringen?").setPositiveButton("Ja", dialogClickListener)
+				.setNegativeButton("Nej", dialogClickListener).show()
+				.setCanceledOnTouchOutside(false);
 			}
 			break;
 		case 0:
@@ -310,5 +314,5 @@ public class MenuActivity extends Activity {
 		return false;
 	}
 
-	
+
 }

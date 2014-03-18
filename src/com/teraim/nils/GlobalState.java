@@ -19,6 +19,7 @@ import com.teraim.nils.bluetooth.BluetoothConnectionService;
 import com.teraim.nils.bluetooth.MasterMessageHandler;
 import com.teraim.nils.bluetooth.MessageHandler;
 import com.teraim.nils.bluetooth.SlaveMessageHandler;
+import com.teraim.nils.bluetooth.SyncEntry;
 import com.teraim.nils.dynamic.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Provyta;
 import com.teraim.nils.dynamic.types.Ruta;
@@ -69,7 +70,7 @@ public class GlobalState  {
 	//Global state for sync.
 	private int syncStatus=BluetoothConnectionService.SYNK_STOPPED;	
 
-	
+
 
 	public String TEXT_LARGE;
 
@@ -109,7 +110,7 @@ public class GlobalState  {
 		Tools.scanRutData(ctx.getResources().openRawResource(R.raw.rutdata_v3),this);
 
 		myHandler = isMaster()?new MasterMessageHandler(this):new SlaveMessageHandler(this);
-		
+
 	}
 
 
@@ -137,7 +138,7 @@ public class GlobalState  {
 	public SpinnerDefinition getSpinnerDefinitions() {
 		return mySpinnerDef;
 	}
-	
+
 	public void setSpinnerDefinitions(SpinnerDefinition sd) {
 		if (sd!=null)
 			Log.d("nils","SetSpinnerDef called with "+sd.size()+" spinners");
@@ -145,7 +146,7 @@ public class GlobalState  {
 			Log.e("nils","Spinnerdef null!!!");
 		mySpinnerDef=sd;
 	}
-	
+
 	public PersistenceHelper getPersistence() {
 		return ph;
 	}
@@ -279,7 +280,7 @@ public class GlobalState  {
 
 
 
-	
+
 
 
 	/**************************************
@@ -299,9 +300,7 @@ public class GlobalState  {
 		case BluetoothConnectionService.SYNC_READY_TO_ROCK:
 			return "PÅ";
 		case BluetoothConnectionService.SYNC_RUNNING:
-			return "AKTIV";
-		case BluetoothConnectionService.SYNC_DONE:
-			return "OK";
+			return "SYNKAR";
 		default:
 			return "?";
 		}
@@ -436,8 +435,8 @@ public class GlobalState  {
 	public Map<String,String> getCurrentKeyHash() {
 		return myKeyHash;
 	}
-	
-	
+
+
 	public void  setKeyHash(Map<String,String> h) { 
 		myKeyHash=h;
 	}
@@ -449,8 +448,8 @@ public class GlobalState  {
 	public boolean isMaster() {
 		String m;
 		if ((m = ph.get(PersistenceHelper.DEVICE_COLOR_KEY)).equals(PersistenceHelper.UNDEFINED)) {
-				ph.put(PersistenceHelper.DEVICE_COLOR_KEY, "Mästare");
-				return true;
+			ph.put(PersistenceHelper.DEVICE_COLOR_KEY, "Mästare");
+			return true;
 		}
 		else
 			return m.equals("Mästare");
@@ -467,7 +466,7 @@ public class GlobalState  {
 		else
 			myHandler = new SlaveMessageHandler(this);
 	}
-	
+
 	public enum ErrorCode {
 		ok,
 		missing_required_column,
@@ -478,12 +477,11 @@ public class GlobalState  {
 		current_ruta_not_set,
 		current_provyta_not_set,
 		no_handler_available
-		
+
 	}
-	
+
 	public boolean syncIsActive() {
-		return (syncStatus == BluetoothConnectionService.SYNC_READY_TO_ROCK ||
-				syncStatus == BluetoothConnectionService.SYNC_DONE);
+		return (syncStatus == BluetoothConnectionService.SYNC_READY_TO_ROCK);
 	}
 
 	public ErrorCode syncIsAllowed() {
@@ -500,8 +498,32 @@ public class GlobalState  {
 		else 
 			return ErrorCode.ok;
 	}
-	
-	
+
+	public void triggerTransfer() {
+		if (syncIsActive()&&syncIsAllowed()==ErrorCode.ok) {
+			Log.d("nils","Doing da sync..");
+			setSyncStatus(BluetoothConnectionService.SYNC_RUNNING);
+			sendEvent(BluetoothConnectionService.SYNK_INITIATE);
+			SyncEntry[] changes = db.getChanges();
+			Log.d("nils","Syncrequest received. Sending "+(changes==null?"no changes":changes.toString()));
+			if (changes==null)
+				log.addRow("[SENDING_SYNC-->0 rows]");
+			else
+				log.addRow("[SENDING_SYNC-->"+changes.length+" rows]");
+			if (changes == null) 
+				changes = new SyncEntry[]{};
+			sendMessage(changes);
+		} else 
+			Log.d("nils","Sync not allowed");
+	}
+
+	public void sendEvent(String action) {
+		Intent intent = new Intent();
+		intent.setAction(action);
+		getContext().sendBroadcast(intent);
+	}
+
+
 
 
 

@@ -21,7 +21,6 @@ import android.widget.Toast;
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
 import com.teraim.nils.bluetooth.BluetoothConnectionService;
-import com.teraim.nils.bluetooth.SyncRequest;
 import com.teraim.nils.dynamic.blocks.AddEntryToFieldListBlock;
 import com.teraim.nils.dynamic.blocks.AddSumOrCountBlock;
 import com.teraim.nils.dynamic.blocks.AddVariableToEntryFieldBlock;
@@ -48,13 +47,13 @@ import com.teraim.nils.dynamic.workflow_realizations.WF_List;
 import com.teraim.nils.exceptions.RuleException;
 import com.teraim.nils.expr.SyntaxException;
 import com.teraim.nils.log.LoggerI;
+import com.teraim.nils.non_generics.Constants;
 
 /*
  * Executes workflow blocks. Child classes define layouts and other specialized behavior
  */
 public abstract class Executor extends Fragment {
 
-	protected static final String SYNC_ID = "SYNX";
 
 	protected Workflow wf;
 
@@ -82,7 +81,6 @@ public abstract class Executor extends Fragment {
 		super.onCreate(savedInstanceState);
 		activity = this.getActivity();
 		myContext = new WF_Context((Context)activity,this,R.id.content_frame);
-
 		gs = GlobalState.getInstance((Context)activity);
 		gs.setCurrentContext(myContext);
 		o = gs.getLogger();
@@ -100,22 +98,7 @@ public abstract class Executor extends Fragment {
 
 
 
-	/* (non-Javadoc)
-	 * @see android.app.Fragment#onStop()
-	 */
-	@Override
-	public void onStop() {
-		//check if ok to sync.
-		if (gs.syncIsAllowed()==GlobalState.ErrorCode.ok &&
-				gs.syncIsActive()) {
-			Log.d("nils","GETTZZZZZZ");
-			gs.setSyncStatus(BluetoothConnectionService.SYNC_RUNNING);
-			gs.sendMessage(new SyncRequest());			
-		} 
-		
-		
-		super.onStop();
-	}
+	
 	
 	
 	
@@ -340,13 +323,13 @@ public abstract class Executor extends Fragment {
 			o.addRedText("TEMPLATE ERROR: Cannot find the root container. \nEach template must have a root! Execution aborted.");				
 		}
 		IntentFilter ifi = new IntentFilter();
-		ifi.addAction(BluetoothConnectionService.SYNK_SUCCESFUL);
+		ifi.addAction(BluetoothConnectionService.SYNK_DATA_RECEIVED);
 		BroadcastReceiver brr = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context ctx, Intent intent) {
 				Log.d("nils","GETS HERE::::::");
 				gs.getArtLista().invalidateCache();
-				myContext.registerEvent(new WF_Event_OnSave(SYNC_ID));
+				myContext.registerEvent(new WF_Event_OnSave(Constants.SYNC_ID));
 			}
 		};
 

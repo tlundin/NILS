@@ -33,6 +33,8 @@ public class Constants {
 	//public static String NILS_BASE_DIR = "/nils";
 	public static String UNDEFINED = "undefined";
 
+	public static final String SYNC_ID = "SYNX";
+
 	
 	//NILS uid
 	public static final UUID RED_UID = UUID.fromString("58500d27-6fd9-47c9-bf6b-d0969ce78bb3");
