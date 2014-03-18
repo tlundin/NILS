@@ -637,7 +637,7 @@ public class DbHelper extends SQLiteOpenHelper {
 		String selection;
 	}
 
-	public Selection createSelection(Map<String, String> keySet, String name) {
+	public Selection createSelection(Map<String, String> keySet, String name, boolean withFuzz) {
 
 		Selection ret = new Selection();
 		//Create selection String.
@@ -656,13 +656,16 @@ public class DbHelper extends SQLiteOpenHelper {
 				//1.find the matching column.
 
 				for (String key:keySet.keySet()) {
-					col = keyColM.get(key);
-					selection+=col+"= ? and ";
+					if (withFuzz)
+						key = keyColM.get(key);
+					selection+=key+"= ? and ";
 
 				}
 				cachedSelArgs.put(keySet.keySet(), selection);
 
-			} 
+			} else {
+				Log.d("nils","Found cached selection Args: "+selection);
+			}
 		}
 		selection+="var= ?";
 
@@ -775,10 +778,12 @@ public class DbHelper extends SQLiteOpenHelper {
 							if (pair[0].equals("var")) {
 								name = pair[1];
 							} else if (!partOfValues(pair[0])) {
+								Log.d("nils",pair[0]+" was not part of values");
 								if (keySet == null)
 									keySet = new HashMap<String, String>();
 								keySet.put(pair[0],pair[1]);
-							}
+							} else
+								Log.d("nils",pair[0]+" was part of values!");
 
 							//cv contains all elements, except id.
 							cv.put(pair[0],pair[1]);													
@@ -792,7 +797,7 @@ public class DbHelper extends SQLiteOpenHelper {
 				//Try find the vairable.
 				if (keySet == null) 
 					Log.d("nils","Keyset was null");
-				Selection sel = this.createSelection(keySet, name);
+				Selection sel = this.createSelection(keySet, name,false);
 				int id = this.getId(name, sel);
 				long rId=-1;
 				if (id==-1) {

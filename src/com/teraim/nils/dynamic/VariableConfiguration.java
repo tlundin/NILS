@@ -232,6 +232,11 @@ public class VariableConfiguration {
 	public String getCurrentProvyta() {
 		return getVariableValue(null,"Current_Provyta");
 	}
+	
+	public void invalidateCache() {
+		for (Variable v:varCache.values())
+			v.invalidate();
+	}
 
 	
 

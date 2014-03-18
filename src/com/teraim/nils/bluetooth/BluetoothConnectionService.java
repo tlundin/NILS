@@ -59,6 +59,8 @@ public class BluetoothConnectionService extends Service implements RemoteDevice 
 	public static final String SYNK_INITIATE = "com.teraim.nils.synkinitiate";
 	public static final String SYNK_COMPLETE = "com.teraim.nils.synk_complete";
 	public static final String SAME_SAME_SYNDROME = "com.teraim.nils.master_syndrome";
+	public static final String SYNK_SUCCESFUL = "com.teraim.nils.sync_succesful";
+
 
 
 

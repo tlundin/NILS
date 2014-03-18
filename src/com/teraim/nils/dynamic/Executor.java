@@ -8,7 +8,10 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -40,6 +43,7 @@ import com.teraim.nils.dynamic.types.Workflow;
 import com.teraim.nils.dynamic.workflow_abstracts.Container;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Container;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
+import com.teraim.nils.dynamic.workflow_realizations.WF_Event_OnSave;
 import com.teraim.nils.dynamic.workflow_realizations.WF_List;
 import com.teraim.nils.exceptions.RuleException;
 import com.teraim.nils.expr.SyntaxException;
@@ -49,6 +53,8 @@ import com.teraim.nils.log.LoggerI;
  * Executes workflow blocks. Child classes define layouts and other specialized behavior
  */
 public abstract class Executor extends Fragment {
+
+	protected static final String SYNC_ID = "SYNX";
 
 	protected Workflow wf;
 
@@ -85,6 +91,7 @@ public abstract class Executor extends Fragment {
 		//TODO: REMOVE
 		//Create fake hash if wf does not provide.
 		final Map<String,String>fakeHash = new HashMap<String,String>();
+		
 
 	}
 	
@@ -332,8 +339,18 @@ public abstract class Executor extends Fragment {
 			o.addRow("");
 			o.addRedText("TEMPLATE ERROR: Cannot find the root container. \nEach template must have a root! Execution aborted.");				
 		}
+		IntentFilter ifi = new IntentFilter();
+		ifi.addAction(BluetoothConnectionService.SYNK_SUCCESFUL);
+		BroadcastReceiver brr = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context ctx, Intent intent) {
+				Log.d("nils","GETS HERE::::::");
+				gs.getArtLista().invalidateCache();
+				myContext.registerEvent(new WF_Event_OnSave(SYNC_ID));
+			}
+		};
 
-
+			activity.registerReceiver(brr, ifi);
 
 	}
 
@@ -473,7 +490,6 @@ public abstract class Executor extends Fragment {
 	/* (non-Javadoc)
 	 * @see android.app.Fragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
 	 */
-
 
 
 

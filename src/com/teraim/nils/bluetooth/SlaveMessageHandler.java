@@ -31,7 +31,8 @@ public class SlaveMessageHandler extends MessageHandler {
 		//SYNC_COMPLETE
 		else if (message instanceof SyncComplete) {
 			gs.setSyncStatus(BluetoothConnectionService.SYNC_DONE);
-			sendEvent(BluetoothConnectionService.SYNK_COMPLETE);			
+			sendEvent(BluetoothConnectionService.SYNK_COMPLETE);
+			
 		} else if (message instanceof SlavePing) {
 			sendEvent(BluetoothConnectionService.SAME_SAME_SYNDROME);
 		}

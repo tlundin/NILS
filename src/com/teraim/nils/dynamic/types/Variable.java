@@ -47,12 +47,18 @@ public class Variable implements Serializable {
 	private String myStringUnit;
 
 	private boolean isLocal;
+
+	private boolean invalidated=true;
 	
 	public enum DataType {
 		numeric,bool,list,text
 	}
 	
 	public String getValue() {
+		if (invalidated) {
+			myValue = myDb.getValue(name,mySelection);	
+			invalidated = false;
+		}
 		return myValue;
 	}
 	
@@ -132,9 +138,9 @@ public class Variable implements Serializable {
 		}		
 		this.keyChain=keyChain;		
 		myDb = gs.getDb();
-		mySelection = myDb.createSelection(keyChain,name);
+		mySelection = myDb.createSelection(keyChain,name,true);
 		myLabel = label;
-		myValue = myDb.getValue(name,mySelection);
+		invalidated=true;
 	}
 
 	private static boolean isHistorical(Map<String, String> kc) {
@@ -161,6 +167,10 @@ public class Variable implements Serializable {
 
 	public void setType(DataType type) {
 		myType = type;
+	}
+	
+	public void invalidate() {
+		invalidated=true;
 	}
 
 

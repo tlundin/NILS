@@ -4,11 +4,14 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.teraim.nils.GlobalState;
+import com.teraim.nils.dynamic.workflow_realizations.WF_Event_OnSave;
 import com.teraim.nils.log.LoggerI;
 import com.teraim.nils.utils.PersistenceHelper;
 
 public abstract class MessageHandler {
 
+	private static final String WhatEver = null;
+	private static final String SYNC_SOURCE = "SYNC_SOURCE";
 	protected GlobalState gs;
 	protected LoggerI o;
 
@@ -30,13 +33,15 @@ public abstract class MessageHandler {
 				o.addRow("[Recieving SYNC: "+ses.length+" rows]");
 				gs.getDb().synchronise(ses);
 				gs.sendMessage(new SyncSuccesful());
+				sendEvent(BluetoothConnectionService.SYNK_SUCCESFUL);
 			}
 			else {
 				o.addRow("[SYNC: No changes since last sync]");				
 			}
 		}
-		else if (message instanceof SyncSuccesful)
+		else if (message instanceof SyncSuccesful) {
 			gs.getDb().syncDone();
+		}
 		
 		handleSpecialized(message);
 		o.draw();
