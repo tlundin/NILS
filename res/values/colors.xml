@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<color name="toogleblue">#ACD1E9</color>
+	<color name="pressed_color">#4d90fe</color>
+    <color name="default_color">#ffffff</color>
 </resources>

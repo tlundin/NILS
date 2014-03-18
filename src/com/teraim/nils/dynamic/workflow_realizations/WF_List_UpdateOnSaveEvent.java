@@ -1,10 +1,8 @@
 package com.teraim.nils.dynamic.workflow_realizations;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import android.util.Log;
 
@@ -117,7 +115,7 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 		
 	}
 	
-	
+	/*
 	@Override
 	public void addEntriesFromRows(List<List<String>> rows) 	{
 		String format = null;
@@ -153,6 +151,7 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 			}
 		}
 	}
+	*/
 
 	@Override
 	public void onEvent(Event e) {

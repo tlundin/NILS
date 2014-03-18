@@ -632,9 +632,9 @@ public class DbHelper extends SQLiteOpenHelper {
 
 	Map <Set<String>,String>cachedSelArgs = new HashMap<Set<String>,String>();
 
-	public class Selection {
-		String[] selectionArgs;
-		String selection;
+	public static class Selection {
+		String[] selectionArgs=null;
+		String selection=null;
 	}
 
 	public Selection createSelection(Map<String, String> keySet, String name, boolean withFuzz) {

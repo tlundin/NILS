@@ -30,8 +30,8 @@ WF_Not_ClickableField implements EventListener {
 	Type myType;
 
 	public WF_Not_ClickableField_SumAndCountOfVariables(String header,String descriptionT, WF_Context myContext, 
-			View view, String myTarget, String pattern,Type sumOrCount,boolean isVisible) {
-		super(header, descriptionT, myContext, view,isVisible);
+			 String myTarget, String pattern,Type sumOrCount,boolean isVisible) {
+		super(header, descriptionT, myContext, LayoutInflater.from(myContext.getContext()).inflate(R.layout.selection_field_normal,null),isVisible);
 		this.myContext=myContext;
 		targetList = myContext.getList(myTarget);
 		myType = sumOrCount;

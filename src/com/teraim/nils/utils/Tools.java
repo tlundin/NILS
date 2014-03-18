@@ -351,54 +351,7 @@ public class Tools {
 		return true;
 	}
 
-	public static Point toPolar(float x, float y) {
-
-		Point p = new Point();
-		double temp1,temp2;
-
-		temp1 = Math.sqrt(x * x + y * y);
-
-		temp2 = Math.asin(Math.abs(y / temp1)); //theta
-
-		if ((x < 0.0D) && (y > 0.0D)) temp2 = (3.141592653589793D - temp2);
-
-
-
-		if ((x < 0.0D) && (y < 0.0D)) temp2 = (3.141592653589793D + temp2);
-
-
-
-		if ((x > 0.0D) && (y < 0.0D)) temp2 = (6.283185307179586D - temp2);
-
-
-
-		if ((x > 0.0D) && (y == 0.0D)) temp2 = 0.0D;
-
-
-
-		if ((x < 0.0D) && (y == 0.0D)) temp2 = 3.141592653589793D;
-
-
-
-		if ((x == 0.0D) && (y < 0.0D)) temp2 = 4.71238898038469D;
-
-
-
-		if ((x == 0.0D) && (y > 0.0D)) temp2 = 1.570796326794897D;
-
-
-
-		temp2 = (temp2 * 180.0D / 3.141592653589793D);
-
-
-		//vinkel
-		p.x = (int)temp2;
-		//avst
-		p.y = (int)temp1;
-
-		return p;
-	}
-
+	
 	//Create a map of references to variables. 
 
 	public static SpinnerDefinition scanSpinerDef(Context myC, LoggerI o) {

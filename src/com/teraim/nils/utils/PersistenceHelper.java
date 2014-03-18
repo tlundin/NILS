@@ -26,6 +26,7 @@ public class PersistenceHelper {
 	public static final String CURRENT_VERSION_OF_VARPATTERN_FILE = "current_version_varpattern";
 	public static final String TAG_DATA_HAS_BEEN_READ = "tagdata_read";
 	public static final String TIME_OF_LAST_CHANGE = "kakkadua";
+	public static final String HistoricalRutorList = "historical_rutor";
 
 	SharedPreferences sp;
 	

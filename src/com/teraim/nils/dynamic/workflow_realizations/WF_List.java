@@ -60,15 +60,23 @@ public abstract class WF_List extends WF_Widget implements Sortable,Filterable {
 	public List<Listable> getList() {
 		return list;
 	}
+	
+	public abstract void addVariableToEveryListEntry(String varSuffix,boolean displayOut,String format,boolean isVisible);
+	public abstract void addFieldListEntry(String listEntryID, 
+			String label, String description);
+	public abstract boolean addVariableToListEntry(String varNameSuffix,boolean displayOut,String targetField,
+			String format, boolean isVisible);
 
+
+	/*
 	public void createEntriesFromRows(List<List<String>> rows) {
 		myWidget.removeAllViews();
 		addEntriesFromRows(rows);
 	}
 	
-		
+	
 	public abstract void addEntriesFromRows(List<List<String>> rows);
-
+*/
 	int intC=0;
 	public void draw() {
 		Log.e("draw","DRAW CALLED "+ (++intC)+" times from list"+this.getId());
@@ -96,11 +104,7 @@ public abstract class WF_List extends WF_Widget implements Sortable,Filterable {
 		} 
 
 	}
+	
 
-	public abstract void addVariableToEveryListEntry(String varSuffix,boolean displayOut,String format,boolean isVisible);
-	public abstract void addFieldListEntry(String listEntryID, 
-			String label, String description);
-	public abstract boolean addVariableToListEntry(String varNameSuffix,boolean displayOut,String targetField,
-			String format, boolean isVisible);
 
 }

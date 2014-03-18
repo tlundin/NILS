@@ -1,9 +1,11 @@
 package com.teraim.nils.dynamic;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import android.util.Log;
 
@@ -11,8 +13,6 @@ import com.teraim.nils.GlobalState;
 import com.teraim.nils.GlobalState.ErrorCode;
 import com.teraim.nils.dynamic.types.Table;
 import com.teraim.nils.dynamic.types.Variable;
-import com.teraim.nils.dynamic.types.Workflow.Unit;
-import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
 import com.teraim.nils.utils.Tools;
 
 
@@ -76,6 +76,16 @@ public class VariableConfiguration {
 	}
 	*/
 	
+	public List<String> getListElements(List<String> row) {
+		List<String> el = null;
+		String listS = row.get(fromNameToColumn.get(requiredColumns.get(LIST_VALUES)));
+		if (listS!=null&&listS.trim().length()>0) {
+			String[] x = listS.trim().split("\\|");
+			if (x!=null&&x.length>0)
+				el = new ArrayList<String>(Arrays.asList(x));
+		}
+		return el;
+	}
 	public String getVarName(List<String> row) {
 		return row.get(fromNameToColumn.get(requiredColumns.get(VARIABLE_NAME)));
 	}
@@ -166,12 +176,13 @@ public class VariableConfiguration {
 		return false;
 	}
 
-	Map<String,Variable>varCache = new HashMap<String,Variable>();
+	Map<String,Variable>varCache = new ConcurrentHashMap<String,Variable>();
 	
 	public String getVariableValue(Map<String, String> keyChain, String varId) {
 		return new Variable(varId,null,null,keyChain,gs).getValue();
 
 	}
+	
 	
 	
 	//Create a variable with the current context and the variable's keychain.
@@ -236,6 +247,10 @@ public class VariableConfiguration {
 	public void invalidateCache() {
 		for (Variable v:varCache.values())
 			v.invalidate();
+	}
+	
+	public void destroyCache() {
+		varCache.clear();
 	}
 
 	

@@ -31,7 +31,6 @@ import com.teraim.nils.dynamic.blocks.BlockCreateListEntriesFromFieldList;
 import com.teraim.nils.dynamic.blocks.ButtonBlock;
 import com.teraim.nils.dynamic.blocks.ContainerDefineBlock;
 import com.teraim.nils.dynamic.blocks.CreateEntryFieldBlock;
-import com.teraim.nils.dynamic.blocks.CreateListEntriesBlock;
 import com.teraim.nils.dynamic.blocks.CreateSortWidgetBlock;
 import com.teraim.nils.dynamic.blocks.DisplayValueBlock;
 import com.teraim.nils.dynamic.blocks.StartBlock;
@@ -75,7 +74,8 @@ public abstract class Executor extends Fragment {
 	protected GlobalState gs;
 
 	protected LoggerI o;
-
+	private IntentFilter ifi;
+	private BroadcastReceiver brr;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -89,7 +89,17 @@ public abstract class Executor extends Fragment {
 		//TODO: REMOVE
 		//Create fake hash if wf does not provide.
 		final Map<String,String>fakeHash = new HashMap<String,String>();
-		
+	
+		ifi = new IntentFilter();
+		ifi.addAction(BluetoothConnectionService.SYNK_DATA_RECEIVED);
+		brr = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context ctx, Intent intent) {
+				Log.d("nils","GETS HERE::::::");
+				gs.getArtLista().invalidateCache();
+				myContext.registerEvent(new WF_Event_OnSave(Constants.SYNC_ID));
+			}
+		};
 
 	}
 	
@@ -101,6 +111,26 @@ public abstract class Executor extends Fragment {
 	
 	
 	
+	
+	/* (non-Javadoc)
+	 * @see android.app.Fragment#onResume()
+	 */
+	@Override
+	public void onResume() {
+		activity.registerReceiver(brr, ifi);
+		super.onResume();
+	}
+	
+	@Override
+	public void onPause()
+	{
+		Log.d("NILS", "In the onPause() event");
+
+		//Stop listening for bluetooth events.
+		activity.unregisterReceiver(brr);
+		super.onPause();
+
+	}
 	
 	protected Workflow getFlow() {
 		Workflow wf=null;
@@ -246,12 +276,7 @@ public abstract class Executor extends Fragment {
 				ListFilterBlock bl = (ListFilterBlock)b;
 				bl.create(myContext);
 			}*/
-			else if (b instanceof CreateListEntriesBlock) {
-				o.addRow("");
-				o.addYellowText("CreateListEntriesBlock found");
-				CreateListEntriesBlock bl = (CreateListEntriesBlock)b;
-				bl.create(myContext);
-			}
+			
 			else if (b instanceof CreateEntryFieldBlock) {
 				o.addRow("");
 				o.addYellowText("CreateEntryFieldBlock found");
@@ -322,18 +347,7 @@ public abstract class Executor extends Fragment {
 			o.addRow("");
 			o.addRedText("TEMPLATE ERROR: Cannot find the root container. \nEach template must have a root! Execution aborted.");				
 		}
-		IntentFilter ifi = new IntentFilter();
-		ifi.addAction(BluetoothConnectionService.SYNK_DATA_RECEIVED);
-		BroadcastReceiver brr = new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context ctx, Intent intent) {
-				Log.d("nils","GETS HERE::::::");
-				gs.getArtLista().invalidateCache();
-				myContext.registerEvent(new WF_Event_OnSave(Constants.SYNC_ID));
-			}
-		};
 
-			activity.registerReceiver(brr, ifi);
 
 	}
 

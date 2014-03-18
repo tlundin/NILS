@@ -7,7 +7,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.teraim.nils.GlobalState;
@@ -32,10 +34,10 @@ public class WF_DisplayValueField extends WF_Widget implements EventListener {
 	boolean fail = false;
 	boolean stringT = false;
 
-	public WF_DisplayValueField(String id, View v, String formula,WF_Context ctx, Unit unit, 
+	public WF_DisplayValueField(String id, String formula,WF_Context ctx, Unit unit, 
 			String label, boolean isVisible,String format) {
-		super(id, v, isVisible,ctx);
-		((TextView)v.findViewById(R.id.header)).setText(label);
+		super(id, LayoutInflater.from(ctx.getContext()).inflate(R.layout.display_value_textview,null), isVisible,ctx);
+		((TextView)getWidget().findViewById(R.id.header)).setText(label);
 		gs = GlobalState.getInstance(ctx.getContext());
 		o = gs.getLogger();
 		this.formula = formula;

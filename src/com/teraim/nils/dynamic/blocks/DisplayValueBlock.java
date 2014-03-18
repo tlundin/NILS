@@ -39,8 +39,7 @@ public class DisplayValueBlock extends Block implements EventGenerator {
 		Container myContainer = myContext.getContainer(containerId);
 		if (myContainer != null) {
 		final Context ctx = myContext.getContext();
-		LinearLayout tv = (LinearLayout) LayoutInflater.from(ctx).inflate(R.layout.display_value_textview,null);
-		WF_DisplayValueField vf = new WF_DisplayValueField(namn,tv,formula,myContext,unit,label,isVisible,format);
+		WF_DisplayValueField vf = new WF_DisplayValueField(namn,formula,myContext,unit,label,isVisible,format);
 		myContainer.add(vf);
 		vf.onEvent(new WF_Event_OnSave(null));
 		} else {

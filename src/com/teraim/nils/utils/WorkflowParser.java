@@ -30,7 +30,6 @@ import com.teraim.nils.dynamic.blocks.BlockCreateListEntriesFromFieldList;
 import com.teraim.nils.dynamic.blocks.ButtonBlock;
 import com.teraim.nils.dynamic.blocks.ContainerDefineBlock;
 import com.teraim.nils.dynamic.blocks.CreateEntryFieldBlock;
-import com.teraim.nils.dynamic.blocks.CreateListEntriesBlock;
 import com.teraim.nils.dynamic.blocks.CreateSortWidgetBlock;
 import com.teraim.nils.dynamic.blocks.DisplayValueBlock;
 import com.teraim.nils.dynamic.blocks.LayoutBlock;
@@ -39,7 +38,6 @@ import com.teraim.nils.dynamic.blocks.StartBlock;
 import com.teraim.nils.dynamic.types.Workflow;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Not_ClickableField_SumAndCountOfVariables;
-import com.teraim.nils.exceptions.EvalException;
 import com.teraim.nils.exceptions.SameOldException;
 import com.teraim.nils.log.LoggerI;
 import com.teraim.nils.non_generics.Constants;
@@ -710,6 +708,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 	 * @throws XmlPullParserException
 	 * @throws EvalException 
 	 */	
+	/*
 	private CreateListEntriesBlock readBlockCreateListEntries(XmlPullParser parser) throws IOException, XmlPullParserException, EvalException {
 		o.addRow("Parsing block: block_create_list_entries...");
 
@@ -717,6 +716,7 @@ public class WorkflowParser extends AsyncTask<Context,Void,ErrorCode>{
 		o.addRedText("block_create_list_entries is no longer supported. Use block_create_list_entries_from_field_list instead");
 		return null;
 	}
+	*/
 	/*
 		boolean isVisible = true;
 		String type=null,fileName="",containerName=null,namn=null,selectionField=null,selectionPattern=null,filter=null;

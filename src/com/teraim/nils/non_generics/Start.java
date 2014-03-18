@@ -33,6 +33,7 @@ import com.teraim.nils.FileLoadedCb.ErrorCode;
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
 import com.teraim.nils.dynamic.templates.FotoTemplate;
+import com.teraim.nils.dynamic.templates.RutaTemplate;
 import com.teraim.nils.dynamic.templates.TagTemplate;
 import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.types.Workflow;
@@ -46,6 +47,7 @@ import com.teraim.nils.ui.MenuActivity;
 import com.teraim.nils.utils.ConfigFileParser;
 import com.teraim.nils.utils.PersistenceHelper;
 import com.teraim.nils.utils.TagFileParser;
+import com.teraim.nils.utils.Tools;
 import com.teraim.nils.utils.WorkflowParser;
 
 public class Start extends MenuActivity {
@@ -470,17 +472,15 @@ public class Start extends MenuActivity {
 		Fragment fragment=null;
 		if (wf!=null) 
 			fragment = wf.createFragment();
-		else {
-			//HACK TODO: REMOVE
-			if (position == 2) {
+		else if (position == 1)
+				fragment = new RutaTemplate();
+		else if (position == 2) 
 				fragment = new TagTemplate();
-			} else
-				if (position == 3) {
-					fragment = new FotoTemplate();
-				}
-				else
-					fragment = new Fragment();
-		}
+		else if (position == 3) 
+					fragment = new FotoTemplate();			
+		else
+			fragment = new Fragment();
+		
 		Bundle args = new Bundle();
 		args.putString("workflow_name", wfId);
 		fragment.setArguments(args);
@@ -577,6 +577,15 @@ public class Start extends MenuActivity {
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 
+
+
+
+	@Override
+	protected void onPause() {
+		Log.d("nils","Saving Safe");
+		Tools.witeObjectToFile(getApplication(), gs.getSafe(), Constants.CONFIG_FILES_DIR+"mysafe");
+		super.onPause();
+	}
 
 
 

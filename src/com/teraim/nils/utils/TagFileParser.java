@@ -62,12 +62,12 @@ public class TagFileParser extends AsyncTask<GlobalState ,Integer,ErrorCode>{
 				String  r[] = row.split(",");
 				String rutaID,provytaID,delytaID,year;
 				if (r!=null&&r.length>5) {	
-					year = r[0];
-					rutaID = r[1];
-					provytaID = r[3];
-					delytaID = r[4];
+					year = "2014";
+					rutaID = r[0];
+					provytaID = r[2];
+					delytaID = r[3];
 					String tag="";
-					for (int i=5;i<r.length;i++) {
+					for (int i=4;i<r.length;i++) {
 
 						if (r[i]!=null && !r[i].equalsIgnoreCase("NULL") && !r[i].startsWith("-")) {
 							tag+=r[i];

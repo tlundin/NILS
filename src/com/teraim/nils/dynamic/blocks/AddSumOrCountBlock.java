@@ -49,7 +49,7 @@ public  class AddSumOrCountBlock extends Block {
 
 		Container myContainer = myContext.getContainer(containerId);
 		WF_Not_ClickableField_SumAndCountOfVariables field = new WF_Not_ClickableField_SumAndCountOfVariables(
-				label,"", myContext, LayoutInflater.from(myContext.getContext()).inflate(R.layout.selection_field_normal,null), 
+				label,"", myContext, 
 				target, myPattern,
 				type,isVisible);
 		if (result == null) {

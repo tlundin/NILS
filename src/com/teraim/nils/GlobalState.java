@@ -77,6 +77,9 @@ public class GlobalState  {
 
 	private WF_Context currentContext;
 
+
+	private ParameterSafe mySafe;
+
 	public static GlobalState getInstance(Context c) {
 		if (singleton == null) {			
 			singleton = new GlobalState(c.getApplicationContext());
@@ -109,7 +112,11 @@ public class GlobalState  {
 		db.printAuditVariables();
 		Tools.scanRutData(ctx.getResources().openRawResource(R.raw.rutdata_v3),this);
 
+		//Event Handler on the Bluetooth interface.
 		myHandler = isMaster()?new MasterMessageHandler(this):new SlaveMessageHandler(this);
+		
+		//Get ParameterSafe.
+		mySafe = (ParameterSafe) Tools.readObjectFromFile(myC, Constants.CONFIG_FILES_DIR+"mysafe");
 
 	}
 
@@ -132,6 +139,7 @@ public class GlobalState  {
 		}
 	}
 
+	
 	/*Singletons available for all classes
 	 * 
 	 */
@@ -169,6 +177,13 @@ public class GlobalState  {
 
 	public VariableConfiguration getArtLista() {
 		return artLista;
+	}
+	
+	public ParameterSafe getSafe() {
+		if (mySafe!=null)
+			return mySafe;
+		else
+			return new ParameterSafe();
 	}
 
 	/**************************************************
@@ -438,6 +453,7 @@ public class GlobalState  {
 
 
 	public void  setKeyHash(Map<String,String> h) { 
+		artLista.destroyCache();
 		myKeyHash=h;
 	}
 
