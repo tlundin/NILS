@@ -8,8 +8,6 @@ import java.util.Set;
 
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.teraim.nils.GlobalState;
@@ -95,7 +93,7 @@ public class WF_DisplayValueField extends WF_Widget implements EventListener {
 				myVariables = new HashSet<Entry<String,DataType>>();
 				for (String var:potVars) {
 					List<String> row = gs.getArtLista().getCompleteVariableDefinition(var);
-					
+
 					if (row == null) {
 						o.addRow("");
 						o.addRedText("Couldn't find variable "+var+" referenced in formula "+formula);
@@ -135,12 +133,13 @@ public class WF_DisplayValueField extends WF_Widget implements EventListener {
 			o.addRow("");
 			o.addRedText("Parsing of formula for DisplayValueBlock failed. Formula: "+formula);
 		}
+		this.onEvent(new WF_Event_OnSave("fuckme"));
 	}
 
 	//update variable.
 	@Override
 	public void onEvent(Event e) {
-		
+
 		String strRes="";
 		String subst=new String(formula);
 		Log.d("nils","Got event in WF_DisplayValueField");	
@@ -155,7 +154,7 @@ public class WF_DisplayValueField extends WF_Widget implements EventListener {
 					break;
 				} else {
 					if (stringT) {
-						
+
 						strRes+=st.getValue();
 					}
 					else {
@@ -165,29 +164,33 @@ public class WF_DisplayValueField extends WF_Widget implements EventListener {
 							substErr=true;
 							Log.d("nils","Variable has no value in substitution...");
 						}
-							
+
 					}
 				}
 			}
 			if (!substErr && !stringT ) {
-				Parser p = gs.getParser();
-				Expr exp=null;
-				try {
-					exp = p.parse(subst);
-				} catch (SyntaxException e1) {
-					o.addRow("");
-					o.addRedText("Syntax error for formula "+formula+" after substitution to "+subst);
-					e1.printStackTrace();
+				if (Tools.isNumeric(subst)) 
+					strRes = subst;
+				else {
+					Parser p = gs.getParser();
+					Expr exp=null;
+					try {
+						exp = p.parse(subst);
+					} catch (SyntaxException e1) {
+						o.addRow("");
+						o.addRedText("Syntax error for formula "+formula+" after substitution to "+subst);
+						e1.printStackTrace();
+					}
+					if (exp==null) 
+					{
+						o.addRow("");
+						o.addRedText("Expr error for "+formula+" (after substitution) "+subst+". Expr is null");	
+						return;
+					} else
+						strRes = Double.toString(exp.value());
 				}
-				if (exp==null) 
-				{
-					o.addRow("");
-					o.addRedText("Expr error for "+formula+" (after substitution) "+subst+". Expr is null");	
-					return;
-				} else
-					strRes = Double.toString(exp.value());
 			} else {
-				
+
 			}
 		} else {
 			o.addRow("");
@@ -196,8 +199,8 @@ public class WF_DisplayValueField extends WF_Widget implements EventListener {
 		}
 		((TextView)this.getWidget().findViewById(R.id.outputValueField)).setText(strRes);
 		((TextView)this.getWidget().findViewById(R.id.outputUnitField)).setText(Tools.getPrintedUnit(unit));
-		
-	
+
+
 	}
 
 

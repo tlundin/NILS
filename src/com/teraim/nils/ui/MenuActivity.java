@@ -39,7 +39,7 @@ public class MenuActivity extends Activity {
 	private GlobalState gs;
 	private PersistenceHelper ph;
 
-
+	public final static String REDRAW = "com.teraim.nils.menu_redraw";
 
 
 	@Override
@@ -117,6 +117,7 @@ public class MenuActivity extends Activity {
 		filter.addAction(BluetoothConnectionService.SYNK_DATA_RECEIVED);
 		filter.addAction(BluetoothConnectionService.SAME_SAME_SYNDROME);
 		filter.addAction(BluetoothConnectionService.SYNK_DATA_TRANSFER_DONE);
+		filter.addAction(REDRAW);
 
 		this.registerReceiver(brr, filter);
 		//Listen for Service started/stopped event.
@@ -182,8 +183,8 @@ public class MenuActivity extends Activity {
 		Log.d("NILS","Refreshing status row ");
 		int c=0;
 		String r,p;
-		r = gs.getArtLista().getVariableValue(null,"Current_Provyta");
-		p = gs.getArtLista().getVariableValue(null,"Current_Ruta");
+		p= gs.getArtLista().getVariableValue(null,"Current_Provyta");
+		r= gs.getArtLista().getVariableValue(null,"Current_Ruta");
 		String pid = p==null?"?":p;
 		String rid = r==null?"?":r;
 		mnu[c++].setTitle("R/PY "+rid+"/"+pid);

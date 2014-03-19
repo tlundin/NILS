@@ -33,6 +33,7 @@ import com.teraim.nils.FileLoadedCb.ErrorCode;
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
 import com.teraim.nils.dynamic.templates.FotoTemplate;
+import com.teraim.nils.dynamic.templates.ProvytaTemplate;
 import com.teraim.nils.dynamic.templates.RutaTemplate;
 import com.teraim.nils.dynamic.templates.TagTemplate;
 import com.teraim.nils.dynamic.types.Variable;
@@ -52,7 +53,7 @@ import com.teraim.nils.utils.WorkflowParser;
 
 public class Start extends MenuActivity {
 
-	private final String NILS_VERSION = "0.31";
+	private final String NILS_VERSION = "0.32";
 
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
@@ -398,20 +399,33 @@ public class Start extends MenuActivity {
 
 	private void createDrawerMenu(String[] wfs) {
 
-		final String[] mainItems = {"Välj ruta","Tåg och delytor","Ta bilder och geo"};
+		final String[] mainItems = {"Välj Ruta","Välj Provyta","Tåg och delytor","Ta bilder och geo"};
 
 		items.clear();
 		//Add "static" headers to menu.
-		items.add(new DrawerMenuHeader("Rutor och Provyta"));
+		items.add(new DrawerMenuHeader("Huvudmoment"));
 		for(int i=0;i<mainItems.length;i++)
 			addItem(i+1,mainItems[i]);	
-		items.add(new DrawerMenuHeader("Delyta"));
+		items.add(new DrawerMenuHeader("Detalj"));
 		for (int i=0;i<wfs.length;i++) 
 			addItem(i+2+mainItems.length,wfs[i]);
 
 	}
 
+	public void createAltDrawerMenu(String[] wfs) {
 
+		final String[] mainItems = {"Välj Gurka","Välj Tomat","Päron","Frukt"};
+
+		items.clear();
+		//Add "static" headers to menu.
+		items.add(new DrawerMenuHeader("Huvudmoment"));
+		for(int i=0;i<mainItems.length;i++)
+			addItem(i+1,mainItems[i]);	
+		items.add(new DrawerMenuHeader("Detalj"));
+		for (int i=0;i<wfs.length;i++) 
+			addItem(i+2+mainItems.length,wfs[i]);
+
+	}
 
 
 	private void addItem(int i, String s) {
@@ -470,13 +484,16 @@ public class Start extends MenuActivity {
 
 		// Create a new fragment and specify the  to show based on position
 		Fragment fragment=null;
+		int p=1;
 		if (wf!=null) 
 			fragment = wf.createFragment();
-		else if (position == 1)
+		else if (position == p++)
 				fragment = new RutaTemplate();
-		else if (position == 2) 
+		else if (position == p++)
+			fragment = new ProvytaTemplate();
+		else if (position == p++) 
 				fragment = new TagTemplate();
-		else if (position == 3) 
+		else if (position == p++) 
 					fragment = new FotoTemplate();			
 		else
 			fragment = new Fragment();

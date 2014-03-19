@@ -19,9 +19,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -37,14 +41,17 @@ import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.teraim.nils.GlobalState;
+import com.teraim.nils.dynamic.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Numerable.Type;
 import com.teraim.nils.dynamic.types.Ruta;
 import com.teraim.nils.dynamic.types.SpinnerDefinition;
 import com.teraim.nils.dynamic.types.SpinnerDefinition.SpinnerElement;
+import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
 import com.teraim.nils.log.DummyLogger;
 import com.teraim.nils.log.LoggerI;
 import com.teraim.nils.non_generics.Constants;
+import com.teraim.nils.utils.DbHelper.Selection;
 
 public class Tools {
 
@@ -457,4 +464,87 @@ public class Tools {
 
 		return bitmap;
 	}
+
+	public static String[] generateList(GlobalState gs, Variable variable) {
+		String[] opt=null;
+		VariableConfiguration al = gs.getArtLista();
+		LoggerI o = gs.getLogger();
+		List<String >listValues = al.getListElements(variable.getBackingDataSet());
+		Log.d("nils","Found dynamic list definition..parsing");
+		
+		if (listValues!=null&&listValues.size()>0) {
+			String [] columnSelector = listValues.get(0).split("=");
+			String[] column=null;
+			boolean error = false;
+			if (columnSelector[0].equalsIgnoreCase("@col")) {
+				Log.d("nils","found column selector");
+				//Column to select.
+				String dbColName = gs.getDb().getColumnName(columnSelector[1]);
+				if (dbColName!=null) {
+					Log.d("nils","Real Column name for "+columnSelector[1]+" is "+dbColName);
+					column = new String[1];
+					column[0]=dbColName;
+				} else {
+					Log.d("nils","Column referenced in List definition for variable "+variable.getLabel()+" not found: "+columnSelector[1]);
+					o.addRow("");
+					o.addRedText("Column referenced in List definition for variable "+variable.getLabel()+" not found: "+columnSelector[1]);
+					error = true;
+				}
+				if (!error) {
+					//Any other columns part of key?
+					Map<String,String>keySet = new HashMap<String,String>();
+					if (listValues.size()>1) {
+						//yes..include these in search
+						Log.d("nils","found additional keys...");
+						String[] keyPair;							
+						for (int i=1;i<listValues.size();i++) {
+							keyPair = listValues.get(i).split("=");
+							if (keyPair!=null && keyPair.length==2) {
+								String valx=al.getVariableValue(null,keyPair[1]);
+								if (valx!=null) 										
+									keySet.put(keyPair[0], valx);
+								else {
+									Log.e("nils","The variable used for dynamic list "+variable.getLabel()+" is not returning a value");
+									o.addRow("");
+									o.addRedText("The variable used for dynamic list "+variable.getLabel()+" is not returning a value");
+								}
+							} else {
+								Log.d("nils","Keypair error: "+keyPair);
+								o.addRow("");
+								o.addRedText("Keypair referenced in List definition for variable "+variable.getLabel()+" cannot be read: "+keyPair);
+							}
+						}
+
+					} else 
+						Log.d("nils","no additional keys..only column");
+					Selection s = gs.getDb().createCoulmnSelection(keySet);
+					List<String[]> values = gs.getDb().getValues(column, s);
+					if (values !=null) {
+						Log.d("nils","Got "+values.size()+" results");
+						//Remove duplicates and sort.
+						SortedSet<String> ss = new TreeSet<String>(new Comparator<String>(){
+							public int compare(String a, String b){
+								return Integer.parseInt(a)-Integer.parseInt(b);
+							}}						                         
+								);
+						for (int i = 0; i<values.size();i++) 
+							ss.add(values.get(i)[0]);
+						opt = new String[ss.size()];
+						int i = 0; 
+						Iterator<String> it = ss.iterator();
+						while (it.hasNext()) {
+							opt[i++]=it.next();
+						}
+					}
+				} else
+					opt=new String[]{"Config Error...please check your list definitions for variable "+variable.getLabel()};
+
+
+			} else
+				Log.e("nils","List "+variable.getId()+" has too few parameters: "+listValues.toString());
+		} else
+			Log.e("nils","List "+variable.getId()+" has strange parameters: "+listValues.toString());
+		return opt;
+		}
+	
 }

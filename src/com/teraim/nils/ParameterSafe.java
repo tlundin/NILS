@@ -12,9 +12,9 @@ import java.util.Set;
 public class ParameterSafe implements Serializable {
 	
 	
-	private static final long serialVersionUID = 176168233268854816L;
+	private static final long serialVersionUID = 176168233268854817L;
 
-	List<Integer> prevRutor;
+	List<Integer> prevRutor,prevProvytor;
 	
 	Set<Integer> avslutadeRutor;
 	
@@ -23,6 +23,7 @@ public class ParameterSafe implements Serializable {
 	
 	public ParameterSafe() {
 		prevRutor = new ArrayList<Integer>();
+		prevProvytor = new ArrayList<Integer>();
 		avslutadeRutor = new HashSet<Integer>();
 	}
 	
@@ -47,6 +48,11 @@ public class ParameterSafe implements Serializable {
 		cR=r;
 		cP=p;
 		cD=d;
+	}
+
+
+	public List<Integer> getPrevYtor() {
+		return prevProvytor;
 	}
 
 }
