@@ -25,7 +25,7 @@ public  class AddSumOrCountBlock extends Block {
 	String format;
 	boolean isVisible = true;
 	private VariableConfiguration al;
-	public AddSumOrCountBlock(String containerId, String label,String postLabel,
+	public AddSumOrCountBlock(String id,String containerId, String label,String postLabel,
 			String filter, String target,
 			WF_Not_ClickableField_SumAndCountOfVariables.Type sumOrCount,String result,
 			boolean isVisible, String format) {
@@ -38,6 +38,7 @@ public  class AddSumOrCountBlock extends Block {
 		this.postLabel = postLabel;
 		this.isVisible = isVisible;
 		this.format = format;
+		this.blockId=id;
 		
 	}
 	

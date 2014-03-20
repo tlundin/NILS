@@ -18,7 +18,8 @@ public class AddVariableToEntryFieldBlock extends Block {
 	String target,namn,format;
 	GlobalState gs;
 	
-	public AddVariableToEntryFieldBlock(String target,String namn,boolean displayOut,String format,boolean isVisible) {
+	public AddVariableToEntryFieldBlock(String id,String target,String namn,boolean displayOut,String format,boolean isVisible) {
+		this.blockId=id;
 		this.target=target;
 		this.namn=namn;
 		this.displayOut=displayOut;
@@ -26,7 +27,7 @@ public class AddVariableToEntryFieldBlock extends Block {
 		this.isVisible=isVisible;
 	}
 	
-	public void create(WF_Context myContext) {
+	public Variable create(WF_Context myContext) {
 		gs = GlobalState.getInstance(myContext.getContext());
 		o = gs.getLogger();
 		VariableConfiguration al = gs.getArtLista();
@@ -38,9 +39,11 @@ public class AddVariableToEntryFieldBlock extends Block {
 			
 		} else {
 			Variable var = al.getVariableInstance(namn);
-			if (var!=null)
+			if (var!=null) {
 				myField.addVariable(var, displayOut, format,isVisible);
+				return var;
+			}
 		}
-		
+		return null;
 	}
 }

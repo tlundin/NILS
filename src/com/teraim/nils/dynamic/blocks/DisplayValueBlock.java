@@ -22,8 +22,9 @@ public class DisplayValueBlock extends Block implements EventGenerator {
 	Unit unit;
 	GlobalState gs;
 	
-	public DisplayValueBlock(String namn, String label,Unit unit,
+	public DisplayValueBlock(String id,String namn, String label,Unit unit,
 			String formula, String containerId,boolean isVisible,String format) {
+		this.blockId=id;
 		this.unit=unit;
 		this.namn=namn;;
 		this.label=label;

@@ -19,9 +19,10 @@ public class AddVariableToListEntry extends Block {
 	String targetField,targetList,format,varNameSuffix;
 	GlobalState gs;
 	
-	public AddVariableToListEntry(String varNameSuffix,
+	public AddVariableToListEntry(String id,String varNameSuffix,
 			String targetList,String targetField, boolean isDisplayed,String format,boolean isVisible) {
 		super();
+		this.blockId=id;
 		this.isVisible = isVisible;
 		this.targetField = targetField;
 		this.targetList = targetList;
@@ -31,7 +32,7 @@ public class AddVariableToListEntry extends Block {
 	} 
 
 
-	public void create(WF_Context myContext) {
+	public Variable create(WF_Context myContext) {
 		gs = GlobalState.getInstance(myContext.getContext());
 		o = gs.getLogger();
 		VariableConfiguration al = gs.getArtLista();
@@ -39,14 +40,16 @@ public class AddVariableToListEntry extends Block {
 		WF_List l= myContext.getList(targetList);
 			if (l!=null) {
 				Log.d("nils","Found entry field in AddVariableToListEntry");
-				boolean added = l.addVariableToListEntry(varNameSuffix,isDisplayed,targetField,format,isVisible);
-				if (!added) {
+				Variable var = l.addVariableToListEntry(varNameSuffix,isDisplayed,targetField,format,isVisible);
+				if (var == null) {
 					Log.e("nils","Didn't find list entry"+targetField+ " in AddVariableToListEntry");
-				}
+				} else
+					return var;
 			} else
 				Log.e("nils","Didn't find list in AddVariableToListEntry");
 				
-		}
+		return null;
+	}
 		
 		
 	

@@ -14,10 +14,11 @@ public  class StartBlock extends Block {
 	final private String[] args;
 	private String context;
 
-	public StartBlock(String[] args,String wfn, String context) {
+	public StartBlock(String id,String[] args,String wfn, String context) {
 		workflowName = wfn;
 		this.args = args;
 		this.context = context;
+		this.blockId=id;
 	}
 
 	public String getName() {

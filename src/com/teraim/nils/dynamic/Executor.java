@@ -2,9 +2,12 @@ package com.teraim.nils.dynamic;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -29,6 +32,7 @@ import com.teraim.nils.dynamic.blocks.AddVariableToListEntry;
 import com.teraim.nils.dynamic.blocks.Block;
 import com.teraim.nils.dynamic.blocks.BlockCreateListEntriesFromFieldList;
 import com.teraim.nils.dynamic.blocks.ButtonBlock;
+import com.teraim.nils.dynamic.blocks.ConditionalContinuationBlock;
 import com.teraim.nils.dynamic.blocks.ContainerDefineBlock;
 import com.teraim.nils.dynamic.blocks.CreateEntryFieldBlock;
 import com.teraim.nils.dynamic.blocks.CreateSortWidgetBlock;
@@ -37,8 +41,12 @@ import com.teraim.nils.dynamic.blocks.StartBlock;
 import com.teraim.nils.dynamic.types.Numerable;
 import com.teraim.nils.dynamic.types.Rule;
 import com.teraim.nils.dynamic.types.Variable;
+import com.teraim.nils.dynamic.types.Variable.DataType;
 import com.teraim.nils.dynamic.types.Workflow;
 import com.teraim.nils.dynamic.workflow_abstracts.Container;
+import com.teraim.nils.dynamic.workflow_abstracts.Event;
+import com.teraim.nils.dynamic.workflow_abstracts.Event.EventType;
+import com.teraim.nils.dynamic.workflow_abstracts.EventListener;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Container;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Event_OnSave;
@@ -47,12 +55,15 @@ import com.teraim.nils.exceptions.RuleException;
 import com.teraim.nils.expr.SyntaxException;
 import com.teraim.nils.log.LoggerI;
 import com.teraim.nils.non_generics.Constants;
+import com.teraim.nils.utils.Tools;
 
 /*
  * Executes workflow blocks. Child classes define layouts and other specialized behavior
  */
 public abstract class Executor extends Fragment {
 
+
+	public static final String STOP_ID = "STOP";
 
 	protected Workflow wf;
 
@@ -76,6 +87,9 @@ public abstract class Executor extends Fragment {
 	protected LoggerI o;
 	private IntentFilter ifi;
 	private BroadcastReceiver brr;
+	private Map<String,String> jump= new HashMap<String,String>();
+	private Set<Variable> visiVars;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -86,10 +100,7 @@ public abstract class Executor extends Fragment {
 		o = gs.getLogger();
 		wf = getFlow();
 
-		//TODO: REMOVE
-		//Create fake hash if wf does not provide.
-		final Map<String,String>fakeHash = new HashMap<String,String>();
-	
+
 		ifi = new IntentFilter();
 		ifi.addAction(BluetoothConnectionService.SYNK_DATA_RECEIVED);
 		brr = new BroadcastReceiver() {
@@ -102,16 +113,16 @@ public abstract class Executor extends Fragment {
 		};
 
 	}
-	
-	
 
 
 
 
-	
-	
-	
-	
+
+
+
+
+
+
 	/* (non-Javadoc)
 	 * @see android.app.Fragment#onResume()
 	 */
@@ -120,7 +131,7 @@ public abstract class Executor extends Fragment {
 		activity.registerReceiver(brr, ifi);
 		super.onResume();
 	}
-	
+
 	@Override
 	public void onPause()
 	{
@@ -131,7 +142,7 @@ public abstract class Executor extends Fragment {
 		super.onPause();
 
 	}
-	
+
 	protected Workflow getFlow() {
 		Workflow wf=null;
 
@@ -158,10 +169,14 @@ public abstract class Executor extends Fragment {
 	 */
 	protected void run() {
 
+		visiVars = new HashSet<Variable>();
 		//LinearLayout my_root = (LinearLayout) findViewById(R.id.myRoot);		
 		List<Block>blocks = wf.getBlocks();
-
-		for (Block b:blocks) {
+		boolean notDone = true;
+		int blockP = 0;
+		Set<Variable>blockVars;
+		while(notDone) {
+			Block b = blocks.get(blockP);
 
 			if (b instanceof StartBlock) {
 				o.addRow("");
@@ -193,13 +208,13 @@ public abstract class Executor extends Fragment {
 									String arg = kv[0].trim();
 									String val = kv[1].trim();
 									Log.d("nils","Keypair: "+arg+","+val);
-									
+
 									if (val.isEmpty()||arg.isEmpty()) {
 										o.addRow("");
 										o.addRedText("Empty variable or argument in definition");
 										err=true;
 									} else {
-										
+
 										if (Character.isDigit(val.charAt(0))) {
 											//constant
 											keyHash.put(arg, val);
@@ -220,14 +235,14 @@ public abstract class Executor extends Fragment {
 													o.addRedText("One of the variables used in current context("+v.getId()+") has no value in database");
 													Log.e("nils","var was null or empty: "+v.getId());
 												} else {
-													
+
 													keyHash.put(arg, varVal);
 													Log.d("nils","Added "+arg+","+varVal+" to current context");
-													
+
 												}
-													
+
 											}
-											
+
 										}
 									}
 								}
@@ -276,13 +291,15 @@ public abstract class Executor extends Fragment {
 				ListFilterBlock bl = (ListFilterBlock)b;
 				bl.create(myContext);
 			}*/
-			
+
 			else if (b instanceof CreateEntryFieldBlock) {
 				o.addRow("");
 				o.addYellowText("CreateEntryFieldBlock found");
 				CreateEntryFieldBlock bl = (CreateEntryFieldBlock)b;
 				Log.d("NILS","CreateEntryFieldBlock found");
-				bl.create(myContext);
+				Variable v=bl.create(myContext);
+				if (v!=null)
+					visiVars.add(v);
 			}
 			else if (b instanceof AddSumOrCountBlock) {
 				o.addRow("");
@@ -300,7 +317,10 @@ public abstract class Executor extends Fragment {
 				o.addRow("");
 				o.addYellowText("AddVariableToEveryListEntryBlock found");
 				AddVariableToEveryListEntryBlock bl = (AddVariableToEveryListEntryBlock)b;
-				bl.create(myContext);
+				blockVars = bl.create(myContext);
+				if (blockVars!=null)
+					visiVars.addAll(blockVars);
+
 			}
 			else if (b instanceof BlockCreateListEntriesFromFieldList) {
 				o.addRow("");
@@ -312,14 +332,16 @@ public abstract class Executor extends Fragment {
 				o.addRow("");
 				o.addYellowText("AddVariableToEntryFieldBlock found");
 				AddVariableToEntryFieldBlock bl = (AddVariableToEntryFieldBlock)b;
-				bl.create(myContext);
-				
+				Variable v = bl.create(myContext);
+				if (v!=null)
+					visiVars.add(v);
+
 			}
 			else if (b instanceof AddVariableToListEntry) {
 				o.addRow("");
 				o.addYellowText("AddVariableToEntryFieldBlock found");
 				AddVariableToListEntry bl = (AddVariableToListEntry)b;
-				bl.create(myContext);
+				Variable v = bl.create(myContext);
 				
 			}
 			else if (b instanceof AddEntryToFieldListBlock) {
@@ -327,9 +349,66 @@ public abstract class Executor extends Fragment {
 				o.addYellowText("AddEntryToFieldListBlock found");
 				AddEntryToFieldListBlock bl = (AddEntryToFieldListBlock)b;
 				bl.create(myContext);
-				
-			}
 
+			}
+			else if (b instanceof ConditionalContinuationBlock) {
+				final ConditionalContinuationBlock bl = (ConditionalContinuationBlock)b;
+				final String formula = bl.getFormula();
+				final Set<Entry<String, DataType>> vars = Tools.parseFormula(gs, formula);
+				if (vars!=null) {
+					final Boolean newValue = false;			
+					EventListener tiva = new EventListener() {
+
+
+						@Override
+						public void onEvent(Event e) {
+							//If evaluation different than earlier, re-render workflow.
+							if(bl.evaluate(gs,formula,vars)) {
+								myContext.onResume();
+								myContext = new WF_Context((Context)activity,Executor.this,R.id.content_frame);
+								myContext.addContainers(getContainers());	
+								Set<Variable> previouslyVisibleVars = visiVars;
+								run();
+								for (Variable v:previouslyVisibleVars) {
+									if (!visiVars.contains(v))
+										v.deleteValue();
+								}
+							}
+
+						}
+					};				
+					myContext.addEventListener(tiva, EventType.onSave);	
+					//trigger event.
+					if (bl.getCurrentEval()==null)
+						bl.evaluate(gs,formula,vars);
+
+					switch (bl.getCurrentEval()) {
+					case ConditionalContinuationBlock.STOP:
+						jump.put(bl.getBlockId(), Executor.STOP_ID);
+						break;
+					case ConditionalContinuationBlock.JUMP:
+						jump.put(bl.getBlockId(), bl.getElseId());						
+						break;
+					case ConditionalContinuationBlock.NEXT:
+						jump.remove(bl.getBlockId());
+					}
+
+				}
+				else 
+					Log.d("nils","Parsing of formula failed - no variables: ["+formula+"]");
+			}
+			String cId = b.getBlockId();
+			String jNext = jump.get(cId);
+			if (jNext!=null) {	
+				if (jNext.equals(Executor.STOP_ID))
+					notDone = false;
+				else
+					blockP = indexOf(jNext,blocks);
+			} else
+				blockP++;
+
+			if (blockP>=blocks.size())
+				notDone=false;
 		}
 
 		//Now all blocks are executed.
@@ -337,9 +416,9 @@ public abstract class Executor extends Fragment {
 		o.addRow("");
 		o.addYellowText("Now Drawing components recursively");
 		//Draw all lists first.
-		for (WF_List l:myContext.getLists()) {
+		for (WF_List l:myContext.getLists()) 
 			l.draw();
-		}
+
 		Container root = myContext.getContainer("root");
 		if (root!=null)
 			myContext.drawRecursively(root);
@@ -359,14 +438,20 @@ public abstract class Executor extends Fragment {
 
 
 
+	private int indexOf(String jNext, List<Block> blocks) {
 
+		for(int i=0;i<blocks.size();i++) {
+			String id = blocks.get(i).getBlockId();
+			Log.d("nils","checking id: "+id);
+			if(id.equals(jNext)) {
+				Log.d("nils","found block to jump to!");
+				return i;
+			}
+		}
 
-
-
-
-
-
-
+		Log.e("nils","Jump pointer to non-existing block. Faulty ID: "+jNext);
+		return blocks.size();
+	}
 	/*			final Map<String, ViewGroup> layoutContainers = getBlockContainers();
 
 	Log.d("NILS","Drawable_block found");

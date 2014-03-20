@@ -18,9 +18,10 @@ public class BlockCreateListEntriesFromFieldList extends Block {
 
 	String id,type,containerId,selectionPattern,selectionField,keyField;
 	boolean isVisible = true;
-	public BlockCreateListEntriesFromFieldList(String namn, String type,
+	public BlockCreateListEntriesFromFieldList(String id,String namn, String type,
 			String containerId, String selectionPattern, String selectionField,String keyField) {
 		super();
+		this.blockId=id;
 		this.id = namn;
 		this.type = type;
 		this.containerId = containerId;

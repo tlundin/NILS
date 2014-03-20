@@ -20,9 +20,10 @@ public  class ContainerDefineBlock extends Block {
 		return containerType;
 	}
 
-	public ContainerDefineBlock(String containerName, String containerType) {
+	public ContainerDefineBlock(String id,String containerName, String containerType) {
 		this.containerName =containerName;
 		this.containerType = containerType;
+		this.blockId=id;
 	}
 	//TODO: Container definition not used!!
 }

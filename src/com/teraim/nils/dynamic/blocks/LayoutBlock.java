@@ -20,8 +20,9 @@ public  class LayoutBlock extends Block {
 	public String getAlignment() {
 		return alignment;
 	}
-	public LayoutBlock(String lbl, String layoutDirection, String alignment) {
+	public LayoutBlock(String id,String lbl, String layoutDirection, String alignment) {
 		this.layoutDirection = layoutDirection;
 		this.alignment = alignment;
+		this.blockId=id;
 	}
 }

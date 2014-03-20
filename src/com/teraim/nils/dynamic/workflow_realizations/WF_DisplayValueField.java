@@ -42,92 +42,24 @@ public class WF_DisplayValueField extends WF_Widget implements EventListener {
 		Log.d("nils","In WF_DisplayValueField Create");	
 		ctx.addEventListener(this, EventType.onSave);	
 		this.unit=unit;
-		Set<String> potVars = new HashSet<String>();
-
-		//Try parsing the formula.
-		String pattern = "+-*/()0123456789 ";
-		String inPattern = "+-*/) ";
-		boolean in = false;
-		String curVar = null;
-		if (formula !=null) {
-			for (int i = 0; i < formula.length(); i++){
-				char c = formula.charAt(i);  
-				if (!in) {
-					//assume its in & test
-					in = true;   
-					curVar = "";
-					for(int j=0;j<pattern.length();j++)
-						if (c == pattern.charAt(j)) {
-							//System.out.println("found non-var char: "+pattern.charAt(j));
-							//fail.
-							in = false;
-							break;
-						}
-				} else {
-					//ok we are in. check if char is part of inPattern
-					for(int j=0;j<inPattern.length();j++)
-						if (c == pattern.charAt(j)) {
-							//System.out.println("found non-var char inside: "+pattern.charAt(j));
-							//fail.
-							in = false;
-							System.out.println("Found variable: "+curVar);
-							potVars.add(curVar);
-							curVar="";
-							break;
-						}
-				}
-				//Add if in.
-				if (in)
-					curVar += c;		    		    	
-			}
-			if (curVar.length()>0) {
-				System.out.println("Found variable: "+curVar);
-				potVars.add(curVar);
-			}
-			if (potVars == null || potVars.size()==0) {
-				fail = true; 
-				o.addRow("");
-				o.addRedText("Found no variables in formula "+formula+". Variables starts with a..zA..z");
-			}
-			else {
-				myVariables = new HashSet<Entry<String,DataType>>();
-				for (String var:potVars) {
-					List<String> row = gs.getArtLista().getCompleteVariableDefinition(var);
-
-					if (row == null) {
-						o.addRow("");
-						o.addRedText("Couldn't find variable "+var+" referenced in formula "+formula);
-						fail = true;
-					} else {
-						DataType type = gs.getArtLista().getnumType(row);					
-						myVariables.add(new AbstractMap.SimpleEntry<String, DataType>(var.trim(),type));
-					}
-				}
-
-				if (myVariables==null)
-					fail = true;
-				else {
-					for (Entry<String, DataType>e:myVariables) {
-						if (e.getValue()==DataType.text) {
-							stringT = true;
-							continue;
-						} else
-							if (stringT) {
-								o.addRow("");
-								o.addText("Text type mixed with non-text Type in formula: "+formula+". This is not allowed");
-								fail = true;
-							}
-					}	
-
-				}
-			}
-		}
-		else {
-			Log.d("nils","got null in formula");
-			o.addRow("");
-			o.addRedText("Formula evaluates to null in DisplayValueField");			
+		myVariables = Tools.parseFormula(gs,formula);
+		if (myVariables==null)
 			fail = true;
+		else {
+			for (Entry<String, DataType>e:myVariables) {
+				if (e.getValue()==DataType.text) {
+					stringT = true;
+					continue;
+				} else
+					if (stringT) {
+						o.addRow("");
+						o.addText("Text type mixed with non-text Type in formula: "+formula+". This is not allowed");
+						fail = true;
+					}
+			}	
+
 		}
+
 
 		if (fail) {
 			o.addRow("");
@@ -141,56 +73,28 @@ public class WF_DisplayValueField extends WF_Widget implements EventListener {
 	public void onEvent(Event e) {
 
 		String strRes="";
-		String subst=new String(formula);
+		String subst;
 		Log.d("nils","Got event in WF_DisplayValueField");	
 		if (!fail) {
-			Variable st;
-			boolean substErr = false;
-			for (Entry<String, DataType> entry:myVariables) {
-				st = gs.getArtLista().getVariableInstance(entry.getKey());
-				if (st==null||st.getValue()==null) {
-					o.addRow("Couldn't find a value for variable "+entry.getKey()+". Formula cannot be calculated: "+formula);
-					substErr=true;					
-					break;
-				} else {
-					if (stringT) {
 
-						strRes+=st.getValue();
-					}
+			subst = Tools.substituteVariables(gs,myVariables,formula,stringT);
+			if (subst!=null ) {
+				if (!stringT ) {
+					if (Tools.isNumeric(subst)) 
+						strRes = subst;
 					else {
-						subst = subst.replace(st.getId(), st.getValue());
-						Log.d("nils","formula after subst: "+subst);
-						if (st.getValue()==null||st.getValue().isEmpty()) {
-							substErr=true;
-							Log.d("nils","Variable has no value in substitution...");
+						strRes = Tools.parseExpression(gs,formula,subst);
+						if (strRes==null) {
+							o.addRow("");
+							o.addRedText("Formula "+formula+" is not being calculated because of RT parse error");	
+							return;
 						}
-
 					}
-				}
-			}
-			if (!substErr && !stringT ) {
-				if (Tools.isNumeric(subst)) 
+				} else
 					strRes = subst;
-				else {
-					Parser p = gs.getParser();
-					Expr exp=null;
-					try {
-						exp = p.parse(subst);
-					} catch (SyntaxException e1) {
-						o.addRow("");
-						o.addRedText("Syntax error for formula "+formula+" after substitution to "+subst);
-						e1.printStackTrace();
-					}
-					if (exp==null) 
-					{
-						o.addRow("");
-						o.addRedText("Expr error for "+formula+" (after substitution) "+subst+". Expr is null");	
-						return;
-					} else
-						strRes = Double.toString(exp.value());
-				}
 			} else {
-
+				o.addRow("");
+				o.addYellowText("Formula "+formula+" is not being calculated because substitution failed");				
 			}
 		} else {
 			o.addRow("");

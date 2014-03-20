@@ -36,7 +36,7 @@ public class CreateSortWidgetBlock extends Block {
 	boolean isVisible = true;
 	
 
-	public CreateSortWidgetBlock(String name,String type,String containerId, String targetId,String selectionField,String displayField,String selectionPattern,boolean isVisible) {
+	public CreateSortWidgetBlock(String id,String name,String type,String containerId, String targetId,String selectionField,String displayField,String selectionPattern,boolean isVisible) {
 		this.type = type;
 		this.containerId = containerId;
 		this.target = targetId;
@@ -45,6 +45,7 @@ public class CreateSortWidgetBlock extends Block {
 		selP = selectionPattern;
 		this.isVisible = isVisible;
 		this.name=name;
+		this.blockId=id;
 	}
 
 

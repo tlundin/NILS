@@ -15,13 +15,14 @@ public class AddEntryToFieldListBlock extends Block {
 	String target= null,namn= null,label=null,description=null;
 
 	
-	public AddEntryToFieldListBlock(String namn,String target,
+	public AddEntryToFieldListBlock(String id,String namn,String target,
 			String label, String description) {
 		super();
 		this.target = target;
 		this.namn = namn;	
 		this.label = label;
 		this.description = description;
+		this.blockId=id;
 	}
 	
 	

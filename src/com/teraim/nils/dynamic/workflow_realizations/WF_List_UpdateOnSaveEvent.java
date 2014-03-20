@@ -1,8 +1,10 @@
 package com.teraim.nils.dynamic.workflow_realizations;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import android.util.Log;
 
@@ -55,8 +57,9 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 	
 	
 	@Override 
-	public void addVariableToEveryListEntry(String varSuffix,boolean displayOut,String format,boolean isVisible) {
+	public Set<Variable> addVariableToEveryListEntry(String varSuffix,boolean displayOut,String format,boolean isVisible) {
 		List<String>cRow;
+		Set<Variable> retVar=null;
 		Variable v;
 		String varID;
 		for (int i=0;i<myRows.size();i++) {
@@ -70,8 +73,12 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 
 					if (entryFields.get(entryLabel)==null)
 						Log.e("nils","SHIIT "+entryLabel);
-					else
+					else {
 						entryFields.get(entryLabel).addVariable(v, displayOut,format,isVisible);
+						if (retVar==null)
+							retVar = new HashSet<Variable>();
+						retVar.add(v);
+					}
 				}
 				else {
 					o.addRow("");
@@ -80,6 +87,7 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 			
 			}
 		}
+		return retVar;
 	}
 
 	@Override
@@ -92,7 +100,7 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 	}
 	
 	@Override
-	public boolean addVariableToListEntry(String varNameSuffix,boolean displayOut,String targetField,
+	public Variable addVariableToListEntry(String varNameSuffix,boolean displayOut,String targetField,
 				String format, boolean isVisible) {
 		String tfName = this.getId()+targetField;
 		WF_ClickableField_Selection ef = entryFields.get(tfName);
@@ -100,7 +108,7 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 			Log.e("nils","Didnt find entry field "+tfName);
 			o.addRow("");
 			o.addRedText("Did NOT find entryfield referred to as "+tfName);
-			return false;
+			return null;
 		}
 		String vName = targetField+"_"+varNameSuffix;
 		Variable v = al.getVariableInstance(vName);
@@ -108,10 +116,10 @@ public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,
 			Log.e("nils","Didnt find vriable "+vName+" in AddVariableToList");
 			o.addRow("");
 			o.addRedText("Did NOT find variable referred to as "+vName+" in AddVariableToList");
-			return false;
+			return null;
 		}
 		ef.addVariable(v, displayOut,format,isVisible);
-		return true;
+		return v;
 		
 	}
 	

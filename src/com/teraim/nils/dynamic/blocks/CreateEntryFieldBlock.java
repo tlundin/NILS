@@ -1,5 +1,7 @@
 package com.teraim.nils.dynamic.blocks;
 
+import java.util.Set;
+
 import android.util.Log;
 
 import com.teraim.nils.GlobalState;
@@ -22,14 +24,15 @@ public class CreateEntryFieldBlock extends Block {
 	GlobalState gs;
 	boolean isVisible = false;
 	String format;
-	
-	public CreateEntryFieldBlock(String name, 
+
+	public CreateEntryFieldBlock(String id,String name, 
 			String containerId,boolean isVisible,String format) {
 		super();
 		this.name = name;
 		this.containerId=containerId;
 		this.isVisible=isVisible;
 		this.format = format;
+		this.blockId=id;
 	}
 
 	/**
@@ -49,11 +52,11 @@ public class CreateEntryFieldBlock extends Block {
 	}
 
 
-	
 
-	
 
-	public void create(WF_Context myContext) {
+
+
+	public Variable create(WF_Context myContext) {
 		gs = GlobalState.getInstance(myContext.getContext());
 		Container myContainer = myContext.getContainer(containerId);
 		o = gs.getLogger();
@@ -73,16 +76,16 @@ public class CreateEntryFieldBlock extends Block {
 				myContainer.add(myField);
 				myField.refreshInputFields();	
 				myField.refreshOutputFields();
+			}
+
 		}
-			
-		}
-			
-		
+
+		return v;
 	}
 
-
-
-				
-		}
 	
+
+
+}
+
 

@@ -1,6 +1,9 @@
 package com.teraim.nils.dynamic.blocks;
 
+import java.util.Set;
+
 import com.teraim.nils.GlobalState;
+import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
 import com.teraim.nils.dynamic.workflow_realizations.WF_List;
 
@@ -12,7 +15,7 @@ public class AddVariableToEveryListEntryBlock extends Block {
 	
 	
 	
-	public AddVariableToEveryListEntryBlock(String target,
+	public AddVariableToEveryListEntryBlock(String id,String target,
 			String variableSuffix, boolean displayOut, String format,boolean isVisible) {
 		super();
 
@@ -21,6 +24,7 @@ public class AddVariableToEveryListEntryBlock extends Block {
 		this.displayOut = displayOut;
 		this.format = format;
 		this.isVisible=isVisible;
+		this.blockId=id;
 	}
 
 
@@ -28,7 +32,7 @@ public class AddVariableToEveryListEntryBlock extends Block {
 	//addVariableToEveryListEntry(String varSuffix,boolean displayOut)
 	//addVariable(String varLabel,Unit unit,String varId,boolean displayOut)
 	
-	public void create(WF_Context myContext) {
+	public Set<Variable> create(WF_Context myContext) {
 		
 		WF_List l = myContext.getList(target);
 		o = GlobalState.getInstance(myContext.getContext()).getLogger();
@@ -36,7 +40,8 @@ public class AddVariableToEveryListEntryBlock extends Block {
 			o.addRow("");
 			o.addRedText("Couldn't find list with ID "+target+" in AddVariableToEveryListEntryBlock");
 		} else {
-			l.addVariableToEveryListEntry(variableSuffix, displayOut,format,isVisible);
+			return l.addVariableToEveryListEntry(variableSuffix, displayOut,format,isVisible);
 		}
+		return null;
 	}
 }

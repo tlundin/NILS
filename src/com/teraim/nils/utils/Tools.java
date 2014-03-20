@@ -18,14 +18,18 @@ import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.Map.Entry;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -47,7 +51,11 @@ import com.teraim.nils.dynamic.types.Ruta;
 import com.teraim.nils.dynamic.types.SpinnerDefinition;
 import com.teraim.nils.dynamic.types.SpinnerDefinition.SpinnerElement;
 import com.teraim.nils.dynamic.types.Variable;
+import com.teraim.nils.dynamic.types.Variable.DataType;
 import com.teraim.nils.dynamic.types.Workflow.Unit;
+import com.teraim.nils.expr.Expr;
+import com.teraim.nils.expr.Parser;
+import com.teraim.nils.expr.SyntaxException;
 import com.teraim.nils.log.DummyLogger;
 import com.teraim.nils.log.LoggerI;
 import com.teraim.nils.non_generics.Constants;
@@ -547,4 +555,131 @@ public class Tools {
 		return opt;
 		}
 	
+	public static Set<Entry<String,DataType>> parseFormula(GlobalState gs, String formula) {
+		Set<String> potVars = new HashSet<String>();
+		LoggerI o = gs.getLogger();
+		boolean fail = false;
+		//Try parsing the formula.
+		String pattern = "=+-*/()0123456789 ";
+		String inPattern = "+-*/) ";
+		boolean in = false;
+		String curVar = null;
+		if (formula !=null) {
+			for (int i = 0; i < formula.length(); i++){
+				char c = formula.charAt(i);  
+				if (!in) {
+					//assume its in & test
+					in = true;   
+					curVar = "";
+					for(int j=0;j<pattern.length();j++)
+						if (c == pattern.charAt(j)) {
+							//System.out.println("found non-var char: "+pattern.charAt(j));
+							//fail.
+							in = false;
+							break;
+						}
+				} else {
+					//ok we are in. check if char is part of inPattern
+					for(int j=0;j<inPattern.length();j++)
+						if (c == pattern.charAt(j)) {
+							//System.out.println("found non-var char inside: "+pattern.charAt(j));
+							//fail.
+							in = false;
+							System.out.println("Found variable: "+curVar);
+							potVars.add(curVar);
+							curVar="";
+							break;
+						}
+				}
+				//Add if in.
+				if (in)
+					curVar += c;		    		    	
+			}
+			if (curVar.length()>0) {
+				System.out.println("Found variable: "+curVar);
+				potVars.add(curVar);
+			}
+			Set<Entry<String,DataType>> myVariables=null;
+			if (potVars == null || potVars.size()==0) {
+				fail = true; 
+				o.addRow("");
+				o.addRedText("Found no variables in formula "+formula+". Variables starts with a..zA..z");
+			}
+			else {
+				myVariables = new HashSet<Entry<String,DataType>>();
+				for (String var:potVars) {
+					List<String> row = gs.getArtLista().getCompleteVariableDefinition(var);
+
+					if (row == null) {
+						o.addRow("");
+						o.addRedText("Couldn't find variable "+var+" referenced in formula "+formula);
+						fail = true;
+					} else {
+						DataType type = gs.getArtLista().getnumType(row);					
+						myVariables.add(new AbstractMap.SimpleEntry<String, DataType>(var.trim(),type));
+					}
+				}
+			}
+			if (!fail)
+				return myVariables;
+
+		} else {
+			Log.d("nils","got null in formula, Tools.parseFormula");
+			o.addRow("");
+			o.addRedText("Formula evaluates to null in Tools.parseFormula");			
+		}
+		return null;
+	}
+
+	public static String substituteVariables(GlobalState gs,Set<Entry<String,DataType>> myVariables,String formula,boolean stringT) {
+		String subst = new String(formula);
+		String strRes = "";
+		Variable st;
+		LoggerI o = gs.getLogger();
+		boolean substErr = false;
+		
+		for (Entry<String, DataType> entry:myVariables) {
+			st = gs.getArtLista().getVariableInstance(entry.getKey());
+			if (st==null||st.getValue()==null) {
+				o.addRow("Couldn't find a value for variable "+entry.getKey()+". Formula cannot be calculated: "+formula);
+				substErr=true;					
+				break;
+			} else {
+				if (stringT) {
+					strRes+=st.getValue();
+				}
+				else {
+					subst = subst.replace(st.getId(), st.getValue());
+					Log.d("nils","formula after subst: "+subst);
+				}
+			}
+		}
+		if (substErr)
+			return null;
+		if (stringT)
+			return strRes;
+		else
+			return subst;
+	}
+
+	public static String parseExpression(GlobalState gs, String formula, String subst) {
+		Parser p = gs.getParser();
+		Expr exp=null;
+		LoggerI o = gs.getLogger();
+
+		try {
+			exp = p.parse(subst);
+		} catch (SyntaxException e1) {
+			o.addRow("");
+			o.addRedText("Syntax error for formula "+formula+" after substitution to "+subst);
+			e1.printStackTrace();
+		}
+		if (exp==null) 
+		{
+			o.addRow("");
+			o.addRedText("Expr error for "+formula+" (after substitution) "+subst+". Expr is null");	
+			return null;
+		} else
+			return Double.toString(exp.value());	
+	}
 }

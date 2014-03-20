@@ -2,14 +2,15 @@ package com.teraim.nils.dynamic.workflow_realizations;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
-import android.app.Activity;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TableLayout.LayoutParams;
 
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.dynamic.VariableConfiguration;
+import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.workflow_abstracts.Filter;
 import com.teraim.nils.dynamic.workflow_abstracts.Filterable;
 import com.teraim.nils.dynamic.workflow_abstracts.Listable;
@@ -61,10 +62,10 @@ public abstract class WF_List extends WF_Widget implements Sortable,Filterable {
 		return list;
 	}
 	
-	public abstract void addVariableToEveryListEntry(String varSuffix,boolean displayOut,String format,boolean isVisible);
+	public abstract Set<Variable> addVariableToEveryListEntry(String varSuffix,boolean displayOut,String format,boolean isVisible);
 	public abstract void addFieldListEntry(String listEntryID, 
 			String label, String description);
-	public abstract boolean addVariableToListEntry(String varNameSuffix,boolean displayOut,String targetField,
+	public abstract Variable addVariableToListEntry(String varNameSuffix,boolean displayOut,String targetField,
 			String format, boolean isVisible);
 
 

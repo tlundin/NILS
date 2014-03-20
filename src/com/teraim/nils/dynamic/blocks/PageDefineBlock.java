@@ -22,9 +22,10 @@ public  class PageDefineBlock extends Block {
 	public String getPageLabel() {
 		return pageLabel;
 	}
-	public PageDefineBlock(String pageName,String pageType,String pageLabel) {
+	public PageDefineBlock(String id,String pageName,String pageType,String pageLabel) {
 		this.pageName =pageName;
 		this.pageType = pageType;
 		this.pageLabel=pageLabel;
+		this.blockId=id;
 	}
 }

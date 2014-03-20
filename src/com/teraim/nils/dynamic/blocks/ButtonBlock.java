@@ -46,8 +46,9 @@ public  class ButtonBlock extends Block {
 		toggle
 	}
 
-	public ButtonBlock(String lbl,String action, String name,String container,String target, String type, boolean isVisible) {
+	public ButtonBlock(String id,String lbl,String action, String name,String container,String target, String type, boolean isVisible) {
 		Log.d("NILS","BUTTONBLOCK type Action. Action is set to "+action);
+		this.blockId=id;
 		this.text = lbl;
 		this.onClick=action;
 		this.name=name;
