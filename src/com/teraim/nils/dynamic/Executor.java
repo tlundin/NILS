@@ -370,8 +370,19 @@ public abstract class Executor extends Fragment {
 								Set<Variable> previouslyVisibleVars = visiVars;
 								run();
 								for (Variable v:previouslyVisibleVars) {
-									if (!visiVars.contains(v))
+									Log.d("nils","Previously visible: "+v.getId());
+									boolean found = false;
+									for(Variable x:visiVars) {									
+										found = x.getId().equals(v.getId());
+										if (found)
+											break;
+									}
+									
+									if (!found) {
+										Log.d("nils","Variable "+v.getId()+" not found.Removing");
 										v.deleteValue();
+									}
+										
 								}
 							}
 

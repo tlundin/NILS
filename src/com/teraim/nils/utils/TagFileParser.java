@@ -82,14 +82,22 @@ public class TagFileParser extends AsyncTask<GlobalState ,Integer,ErrorCode>{
 
 						Variable v=null; 
 						Map<String,String>keys = Tools.createKeyMap(VariableConfiguration.KEY_YEAR,year,"ruta",rutaID,"provyta",provytaID,"delyta",delytaID);
-						if (keys!=null  && provytaID !=null && rutaID !=null && delytaID != null) {
-							gs.setKeyHash(keys);
+						gs.setKeyHash(keys);
+						if (keys!=null  && provytaID !=null && rutaID !=null && delytaID != null) {						
 							v = gs.getArtLista().getVariableInstance(varId);
 							if (v!=null)
 								v.setValue(tag);
 							else
 								Log.e("nils","Variable null in TagfileParser");
 							Log.d("nils","Tåg:"+tag+"[R:"+rutaID+" P:"+provytaID+" D:"+delytaID+"]");
+							//TODO: REMOVE!
+							keys = Tools.createKeyMap(VariableConfiguration.KEY_YEAR,year,"ruta",rutaID,"linje",delytaID);
+							gs.setKeyHash(keys);
+							v = gs.getArtLista().getVariableInstance("StrandMyr");
+							if (v!=null)
+								v.setValue("fjodor");
+							else
+								Log.e("nils","Variable LINJE null in TagfileParser");
 							publishProgress(lineC);
 						} else {
 							Log.e("nils","Null error on line "+lineC+" rutaID: "+

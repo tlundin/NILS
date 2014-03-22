@@ -47,12 +47,11 @@ public class ConditionalContinuationBlock extends Block {
 			if (subst!=null) {
 				String strRes = Tools.parseExpression(gs,formula,subst);
 				if (strRes != null) {
-					Log.e("nils","YIPEEE "+strRes);
 					if (Double.parseDouble(strRes)==1) {
 						Log.d("nils","Evaluates to true");
-						eval=JUMP;
-					} else {
 						eval=NEXT;
+					} else {
+						eval=JUMP;
 						Log.d("nils","Evaluates to false");
 					}
 				} else {

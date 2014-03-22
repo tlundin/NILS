@@ -99,7 +99,7 @@ public class ProvytaTemplate extends Executor implements OnGesturePerformedListe
 		Button navi = (Button)fieldListPanel.findViewById(R.id.naviButton);
 		Button gron = (Button)fieldListPanel.findViewById(R.id.gronB);
 		navi.setOnClickListener(new OnClickListener() {
-			
+			//TODO: CHANGE TO CORRECT GPS
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q="+50.782727+","+(-2.994937)));

@@ -560,8 +560,8 @@ public class Tools {
 		LoggerI o = gs.getLogger();
 		boolean fail = false;
 		//Try parsing the formula.
-		String pattern = "=+-*/()0123456789 ";
-		String inPattern = "+-*/) ";
+		String pattern = "<>=+-*/()0123456789";
+		String inPattern = "<>=+-*/)";
 		boolean in = false;
 		String curVar = null;
 		if (formula !=null) {
@@ -572,7 +572,7 @@ public class Tools {
 					in = true;   
 					curVar = "";
 					for(int j=0;j<pattern.length();j++)
-						if (c == pattern.charAt(j)) {
+						if (c == pattern.charAt(j)||Character.isWhitespace(c)) {
 							//System.out.println("found non-var char: "+pattern.charAt(j));
 							//fail.
 							in = false;
@@ -581,8 +581,8 @@ public class Tools {
 				} else {
 					//ok we are in. check if char is part of inPattern
 					for(int j=0;j<inPattern.length();j++)
-						if (c == pattern.charAt(j)) {
-							//System.out.println("found non-var char inside: "+pattern.charAt(j));
+						if (c == pattern.charAt(j)||Character.isWhitespace(c)) {
+							System.out.println("found non-var char inside: ["+pattern.charAt(j)+"]");
 							//fail.
 							in = false;
 							System.out.println("Found variable: "+curVar);
