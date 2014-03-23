@@ -10,21 +10,23 @@
             android:layout_height="240dp"
             android:baselineAligned="false"
             android:orientation="horizontal" >
+			
+            
+         <ScrollView
+                android:id="@+id/scrollView2"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:fillViewport="true" >
 
-            <FrameLayout
-                android:id="@+id/Selected"
-                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                 >
-
-                <ListView
+                <LinearLayout
+                    android:id="@+id/selected"
                     android:layout_width="match_parent"
-                	android:layout_height="match_parent"
-                    android:id="@+id/SelectedL"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical" >
-                </ListView>
-            </FrameLayout>
+                </LinearLayout>
+            </ScrollView>
+            
 
             <View
                 android:layout_width="1dip"
@@ -78,19 +80,13 @@
                 android:layout_width="1dip"
                 android:layout_height="fill_parent"
                 android:background="#000000" />
-         <FrameLayout
+         <LinearLayout
              android:id="@+id/fieldList"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-            
-            <ListView
-                android:id="@+id/fieldListL"
-                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/ruta_listview_bg_key"
                 android:orientation="vertical" >
-                
-            </ListView>
-            </FrameLayout>
+            
+            </LinearLayout>
+            
         </LinearLayout>
     </LinearLayout>

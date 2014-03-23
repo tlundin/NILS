@@ -20,7 +20,7 @@ import com.teraim.nils.dynamic.workflow_abstracts.Filterable;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Column_Name_Filter;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Filter;
-import com.teraim.nils.dynamic.workflow_realizations.WF_List;
+import com.teraim.nils.dynamic.workflow_realizations.WF_Static_List;
 import com.teraim.nils.dynamic.workflow_realizations.WF_SorterWidget;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Widget;
 
@@ -68,7 +68,7 @@ public class CreateSortWidgetBlock extends Block {
 		}
 		else {
 			o.addRow("Adding new SorterWidget of type "+type);
-			myContainer.add(new WF_SorterWidget(name,ctx,type,((WF_List)targetList),selF,dispF,selP,isVisible));
+			myContainer.add(new WF_SorterWidget(name,ctx,type,((WF_Static_List)targetList),selF,dispF,selP,isVisible));
 			//myContainer.add(new WF_Widget(buttonPanel));
 		}
 

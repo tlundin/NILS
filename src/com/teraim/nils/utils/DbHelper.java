@@ -68,6 +68,8 @@ public class DbHelper extends SQLiteOpenHelper {
 			String col=null;
 			for(String key:keys) {
 				col = keyColM.get(key);
+				if (col==null)
+					col=key;
 				ret.put(key, pick(col));
 			}
 			return ret; 
@@ -140,7 +142,11 @@ public class DbHelper extends SQLiteOpenHelper {
 				if (keyColM.containsKey(keyParts.get(i))) {
 					Log.d("nils","Key "+keyParts.get(i)+" already exists..skipping");
 					continue;
-				} else {
+				} else if (staticColumn(keyParts.get(i))) {
+					Log.e("nils","Key "+keyParts.get(i)+" is a static key. Sure this ok??");
+
+				}				
+				else {
 					Log.d("nils","Found new column key "+keyParts.get(i));
 					if (keyParts.get(i).isEmpty()) {
 						Log.d("nils","found empty keypart! Skipping");
@@ -162,6 +168,16 @@ public class DbHelper extends SQLiteOpenHelper {
 			Log.d("nils","Key: "+e+"Value:"+keyColM.get(e));
 
 
+	}
+
+
+
+	private boolean staticColumn(String col) {
+		for (String staticCol:VAR_COLS) {
+			if (staticCol.equals(col))
+				return true;
+		}
+		return false;
 	}
 
 
@@ -346,7 +362,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
 
 
-	public void deleteVariable(String name,Selection s) {
+	public void deleteVariable(String name,Selection s,boolean isLocal) {
 		// 1. get reference to writable DB
 		//SQLiteDatabase db = this.getWritableDatabase();
 
@@ -360,7 +376,8 @@ public class DbHelper extends SQLiteOpenHelper {
 		else 
 			Log.d("deleted", name);
 
-		insertDeleteAuditEntry(s);
+		if (!isLocal)
+			insertDeleteAuditEntry(s);
 	}
 
 	private void insertDeleteAuditEntry(Selection s) {
@@ -378,30 +395,43 @@ public class DbHelper extends SQLiteOpenHelper {
 		Log.d("nils",dd);
 	}
 
-	private void insertAuditEntry(ContentValues values) {
-
-		//long aff = db.insert(TABLE_AUDIT, null, values);
-		Log.d("nils","In audit insert");
-		if (values!=null) {
-			Log.d("nils","VALUES: "+values.toString());
-			Set<Entry<String, Object>> s=values.valueSet();
-			Iterator itr = s.iterator();
-
-			Log.d("DatabaseSync", "ContentValue Length :: " +values.size());
-			String res="";
-			while(itr.hasNext())
-			{
-				Map.Entry me = (Map.Entry)itr.next(); 
-				String key = me.getKey().toString();
-				String value =  me.getValue().toString();
-				res+=key+"="+value+(itr.hasNext()?"|":"");
-
+	private void insertAuditEntry(Variable v,Map<String,String> valueSet) {
+		String changes = "";
+		//First the keys.
+		Map<String, String> keyChain = v.getKeyChain();
+		Iterator<Entry<String,String>> it = keyChain.entrySet().iterator();
+		while (it.hasNext()) {			
+			Entry<String, String> entry = it.next();			 
+			String value = entry.getValue();
+			String column = getColumnName(entry.getKey());
+			changes+=column+"="+value;
+			if (it.hasNext()) 
+				changes+="|";
+			else {
+				changes+="var|"+v.getId();
+				break;	
 			}
-			Log.d("nils","STRING RESULT: "+res);
-			storeAuditEntry("I",res);
+		}
+		changes += ",";
+		//Now the values
+		it = valueSet.entrySet().iterator();
+		while (it.hasNext()) {			
+			Entry<String, String> entry = it.next();			 
+			String value = entry.getValue();
+			String column = getColumnName(entry.getKey());
+			changes+=column+"="+value;
+			if (it.hasNext()) 
+				changes+="|";
+			else 
+				break;	
+
 		}
 
-	} 
+		Log.d("nils","STRING RESULT: "+changes);
+		storeAuditEntry("I",changes);
+	}
+
+
 
 	private void storeAuditEntry(String action, String changes) {
 		ContentValues values=new ContentValues();
@@ -452,23 +482,28 @@ public class DbHelper extends SQLiteOpenHelper {
 			dd+=columns[i]+",";
 		}
 		Log.d("nils","In getvalues with columns "+dd+", selection "+s.selection+" and selectionargs "+print(s.selectionArgs));
+		//Substitute if possible.		
+		String[] substCols = new String[columns.length];
+		String subs;
+		for (int i = 0; i< columns.length;i++) {
+			subs = keyColM.get(columns[i]);
+			if (subs!=null)
+				substCols[i]=subs;
+			else
+				substCols[i]=columns[i];
+		}
 		//Get cached selectionArgs if exist.
 		//this.printAllVariables();
-		Cursor c = db.query(TABLE_VARIABLES,columns,
+		Cursor c = db.query(TABLE_VARIABLES,substCols,
 				s.selection,s.selectionArgs,null,null,null,null);
 		if (c != null && c.moveToFirst()) {
 			List<String[]> ret = new ArrayList<String[]>();
 			String[] row;
 			do {
 				row = new String[c.getColumnCount()];
-				Log.d("nils","Cursor count "+c.getCount()+" columns "+c.getColumnCount());
 				boolean nullRow = true;
 				for (int i=0;i<c.getColumnCount();i++) {
-					Log.d("nils","Found values in db for "+columns[i]+" :"+c.getString(i));				
-					if (c.getString(i)==null) {
-						Log.e("nils","Null!");
-
-					} else {
+					if (c.getString(i)!=null) {
 						if (c.getString(i).equalsIgnoreCase("null"))
 							Log.e("nils","StringNull!");					
 						row[i]=c.getString(i);
@@ -477,30 +512,32 @@ public class DbHelper extends SQLiteOpenHelper {
 
 				}
 				if (!nullRow) {
-					Log.d("nils","found row not null");
+					//Log.d("nils","GetValues found row. First elem: "+c.getString(0));
 					//only add row if one of the values is not null.
 					ret.add(row);
 				}
-			} while (c.moveToNext());	
+			} while (c.moveToNext());
+			if (ret.size()==0)
+				Log.d("nils","Found no values in GetValues");
 			return ret;
 		} 
-		Log.d("nils","Did NOT find value in db for "+columns.toString());
+		Log.d("nils","Did NOT find value in db for "+substCols.toString());
 		c.close();
 		return null;
 	}
 
 
-	public String getValue(String name, Selection s) {
+	public String getValue(String name, Selection s,String[] valueCol) {
 		Log.d("nils","In getvalue with name "+name+" and selection "+s.selection+" and selectionargs "+print(s.selectionArgs));
 		//Get cached selectionArgs if exist.
 		//this.printAllVariables();
-		Cursor c = db.query(TABLE_VARIABLES,new String[]{"value"},
+		Cursor c = db.query(TABLE_VARIABLES,valueCol,
 				s.selection,s.selectionArgs,null,null,null,null);
 		if (c != null && c.moveToFirst()) {
 			//Log.d("nils","Cursor count "+c.getCount()+" columns "+c.getColumnCount());
 			String value = c.getString(0);
-			//Log.d("nils","Found value in db for "+name+" :"+value);
-			c.close();
+			Log.d("nils","Found value in db for "+name+" :"+value);
+			c.close();		
 			return value;
 		} 
 		Log.d("nils","Did NOT find value in db for "+name);
@@ -537,58 +574,74 @@ public class DbHelper extends SQLiteOpenHelper {
 
 	//Insert or Update existing value. Synchronize tells if var should be synched over blutooth.
 
-	public void insertVariable(Variable var,String newValue,boolean isLocal){
-		PersistenceHelper ph = GlobalState.getInstance(ctx).getPersistence();
-		//for logging
-		//Log.d("nils", "Inserting variable "+var.getId()+" into database with value "+var.getValue()); 
 
-		int found = getId(var.getId(),var.getSelection());
-		boolean replace = (found != -1);
-		// 1. create ContentValues to add key "column"/value
+	public void insertVariable(Variable var,String newValue,boolean isLocal){
+		String timeStamp = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())+"";
+		final PersistenceHelper ph = GlobalState.getInstance(ctx).getPersistence();
+		//for logging
+		Log.d("nils", "Inserting variable "+var.getId()+" into database with value "+var.getValue()); 
+
+		//Delete any existing value.
+		deleteVariable(var.getId(),var.getSelection(),true);
+
 		ContentValues values = new ContentValues();
+		//Key need to be updated?
+		if (var.isKeyVariable()) {
+			Log.d("nils","updating key to "+newValue);
+			Log.d("nils","Size before: "+var.getKeyChain().size());
+			String oldValue = var.getKeyChain().put(var.getValueColumnName(), newValue);
+			Log.d("nils","oldValue: "+oldValue);
+			Log.d("nils","Size after: "+var.getKeyChain().size());
+			Log.d("nils","Sele size before: "+var.getSelection().selectionArgs.length);
+			var.getSelection().selectionArgs=createSelectionArgs(var.getKeyChain(),var.getId());
+			Log.d("nils","Sele size after: "+var.getSelection().selectionArgs.length);
+			//Check if the new chain leads to existing variable.
+			int id = getId(var.getId(),var.getSelection());
+			//Found match. Replace.
+			if (id!=-1)
+				values.put("id", id);
+		}
+		// 1. create ContentValues to add key "column"/value
 
 		//Add column,value mapping.
 		Map<String,String> keyChain=var.getKeyChain();
 		//If no key column mappings, skip. Variable is global with Id as key.
 		if (keyChain!=null) {
-			//Log.d("nils","keychain has "+keyChain.size()+" elements");
+			Log.d("nils","keychain has "+keyChain.size()+" elements");
 			for(String key:keyChain.keySet()) {
 				String value = keyChain.get(key);
-				String column = keyColM.get(key);
+				String column = getColumnName(key);
 				values.put(column,value);
-				//Log.d("nils","Adding column "+column+" with value "+value);
+				Log.d("nils","Adding column "+column+"(key):"+key+" with value "+value);
 			}
-		}  
-		//Log.d("nils","Inserting global variable "+var.getId());
+		} else
+			Log.d("nils","Inserting global variable "+var.getId()+" value: "+newValue);
 		values.put("var", var.getId());
-		values.put("value", newValue);
+		values.put(var.getValueColumnName(), newValue);
 		values.put("lag",ph.get(PersistenceHelper.LAG_ID_KEY));
-		values.put("timestamp", TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+		values.put("timestamp", timeStamp);
 		values.put("author", ph.get(PersistenceHelper.USER_ID_KEY));
-		if (replace) 			
-			values.put("id", found);
 
 		// 3. insert
 		long rId;
-		if (!replace) {
-			rId = db.insert(TABLE_VARIABLES, // table
-					null, //nullColumnHack
-					values
-					); 
-		} else {
-			//Log.d("nils","REPLACING in INSERTX");
-			rId = db.replace(TABLE_VARIABLES, // table
-					null, //nullColumnHack
-					values
-					); 	
-		}
+		rId = db.insert(TABLE_VARIABLES, // table
+				null, //nullColumnHack
+				values
+				); 
+
 
 		if (rId==-1) {
 			Log.e("nils","Could not insert variable "+var.getId());
 		} else {
 			//If this variable is not local, store the action for synchronization.
-			if (!isLocal)
-				insertAuditEntry(values);
+			if (!isLocal) {
+				Map <String,String> valueSet = new HashMap<String,String>();
+				valueSet.put(var.getValueColumnName(), newValue);
+				valueSet.put("lag",ph.get(PersistenceHelper.LAG_ID_KEY));
+				valueSet.put("timestamp", timeStamp);
+				valueSet.put("author", ph.get(PersistenceHelper.USER_ID_KEY));
+				insertAuditEntry(var,valueSet);
+			}
 			else
 				Log.d("nils","Variable "+var.getId()+" not inserted in Audit: local");
 		}
@@ -596,6 +649,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
 
 	long maxStamp = 0;
+
 	public SyncEntry[] getChanges() {
 
 		String timestamp = ph.get(PersistenceHelper.TIME_OF_LAST_CHANGE);
@@ -637,7 +691,7 @@ public class DbHelper extends SQLiteOpenHelper {
 		String selection=null;
 	}
 
-	public Selection createSelection(Map<String, String> keySet, String name, boolean withFuzz) {
+	public Selection createSelection(Map<String, String> keySet, String name) {
 
 		Selection ret = new Selection();
 		//Create selection String.
@@ -651,13 +705,11 @@ public class DbHelper extends SQLiteOpenHelper {
 
 				//Log.d("nils","selection null...creating");
 				//Does not exist...need to create.
-				String col;
 				selection="";
 				//1.find the matching column.
-
+				String subs;
 				for (String key:keySet.keySet()) {
-					if (withFuzz)
-						key = keyColM.get(key);
+					key = getColumnName(key);
 					selection+=key+"= ? and ";
 
 				}
@@ -673,8 +725,15 @@ public class DbHelper extends SQLiteOpenHelper {
 
 		//Log.d("nils","created new selection: "+selection);
 
+		ret.selectionArgs=createSelectionArgs(keySet,name);
+		//Log.d("nils","CREATE SELECTION RETURNS: "+ret.selection+" "+print(ret.selectionArgs));
+		return ret;
+	}
+
+
+
+	private String[] createSelectionArgs(Map<String, String> keySet,String name) {
 		String[] selectionArgs;
-		//Create selectionArgs
 		if (keySet == null) {
 			selectionArgs=new String[] {name};
 		} else {
@@ -682,14 +741,12 @@ public class DbHelper extends SQLiteOpenHelper {
 			int c=0;
 			for (String key:keySet.keySet()) {			
 				selectionArgs[c++]=keySet.get(key);
-				//Log.d("nils","Adding selArg "+keySet.get(key)+" for key "+key);
+				Log.d("nils","Adding selArg "+keySet.get(key)+" for key "+key);
 			}
 			//add name part
 			selectionArgs[keySet.keySet().size()]=name;
 		}
-		ret.selectionArgs=selectionArgs;
-		//Log.d("nils","CREATE SELECTION RETURNS: "+ret.selection+" "+print(ret.selectionArgs));
-		return ret;
+		return selectionArgs;
 	}
 
 
@@ -699,7 +756,7 @@ public class DbHelper extends SQLiteOpenHelper {
 		//Create selection String.
 
 		//If keyset is null, the variable is potentially global with only name as a key.
-		String selection="";
+		String selection=null;
 		if (keySet!=null) {
 			selection = cachedSelArgs.get(keySet.keySet());
 			if (selection!=null) {
@@ -715,7 +772,7 @@ public class DbHelper extends SQLiteOpenHelper {
 				for (int i=0;i<keys.size();i++) {
 					String key = keys.get(i);
 
-					col = keyColM.get(key);
+					col = getColumnName(key);
 					selection+=col+"= ?"+((i < (keys.size()-1))?" and ":"");
 
 
@@ -737,11 +794,17 @@ public class DbHelper extends SQLiteOpenHelper {
 	}
 
 
+	//Try to map ColId.
+	//If no mapping exist, return colId.
 
 	public String getColumnName(String colId) {
 		if (colId==null||colId.length()==0)
 			return null;
-		return keyColM.get(colId);
+		String ret = keyColM.get(colId);
+		if (ret == null)
+			return colId;
+		else
+			return ret;
 	}
 
 
@@ -750,18 +813,23 @@ public class DbHelper extends SQLiteOpenHelper {
 
 	public void synchronise(SyncEntry[] ses) {
 		String changes;
+		String name=null;
 		Log.d("nils","In Synchronize with "+ses.length+" arguments");
 		for (SyncEntry s:ses) {		
 			changes = s.getChanges();
 			if (s.isInsert()) {
 				Map<String, String> keySet=null; 
 				ContentValues cv = new ContentValues();
-				String ch[] = changes.split("\\|");
+				String kv[] = changes.split(",");
+
+				String[] keys = kv[0].split("\\|");
+				String[] values = kv[1].split("\\|");
+
 				String[] pair;
-				boolean found=false; String name = null;
-				int c=0;
-				for (String vPair:ch) {
-					pair = vPair.split("=");
+				int c=1;
+
+				for (String keyPair:keys) {
+					pair = keyPair.split("=");
 					if (pair!=null) {	
 						if (pair.length==1) {
 							String k = pair[0];
@@ -770,34 +838,36 @@ public class DbHelper extends SQLiteOpenHelper {
 							pair[1] = "";
 						}
 						Log.d("nils","Pair "+(c++)+": Key:"+pair[0]+" Value: "+pair[1]);
-						if (pair[0].equals("id")) {						
-							Log.d("nils","discarding ID parameter ");
+
+						if (pair[0].equals("var")) {
+							name = pair[1];
 						} else {
-							//build keychain.
-
-							if (pair[0].equals("var")) {
-								name = pair[1];
-							} else if (!partOfValues(pair[0])) {
-								Log.d("nils",pair[0]+" was not part of values");
-								if (keySet == null)
-									keySet = new HashMap<String, String>();
-								keySet.put(pair[0],pair[1]);
-							} else
-								Log.d("nils",pair[0]+" was part of values!");
-
-							//cv contains all elements, except id.
-							cv.put(pair[0],pair[1]);													
-						}					
-					}
-					else {
-						Log.e("nils","Something not good in synchronize (dbHelper). A valuepair was either null or not 2 long: "+vPair);
-					}
-
+							if (keySet == null)
+								keySet = new HashMap<String, String>();
+							keySet.put(pair[0],pair[1]);
+						}
+						//cv contains all elements, except id.
+						cv.put(pair[0],pair[1]);													
+					}									
+					else 
+						Log.e("nils","Something not good in synchronize (dbHelper). A valuepair was null ");
 				}
-				//Try find the vairable.
+				for (String value:values) {
+					pair = value.split("=");
+					if (pair!=null) {	
+						if (pair.length==1) {
+							String k = pair[0];
+							pair = new String[2];
+							pair[0] = k;
+							pair[1] = "";
+						}
+						cv.put(pair[0],pair[1]);
+					}
+				}
 				if (keySet == null) 
 					Log.d("nils","Keyset was null");
-				Selection sel = this.createSelection(keySet, name,false);
+				Log.d("nils","SYNC WITH PARAMETER NAMED "+name);
+				Selection sel = this.createSelection(keySet, name);
 				int id = this.getId(name, sel);
 				long rId=-1;
 				if (id==-1) {
@@ -841,7 +911,7 @@ public class DbHelper extends SQLiteOpenHelper {
 						Selection sel = new Selection();
 						sel.selection=selection;
 						sel.selectionArgs=selectionArgs;
-						this.deleteVariable("abrakadabra", sel);
+						this.deleteVariable("abrakadabra", sel,true);
 					}
 				}
 			}

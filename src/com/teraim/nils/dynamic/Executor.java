@@ -50,7 +50,7 @@ import com.teraim.nils.dynamic.workflow_abstracts.EventListener;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Container;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Event_OnSave;
-import com.teraim.nils.dynamic.workflow_realizations.WF_List;
+import com.teraim.nils.dynamic.workflow_realizations.WF_Static_List;
 import com.teraim.nils.exceptions.RuleException;
 import com.teraim.nils.expr.SyntaxException;
 import com.teraim.nils.log.LoggerI;
@@ -427,7 +427,7 @@ public abstract class Executor extends Fragment {
 		o.addRow("");
 		o.addYellowText("Now Drawing components recursively");
 		//Draw all lists first.
-		for (WF_List l:myContext.getLists()) 
+		for (WF_Static_List l:myContext.getLists()) 
 			l.draw();
 
 		Container root = myContext.getContainer("root");

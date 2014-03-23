@@ -14,12 +14,12 @@ public class WF_TimeOrder_Sorter implements Sorter {
 	@Override
 	public List<? extends Listable> sort(List<? extends Listable> list) {
 //		Log.d("nils","Before TIME Sort: ");
-//		for(Listable l:list)
-//			Log.d("nils",l.getLabel()+",");
+//	for(Listable l:list)
+//			Log.d("nils",l.getLabel());
 		Collections.sort(list, WF_ListEntry.Comparators.Time);
 //		Log.d("nils","After TIME Sort: ");
 //		for(Listable l:list)
-//			Log.d("nils",l.getLabel()+",");
+//			Log.d("nils",l.getLabel());
 		return list;
 	}
 

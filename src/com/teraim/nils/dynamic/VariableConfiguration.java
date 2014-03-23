@@ -24,29 +24,29 @@ public class VariableConfiguration {
 	public static String Type = "Type";
 	public static String Col_Functional_Group = "Funktionell grupp";
 	public static String Col_Variable_Local = "Local";
-	
+
 	public final static String KEY_YEAR = "år";
-	
-	
-	
-	
+
+
+
+
 	public static List<String>requiredColumns=Arrays.asList(Col_Variable_Keys,Col_Functional_Group,Col_Variable_Name,Col_Variable_Label,Type,"Unit","List Values","Description",Col_Variable_Local);
 
-	
+
 	private static int KEY_CHAIN=0,FUNCTIONAL_GROUP=1,VARIABLE_NAME=2,VARIABLE_LABEL=3,TYPE=4,UNIT=5,LIST_VALUES=6,DESCRIPTION=7,LOCAL=8;
-	
+
 	Map<String,Integer>fromNameToColumn = new HashMap<String,Integer>();
 
-	
+
 	Table myTable;
 	GlobalState gs;
-	
+
 	public VariableConfiguration(GlobalState gs) {
 		this.gs = gs;
 		myTable = gs.thawTable();
-		
+
 	}
-	
+
 	public ErrorCode validateAndInit() {
 		if (myTable==null)
 			return ErrorCode.file_not_found;
@@ -62,20 +62,20 @@ public class VariableConfiguration {
 				//Actual column index is decoupled.
 				fromNameToColumn.put(c, tableIndex);
 		}
-		
+
 		return ErrorCode.ok;
 	}
-	
+
 	public Table getTable() {
 		return myTable;
 	}
-	
+
 	/*
 	public String getListEntryName(List<String> row) {
 		return row.get(fromNameToColumn.get(requiredColumns.get(LIST_ENTRY)));
 	}
-	*/
-	
+	 */
+
 	public List<String> getListElements(List<String> row) {
 		List<String> el = null;
 		String listS = row.get(fromNameToColumn.get(requiredColumns.get(LIST_VALUES)));
@@ -93,11 +93,11 @@ public class VariableConfiguration {
 	public String getVarLabel(List<String> row) {
 		return row.get(fromNameToColumn.get(requiredColumns.get(VARIABLE_LABEL)));
 	}
-	
+
 	public String getVariableDescription(List<String> row) {		
 		return row.get(fromNameToColumn.get(requiredColumns.get(DESCRIPTION)));
 	}
-	
+
 	public boolean getVarIsLocal(List<String> row) {
 		String s= row.get(fromNameToColumn.get(requiredColumns.get(LOCAL)));
 		Log.d("nils","getvarislocal uses string "+s);
@@ -107,7 +107,7 @@ public class VariableConfiguration {
 			return true;
 	}
 
-	
+
 	public String getKeyChain(List<String> row) {
 		return row.get(fromNameToColumn.get(requiredColumns.get(KEY_CHAIN)));		
 	}
@@ -118,20 +118,20 @@ public class VariableConfiguration {
 	public Variable.DataType getnumType(List<String> row) {
 		String type = row.get(fromNameToColumn.get(requiredColumns.get(TYPE)));
 		if (type!=null) {		
-		if (type.equals("number")||type.equals("numeric"))
-			return Variable.DataType.numeric;
-		else if (type.equals("boolean"))
-			return Variable.DataType.bool;
-		else if (type.equals("list"))
-			return Variable.DataType.list;
-		else if (type.equals("text"))
-			return Variable.DataType.text;
-		else
-			Log.e("nils","TYPE NOT KNOWN: "+type);
+			if (type.equals("number")||type.equals("numeric"))
+				return Variable.DataType.numeric;
+			else if (type.equals("boolean"))
+				return Variable.DataType.bool;
+			else if (type.equals("list"))
+				return Variable.DataType.list;
+			else if (type.equals("text"))
+				return Variable.DataType.text;
+			else
+				Log.e("nils","TYPE NOT KNOWN: "+type);
 		}
 		Log.e("nils","TYPE NULL?: "+type);
-		
-		
+
+
 		return null;
 	}
 
@@ -143,11 +143,11 @@ public class VariableConfiguration {
 	public List<String> getCompleteVariableDefinition(String varName) {
 		return myTable.getRowFromKey(varName);
 	}
-	
+
 	public String getAction(List<String> row) {
 		return null;
 	}
-	
+
 	public String getEntryLabel(List<String> row) {
 		String res= myTable.getElement("Svenskt Namn", row);
 		//If this is a non-art variable, use varlabel instead.
@@ -157,17 +157,17 @@ public class VariableConfiguration {
 			Log.e("nils","getEntryLabel failed to find a Label for row: "+row.toString());
 		return res;
 	}
-	
+
 	public String getBeskrivning(List<String> row) {
 		String b = myTable.getElement("Beskrivning", row);
 		if(b==null) 
 			b = this.getVariableDescription(row);
-		
+
 		return (b==null?"":b);
 	}
-	
 
-	
+
+
 	public String getUrl(List<String> row) {
 		return myTable.getElement("Internet link", row);	
 	}
@@ -177,34 +177,55 @@ public class VariableConfiguration {
 	}
 
 	Map<String,Variable>varCache = new ConcurrentHashMap<String,Variable>();
-	
-	public String getVariableValue(Map<String, String> keyChain, String varId) {
-		return new Variable(varId,null,null,keyChain,gs).getValue();
 
+	public String getVariableValue(Map<String, String> keyChain, String varId) {
+		return new Variable(varId,null,null,keyChain,gs,"value").getValue();
+		
 	}
-	
-	
-	
-	//Create a variable with the current context and the variable's keychain.
-	public Variable getVariableInstance(String varId) {	
-		Variable v = varCache.get(varId);
-		if (v!=null) 
-			return v;
+
+	public Variable getVariableInstance(String varId) {
 		String varLabel =null;
-		List<String> row = this.getCompleteVariableDefinition(varId);
-		if (row!=null) {
-		//Log.d("nils","Fetching keychain from row "+row);
-		String keyChain = this.getKeyChain(row);
-		varLabel = this.getVarLabel(row);
-		//Log.d("nils","getVariableInstance for "+varId+" with keychain "+keyChain);
-		//Log.d("nils","KeyChain is empty?"+keyChain.isEmpty());
-		Map<String, String> vMap;
-		if (keyChain!=null&&!keyChain.isEmpty()) {
-		String[] keys = keyChain.split("\\|");
+		String keyChain = null;
+		Variable v = varCache.get(varId);
+		if (v!=null) {
+			Log.d("nils","found cached var: "+varId+" backing: "+this.getCompleteVariableDefinition(varId));
+			return v;
+		}
+		else {
+			List<String> row = this.getCompleteVariableDefinition(varId);
+			if (row!=null) {
+				keyChain = this.getKeyChain(row);
+				varLabel = this.getVarLabel(row);
+				v = getVariableInstance(keyChain,varId,varLabel,row,gs.getCurrentKeyHash(),"value");		
+				if (v!=null)
+					varCache.put(varId, v);
+				
+				else
+					Log.e("nils","getVariableInstance: Could not CREATE: "+varId);	
+			} else 
+				Log.e("nils","getVariableInstance: Cannot find variable: "+varId);		
+			
+			return v;
+		}
+	}
+
+
+	//Create a variable with the current context and the variable's keychain.
+	public Variable getVariableInstance(String keyChain,String varId,String varLabel,List<String> row,Map<String, String> cMap,String valueColumn) {	
 		//find my keys in the current context.
-		vMap = new HashMap<String,String>();
-		Map<String, String> cMap = gs.getCurrentKeyHash();
-		for (String key:keys) {
+		//Use a cache for faster access.
+		return new Variable(varId,varLabel,row,buildDbKey(keyChain,cMap),gs,valueColumn);
+	} 
+
+
+	private Map<String, String> buildDbKey(String keyChain,
+			Map<String, String> cMap) {
+		if (keyChain==null||keyChain.isEmpty()) 
+			return null;
+
+		String[] keys = keyChain.split("\\|");
+		Map<String, String> vMap = new HashMap<String,String>();
+		for (String key:keys) {		
 			String value = cMap.get(key);
 			if (value!=null) {
 				vMap.put(key, value);
@@ -212,19 +233,12 @@ public class VariableConfiguration {
 			}
 			else {
 				Log.e("nils","Couldn't find key "+key+" in current context");
-				
+
 			}
 		}
-		} else
-			vMap=null;
-		//Use a cache for faster access.
-		v = new Variable(varId,varLabel,row,vMap,gs);
-		varCache.put(varId, v);
-		return v;
-		} 
-		Log.e("nils","Couldn't find variable "+varId+" in getVariableInstance");
-		return null;
+		return vMap;
 	}
+
 
 	public Map<String,String> createStandardKeyMap() {
 		String currentYear = getVariableValue(null,"Current_Year");
@@ -239,26 +253,26 @@ public class VariableConfiguration {
 	public String getCurrentRuta() {
 		return getVariableValue(null,"Current_Ruta");
 	}
-	
+
 	public String getCurrentProvyta() {
 		return getVariableValue(null,"Current_Provyta");
 	}
-	
+
 	public void invalidateCache() {
 		for (Variable v:varCache.values())
 			v.invalidate();
 	}
-	
+
 	public void destroyCache() {
 		varCache.clear();
 	}
 
-	
 
 
 
-	
-	
-	
+
+
+
+
 }
 

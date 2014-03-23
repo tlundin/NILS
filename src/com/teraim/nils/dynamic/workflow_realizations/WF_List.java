@@ -22,24 +22,23 @@ public abstract class WF_List extends WF_Widget implements Sortable,Filterable {
 	protected final List<Listable> list = new  ArrayList<Listable>(); //Instantiated in constructor
 	protected final List<Filter> myFilters=new ArrayList<Filter>();
 	protected final List<Sorter> mySorters=new ArrayList<Sorter>();
-	private List<? extends Listable> filteredList;
-	protected final List<List<String>> myRows;
+	protected List<? extends Listable> filteredList;
+
 	protected WF_Context myContext;
+	protected GlobalState gs;
 	protected VariableConfiguration al;
-	protected String group;
+
 	//How about using the Container's panel?? TODO
-	public WF_List(String id, WF_Context ctx,List<List<String>> rows,boolean isVisible) {
+	public WF_List(String id,boolean isVisible,WF_Context ctx) {
 		super(id,new LinearLayout(ctx.getContext()),isVisible,ctx);	
 		myWidget = (LinearLayout)getWidget();
 		myWidget.setOrientation(LinearLayout.VERTICAL);
 		myWidget.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 		myContext = ctx;
-		al = GlobalState.getInstance(ctx.getContext()).getArtLista();
-		myRows = rows;
-		group = al.getFunctionalGroup(myRows.get(0));
-		
+		gs = GlobalState.getInstance(ctx.getContext());
+		al = gs.getArtLista();
 	}
-
+	
 	@Override
 	public void addSorter(Sorter s) {
 		mySorters.add(s);
@@ -62,22 +61,7 @@ public abstract class WF_List extends WF_Widget implements Sortable,Filterable {
 		return list;
 	}
 	
-	public abstract Set<Variable> addVariableToEveryListEntry(String varSuffix,boolean displayOut,String format,boolean isVisible);
-	public abstract void addFieldListEntry(String listEntryID, 
-			String label, String description);
-	public abstract Variable addVariableToListEntry(String varNameSuffix,boolean displayOut,String targetField,
-			String format, boolean isVisible);
 
-
-	/*
-	public void createEntriesFromRows(List<List<String>> rows) {
-		myWidget.removeAllViews();
-		addEntriesFromRows(rows);
-	}
-	
-	
-	public abstract void addEntriesFromRows(List<List<String>> rows);
-*/
 	int intC=0;
 	public void draw() {
 		Log.e("draw","DRAW CALLED "+ (++intC)+" times from list"+this.getId());

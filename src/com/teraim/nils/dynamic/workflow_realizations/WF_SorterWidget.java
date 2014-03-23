@@ -27,9 +27,9 @@ public class WF_SorterWidget extends WF_Widget {
 
 	
 	WF_Filter existing;
-	WF_List targetList;
+	WF_Static_List targetList;
 	
-	public WF_SorterWidget(String name,WF_Context ctx, String type, final WF_List targetList,final String selectionField, final String displayField,String selectionPattern,boolean isVisible) {
+	public WF_SorterWidget(String name,WF_Context ctx, String type, final WF_Static_List targetList,final String selectionField, final String displayField,String selectionPattern,boolean isVisible) {
 		super(name,new LinearLayout(ctx.getContext()),isVisible,ctx);
 		LinearLayout buttonPanel;
 		LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT);

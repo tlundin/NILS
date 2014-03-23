@@ -194,17 +194,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 				mActionMode = ((Activity)myContext.getContext()).startActionMode(mActionModeCallback);
 				WF_ClickableField.this.getWidget().setSelected(true);
 				return true;
-				/*
-				for (View inf:myVars.values()) {
-					if (inf!=null) {
-						if (inf instanceof EditText)
-							((EditText)inf).setText("");
 
-					}
-				}
-				save();
-				return true;
-				 */
 			}
 		});
 
@@ -262,7 +252,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 		if (displayOut && virgin) {
 			virgin = false;
 			Log.d("nils","Setting key variable to "+varId);
-			super.setKeyRow(varId);
+			super.setKeyRow(var);
 		}
 		if (var.getType()==null) {
 			o.addRow("");
@@ -368,9 +358,9 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 				adapter.addAll(opt);
 				Log.d("nils","Adapter has "+adapter.getCount()+" elements");
 				adapter.notifyDataSetChanged();
-				
-				
-				
+
+
+
 			}
 			else
 				Log.e("nils","Couldnt add elements to spinner - opt was null in WF_ClickableField");
@@ -381,18 +371,20 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 				@Override
 				public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 					//Check if this spinner has side effects.
-					List<SpinnerElement> ems = sd.get((String)spinner.getTag(R.string.u1));
-					List<String> curMapping = (List<String>)spinner.getTag(R.string.u2);
-					if (ems!=null) {
-						SpinnerElement e = ems.get(position);
-						Log.d("nils","In onItemSelected. Spinner Element is "+e.opt+" with variables "+e.varMapping.toString());
-						if (e.varMapping!=null) {
-							//hide the views for the last selected.
-							hideOrShowViews(curMapping,HIDE);
-							hideOrShowViews(e.varMapping,SHOW);
-							spinner.setTag(R.string.u2,e.varMapping);
-							sDescr.setText(e.descr);
-							Log.e("nils","DESCR TEXT SET TO "+e.descr);
+					if (sd!=null) {
+						List<SpinnerElement> ems= sd.get((String)spinner.getTag(R.string.u1));
+						List<String> curMapping = (List<String>)spinner.getTag(R.string.u2);
+						if (ems!=null) {
+							SpinnerElement e = ems.get(position);
+							Log.d("nils","In onItemSelected. Spinner Element is "+e.opt+" with variables "+e.varMapping.toString());
+							if (e.varMapping!=null) {
+								//hide the views for the last selected.
+								hideOrShowViews(curMapping,HIDE);
+								hideOrShowViews(e.varMapping,SHOW);
+								spinner.setTag(R.string.u2,e.varMapping);
+								sDescr.setText(e.descr);
+								Log.e("nils","DESCR TEXT SET TO "+e.descr);
+							}
 						}
 					}
 				}
@@ -440,7 +432,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 			//o.addRow("Adding edit field for dy-variable with label "+label+", name "+varId+", type "+numType.name()+" and unit "+unit.name());
 			l = LayoutInflater.from(myContext.getContext()).inflate(R.layout.edit_field_numeric,null);
 			header = (TextView)l.findViewById(R.id.header);
-			header.setText(varLabel+" ("+unit+")");
+			header.setText(varLabel+(unit.length()>0?" ("+unit+")":""));
 			//etview.setText(Tools.getPrintedUnit(unit));
 			inputContainer.addView(l);
 			myVars.put(var,l);
@@ -490,7 +482,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 				RadioGroup rbg = (RadioGroup)view.findViewById(R.id.radioG);
 				//If checked set value to True.
 				int id = rbg.getCheckedRadioButtonId();
-				
+
 				if (id == -1 || id == R.id.nej) {
 					variable.setValue("0");
 				}
@@ -561,7 +553,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 						String[] opt = null;
 						Spinner sp = (Spinner)v.findViewById(R.id.spinner);
 						String tag = (String) sp.getTag();
-						
+
 						String val[] = values.get(variable);
 						if (val!=null) {
 							for (int i=0;i<val.length;i++) {
@@ -570,7 +562,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 							}
 						}
 
-						
+
 						else if (tag!=null && tag.equals("dynamic")) {
 							//Get the list values
 							opt = Tools.generateList(gs, variable);

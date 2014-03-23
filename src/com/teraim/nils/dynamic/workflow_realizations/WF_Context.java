@@ -23,7 +23,7 @@ import com.teraim.nils.dynamic.workflow_abstracts.Listable;
 public class WF_Context {
 
 	private Context ctx;
-	private final List<WF_List> lists=new ArrayList<WF_List>();
+	private final List<WF_Static_List> lists=new ArrayList<WF_Static_List>();
 	private Map<String,Drawable> drawables;
 	private List<WF_Container> containers;
 	private final Executor myTemplate;
@@ -46,12 +46,12 @@ public class WF_Context {
 		return (Activity)ctx;
 	}
 	
-	public List<WF_List> getLists() {
+	public List<WF_Static_List> getLists() {
 		return lists;
 	}
 
-	public  WF_List getList(String id) {
-		for (WF_List wfl:lists) {
+	public  WF_Static_List getList(String id) {
+		for (WF_Static_List wfl:lists) {
 			Log.d("nils","filterable list: "+wfl.getId());
 			String myId = wfl.getId();				
 			if(myId!=null && myId.equalsIgnoreCase(id))
@@ -62,7 +62,7 @@ public class WF_Context {
 
 
 	public List<Listable> getListable(String id) {
-		for (WF_List wfl:lists) {
+		for (WF_Static_List wfl:lists) {
 			Log.d("nils","filterable list: "+wfl.getId());
 			String myId = wfl.getId();				
 			if(myId!=null && myId.equalsIgnoreCase(id))
@@ -76,7 +76,7 @@ public class WF_Context {
 		Log.d("nils","Getfilterable called with id "+id);
 		if (id==null||lists==null)
 			return null;
-		for (WF_List wfl:lists) {
+		for (WF_Static_List wfl:lists) {
 			Log.d("nils","filterable list: "+wfl.getId());
 			String myId = wfl.getId();				
 			if(myId!=null && myId.equalsIgnoreCase(id))
@@ -88,7 +88,7 @@ public class WF_Context {
 		this.containers = containers; 
 	}
 
-	public void addList(WF_List l) {
+	public void addList(WF_Static_List l) {
 		lists.add(l);
 	}
 	

@@ -34,8 +34,9 @@ public class Variable implements Serializable {
 	//String value=null;
 	private String name=null;
 	private DataType myType=null;
-	private String myValue=null,oldValue=null;
+	private String myValue=null;
 
+	private String[] myValueColumn = new String[1];
 	private Selection mySelection=null;
 	
 	private String myLabel = null;
@@ -50,13 +51,17 @@ public class Variable implements Serializable {
 
 	private boolean invalidated=true;
 	
+	private boolean isKeyVariable = false;
+
+	private String realValueColumnName;
+	
 	public enum DataType {
 		numeric,bool,list,text
 	}
 	
 	public String getValue() {
 		if (invalidated) {
-			myValue = myDb.getValue(name,mySelection);	
+			myValue = myDb.getValue(name,mySelection,myValueColumn);	
 			invalidated = false;
 		}
 		return myValue;
@@ -72,25 +77,10 @@ public class Variable implements Serializable {
 	
 	public void setValue(String value) {
 		myValue = value;
+		//will change keyset as side effect if valueKey variable.
+		//reason for changing indirect is that old variable need to be erased. 
 		myDb.insertVariable(this,value,isLocal);
 	}
-
-	/*
-	public void setValueWithoutCommit(String value) {
-		oldValue = myValue;
-		myValue = value;
-		
-	}
-	
-	public void commit() {
-		myDb.insertVariable(this, myValue);
-	}
-	
-	//Cancel can only be called after at setValueWithoutCommit.
-	public void cancel() {
-		myValue = oldValue;
-	}
-	*/
 	
 	
 	public String getId() {
@@ -126,8 +116,12 @@ public class Variable implements Serializable {
 		return mySelection;
 	}
 	
+	public String getValueColumnName() {
+		return realValueColumnName;
+	}
 	
-	public Variable(String name,String label,List<String> row,Map<String,String>keyChain, GlobalState gs) {
+	
+	public Variable(String name,String label,List<String> row,Map<String,String>keyChain, GlobalState gs,String valueColumn) {
 		this.name = name;
 		if (row!=null) {
 			myRow = row;
@@ -138,9 +132,16 @@ public class Variable implements Serializable {
 		}		
 		this.keyChain=keyChain;		
 		myDb = gs.getDb();
-		mySelection = myDb.createSelection(keyChain,name,true);
+		mySelection = myDb.createSelection(keyChain,name);
 		myLabel = label;
+		realValueColumnName = valueColumn;
+		myValueColumn[0]=myDb.getColumnName(valueColumn);
+		Log.d("nils","myValueColumn: "+myValueColumn[0]);
 		invalidated=true;
+		if (keyChain!=null && keyChain.containsKey(valueColumn)) {
+			Log.e("nils","Variable value column in keyset for valcol "+valueColumn+" varid "+name);
+			isKeyVariable=true;
+		}
 	}
 
 	private static boolean isHistorical(Map<String, String> kc) {
@@ -161,7 +162,7 @@ public class Variable implements Serializable {
 	}
 
 	public void deleteValue() {
-		myDb.deleteVariable(name, mySelection);
+		myDb.deleteVariable(name,mySelection,isLocal);
 		myValue=null;
 	}
 
@@ -173,6 +174,9 @@ public class Variable implements Serializable {
 		invalidated=true;
 	}
 
+	public boolean isKeyVariable() {
+		return isKeyVariable;
+	}
 
 
 

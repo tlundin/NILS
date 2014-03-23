@@ -16,7 +16,7 @@ import com.teraim.nils.dynamic.VariableConfiguration;
 import com.teraim.nils.dynamic.blocks.CreateSortWidgetBlock;
 import com.teraim.nils.dynamic.workflow_abstracts.Filter;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Container;
-import com.teraim.nils.dynamic.workflow_realizations.WF_List;
+import com.teraim.nils.dynamic.workflow_realizations.WF_Static_List;
 import com.teraim.nils.dynamic.workflow_realizations.WF_OnlyWithoutValue_Filter;
 import com.teraim.nils.dynamic.workflow_realizations.WF_SorterWidget;
 
@@ -94,7 +94,7 @@ public class ListInputTemplate extends Executor {
 	Filter f = new WF_OnlyWithoutValue_Filter();
 	private boolean toggleStateH = true;
 	private void hideEdited(String target) {
-		final WF_List fieldList = (WF_List)myContext.getFilterable(target);
+		final WF_Static_List fieldList = (WF_Static_List)myContext.getFilterable(target);
 		if (toggleStateH) {
 			fieldList.addFilter(f);
 		} else

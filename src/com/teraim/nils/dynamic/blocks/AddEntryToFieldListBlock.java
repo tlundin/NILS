@@ -2,7 +2,7 @@ package com.teraim.nils.dynamic.blocks;
 
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
-import com.teraim.nils.dynamic.workflow_realizations.WF_List;
+import com.teraim.nils.dynamic.workflow_realizations.WF_Static_List;
 
 
 
@@ -28,7 +28,7 @@ public class AddEntryToFieldListBlock extends Block {
 	
 	public void create(WF_Context myContext) {
 		o = GlobalState.getInstance(myContext.getContext()).getLogger();
-		WF_List myList = myContext.getList(target);
+		WF_Static_List myList = myContext.getList(target);
 
 		if (myList==null) {
 			o.addRow("");

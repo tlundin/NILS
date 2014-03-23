@@ -15,7 +15,7 @@ import com.teraim.nils.dynamic.workflow_abstracts.Event.EventType;
 import com.teraim.nils.dynamic.workflow_abstracts.EventGenerator;
 import com.teraim.nils.dynamic.workflow_abstracts.EventListener;
 
-public class WF_List_UpdateOnSaveEvent extends WF_List implements EventListener,EventGenerator{
+public class WF_List_UpdateOnSaveEvent extends WF_Static_List implements EventListener,EventGenerator{
 
 	
 	Map<String,WF_ClickableField_Selection> entryFields = new HashMap<String,WF_ClickableField_Selection>();

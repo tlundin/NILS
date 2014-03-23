@@ -5,7 +5,7 @@ import java.util.Set;
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
-import com.teraim.nils.dynamic.workflow_realizations.WF_List;
+import com.teraim.nils.dynamic.workflow_realizations.WF_Static_List;
 
 public class AddVariableToEveryListEntryBlock extends Block {
 
@@ -34,7 +34,7 @@ public class AddVariableToEveryListEntryBlock extends Block {
 	
 	public Set<Variable> create(WF_Context myContext) {
 		
-		WF_List l = myContext.getList(target);
+		WF_Static_List l = myContext.getList(target);
 		o = GlobalState.getInstance(myContext.getContext()).getLogger();
 		if (l==null) {
 			o.addRow("");

@@ -33,6 +33,7 @@ import com.teraim.nils.FileLoadedCb.ErrorCode;
 import com.teraim.nils.GlobalState;
 import com.teraim.nils.R;
 import com.teraim.nils.dynamic.templates.FotoTemplate;
+import com.teraim.nils.dynamic.templates.LinjePortalTemplate;
 import com.teraim.nils.dynamic.templates.ProvytaTemplate;
 import com.teraim.nils.dynamic.templates.RutaTemplate;
 import com.teraim.nils.dynamic.templates.TagTemplate;
@@ -399,7 +400,7 @@ public class Start extends MenuActivity {
 
 	private void createDrawerMenu(String[] wfs) {
 
-		final String[] mainItems = {"Välj Ruta","Välj Provyta","Tåg och delytor","Ta bilder och geo"};
+		final String[] mainItems = {"Ruta","Provyta","Linjer","Tåg och delytor","Ta bilder och geo"};
 
 		items.clear();
 		//Add "static" headers to menu.
@@ -491,10 +492,13 @@ public class Start extends MenuActivity {
 				fragment = new RutaTemplate();
 		else if (position == p++)
 			fragment = new ProvytaTemplate();
+		else if (position == p++)
+			fragment = new LinjePortalTemplate();
 		else if (position == p++) 
 				fragment = new TagTemplate();
 		else if (position == p++) 
-					fragment = new FotoTemplate();			
+					fragment = new FotoTemplate();
+		
 		else
 			fragment = new Fragment();
 		

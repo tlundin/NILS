@@ -9,7 +9,7 @@ import com.teraim.nils.dynamic.VariableConfiguration;
 import com.teraim.nils.dynamic.workflow_abstracts.Container;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Alphanumeric_Sorter;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
-import com.teraim.nils.dynamic.workflow_realizations.WF_List;
+import com.teraim.nils.dynamic.workflow_realizations.WF_Static_List;
 import com.teraim.nils.dynamic.workflow_realizations.WF_List_UpdateOnSaveEvent;
 import com.teraim.nils.dynamic.workflow_realizations.WF_OnlyWithValue_Filter;
 import com.teraim.nils.dynamic.workflow_realizations.WF_TimeOrder_Sorter;
@@ -36,7 +36,7 @@ public class BlockCreateListEntriesFromFieldList extends Block {
 
 	public void create(WF_Context myContext) {
 		o = GlobalState.getInstance(myContext.getContext()).getLogger();
-		WF_List myList; 
+		WF_Static_List myList; 
 		VariableConfiguration al = GlobalState.getInstance(myContext.getContext()).getArtLista();
 		List<List<String>>rows = al.getTable().getRowsContaining(selectionField, selectionPattern);
 		Log.d("nils","Number of rows in CreateEntrieFromList "+rows.size());

@@ -7,7 +7,7 @@ import com.teraim.nils.dynamic.VariableConfiguration;
 import com.teraim.nils.dynamic.types.Variable;
 import com.teraim.nils.dynamic.workflow_realizations.WF_ClickableField_Selection;
 import com.teraim.nils.dynamic.workflow_realizations.WF_Context;
-import com.teraim.nils.dynamic.workflow_realizations.WF_List;
+import com.teraim.nils.dynamic.workflow_realizations.WF_Static_List;
 
 public class AddVariableToListEntry extends Block {
 
@@ -37,7 +37,7 @@ public class AddVariableToListEntry extends Block {
 		o = gs.getLogger();
 		VariableConfiguration al = gs.getArtLista();
 		
-		WF_List l= myContext.getList(targetList);
+		WF_Static_List l= myContext.getList(targetList);
 			if (l!=null) {
 				Log.d("nils","Found entry field in AddVariableToListEntry");
 				Variable var = l.addVariableToListEntry(varNameSuffix,isDisplayed,targetField,format,isVisible);

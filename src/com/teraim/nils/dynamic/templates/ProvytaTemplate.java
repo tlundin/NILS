@@ -60,12 +60,13 @@ public class ProvytaTemplate extends Executor implements OnGesturePerformedListe
 	private GestureLibrary gestureLib;
 	private PersistenceHelper ph;
 	private ParameterSafe ps;
+	private EditText vg;
 
 
 
 	private double[] cords;
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(final LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		
 		ps = gs.getSafe();
@@ -80,6 +81,7 @@ public class ProvytaTemplate extends Executor implements OnGesturePerformedListe
 		ViewGroup fieldListPanel = (LinearLayout)v.findViewById(R.id.fieldList);
 		
 		final Spinner pySpinner = (Spinner)fieldListPanel.findViewById(R.id.pySpinner);
+		final Spinner linjeSpinner = (Spinner)fieldListPanel.findViewById(R.id.linjeSpinner);
 		myLayouts.add(root);
 		myLayouts.add(new WF_Container("Field_List_panel_1", fieldListPanel , root));
 		myLayouts.add(new WF_Container("Aggregation_panel_3", aggregatePanel, root));
@@ -126,12 +128,25 @@ public class ProvytaTemplate extends Executor implements OnGesturePerformedListe
 	    List<String> provytor = new ArrayList<String>();
 	    final Variable pyv = gs.getArtLista().getVariableInstance("Current_Provyta");	    
 	    String[] opt = Tools.generateList(gs, pyv);	    
+	    provytor.add("");
 	    for (String s:opt) 
 	    	provytor.add(s);
 	    
 	    ArrayAdapter<String> adp1=new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1,provytor);
 	    adp1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 	    pySpinner.setAdapter(adp1);
+	    
+	    List<String> linjer = new ArrayList<String>();
+	    final Variable liv = gs.getArtLista().getVariableInstance("Current_Linje");
+	    
+	    opt = Tools.generateList(gs, liv);	  
+	    linjer.add("");
+	    for (String s:opt) 
+	    	linjer.add(s);
+	    ArrayAdapter<String> adp2=new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1,linjer);
+	    adp2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+	    linjeSpinner.setAdapter(adp2);
+	    
 	    final RutaAdapter selectedListA = new RutaAdapter(this.getActivity(), R.layout.ruta_list_row, prevProvytor);
 	    selectedList.setAdapter(selectedListA);	
 	    
@@ -142,7 +157,7 @@ public class ProvytaTemplate extends Executor implements OnGesturePerformedListe
             public void onItemSelected(AdapterView<?> arg0, View arg1,
                     int arg2, long arg3) {
                 String pi=pySpinner.getSelectedItem().toString();
-                if (pi.equals(pyv.getValue()))
+                if (pi.length()==0 || pi.equals(pyv.getValue()))
 					Log.d("nils","Samma provyta vald - ingen ändring");
                 else {
 			 
@@ -161,13 +176,32 @@ public class ProvytaTemplate extends Executor implements OnGesturePerformedListe
 
             }
         });
-	    
-	   final EditText vg = (EditText)inflater.inflate(R.layout.gron_lapp, null);
-	    
+	    linjeSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> arg0, View arg1,
+                    int arg2, long arg3) {
+                String pi=linjeSpinner.getSelectedItem().toString();
+                if (pi.length()==0 ||pi.equals(liv.getValue()))
+					Log.d("nils","Samma provyta vald - ingen ändring");
+                else {			 
+						liv.setValue(pi);
+					}	
+				
+			}
+            
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+
+            }
+        });
 	    gron.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
+			 	vg = (EditText)inflater.inflate(R.layout.gron_lapp, null);
 			    AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
 				alert.setTitle("Grön Lapp");
 				alert.setMessage("Berätta om den här provytan!");

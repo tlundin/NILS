@@ -3,15 +3,19 @@ package com.teraim.nils.dynamic.workflow_realizations;
 import android.util.Log;
 import android.view.View;
 
+import com.teraim.nils.GlobalState;
+import com.teraim.nils.dynamic.VariableConfiguration;
 import com.teraim.nils.dynamic.workflow_abstracts.Drawable;
 
 public class WF_Widget extends WF_Thing implements Drawable {
 
 	private View myView;
 	private boolean isVisible;
+	protected VariableConfiguration al;
 	
 	public WF_Widget(String id,View v,boolean isVisible,WF_Context myContext) {
 		super(id);
+		al = GlobalState.getInstance(myContext.getContext()).getArtLista();
 		myView = v;
 		if (!isVisible)
 			hide();

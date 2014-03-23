@@ -17,7 +17,6 @@ public abstract class WF_ListEntry extends WF_Widget implements Listable,Compara
 
 	//String keyVariable=null;
 	List<String> keyRow =null;
-	VariableConfiguration al;
 	String label = "";
 	Variable myVar = null;
 	
@@ -26,16 +25,14 @@ public abstract class WF_ListEntry extends WF_Widget implements Listable,Compara
 
 	public WF_ListEntry(View v,WF_Context ctx,boolean isVisible) {
 		super("LIST_ID",v,isVisible,ctx);
-		al = GlobalState.getInstance(ctx.getContext()).getArtLista();
-		o = GlobalState.getInstance(ctx.getContext()).getLogger();
 	}
 
-	public void setKeyRow(String key) {
-			myVar = al.getVariableInstance(key);
+	public void setKeyRow(Variable var) {
+			myVar = var;
 			if (myVar!=null) {
 				keyRow = myVar.getBackingDataSet();		
 				//Log.d("nils","Calling setKeyRow for "+keyRow.toString());
-				label = al.getEntryLabel(keyRow);
+				label = myVar.getLabel();
 			}
 	}
 

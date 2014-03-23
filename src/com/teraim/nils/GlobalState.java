@@ -109,7 +109,7 @@ public class GlobalState  {
 		db = new DbHelper(ctx,artLista.getTable(),ph);
 		myWfs = thawWorkflows();		
 
-		db.printAuditVariables();
+		//db.printAuditVariables();
 		Tools.scanRutData(ctx.getResources().openRawResource(R.raw.rutdata_v3),this);
 
 		//Event Handler on the Bluetooth interface.

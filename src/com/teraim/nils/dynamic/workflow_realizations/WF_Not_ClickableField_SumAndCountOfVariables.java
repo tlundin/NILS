@@ -17,7 +17,7 @@ import com.teraim.nils.dynamic.workflow_abstracts.Listable;
 public class WF_Not_ClickableField_SumAndCountOfVariables extends
 WF_Not_ClickableField implements EventListener {
 
-	private WF_List targetList;
+	private WF_Static_List targetList;
 	private WF_Context myContext;
 	String myPattern;
 	//Detta är en id för widgeten - inte variabeln!!
