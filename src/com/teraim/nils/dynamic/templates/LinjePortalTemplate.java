@@ -45,13 +45,14 @@ public class LinjePortalTemplate extends Executor  {
 	List<WF_Container> myLayouts;
 	VariableConfiguration al;
 	DbHelper db;
-	ViewGroup myContainer = null;
+	
 	private PersistenceHelper ph;
 	private ParameterSafe ps;
 	private double[] cords;
 	EditText meterEd;
 	String currentYear,currentRuta,currentLinje;
-
+	private LinearLayout aggregatePanel,fieldList,selectedPanel;
+	private WF_Container root;
 	@Override
 	public View onCreateView(final LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -76,21 +77,20 @@ public class LinjePortalTemplate extends Executor  {
 			alert.show();
 		}
 		else {
-			myContext.onResume();
-			myLayouts = new ArrayList<WF_Container>();
-			myContainer = container;
-			WF_Container root = new WF_Container("root", (LinearLayout)v.findViewById(R.id.root), null);
-			LinearLayout aggregatePanel = (LinearLayout)v.findViewById(R.id.aggregates);
-			LinearLayout fieldList = (LinearLayout)v.findViewById(R.id.fieldList);
+			myContext.emptyContianers();
+
+			root = new WF_Container("root", (LinearLayout)v.findViewById(R.id.root), null);
+			aggregatePanel = (LinearLayout)v.findViewById(R.id.aggregates);
+			fieldList = (LinearLayout)v.findViewById(R.id.fieldList);
 			//ListView selectedList = (ListView)v.findViewById(R.id.SelectedL);
-			LinearLayout selectedPanel = (LinearLayout)v.findViewById(R.id.selected);
+			selectedPanel = (LinearLayout)v.findViewById(R.id.selected);
+			myLayouts = new ArrayList<WF_Container>();
 			myLayouts.add(root);
 			myLayouts.add(new WF_Container("Field_List_panel_1", fieldList, root));
 			myLayouts.add(new WF_Container("Aggregation_panel_3", aggregatePanel, root));
 			myLayouts.add(new WF_Container("Filter_panel_4", (LinearLayout)v.findViewById(R.id.filterPanel), root));
 			myLayouts.add(new WF_Container("Field_List_panel_2", selectedPanel, root));
 			myContext.addContainers(getContainers());
-
 
 			//
 			Log.d("nils","year: "+currentYear+" Ruta: "+currentRuta+" Linje: "+currentLinje);
@@ -164,20 +164,22 @@ public class LinjePortalTemplate extends Executor  {
 										//Start workflow here.
 										Log.d("nils","Trying to start workflow "+"wf_"+linjeObjLabel);
 										Workflow wf = gs.getWorkflow("wf_"+linjeObjLabel);
-										Fragment f = wf.createFragment();
-										if (f == null) {
-											o.addRow("");
-											o.addRedText("Couldn't create new fragment...Workflow was named"+wf.getName());
+										if (wf!=null) {
+											Fragment f = wf.createFragment();
+											if (f == null) {
+												o.addRow("");
+												o.addRedText("Couldn't create new fragment...Workflow was named"+wf.getName());
+											}
+											Bundle b = new Bundle();
+											b.putString("workflow_name", "wf_"+linjeObjLabel); //Your id
+											f.setArguments(b); //Put your id to your next Intent
+											//save all changes
+											final FragmentTransaction ft = myContext.getActivity().getFragmentManager().beginTransaction(); 
+											ft.replace(myContext.getRootContainer(), f);
+											ft.addToBackStack(null);
+											ft.commit(); 
+											Log.d("nils","Should have started "+"wf_"+linjeObjLabel);
 										}
-										Bundle b = new Bundle();
-										b.putString("workflow_name", "wf_"+linjeObjLabel); //Your id
-										f.setArguments(b); //Put your id to your next Intent
-										//save all changes
-										final FragmentTransaction ft = myContext.getActivity().getFragmentManager().beginTransaction(); 
-										ft.replace(myContext.getRootContainer(), f);
-										ft.addToBackStack(null);
-										ft.commit(); 
-										Log.d("nils","Should have started "+"wf_"+linjeObjLabel);
 									}
 								}
 							}

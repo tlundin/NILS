@@ -20,6 +20,8 @@ public class WF_Container extends WF_Thing implements Container {
 		super(id);
 		this.parent=parent;
 		me = container;
+		if (container == null)
+			Log.e("nils","UUUU Create container called with null");
 		myItems = new ArrayList<WF_Widget>();
 		
 	}
@@ -69,6 +71,7 @@ public class WF_Container extends WF_Thing implements Container {
 
 	@Override
 	public void remove(WF_Widget d) {
+		
 		myItems.remove(d);
 	}
 
@@ -81,8 +84,10 @@ public class WF_Container extends WF_Thing implements Container {
 	public void removeAll() {
 		Log.d("nils","cleaning up container...");
 		if (myItems!=null) {
+			for (WF_Widget w:myItems) 
+				me.removeView(w.getWidget());
 			myItems = new ArrayList<WF_Widget>();
-			me.removeAllViews();
+			//me.removeAllViews();
 		}
 
 	}

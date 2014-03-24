@@ -371,9 +371,9 @@ public class DbHelper extends SQLiteOpenHelper {
 				s.selection,  // selections
 				s.selectionArgs); //selections args
 
-		if(aff==0) 
-			Log.e("nils","Couldn't delete "+name+" from database. Not found. Sel: "+s.selection+" Args: "+print(s.selectionArgs));
-		else 
+		if(aff!=0) 
+//			Log.e("nils","Couldn't delete "+name+" from database. Not found. Sel: "+s.selection+" Args: "+print(s.selectionArgs));
+//		else 
 			Log.d("deleted", name);
 
 		if (!isLocal)
@@ -404,10 +404,8 @@ public class DbHelper extends SQLiteOpenHelper {
 			Entry<String, String> entry = it.next();			 
 			String value = entry.getValue();
 			String column = getColumnName(entry.getKey());
-			changes+=column+"="+value;
-			if (it.hasNext()) 
-				changes+="|";
-			else {
+			changes+=column+"="+value+"|";
+			if (!it.hasNext()) {
 				changes+="var|"+v.getId();
 				break;	
 			}
@@ -481,7 +479,7 @@ public class DbHelper extends SQLiteOpenHelper {
 		for (int i=0;i<columns.length;i++) {
 			dd+=columns[i]+",";
 		}
-		Log.d("nils","In getvalues with columns "+dd+", selection "+s.selection+" and selectionargs "+print(s.selectionArgs));
+		//Log.d("nils","In getvalues with columns "+dd+", selection "+s.selection+" and selectionargs "+print(s.selectionArgs));
 		//Substitute if possible.		
 		String[] substCols = new String[columns.length];
 		String subs;
@@ -528,7 +526,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
 
 	public String getValue(String name, Selection s,String[] valueCol) {
-		Log.d("nils","In getvalue with name "+name+" and selection "+s.selection+" and selectionargs "+print(s.selectionArgs));
+		//Log.d("nils","In getvalue with name "+name+" and selection "+s.selection+" and selectionargs "+print(s.selectionArgs));
 		//Get cached selectionArgs if exist.
 		//this.printAllVariables();
 		Cursor c = db.query(TABLE_VARIABLES,valueCol,
@@ -536,7 +534,7 @@ public class DbHelper extends SQLiteOpenHelper {
 		if (c != null && c.moveToFirst()) {
 			//Log.d("nils","Cursor count "+c.getCount()+" columns "+c.getColumnCount());
 			String value = c.getString(0);
-			Log.d("nils","Found value in db for "+name+" :"+value);
+			Log.d("nils","GETVALUE ["+name+" :"+value+"]");
 			c.close();		
 			return value;
 		} 
@@ -576,10 +574,11 @@ public class DbHelper extends SQLiteOpenHelper {
 
 
 	public void insertVariable(Variable var,String newValue,boolean isLocal){
+		boolean isReplace = false;
 		String timeStamp = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())+"";
 		final PersistenceHelper ph = GlobalState.getInstance(ctx).getPersistence();
 		//for logging
-		Log.d("nils", "Inserting variable "+var.getId()+" into database with value "+var.getValue()); 
+		Log.d("nils", "INSERT VALUE ["+var.getId()+": "+var.getValue()+"] Local: "+isLocal); 
 
 		//Delete any existing value.
 		deleteVariable(var.getId(),var.getSelection(),true);
@@ -588,18 +587,16 @@ public class DbHelper extends SQLiteOpenHelper {
 		//Key need to be updated?
 		if (var.isKeyVariable()) {
 			Log.d("nils","updating key to "+newValue);
-			Log.d("nils","Size before: "+var.getKeyChain().size());
 			String oldValue = var.getKeyChain().put(var.getValueColumnName(), newValue);
-			Log.d("nils","oldValue: "+oldValue);
-			Log.d("nils","Size after: "+var.getKeyChain().size());
-			Log.d("nils","Sele size before: "+var.getSelection().selectionArgs.length);
 			var.getSelection().selectionArgs=createSelectionArgs(var.getKeyChain(),var.getId());
-			Log.d("nils","Sele size after: "+var.getSelection().selectionArgs.length);
 			//Check if the new chain leads to existing variable.
 			int id = getId(var.getId(),var.getSelection());
 			//Found match. Replace.
-			if (id!=-1)
+			if (id!=-1) {
+				Log.d("nils","variable exists");
 				values.put("id", id);
+				isReplace=true;
+			}
 		}
 		// 1. create ContentValues to add key "column"/value
 
@@ -607,28 +604,36 @@ public class DbHelper extends SQLiteOpenHelper {
 		Map<String,String> keyChain=var.getKeyChain();
 		//If no key column mappings, skip. Variable is global with Id as key.
 		if (keyChain!=null) {
-			Log.d("nils","keychain has "+keyChain.size()+" elements");
+			//			Log.d("nils","keychain has "+keyChain.size()+" elements");
 			for(String key:keyChain.keySet()) {
 				String value = keyChain.get(key);
 				String column = getColumnName(key);
 				values.put(column,value);
-				Log.d("nils","Adding column "+column+"(key):"+key+" with value "+value);
+				//				Log.d("nils","Adding column "+column+"(key):"+key+" with value "+value);
 			}
-		} else
-			Log.d("nils","Inserting global variable "+var.getId()+" value: "+newValue);
+		} //else
+		//	Log.d("nils","Inserting global variable "+var.getId()+" value: "+newValue);
 		values.put("var", var.getId());
-		values.put(var.getValueColumnName(), newValue);
+		if (!var.isKeyVariable())
+			values.put(getColumnName(var.getValueColumnName()), newValue);
 		values.put("lag",ph.get(PersistenceHelper.LAG_ID_KEY));
 		values.put("timestamp", timeStamp);
 		values.put("author", ph.get(PersistenceHelper.USER_ID_KEY));
 
 		// 3. insert
 		long rId;
-		rId = db.insert(TABLE_VARIABLES, // table
-				null, //nullColumnHack
-				values
-				); 
+		if (isReplace) {
+			rId = db.replace(TABLE_VARIABLES, // table
+					null, //nullColumnHack
+					values
+					); 
 
+		} else {
+			rId = db.insert(TABLE_VARIABLES, // table
+					null, //nullColumnHack
+					values
+					); 
+		}
 
 		if (rId==-1) {
 			Log.e("nils","Could not insert variable "+var.getId());
@@ -636,14 +641,15 @@ public class DbHelper extends SQLiteOpenHelper {
 			//If this variable is not local, store the action for synchronization.
 			if (!isLocal) {
 				Map <String,String> valueSet = new HashMap<String,String>();
-				valueSet.put(var.getValueColumnName(), newValue);
+				if (!var.isKeyVariable())
+					valueSet.put(getColumnName(var.getValueColumnName()), newValue);
 				valueSet.put("lag",ph.get(PersistenceHelper.LAG_ID_KEY));
 				valueSet.put("timestamp", timeStamp);
 				valueSet.put("author", ph.get(PersistenceHelper.USER_ID_KEY));
 				insertAuditEntry(var,valueSet);
 			}
-			else
-				Log.d("nils","Variable "+var.getId()+" not inserted in Audit: local");
+			//else
+			//	Log.d("nils","Variable "+var.getId()+" not inserted in Audit: local");
 		}
 	}
 
@@ -687,8 +693,8 @@ public class DbHelper extends SQLiteOpenHelper {
 	Map <Set<String>,String>cachedSelArgs = new HashMap<Set<String>,String>();
 
 	public static class Selection {
-		String[] selectionArgs=null;
-		String selection=null;
+		public String[] selectionArgs=null;
+		public String selection=null;
 	}
 
 	public Selection createSelection(Map<String, String> keySet, String name) {
@@ -758,7 +764,7 @@ public class DbHelper extends SQLiteOpenHelper {
 		//If keyset is null, the variable is potentially global with only name as a key.
 		String selection=null;
 		if (keySet!=null) {
-			selection = cachedSelArgs.get(keySet.keySet());
+			//selection = cachedSelArgs.get(keySet.keySet());
 			if (selection!=null) {
 				Log.d("nils","found cached selArgs: "+selection);
 			} else {
@@ -931,5 +937,7 @@ public class DbHelper extends SQLiteOpenHelper {
 			Log.d("nils","maxstamp 0");
 	}
 
+	
+	
 
 }

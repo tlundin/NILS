@@ -1,9 +1,9 @@
 package com.teraim.nils.dynamic;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import android.content.Context;
 import android.os.Handler;
@@ -18,7 +18,7 @@ import com.teraim.nils.non_generics.Constants;
 
 public class EventBroker {
 
-	Map<EventType,List<EventListener>> eventListeners= new HashMap<EventType,List<EventListener>>();
+	Map<EventType,List<EventListener>> eventListeners= new ConcurrentHashMap<EventType,List<EventListener>>();
 	private Context ctx;
 	
 	public EventBroker(Context ctx) {
@@ -43,9 +43,11 @@ public class EventBroker {
 			Log.d("nils","No eventlistener exists for event "+e.getType().name());
 		} else {
 			Log.d("nils","sending event to "+els.size()+" listeners");
+
 		for(EventListener el:els)
 			el.onEvent(e);
 		}
+		
 		if (e instanceof WF_Event_OnSave && e.getProvider()!=Constants.SYNC_ID) {
 			Log.d("nils","Save event...sending delayed sync request");
 			new Handler().postDelayed(new Runnable() {
@@ -54,6 +56,10 @@ public class EventBroker {
 				}
 			}, 2000);
 		} 
+	}
+	
+	public void removeAllListeners() {
+		eventListeners.clear();
 	}
 	
 }

@@ -307,7 +307,7 @@ public class Start extends MenuActivity {
 				if(ph.get(PersistenceHelper.USER_ID_KEY).equals(PersistenceHelper.UNDEFINED))
 					ph.put(PersistenceHelper.USER_ID_KEY, "Mulle");
 				
-
+				gs.sendEvent(MenuActivity.REDRAW);
 			}
 
 			break;

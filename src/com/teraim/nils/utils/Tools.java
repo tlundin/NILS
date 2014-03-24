@@ -372,7 +372,7 @@ public class Tools {
 	public static SpinnerDefinition scanSpinerDef(Context myC, LoggerI o) {
 
 		int noOfC=-1;
-		int noOfRequiredColumns=3;
+		int noOfRequiredColumns=5;
 		SpinnerDefinition sd=null;
 		// Create dummylogger if o set to null.
 		if (o==null)
@@ -406,13 +406,19 @@ public class Tools {
 			Log.d("nils","spinnerheader: "+header);
 			String curId=null;
 			while((row = br.readLine())!=null) {
-				//Log.d("nils","SPINNING ROW: "+row);
-				String[]  r = row.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)",-1);
+				Log.d("nils","SPINNING ROW: "+row);
+				String[]  r = split(row);
 				if (r.length<noOfRequiredColumns) {
-					Log.d("nils","TOO SHORT ROW on line in spinnerdef file."+rowC);
+					Log.d("nils","TOO SHORT ROW on line in spinnerdef file."+rowC+" length: "+r.length);
+					for (int i=0;i<r.length;i++)
+						Log.d("nils","R"+i+":"+r[i]);
 					o.addRow("");
 					o.addRow("Line "+rowC+" of SpinnerDef file too short: "+row);
 				} else {
+					
+					//for (int i=0;i<r.length;i++)
+					//	Log.d("nils","R"+i+":"+r[i]);
+
 					String id = r[0];
 					if (curId==null || !id.equals(curId)) {
 						sl = new ArrayList<SpinnerElement>();
@@ -681,5 +687,40 @@ public class Tools {
 			return null;
 		} else
 			return Double.toString(exp.value());	
+	}
+	
+	
+	public static String[] split(String input) {
+		List<String> result = new ArrayList<String>();
+		int start = 0;
+		boolean inQuotes = false;
+		for (int current = 0; current < input.length(); current++) {
+		    if (input.charAt(current) == '\"') inQuotes = !inQuotes; // toggle state
+		    boolean atLastChar = (current == input.length() - 1);
+		    if(atLastChar) {
+		    	if (input.charAt(current) == ',') {
+		    		if (start==current)
+		    			result.add("");
+		    		else
+		    			result.add(input.substring(start,current));
+		    		result.add("");
+		    	} else {
+		    		//Log.d("nils","Last char: "+input.charAt(current));
+		    		result.add(input.substring(start));
+		    	}
+		    }
+		    else if (input.charAt(current) == ',' && !inQuotes) {
+		    	String toAdd = input.substring(start, current);
+		    	//Log.d("Adding",toAdd);
+
+		        result.add(toAdd);
+		        start = current + 1;
+		    }
+		}
+		if (result.size()==0)
+			return new String[]{input};
+		else
+			return result.toArray(new String[0]);
+		
 	}
 }

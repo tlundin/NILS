@@ -17,8 +17,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.teraim.nils.GlobalState;
@@ -94,12 +97,12 @@ public abstract class Executor extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		activity = this.getActivity();
-		myContext = new WF_Context((Context)activity,this,R.id.content_frame);
 		gs = GlobalState.getInstance((Context)activity);
-		gs.setCurrentContext(myContext);
 		o = gs.getLogger();
 		wf = getFlow();
-
+		
+		myContext = new WF_Context((Context)activity,this,R.id.content_frame);
+		gs.setCurrentContext(myContext);
 
 		ifi = new IntentFilter();
 		ifi.addAction(BluetoothConnectionService.SYNK_DATA_RECEIVED);
@@ -116,16 +119,6 @@ public abstract class Executor extends Fragment {
 
 
 
-
-
-
-
-
-
-
-	/* (non-Javadoc)
-	 * @see android.app.Fragment#onResume()
-	 */
 	@Override
 	public void onResume() {
 		activity.registerReceiver(brr, ifi);
@@ -352,6 +345,8 @@ public abstract class Executor extends Fragment {
 
 			}
 			else if (b instanceof ConditionalContinuationBlock) {
+				o.addRow("");
+				o.addYellowText("ConditionalContinuationBlock found");
 				final ConditionalContinuationBlock bl = (ConditionalContinuationBlock)b;
 				final String formula = bl.getFormula();
 				final Set<Entry<String, DataType>> vars = Tools.parseFormula(gs, formula);
@@ -364,34 +359,39 @@ public abstract class Executor extends Fragment {
 						public void onEvent(Event e) {
 							//If evaluation different than earlier, re-render workflow.
 							if(bl.evaluate(gs,formula,vars)) {
-								myContext.onResume();
-								myContext = new WF_Context((Context)activity,Executor.this,R.id.content_frame);
-								myContext.addContainers(getContainers());	
-								Set<Variable> previouslyVisibleVars = visiVars;
-								run();
-								for (Variable v:previouslyVisibleVars) {
-									Log.d("nils","Previously visible: "+v.getId());
-									boolean found = false;
-									for(Variable x:visiVars) {									
-										found = x.getId().equals(v.getId());
-										if (found)
-											break;
+								//myContext.onResume();
+								new Handler().postDelayed(new Runnable() {
+									public void run() {
+										myContext.emptyContianers();
+										Set<Variable> previouslyVisibleVars = visiVars;
+										Executor.this.run();
+										for (Variable v:previouslyVisibleVars) {
+											Log.d("nils","Previously visible: "+v.getId());
+											boolean found = false;
+											for(Variable x:visiVars) {									
+												found = x.getId().equals(v.getId());
+												if (found)
+													break;
+											}
+											
+											if (!found) {
+												Log.d("nils","Variable "+v.getId()+" not found.Removing");
+												v.deleteValue();
+											}
+												
+										}	
 									}
-									
-									if (!found) {
-										Log.d("nils","Variable "+v.getId()+" not found.Removing");
-										v.deleteValue();
-									}
-										
-								}
+								}, 0);
+								
 							}
 
 						}
-					};				
+					};		
+					Log.d("nils","Adding eventlistener for the conditional block");
 					myContext.addEventListener(tiva, EventType.onSave);	
 					//trigger event.
-					if (bl.getCurrentEval()==null)
-						bl.evaluate(gs,formula,vars);
+					//if (bl.getCurrentEval()==null)
+					bl.evaluate(gs,formula,vars);
 
 					switch (bl.getCurrentEval()) {
 					case ConditionalContinuationBlock.STOP:
@@ -405,8 +405,11 @@ public abstract class Executor extends Fragment {
 					}
 
 				}
-				else 
+				else {
+					o.addRow("");
+					o.addRedText("Parsing of formula failed - no variables: ["+formula+"]");
 					Log.d("nils","Parsing of formula failed - no variables: ["+formula+"]");
+				}
 			}
 			String cId = b.getBlockId();
 			String jNext = jump.get(cId);

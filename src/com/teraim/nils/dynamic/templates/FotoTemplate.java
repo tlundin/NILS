@@ -44,7 +44,7 @@ import com.teraim.nils.utils.ImageHandler;
 public class FotoTemplate extends Executor implements OnGesturePerformedListener, LocationListener {
 
 	List<WF_Container> myLayouts;
-	ViewGroup myContainer = null;
+	
 	private GestureLibrary gestureLib;
 	private ToggleButton gpsB;
 	private TextView gpsT,GPS_X,GPS_Y;
@@ -66,17 +66,15 @@ public class FotoTemplate extends Executor implements OnGesturePerformedListener
 	private TextView spT;
 	private TextView sydT;
 
-
+	private View v;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		myContext.onResume();
-		myLayouts = new ArrayList<WF_Container>();
+		myContext.emptyContianers();
 		Log.d("nils","in onCreateView of foto template");
-		myContainer = container;
-		View v = inflater.inflate(R.layout.template_foto, container, false);	
-		WF_Container root = new WF_Container("root", (RelativeLayout)v.findViewById(R.id.root), null);
-		myLayouts.add(root);
+		
+		v = inflater.inflate(R.layout.template_foto, container, false);	
+
 		//		myLayouts.add(new WF_Container("Field_List_panel_1", (LinearLayout)v.findViewById(R.id.fieldList), root));
 		//		myLayouts.add(new WF_Container("Aggregation_panel_3", (LinearLayout)v.findViewById(R.id.aggregates), root));
 		//		myLayouts.add(new WF_Container("Description_panel_1", (FrameLayout)v.findViewById(R.id.Description), root));
@@ -244,6 +242,8 @@ public class FotoTemplate extends Executor implements OnGesturePerformedListener
 
 	@Override
 	protected List<WF_Container> getContainers() {
+		myLayouts = new ArrayList<WF_Container>();
+		myLayouts.add(new WF_Container("root", (RelativeLayout)v.findViewById(R.id.root), null));
 		return myLayouts;
 	}
 

@@ -64,7 +64,7 @@ public class RutaTemplate extends Executor implements OnGesturePerformedListener
 			Bundle savedInstanceState) {
 		
 		ps = gs.getSafe();
-		myContext.onResume();
+		myContext.emptyContianers();
 		myLayouts = new ArrayList<WF_Container>();
 		Log.d("nils","in onCreateView of provyta_template");
 		myContainer = container;

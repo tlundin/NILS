@@ -39,7 +39,7 @@ public class ListInputTemplate extends Executor {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		myContext.onResume();
+		myContext.emptyContianers();
 		myLayouts = new ArrayList<WF_Container>();
 		Log.d("nils","in onCreateView");
 		myContainer = container;

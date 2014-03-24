@@ -27,7 +27,7 @@ public class WF_Context {
 	private Map<String,Drawable> drawables;
 	private List<WF_Container> containers;
 	private final Executor myTemplate;
-	private final EventBroker eventBroker;
+	private EventBroker eventBroker;
 	//ID for the container containing the template itself
 	private final int rootContainerId;
 
@@ -118,23 +118,21 @@ public class WF_Context {
 
 	
 	
-	public void onResume() {
+	public void emptyContianers() {
 		if (containers!=null)
-			for (Container c:containers) {
-				if (c!=null)
+			for (Container c:containers) 
 					c.removeAll();
-			}
 		if (lists.size()!=0) {
 			lists.clear();
-			containers.clear();
 			drawables.clear();
+			eventBroker.removeAllListeners();
 		}
 	}
 
 	//draws all containers traversing the tree.
 	public void drawRecursively(Container c) {
 		if (c==null) {
-			Log.e("nils","This container has no elements.");
+			Log.e("nils","This container is null");
 			return;
 		}
 
@@ -150,8 +148,10 @@ public class WF_Context {
 			Container parent;
 			for(Container c:containers) {
 				parent = c.getParent();
-				if (parent == null) 
+				if (parent == null) {
+					//Log.e("nils","Parent is null in getChildren");
 					continue;
+				}
 				if (parent.equals(key))
 					ret.add(c);
 			}
@@ -165,6 +165,7 @@ public class WF_Context {
 
 	public void addEventListener(EventListener el,
 			EventType et) {
+		
 		eventBroker.registerEventListener(et, el);
 	}
 
@@ -176,6 +177,11 @@ public class WF_Context {
 	}
 	public int getRootContainer() {
 		return rootContainerId;
+	}
+	public void onCreateView() {
+		this.emptyContianers();
+		if (containers!=null)
+			containers.clear();
 	}
 	
 	

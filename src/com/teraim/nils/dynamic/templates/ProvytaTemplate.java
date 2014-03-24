@@ -70,7 +70,7 @@ public class ProvytaTemplate extends Executor implements OnGesturePerformedListe
 			Bundle savedInstanceState) {
 		
 		ps = gs.getSafe();
-		myContext.onResume();
+		myContext.emptyContianers();
 		myLayouts = new ArrayList<WF_Container>();
 		Log.d("nils","in onCreateView of provyta_template");
 		myContainer = container;
@@ -128,7 +128,7 @@ public class ProvytaTemplate extends Executor implements OnGesturePerformedListe
 	    List<String> provytor = new ArrayList<String>();
 	    final Variable pyv = gs.getArtLista().getVariableInstance("Current_Provyta");	    
 	    String[] opt = Tools.generateList(gs, pyv);	    
-	    provytor.add("");
+	    provytor.add("-");
 	    for (String s:opt) 
 	    	provytor.add(s);
 	    
@@ -140,13 +140,16 @@ public class ProvytaTemplate extends Executor implements OnGesturePerformedListe
 	    final Variable liv = gs.getArtLista().getVariableInstance("Current_Linje");
 	    
 	    opt = Tools.generateList(gs, liv);	  
-	    linjer.add("");
+	    linjer.add("-");
 	    for (String s:opt) 
 	    	linjer.add(s);
 	    ArrayAdapter<String> adp2=new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1,linjer);
 	    adp2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 	    linjeSpinner.setAdapter(adp2);
-	    
+	    if (pyv.getValue()!=null)
+	    	pySpinner.setSelection(adp1.getPosition(pyv.getValue()));
+	    if (liv.getValue()!=null)
+	    	linjeSpinner.setSelection(adp2.getPosition(liv.getValue()));
 	    final RutaAdapter selectedListA = new RutaAdapter(this.getActivity(), R.layout.ruta_list_row, prevProvytor);
 	    selectedList.setAdapter(selectedListA);	
 	    
@@ -160,11 +163,12 @@ public class ProvytaTemplate extends Executor implements OnGesturePerformedListe
                 if (pi.length()==0 || pi.equals(pyv.getValue()))
 					Log.d("nils","Samma provyta vald - ingen ändring");
                 else {
-			 
-						pyv.setValue(pi);
-						prevProvytor.add(0, Integer.parseInt(pi));
-						selectedListA.notifyDataSetChanged();
-						gs.sendEvent(MenuActivity.REDRAW);
+                		if (!pi.equals("-")) {
+							pyv.setValue(pi);
+							prevProvytor.add(0, Integer.parseInt(pi));
+							selectedListA.notifyDataSetChanged();
+							gs.sendEvent(MenuActivity.REDRAW);
+                		}
 					}	
 				
 			}
@@ -184,7 +188,8 @@ public class ProvytaTemplate extends Executor implements OnGesturePerformedListe
                 String pi=linjeSpinner.getSelectedItem().toString();
                 if (pi.length()==0 ||pi.equals(liv.getValue()))
 					Log.d("nils","Samma provyta vald - ingen ändring");
-                else {			 
+                else {	
+                	if (!pi.equals("-")) 
 						liv.setValue(pi);
 					}	
 				

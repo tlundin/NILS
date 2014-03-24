@@ -222,7 +222,8 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 				Map <String, List<List<String>>> groups=new HashMap<String,List<List<String>>>();
 
 				while((row = br.readLine())!=null) {
-					String[]  r = row.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)",-1);				
+					//String[]  r = row.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)",-1);	
+					String[] r = Tools.split(row);
 					if (r!=null) {
 						for(int i=0;i<r.length;i++) {
 							if (r[i]!=null)
@@ -344,6 +345,10 @@ public class ConfigFileParser extends AsyncTask<Context,Void,ErrorCode>{
 		else 
 			return ErrorCode.newVarPatternVersionLoaded;
 	}
+
+
+
+	
 
 
 

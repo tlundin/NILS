@@ -91,8 +91,13 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			MenuItem x = menu.getItem(0);
-			if (!Tools.isNetworkAvailable(gs.getContext()))
+			List<String> row = myVars.keySet().iterator().next().getBackingDataSet();
+			String url = al.getUrl(row);
+			
+			if (!Tools.isNetworkAvailable(gs.getContext())||url==null||url.length()==0)
 				x.setVisible(false);
+			else
+				x.setVisible(true);
 			return false; // Return false if nothing is done
 		}
 
@@ -471,10 +476,12 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 
 	private void save() {
 		//for now only delytevariabler. 
+		Map<Variable,String>changes = new HashMap<Variable,String>();
 		Iterator<Map.Entry<Variable,View>> it = myVars.entrySet().iterator();
 		while (it.hasNext()) {
 			Map.Entry<Variable,View> pairs = (Map.Entry<Variable,View>)it.next();
 			Variable variable = pairs.getKey();
+			changes.put(variable, variable.getValue());
 			DataType type = variable.getType();
 			View view = pairs.getValue();
 			if (type == DataType.bool) {
@@ -515,7 +522,7 @@ public abstract class WF_ClickableField extends WF_Not_ClickableField implements
 							variable.setValue((String)sp.getSelectedItem());
 					} 
 		}
-		myContext.registerEvent(new WF_Event_OnSave(this.getId()));
+		myContext.registerEvent(new WF_Event_OnSave(this.getId(),changes));
 	}
 
 	@Override
